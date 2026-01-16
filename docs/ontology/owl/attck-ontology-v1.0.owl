@@ -1,0 +1,526 @@
+@prefix attck: <https://example.org/sec/attck#> .
+@prefix core: <https://example.org/sec/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+############################
+# Ontology Declaration
+############################
+
+attck:ATTACKOntology a owl:Ontology ;
+  rdfs:label "ATT&CK (Adversarial Tactics, Techniques, and Common Knowledge) Ontology v1.0" ;
+  rdfs:comment "Frozen, authoritative ontology for ATT&CK adversary behavior taxonomy aligned to MITRE ATT&CK framework and STIX 2.1." ;
+  owl:imports core:CoreOntology .
+
+############################
+# Tactic & Technique Classes
+############################
+
+attck:Tactic a owl:Class ;
+  rdfs:label "Tactic" ;
+  rdfs:comment "High-level strategic objective or goal of an adversary during an attack campaign (e.g., Initial Access, Execution, Persistence, Privilege Escalation)." ;
+  rdfs:subClassOf core:Tactic .
+
+attck:Technique a owl:Class ;
+  rdfs:label "Technique" ;
+  rdfs:comment "Concrete adversary action or method that achieves a tactic objective (e.g., Command and Scripting Interpreter, Remote System Discovery)." ;
+  rdfs:subClassOf core:Technique .
+
+attck:SubTechnique a owl:Class ;
+  rdfs:label "Sub-Technique" ;
+  rdfs:comment "Granular variation, specific implementation, or variant of a technique with distinct detection opportunities (e.g., Bash, Python, PowerShell for Command and Scripting Interpreter)." ;
+  rdfs:subClassOf core:SubTechnique .
+
+############################
+# Adversary Classes
+############################
+
+attck:Group a owl:Class ;
+  rdfs:label "Adversary Group" ;
+  rdfs:comment "Threat actor group, intrusion set, or campaign cluster with identifiable objectives and attack patterns (e.g., APT28, Lazarus Group)." .
+
+attck:Software a owl:Class ;
+  rdfs:label "Software" ;
+  rdfs:comment "Malware, tool, or utility leveraged by threat actors to achieve tactical objectives (e.g., Mimikatz, Emotet)." .
+
+attck:Malware a owl:Class ;
+  rdfs:label "Malware" ;
+  rdfs:comment "Malicious software used in attacks (subset of Software)." ;
+  rdfs:subClassOf attck:Software .
+
+attck:Tool a owl:Class ;
+  rdfs:label "Tool" ;
+  rdfs:comment "Legitimate or custom-developed software used by threat actors (subset of Software)." ;
+  rdfs:subClassOf attck:Software .
+
+attck:Campaign a owl:Class ;
+  rdfs:label "Campaign" ;
+  rdfs:comment "Series of related adversary activities targeting one or more organizations over a defined period." .
+
+############################
+# Detection & Observable Classes
+############################
+
+attck:DataSource a owl:Class ;
+  rdfs:label "Data Source" ;
+  rdfs:comment "Source of observable data for detecting adversary behavior (e.g., Windows Event Logs, Network Traffic, File System)." .
+
+attck:DataComponent a owl:Class ;
+  rdfs:label "Data Component" ;
+  rdfs:comment "Specific data element or record type within a data source (e.g., Process Creation, Logon Session, DNS Query)." .
+
+attck:DetectionAvailability a owl:Class ;
+  rdfs:label "Detection Availability" ;
+  rdfs:comment "Metadata indicating detection capability, reliability, and coverage for technique and data component combinations." .
+
+attck:Platform a owl:Class ;
+  rdfs:label "Platform" ;
+  rdfs:comment "Operating system or platform targeted by a technique (e.g., Windows, macOS, Linux, Cloud Platforms)." .
+
+attck:Asset a owl:Class ;
+  rdfs:label "Asset" ;
+  rdfs:comment "Target asset, resource, or system type that a technique can be used against (e.g., Server, Workstation, Network Device)." .
+
+############################
+# Tactic-Technique Relationships
+############################
+
+attck:contains a owl:ObjectProperty ;
+  rdfs:label "contains" ;
+  rdfs:comment "Tactic includes one or more techniques as methods to achieve its objective." ;
+  rdfs:domain attck:Tactic ;
+  rdfs:range attck:Technique ;
+  owl:inverseOf attck:belongs_to .
+
+attck:belongs_to a owl:ObjectProperty ;
+  rdfs:label "belongs to" ;
+  rdfs:comment "Technique is a method for achieving a specific tactic objective." ;
+  rdfs:domain attck:Technique ;
+  rdfs:range attck:Tactic ;
+  owl:inverseOf attck:contains .
+
+attck:subtechnique_of a owl:ObjectProperty ;
+  rdfs:label "subtechnique of" ;
+  rdfs:comment "Sub-technique is a specialized variant or implementation of parent technique." ;
+  rdfs:domain attck:SubTechnique ;
+  rdfs:range attck:Technique ;
+  a owl:FunctionalProperty ;
+  owl:inverseOf attck:has_subtechnique .
+
+attck:has_subtechnique a owl:ObjectProperty ;
+  rdfs:label "has subtechnique" ;
+  rdfs:comment "Technique has one or more sub-technique variants." ;
+  rdfs:domain attck:Technique ;
+  rdfs:range attck:SubTechnique ;
+  owl:inverseOf attck:subtechnique_of .
+
+############################
+# Adversary Usage Relationships
+############################
+
+attck:uses_technique a owl:ObjectProperty ;
+  rdfs:label "uses technique" ;
+  rdfs:comment "Adversary group or software employs a technique in their operations." ;
+  rdfs:domain [ owl:unionOf (attck:Group attck:Software) ] ;
+  rdfs:range [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  owl:inverseOf attck:used_by_adversary .
+
+attck:used_by_adversary a owl:ObjectProperty ;
+  rdfs:label "used by adversary" ;
+  rdfs:comment "Technique is known to be used by threat actors." ;
+  rdfs:domain [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  rdfs:range [ owl:unionOf (attck:Group attck:Software) ] ;
+  owl:inverseOf attck:uses_technique .
+
+attck:uses_software a owl:ObjectProperty ;
+  rdfs:label "uses software" ;
+  rdfs:comment "Adversary group employs specific software (malware or tool)." ;
+  rdfs:domain [ owl:unionOf (attck:Group attck:Campaign) ] ;
+  rdfs:range attck:Software ;
+  owl:inverseOf attck:used_by_group .
+
+attck:used_by_group a owl:ObjectProperty ;
+  rdfs:label "used by group" ;
+  rdfs:comment "Software is known to be used by threat actor groups." ;
+  rdfs:domain attck:Software ;
+  rdfs:range [ owl:unionOf (attck:Group attck:Campaign) ] ;
+  owl:inverseOf attck:uses_software .
+
+attck:software_implements_technique a owl:ObjectProperty ;
+  rdfs:label "implements technique" ;
+  rdfs:comment "Software implements or provides functionality for specific technique." ;
+  rdfs:domain attck:Software ;
+  rdfs:range [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  owl:inverseOf attck:implemented_by_software .
+
+attck:implemented_by_software a owl:ObjectProperty ;
+  rdfs:label "implemented by software" ;
+  rdfs:comment "Technique can be implemented or executed via specific software." ;
+  rdfs:domain [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  rdfs:range attck:Software ;
+  owl:inverseOf attck:software_implements_technique .
+
+############################
+# Detection & Data Relationships
+############################
+
+attck:detects a owl:ObjectProperty ;
+  rdfs:label "detects" ;
+  rdfs:comment "Data component can detect or identify usage of a technique." ;
+  rdfs:domain attck:DataComponent ;
+  rdfs:range [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  owl:inverseOf attck:detected_by_component .
+
+attck:detected_by_component a owl:ObjectProperty ;
+  rdfs:label "detected by component" ;
+  rdfs:comment "Technique can be detected using specific data component." ;
+  rdfs:domain [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  rdfs:range attck:DataComponent ;
+  owl:inverseOf attck:detects .
+
+attck:has_data_source a owl:ObjectProperty ;
+  rdfs:label "has data source" ;
+  rdfs:comment "Technique can leverage or is detectable via specific data source." ;
+  rdfs:domain [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  rdfs:range attck:DataSource ;
+  owl:inverseOf attck:detects_technique .
+
+attck:detects_technique a owl:ObjectProperty ;
+  rdfs:label "detects technique" ;
+  rdfs:comment "Data source can detect or identify usage of a technique." ;
+  rdfs:domain attck:DataSource ;
+  rdfs:range [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  owl:inverseOf attck:has_data_source .
+
+attck:has_data_component a owl:ObjectProperty ;
+  rdfs:label "has data component" ;
+  rdfs:comment "Technique can be detected via specific data component." ;
+  rdfs:domain [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  rdfs:range attck:DataComponent ;
+  owl:inverseOf attck:component_of_technique .
+
+attck:component_of_technique a owl:ObjectProperty ;
+  rdfs:label "component of technique" ;
+  rdfs:comment "Data component applies to detection of specific technique." ;
+  rdfs:domain attck:DataComponent ;
+  rdfs:range [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  owl:inverseOf attck:has_data_component .
+
+attck:containsComponent a owl:ObjectProperty ;
+  rdfs:label "contains component" ;
+  rdfs:comment "Data source contains specific data component." ;
+  rdfs:domain attck:DataSource ;
+  rdfs:range attck:DataComponent ;
+  owl:inverseOf attck:componentOf .
+
+attck:componentOf a owl:ObjectProperty ;
+  rdfs:label "component of" ;
+  rdfs:comment "Data component is part of a data source." ;
+  rdfs:domain attck:DataComponent ;
+  rdfs:range attck:DataSource ;
+  owl:inverseOf attck:containsComponent .
+
+############################
+# Platform & Asset Targeting
+############################
+
+attck:targets_platform a owl:ObjectProperty ;
+  rdfs:label "targets platform" ;
+  rdfs:comment "Technique is applicable to or targets specific platform." ;
+  rdfs:domain [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  rdfs:range attck:Platform ;
+  owl:inverseOf attck:targeted_by_technique .
+
+attck:targeted_by_technique a owl:ObjectProperty ;
+  rdfs:label "targeted by technique" ;
+  rdfs:comment "Platform can be targeted by specific technique." ;
+  rdfs:domain attck:Platform ;
+  rdfs:range [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  owl:inverseOf attck:targets_platform .
+
+attck:targets_asset a owl:ObjectProperty ;
+  rdfs:label "targets asset" ;
+  rdfs:comment "Technique can be used against specific asset type." ;
+  rdfs:domain [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  rdfs:range attck:Asset ;
+  owl:inverseOf attck:targeted_by ;
+
+attck:targeted_by a owl:ObjectProperty ;
+  rdfs:label "targeted by" ;
+  rdfs:comment "Asset type can be targeted by specific technique." ;
+  rdfs:domain attck:Asset ;
+  rdfs:range [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  owl:inverseOf attck:targets_asset .
+
+############################
+# Campaign & Group Relationships
+############################
+
+attck:part_of_campaign a owl:ObjectProperty ;
+  rdfs:label "part of campaign" ;
+  rdfs:comment "Group activities or incidents are attributed to a specific campaign." ;
+  rdfs:domain attck:Group ;
+  rdfs:range attck:Campaign ;
+  owl:inverseOf attck:includes_group .
+
+attck:includes_group a owl:ObjectProperty ;
+  rdfs:label "includes group" ;
+  rdfs:comment "Campaign involves activities of specific threat group(s)." ;
+  rdfs:domain attck:Campaign ;
+  rdfs:range attck:Group ;
+  owl:inverseOf attck:part_of_campaign .
+
+attck:collaborates_with a owl:ObjectProperty ;
+  rdfs:label "collaborates with" ;
+  rdfs:comment "Two groups coordinate or share resources in operations." ;
+  rdfs:domain attck:Group ;
+  rdfs:range attck:Group ;
+  a owl:SymmetricProperty .
+
+############################
+# Datatype Properties
+############################
+
+attck:technique_id a owl:DatatypeProperty ;
+  rdfs:label "Technique ID" ;
+  rdfs:comment "Canonical ATT&CK technique identifier (e.g., 'T1059', 'T1078.001')." ;
+  rdfs:domain [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+attck:tactic_id a owl:DatatypeProperty ;
+  rdfs:label "Tactic ID" ;
+  rdfs:comment "Canonical ATT&CK tactic identifier (e.g., 'TA0001', 'TA0002')." ;
+  rdfs:domain attck:Tactic ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+attck:name a owl:DatatypeProperty ;
+  rdfs:label "Name" ;
+  rdfs:comment "Human-readable name of technique, tactic, group, or software." ;
+  rdfs:domain [ owl:unionOf (attck:Technique attck:SubTechnique attck:Tactic attck:Group attck:Software attck:Campaign) ] ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+attck:description a owl:DatatypeProperty ;
+  rdfs:label "Description" ;
+  rdfs:comment "Detailed description of technique, tactic, group, or software." ;
+  rdfs:domain [ owl:unionOf (attck:Technique attck:SubTechnique attck:Tactic attck:Group attck:Software) ] ;
+  rdfs:range xsd:string .
+
+attck:killChainPhase a owl:DatatypeProperty ;
+  rdfs:label "Kill Chain Phase" ;
+  rdfs:comment "Position of technique in attack lifecycle (legacy classification)." ;
+  rdfs:domain [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  rdfs:range xsd:string .
+
+attck:tacticName a owl:DatatypeProperty ;
+  rdfs:label "Tactic Name" ;
+  rdfs:comment "Human-readable name of the tactic (e.g., 'Initial Access', 'Execution')." ;
+  rdfs:domain attck:Tactic ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+attck:tacticDescription a owl:DatatypeProperty ;
+  rdfs:label "Tactic Description" ;
+  rdfs:comment "Description of the tactic objective and its role in attack campaigns." ;
+  rdfs:domain attck:Tactic ;
+  rdfs:range xsd:string .
+
+attck:group_id a owl:DatatypeProperty ;
+  rdfs:label "Group ID" ;
+  rdfs:comment "Canonical ATT&CK group identifier (e.g., 'G0001')." ;
+  rdfs:domain attck:Group ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+attck:aliases a owl:DatatypeProperty ;
+  rdfs:label "Aliases" ;
+  rdfs:comment "Known aliases or alternate names for a group (comma-separated or array)." ;
+  rdfs:domain attck:Group ;
+  rdfs:range xsd:string .
+
+attck:software_id a owl:DatatypeProperty ;
+  rdfs:label "Software ID" ;
+  rdfs:comment "Canonical ATT&CK software identifier (e.g., 'S0001')." ;
+  rdfs:domain attck:Software ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+attck:softwareType a owl:DatatypeProperty ;
+  rdfs:label "Software Type" ;
+  rdfs:comment "Type of software: Malware or Tool." ;
+  rdfs:domain attck:Software ;
+  rdfs:range xsd:string .
+
+attck:dataSourceName a owl:DatatypeProperty ;
+  rdfs:label "Data Source Name" ;
+  rdfs:comment "Name of the data source (e.g., 'Windows Event Logs', 'Network Traffic')." ;
+  rdfs:domain attck:DataSource ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+attck:dataSourceDescription a owl:DatatypeProperty ;
+  rdfs:label "Data Source Description" ;
+  rdfs:comment "Description of data source and what it provides." ;
+  rdfs:domain attck:DataSource ;
+  rdfs:range xsd:string .
+
+attck:componentName a owl:DatatypeProperty ;
+  rdfs:label "Component Name" ;
+  rdfs:comment "Name of the data component (e.g., 'Process Creation', 'DNS Query')." ;
+  rdfs:domain attck:DataComponent ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+attck:componentDescription a owl:DatatypeProperty ;
+  rdfs:label "Component Description" ;
+  rdfs:comment "Description of the specific data element or record type." ;
+  rdfs:domain attck:DataComponent ;
+  rdfs:range xsd:string .
+
+attck:platformName a owl:DatatypeProperty ;
+  rdfs:label "Platform Name" ;
+  rdfs:comment "Name of the platform (e.g., 'Windows', 'macOS', 'Linux', 'AWS', 'Azure')." ;
+  rdfs:domain attck:Platform ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+attck:assetName a owl:DatatypeProperty ;
+  rdfs:label "Asset Name" ;
+  rdfs:comment "Name or type of asset (e.g., 'Server', 'Workstation', 'Mobile Device')." ;
+  rdfs:domain attck:Asset ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+attck:assetDescription a owl:DatatypeProperty ;
+  rdfs:label "Asset Description" ;
+  rdfs:comment "Description of the asset type or category." ;
+  rdfs:domain attck:Asset ;
+  rdfs:range xsd:string .
+
+attck:detectionCoverage a owl:DatatypeProperty ;
+  rdfs:label "Detection Coverage" ;
+  rdfs:comment "Estimate of detection coverage for technique-datacomponent pair: Exceptional, Good, Moderate, Poor." ;
+  rdfs:domain attck:DetectionAvailability ;
+  rdfs:range xsd:string .
+
+attck:isMTSRelevant a owl:DatatypeProperty ;
+  rdfs:label "MTS Relevant" ;
+  rdfs:comment "Boolean indicating if technique is relevant to MITRE Threat Sourcing (MTS)." ;
+  rdfs:domain [ owl:unionOf (attck:Technique attck:SubTechnique) ] ;
+  rdfs:range xsd:boolean .
+
+attck:publishedDate a owl:DatatypeProperty ;
+  rdfs:label "Published Date" ;
+  rdfs:comment "Date when technique or group was first published in ATT&CK." ;
+  rdfs:domain [ owl:unionOf (attck:Technique attck:SubTechnique attck:Tactic attck:Group attck:Software) ] ;
+  rdfs:range xsd:date .
+
+attck:lastModifiedDate a owl:DatatypeProperty ;
+  rdfs:label "Last Modified Date" ;
+  rdfs:comment "Date when technique or group definition was last updated." ;
+  rdfs:domain [ owl:unionOf (attck:Technique attck:SubTechnique attck:Tactic attck:Group attck:Software) ] ;
+  rdfs:range xsd:date .
+
+############################
+# Class Constraints (SHACL-informative)
+############################
+
+# Tactic instances MUST have:
+# - tactic_id (functional, required)
+# - tacticName (functional, required)
+# - at least one contains relationship to Technique
+
+# Technique instances MUST have:
+# - technique_id (functional, required)
+# - name (functional, required)
+# - belongs_to at least one Tactic
+# - optional subtechnique relationships
+
+# SubTechnique instances MUST have:
+# - technique_id (functional, required)
+# - subtechnique_of exactly one Technique (functional)
+
+# Group instances MUST have:
+# - group_id (functional, required)
+# - name (functional, required)
+# - uses_technique or uses_software relationship
+
+# Software instances MUST have:
+# - software_id (functional, required)
+# - name (functional, required)
+# - softwareType specified
+
+# DataSource & DataComponent MUST have proper containment relationship
+
+############################
+# Example Instances (Informative)
+############################
+
+# attck:TA0001 a attck:Tactic ;
+#   attck:tactic_id "TA0001" ;
+#   attck:tacticName "Initial Access" ;
+#   attck:tacticDescription "The adversary is trying to get into your network." ;
+#   attck:contains attck:T1189 ;
+#   attck:publishedDate "2017-10-15"^^xsd:date ;
+#   attck:lastModifiedDate "2023-08-01"^^xsd:date .
+#
+# attck:T1189 a attck:Technique ;
+#   attck:technique_id "T1189" ;
+#   attck:name "Drive-by Compromise" ;
+#   attck:description "An adversary gains access to a system through a user visiting a website over the normal course of browsing." ;
+#   attck:belongs_to attck:TA0001 ;
+#   attck:has_subtechnique attck:T1189_001 ;
+#   attck:targets_platform attck:PlatformWindows ;
+#   attck:targets_asset attck:AssetWorkstation ;
+#   attck:has_data_source attck:DSrcNetworkTraffic ;
+#   attck:has_data_component attck:DSrcNetworkTrafficHTTP ;
+#   attck:used_by_adversary attck:G0001 ;
+#   attck:used_by_adversary attck:Emotet ;
+#   attck:publishedDate "2017-10-15"^^xsd:date ;
+#   attck:lastModifiedDate "2023-06-15"^^xsd:date .
+#
+# attck:T1189_001 a attck:SubTechnique ;
+#   attck:technique_id "T1189.001" ;
+#   attck:name "Watering Hole" ;
+#   attck:description "An adversary compromises a website frequently visited by target users." ;
+#   attck:subtechnique_of attck:T1189 .
+#
+# attck:G0001 a attck:Group ;
+#   attck:group_id "G0001" ;
+#   attck:name "APT1" ;
+#   attck:aliases "Comment Crew, Comment Group, Shady RAT" ;
+#   attck:description "APT1 is a Chinese threat group with a focus on intrusions into the aerospace, energy, and IT sectors." ;
+#   attck:uses_technique attck:T1189 ;
+#   attck:uses_software attck:Emotet ;
+#   attck:publishedDate "2013-01-29"^^xsd:date ;
+#   attck:lastModifiedDate "2023-04-12"^^xsd:date .
+#
+# attck:Emotet a attck:Malware ;
+#   attck:software_id "S0367" ;
+#   attck:name "Emotet" ;
+#   attck:softwareType "Malware" ;
+#   attck:description "Emotet is malware that was first discovered by Trend Micro in 2014." ;
+#   attck:uses_technique attck:T1189 ;
+#   attck:used_by_group attck:G0001 ;
+#   attck:publishedDate "2018-04-05"^^xsd:date ;
+#   attck:lastModifiedDate "2023-09-08"^^xsd:date .
+#
+# attck:PlatformWindows a attck:Platform ;
+#   attck:platformName "Windows" .
+#
+# attck:AssetWorkstation a attck:Asset ;
+#   attck:assetName "Workstation" ;
+#   attck:assetDescription "End-user workstation or personal computer." .
+#
+# attck:DSrcNetworkTraffic a attck:DataSource ;
+#   attck:dataSourceName "Network Traffic" ;
+#   attck:dataSourceDescription "Data exfiltrated or transferred over the network." ;
+#   attck:containsComponent attck:DSrcNetworkTrafficHTTP .
+#
+# attck:DSrcNetworkTrafficHTTP a attck:DataComponent ;
+#   attck:componentName "HTTP/HTTPS Traffic" ;
+#   attck:componentDescription "Subset of Network Traffic data focusing on HTTP/HTTPS protocols." ;
+#   attck:detects attck:T1189 .

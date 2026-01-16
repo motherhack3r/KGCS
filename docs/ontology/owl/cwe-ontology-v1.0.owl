@@ -1,0 +1,371 @@
+@prefix cwe: <https://example.org/sec/cwe#> .
+@prefix core: <https://example.org/sec/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+############################
+# Ontology Declaration
+############################
+
+cwe:CWEOntology a owl:Ontology ;
+  rdfs:label "CWE (Common Weakness Enumeration) Ontology v1.0" ;
+  rdfs:comment "Frozen, authoritative ontology for CWE weakness classification aligned to MITRE CWE standard." ;
+  owl:imports core:CoreOntology .
+
+############################
+# Core Classes
+############################
+
+cwe:Weakness a owl:Class ;
+  rdfs:label "Weakness" ;
+  rdfs:comment "Individual weakness entry from CWE standard (e.g., CWE-121: Stack-based Buffer Overflow)." ;
+  rdfs:subClassOf core:Weakness .
+
+cwe:Category a owl:Class ;
+  rdfs:label "Category" ;
+  rdfs:comment "Grouping of weaknesses representing a common abstraction level (e.g., Buffer Overflows)." ;
+  rdfs:subClassOf cwe:Weakness .
+
+cwe:View a owl:Class ;
+  rdfs:label "View" ;
+  rdfs:comment "Perspective or taxonomy view of CWE weaknesses (e.g., CWE/OWASP Top 10, CISQ)." ;
+  rdfs:subClassOf cwe:Weakness .
+
+cwe:Platform a owl:Class ;
+  rdfs:label "Applicable Platform" ;
+  rdfs:comment "Target platform for a weakness (e.g., Windows, Linux, Web Application)." .
+
+cwe:DetectionMethod a owl:Class ;
+  rdfs:label "Detection Method" ;
+  rdfs:comment "Technique used to detect or identify a weakness (e.g., Static Analysis, Dynamic Analysis)." .
+
+cwe:Mitigation a owl:Class ;
+  rdfs:label "Mitigation Strategy" ;
+  rdfs:comment "Recommended mitigation or remediation strategy for a weakness." .
+
+cwe:Consequence a owl:Class ;
+  rdfs:label "Consequence" ;
+  rdfs:comment "Impact of exploiting a weakness (e.g., Confidentiality, Integrity, Availability impact)." .
+
+cwe:DevelopmentPhase a owl:Class ;
+  rdfs:label "Development Phase" ;
+  rdfs:comment "Development lifecycle phase where mitigation is applicable (e.g., Design, Implementation)." .
+
+cwe:Reference a owl:Class ;
+  rdfs:label "Reference" ;
+  rdfs:comment "External reference providing additional context or information about a weakness." .
+
+############################
+# Hierarchical Relationships
+############################
+
+cwe:childOf a owl:ObjectProperty ;
+  rdfs:label "child of" ;
+  rdfs:comment "Hierarchical relationship: source is more specific than target." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range cwe:Weakness ;
+  owl:inverseOf cwe:parentOf .
+
+cwe:parentOf a owl:ObjectProperty ;
+  rdfs:label "parent of" ;
+  rdfs:comment "Hierarchical relationship: source is more general than target (inverse of childOf)." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range cwe:Weakness ;
+  owl:inverseOf cwe:childOf .
+
+cwe:peerOf a owl:ObjectProperty ;
+  rdfs:label "peer of" ;
+  rdfs:comment "Same abstraction level relationship; both weaknesses are at equivalent specificity." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range cwe:Weakness ;
+  a owl:SymmetricProperty .
+
+############################
+# Sequential & Compositional Relationships
+############################
+
+cwe:canPrecede a owl:ObjectProperty ;
+  rdfs:label "can precede" ;
+  rdfs:comment "Source weakness can occur before target weakness in a causal sequence." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range cwe:Weakness ;
+  owl:inverseOf cwe:canFollow .
+
+cwe:canFollow a owl:ObjectProperty ;
+  rdfs:label "can follow" ;
+  rdfs:comment "Source weakness can occur after target weakness in a causal sequence." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range cwe:Weakness ;
+  owl:inverseOf cwe:canPrecede .
+
+cwe:requiredBy a owl:ObjectProperty ;
+  rdfs:label "required by" ;
+  rdfs:comment "Source weakness is a prerequisite for target weakness." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range cwe:Weakness ;
+  owl:inverseOf cwe:requires .
+
+cwe:requires a owl:ObjectProperty ;
+  rdfs:label "requires" ;
+  rdfs:comment "Source weakness requires target weakness as a prerequisite." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range cwe:Weakness ;
+  owl:inverseOf cwe:requiredBy .
+
+cwe:canAlsoBe a owl:ObjectProperty ;
+  rdfs:label "can also be" ;
+  rdfs:comment "Source weakness is an alternative classification of target weakness." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range cwe:Weakness ;
+  a owl:SymmetricProperty .
+
+cwe:startsWith a owl:ObjectProperty ;
+  rdfs:label "starts with" ;
+  rdfs:comment "Sequential relationship: source weakness initiates a sequence ending in target." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range cwe:Weakness .
+
+############################
+# External Taxonomy Mappings (Non-Core References)
+############################
+
+cwe:mapsToCAPEC a owl:ObjectProperty ;
+  rdfs:label "maps to CAPEC" ;
+  rdfs:comment "CWE weakness maps to CAPEC attack pattern (reference to external taxonomy)." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range core:AttackPattern .
+
+cwe:mapsToVulnerability a owl:ObjectProperty ;
+  rdfs:label "maps to CVE" ;
+  rdfs:comment "CWE weakness is involved in specific CVE vulnerability instances." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range core:Vulnerability .
+
+cwe:mapsToWASC a owl:ObjectProperty ;
+  rdfs:label "maps to WASC" ;
+  rdfs:comment "CWE weakness maps to WASC (Web Application Security Consortium) classification." ;
+  rdfs:domain cwe:Weakness .
+
+cwe:mapsToOWASP a owl:ObjectProperty ;
+  rdfs:label "maps to OWASP" ;
+  rdfs:comment "CWE weakness maps to OWASP (Open Web Application Security Project) category." ;
+  rdfs:domain cwe:Weakness .
+
+cwe:mapsToCERT a owl:ObjectProperty ;
+  rdfs:label "maps to CERT" ;
+  rdfs:comment "CWE weakness maps to CERT Secure Coding Standard." ;
+  rdfs:domain cwe:Weakness .
+
+cwe:mapsToPCI a owl:ObjectProperty ;
+  rdfs:label "maps to PCI" ;
+  rdfs:comment "CWE weakness maps to PCI DSS (Payment Card Industry Data Security Standard) requirement." ;
+  rdfs:domain cwe:Weakness .
+
+cwe:mapsToNVD a owl:ObjectProperty ;
+  rdfs:label "maps to NVD" ;
+  rdfs:comment "CWE weakness is utilized in NVD (National Vulnerability Database) CVE entries." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range core:Vulnerability .
+
+cwe:mapsToCISQ a owl:ObjectProperty ;
+  rdfs:label "maps to CISQ" ;
+  rdfs:comment "CWE weakness maps to CISQ (Consortium for Information & Software Quality) standard." ;
+  rdfs:domain cwe:Weakness .
+
+############################
+# Characteristic Properties (Impact & Methods)
+############################
+
+cwe:hasConsequence a owl:ObjectProperty ;
+  rdfs:label "has consequence" ;
+  rdfs:comment "Source weakness results in specific consequence when exploited." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range cwe:Consequence .
+
+cwe:hasDetectionMethod a owl:ObjectProperty ;
+  rdfs:label "has detection method" ;
+  rdfs:comment "Technique or tool that can be used to detect source weakness." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range cwe:DetectionMethod .
+
+cwe:hasMitigation a owl:ObjectProperty ;
+  rdfs:label "has mitigation" ;
+  rdfs:comment "Recommended mitigation or remediation strategy for source weakness." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range cwe:Mitigation .
+
+cwe:appliesTo a owl:ObjectProperty ;
+  rdfs:label "applies to" ;
+  rdfs:comment "Mitigation strategy applies to specific development phase." ;
+  rdfs:domain cwe:Mitigation ;
+  rdfs:range cwe:DevelopmentPhase .
+
+cwe:hasPlatform a owl:ObjectProperty ;
+  rdfs:label "has platform" ;
+  rdfs:comment "Source weakness is applicable to target platform." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range cwe:Platform .
+
+cwe:hasReference a owl:ObjectProperty ;
+  rdfs:label "has reference" ;
+  rdfs:comment "Source weakness is documented by external reference." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range cwe:Reference .
+
+############################
+# View & Category Relationships
+############################
+
+cwe:memberOf a owl:ObjectProperty ;
+  rdfs:label "member of" ;
+  rdfs:comment "Source weakness is a member of target category or view." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range [ owl:unionOf (cwe:Category cwe:View) ] ;
+  owl:inverseOf cwe:containsWeakness .
+
+cwe:containsWeakness a owl:ObjectProperty ;
+  rdfs:label "contains weakness" ;
+  rdfs:comment "Source category or view contains target weakness." ;
+  rdfs:range cwe:Weakness ;
+  rdfs:domain [ owl:unionOf (cwe:Category cwe:View) ] ;
+  owl:inverseOf cwe:memberOf .
+
+############################
+# Datatype Properties
+############################
+
+cwe:cwe_id a owl:DatatypeProperty ;
+  rdfs:label "CWE ID" ;
+  rdfs:comment "Canonical CWE identifier (e.g., 'CWE-121', 'CWE-79')." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+cwe:name a owl:DatatypeProperty ;
+  rdfs:label "Name" ;
+  rdfs:comment "Human-readable name of the weakness." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+cwe:description a owl:DatatypeProperty ;
+  rdfs:label "Description" ;
+  rdfs:comment "Detailed description of the weakness, its nature, and impact." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range xsd:string .
+
+cwe:abstractionLevel a owl:DatatypeProperty ;
+  rdfs:label "Abstraction Level" ;
+  rdfs:comment "Level of abstraction: Class, Base, Variant, or Pillar." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Pillar" "Class" "Base" "Variant") .
+
+cwe:status a owl:DatatypeProperty ;
+  rdfs:label "Status" ;
+  rdfs:comment "Status of weakness definition (Draft, Incomplete, Stable)." ;
+  rdfs:domain cwe:Weakness ;
+  rdfs:range xsd:string .
+
+cwe:scope a owl:DatatypeProperty ;
+  rdfs:label "Consequence Scope" ;
+  rdfs:comment "Scope of consequence impact: Confidentiality, Integrity, Availability, or Access Control." ;
+  rdfs:domain cwe:Consequence ;
+  rdfs:range xsd:string .
+
+cwe:impact a owl:DatatypeProperty ;
+  rdfs:label "Impact Level" ;
+  rdfs:comment "Severity of impact: Low, Medium, or High." ;
+  rdfs:domain cwe:Consequence ;
+  rdfs:range xsd:string .
+
+cwe:method a owl:DatatypeProperty ;
+  rdfs:label "Detection Method" ;
+  rdfs:comment "Name or description of the detection method (e.g., Static Code Analysis)." ;
+  rdfs:domain cwe:DetectionMethod ;
+  rdfs:range xsd:string .
+
+cwe:effectiveness a owl:DatatypeProperty ;
+  rdfs:label "Effectiveness" ;
+  rdfs:comment "Effectiveness rating of detection method or mitigation: Low, Medium, or High." ;
+  rdfs:domain [ owl:unionOf (cwe:DetectionMethod cwe:Mitigation) ] ;
+  rdfs:range xsd:string .
+
+cwe:strategy a owl:DatatypeProperty ;
+  rdfs:label "Mitigation Strategy" ;
+  rdfs:comment "Name or description of the mitigation strategy." ;
+  rdfs:domain cwe:Mitigation ;
+  rdfs:range xsd:string .
+
+cwe:phase a owl:DatatypeProperty ;
+  rdfs:label "Development Phase" ;
+  rdfs:comment "Development lifecycle phase (Architecture, Design, Implementation, Testing, Deployment)." ;
+  rdfs:domain cwe:DevelopmentPhase ;
+  rdfs:range xsd:string .
+
+cwe:url a owl:DatatypeProperty ;
+  rdfs:label "URL" ;
+  rdfs:comment "URL pointing to external reference resource." ;
+  rdfs:domain cwe:Reference ;
+  rdfs:range xsd:anyURI .
+
+cwe:referenceType a owl:DatatypeProperty ;
+  rdfs:label "Reference Type" ;
+  rdfs:comment "Type of reference (e.g., External, Academic, Tool, Measurement)." ;
+  rdfs:domain cwe:Reference ;
+  rdfs:range xsd:string .
+
+############################
+# Class Constraints (SHACL-informative)
+############################
+
+# Weakness instances MUST have:
+# - cwe_id (functional, required)
+# - name (functional, required)
+# - abstraction level (required)
+# - status (required)
+# - at least one relationship (parentOf, childOf, or external mapping)
+
+# Category & View instances MUST:
+# - extend cwe:Weakness
+# - not be parentOf or childOf non-category/view weaknesses
+
+# Consequence, DetectionMethod, Mitigation instances MUST:
+# - have proper domain linkage (hasConsequence, hasDetectionMethod, hasMitigation)
+# - have descriptive properties (scope/method/strategy, effectiveness/impact)
+
+############################
+# Example Instances (Informative)
+############################
+
+# cwe:CWE-121 a cwe:Weakness ;
+#   cwe:cwe_id "CWE-121" ;
+#   cwe:name "Stack-based Buffer Overflow" ;
+#   cwe:description "The product copies an input buffer to on-stack memory without checking the size." ;
+#   cwe:abstractionLevel "Base" ;
+#   cwe:status "Stable" ;
+#   cwe:childOf cwe:CWE-787 ;
+#   cwe:hasConsequence cwe:BufferOverflowConfidentiality ;
+#   cwe:hasDetectionMethod cwe:StaticAnalysis ;
+#   cwe:hasMitigation cwe:BoundsChecking ;
+#   cwe:hasPlatform cwe:PlatformWindows ;
+#   cwe:mapsToCAPEC <https://example.org/capec#CAPEC-100> ;
+#   cwe:mapsToWASC "WASC-14" ;
+#   cwe:hasReference cwe:Ref12345 .
+#
+# cwe:BufferOverflowConfidentiality a cwe:Consequence ;
+#   cwe:scope "Confidentiality" ;
+#   cwe:impact "High" .
+#
+# cwe:StaticAnalysis a cwe:DetectionMethod ;
+#   cwe:method "Static Code Analysis" ;
+#   cwe:effectiveness "High" .
+#
+# cwe:BoundsChecking a cwe:Mitigation ;
+#   cwe:strategy "Implement bounds checking" ;
+#   cwe:effectiveness "High" ;
+#   cwe:appliesTo cwe:PhaseImplementation .
+#
+# cwe:PhaseImplementation a cwe:DevelopmentPhase ;
+#   cwe:phase "Implementation" .

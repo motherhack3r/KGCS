@@ -1,0 +1,91 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+############################
+# Ontology Declaration
+############################
+
+sec:CoreOntology a owl:Ontology ;
+  rdfs:label "Cybersecurity Core Ontology v1.0" ;
+  rdfs:comment "Authoritative, immutable cybersecurity ontology aligned to public standards." .
+
+############################
+# Core Classes
+############################
+
+sec:Platform a owl:Class .
+sec:PlatformConfiguration a owl:Class .
+
+sec:Vulnerability a owl:Class .
+sec:VulnerabilityScore a owl:Class .
+sec:Reference a owl:Class .
+
+sec:Weakness a owl:Class .
+sec:AttackPattern a owl:Class .
+
+sec:Technique a owl:Class .
+sec:SubTechnique a owl:Class ;
+  rdfs:subClassOf sec:Technique .
+
+sec:Tactic a owl:Class .
+
+sec:DefensiveTechnique a owl:Class .
+sec:DetectionAnalytic a owl:Class .
+sec:DeceptionTechnique a owl:Class .
+
+sec:EngagementConcept a owl:Class .
+
+############################
+# Object Properties
+############################
+
+sec:affected_by a owl:ObjectProperty ;
+  rdfs:domain sec:PlatformConfiguration ;
+  rdfs:range sec:Vulnerability .
+
+sec:scored_by a owl:ObjectProperty ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range sec:VulnerabilityScore .
+
+sec:references a owl:ObjectProperty ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range sec:Reference .
+
+sec:caused_by a owl:ObjectProperty ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range sec:Weakness .
+
+sec:exploited_by a owl:ObjectProperty ;
+  rdfs:domain sec:Weakness ;
+  rdfs:range sec:AttackPattern .
+
+sec:implemented_as a owl:ObjectProperty ;
+  rdfs:domain sec:AttackPattern ;
+  rdfs:range sec:Technique .
+
+sec:belongs_to a owl:ObjectProperty ;
+  rdfs:domain sec:Technique ;
+  rdfs:range sec:Tactic .
+
+sec:subtechnique_of a owl:ObjectProperty ;
+  rdfs:domain sec:SubTechnique ;
+  rdfs:range sec:Technique ;
+  owl:cardinality "1"^^xsd:nonNegativeInteger .
+
+sec:mitigated_by a owl:ObjectProperty ;
+  rdfs:domain sec:Technique ;
+  rdfs:range sec:DefensiveTechnique .
+
+sec:detected_by a owl:ObjectProperty ;
+  rdfs:domain sec:Technique ;
+  rdfs:range sec:DetectionAnalytic .
+
+sec:countered_by a owl:ObjectProperty ;
+  rdfs:domain sec:Technique ;
+  rdfs:range sec:DeceptionTechnique .
+
+sec:disrupts a owl:ObjectProperty ;
+  rdfs:domain sec:EngagementConcept ;
+  rdfs:range sec:Technique .

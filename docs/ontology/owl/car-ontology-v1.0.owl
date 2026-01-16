@@ -1,0 +1,415 @@
+@prefix car: <https://example.org/sec/car#> .
+@prefix core: <https://example.org/sec/core#> .
+@prefix d3f: <https://example.org/sec/d3fend#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+############################
+# Ontology Declaration
+############################
+
+car:CAROntology a owl:Ontology ;
+  rdfs:label "CAR (Cyber Analytics Repository) Ontology v1.0" ;
+  rdfs:comment "Frozen, authoritative ontology for CAR response activities and incident handling procedures aligned to the CAR framework." ;
+  owl:imports core:CoreOntology ;
+  owl:imports d3f:D3FENDOntology .
+
+############################
+# Core Classes (Response Hubs)
+############################
+
+car:ResponseHub a owl:Class ;
+  rdfs:label "Response Hub" ;
+  rdfs:comment "Central organizational unit for a coordinated response activity or incident handling procedure." .
+
+car:IncidentResponseTeam a owl:Class ;
+  rdfs:label "Incident Response Team" ;
+  rdfs:comment "Organizational team responsible for orchestrating and executing incident response phases (Preparation, Detection, Containment, Eradication, Recovery, Post-Incident)." ;
+  rdfs:subClassOf car:ResponseHub .
+
+car:ContainmentProtocol a owl:Class ;
+  rdfs:label "Containment Protocol" ;
+  rdfs:comment "Documented procedure to limit the spread, scope, and impact of an active incident or threat." ;
+  rdfs:subClassOf car:ResponseHub .
+
+car:EradicationProcedure a owl:Class ;
+  rdfs:label "Eradication Procedure" ;
+  rdfs:comment "Steps and procedures to identify and remove threat actors, malware, and artifacts from the environment." ;
+  rdfs:subClassOf car:ResponseHub .
+
+car:RecoveryProcedure a owl:Class ;
+  rdfs:label "Recovery Procedure" ;
+  rdfs:comment "Actions and processes to restore systems, data, and services to normal operations." ;
+  rdfs:subClassOf car:ResponseHub .
+
+car:PostIncidentAnalysis a owl:Class ;
+  rdfs:label "Post-Incident Analysis" ;
+  rdfs:comment "Review, analysis, and documentation of incident response activities for lessons learned and process improvement." ;
+  rdfs:subClassOf car:ResponseHub .
+
+############################
+# Supporting Classes
+############################
+
+car:AnalyticFunction a owl:Class ;
+  rdfs:label "Analytic Function" ;
+  rdfs:comment "Functional capability for detection, analysis, or response (e.g., Log Analysis, Network Correlation, Threat Hunting)." .
+
+car:DataSource a owl:Class ;
+  rdfs:label "Data Source" ;
+  rdfs:comment "Source of information used by CAR analytics (e.g., EDR logs, Network packets, Cloud API logs)." .
+
+car:AnalyticDetection a owl:Class ;
+  rdfs:label "Analytic Detection" ;
+  rdfs:comment "Specific detection rule or analytic that identifies malicious activity." .
+
+car:ResponseAction a owl:Class ;
+  rdfs:label "Response Action" ;
+  rdfs:comment "Specific actionable response operation (e.g., Kill process, Block IP, Isolate system)." .
+
+car:ImpactMetric a owl:Class ;
+  rdfs:label "Impact Metric" ;
+  rdfs:comment "Metric quantifying the severity, urgency, or resource requirement of a response activity." .
+
+############################
+# Cross-Standard Integration
+############################
+
+car:triggers a owl:ObjectProperty ;
+  rdfs:label "triggers" ;
+  rdfs:comment "Executing this response hub activates or invokes a D3FEND defensive technique." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range d3f:DefensiveTechnique ;
+  owl:inverseOf d3f:triggeredBy .
+
+car:addresses a owl:ObjectProperty ;
+  rdfs:label "addresses" ;
+  rdfs:comment "Response hub mitigates, detects, or responds to an ATT&CK technique." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range core:Technique ;
+  owl:inverseOf core:addressedBy .
+
+car:targets a owl:ObjectProperty ;
+  rdfs:label "targets" ;
+  rdfs:comment "Response hub is specifically applied to or focused on a particular asset or platform." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range core:Platform .
+
+car:responds_to a owl:ObjectProperty ;
+  rdfs:label "responds to" ;
+  rdfs:comment "Response hub is triggered by or addressing a specific CVE vulnerability." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range core:Vulnerability .
+
+car:mapsToDefenseTechnique a owl:ObjectProperty ;
+  rdfs:label "maps to defensive technique" ;
+  rdfs:comment "Explicit mapping between CAR response hub and D3FEND defensive technique." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range d3f:DefensiveTechnique ;
+  owl:inverseOf d3f:mappedFromCAR .
+
+car:mapsToTechnique a owl:ObjectProperty ;
+  rdfs:label "maps to technique" ;
+  rdfs:comment "Explicit mapping between CAR response hub and ATT&CK technique." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range core:Technique ;
+  owl:inverseOf core:mappedFromCAR .
+
+############################
+# Analytic & Detection Properties
+############################
+
+car:hasAnalyticFunction a owl:ObjectProperty ;
+  rdfs:label "has analytic function" ;
+  rdfs:comment "Response hub employs a specific analytic function for detection or analysis." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range car:AnalyticFunction .
+
+car:requiresDataSource a owl:ObjectProperty ;
+  rdfs:label "requires data source" ;
+  rdfs:comment "Response hub depends on data from specific source(s)." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range car:DataSource .
+
+car:hasDetection a owl:ObjectProperty ;
+  rdfs:label "has detection" ;
+  rdfs:comment "Response hub includes or is enabled by specific detection analytic." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range car:AnalyticDetection .
+
+car:executesAction a owl:ObjectProperty ;
+  rdfs:label "executes action" ;
+  rdfs:comment "Response hub executes or orchestrates specific response action(s)." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range car:ResponseAction .
+
+car:measuredBy a owl:ObjectProperty ;
+  rdfs:label "measured by" ;
+  rdfs:comment "Response hub effectiveness or urgency is measured by impact metric." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range car:ImpactMetric .
+
+############################
+# Temporal & Process Relationships
+############################
+
+car:precedes a owl:ObjectProperty ;
+  rdfs:label "precedes" ;
+  rdfs:comment "Source response hub logically precedes target in incident response workflow." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range car:ResponseHub ;
+  owl:inverseOf car:follows .
+
+car:follows a owl:ObjectProperty ;
+  rdfs:label "follows" ;
+  rdfs:comment "Source response hub logically follows target in incident response workflow." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range car:ResponseHub ;
+  owl:inverseOf car:precedes .
+
+car:enabledBy a owl:ObjectProperty ;
+  rdfs:label "enabled by" ;
+  rdfs:comment "Source response hub is enabled or supported by target response hub." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range car:ResponseHub ;
+  owl:inverseOf car:enables .
+
+car:enables a owl:ObjectProperty ;
+  rdfs:label "enables" ;
+  rdfs:comment "Source response hub enables or supports execution of target response hub." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range car:ResponseHub ;
+  owl:inverseOf car:enabledBy .
+
+car:incompatibleWith a owl:ObjectProperty ;
+  rdfs:label "incompatible with" ;
+  rdfs:comment "Source response hub cannot be executed concurrently with target hub." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range car:ResponseHub ;
+  a owl:SymmetricProperty .
+
+############################
+# Datatype Properties (Metrics & Characteristics)
+############################
+
+car:car_id a owl:DatatypeProperty ;
+  rdfs:label "CAR ID" ;
+  rdfs:comment "Canonical CAR identifier (e.g., 'CAR-001', 'CAR-2023-01-001')." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+car:name a owl:DatatypeProperty ;
+  rdfs:label "Name" ;
+  rdfs:comment "Human-readable name of the response hub or activity." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+car:description a owl:DatatypeProperty ;
+  rdfs:label "Description" ;
+  rdfs:comment "Detailed description of the response hub, its purpose, and execution procedures." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range xsd:string .
+
+car:procedure a owl:DatatypeProperty ;
+  rdfs:label "Procedure" ;
+  rdfs:comment "Step-by-step procedural documentation for executing the response hub." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range xsd:string .
+
+car:mass a owl:DatatypeProperty ;
+  rdfs:label "Mass" ;
+  rdfs:comment "Metric representing urgency, impact severity, or escalation level (0.0 - 1.0)." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range [ a rdfs:Datatype ;
+                owl:withRestrictions (
+                  [ xsd:minInclusive 0.0 ]
+                  [ xsd:maxInclusive 1.0 ]
+                ) ] .
+
+car:energy a owl:DatatypeProperty ;
+  rdfs:label "Energy" ;
+  rdfs:comment "Metric representing resource cost, effort, or complexity required (0.0 - 1.0)." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range [ a rdfs:Datatype ;
+                owl:withRestrictions (
+                  [ xsd:minInclusive 0.0 ]
+                  [ xsd:maxInclusive 1.0 ]
+                ) ] .
+
+car:priority a owl:DatatypeProperty ;
+  rdfs:label "Priority" ;
+  rdfs:comment "Execution priority relative to other response hubs: Critical, High, Medium, Low." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range xsd:string .
+
+car:status a owl:DatatypeProperty ;
+  rdfs:label "Status" ;
+  rdfs:comment "Status of response hub definition: Draft, Active, Deprecated, Archived." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range xsd:string .
+
+car:version a owl:DatatypeProperty ;
+  rdfs:label "Version" ;
+  rdfs:comment "Version number of the response hub definition." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range xsd:string .
+
+car:function a owl:DatatypeProperty ;
+  rdfs:label "Function Name" ;
+  rdfs:comment "Name or type of analytic function (e.g., Log Aggregation, Network Flow Analysis)." ;
+  rdfs:domain car:AnalyticFunction ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+car:functionDescription a owl:DatatypeProperty ;
+  rdfs:label "Function Description" ;
+  rdfs:comment "Description of what the analytic function does." ;
+  rdfs:domain car:AnalyticFunction ;
+  rdfs:range xsd:string .
+
+car:dataSourceName a owl:DatatypeProperty ;
+  rdfs:label "Data Source Name" ;
+  rdfs:comment "Name or identifier of the data source (e.g., 'EDR Agent', 'SIEM', 'DNS Logs')." ;
+  rdfs:domain car:DataSource ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+car:dataSourceType a owl:DatatypeProperty ;
+  rdfs:label "Data Source Type" ;
+  rdfs:comment "Type of data source: Endpoint, Network, Cloud, Identity, Application, Infrastructure." ;
+  rdfs:domain car:DataSource ;
+  rdfs:range xsd:string .
+
+car:detectionRuleName a owl:DatatypeProperty ;
+  rdfs:label "Detection Rule Name" ;
+  rdfs:comment "Name or identifier of the detection rule or correlation logic." ;
+  rdfs:domain car:AnalyticDetection ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+car:detectionLogic a owl:DatatypeProperty ;
+  rdfs:label "Detection Logic" ;
+  rdfs:comment "Description or pseudocode of the detection logic." ;
+  rdfs:domain car:AnalyticDetection ;
+  rdfs:range xsd:string .
+
+car:actionName a owl:DatatypeProperty ;
+  rdfs:label "Action Name" ;
+  rdfs:comment "Name of the response action (e.g., 'Kill Process', 'Block IP', 'Isolate System')." ;
+  rdfs:domain car:ResponseAction ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+car:actionDescription a owl:DatatypeProperty ;
+  rdfs:label "Action Description" ;
+  rdfs:comment "Description of what the response action does and its effects." ;
+  rdfs:domain car:ResponseAction ;
+  rdfs:range xsd:string .
+
+car:actionType a owl:DatatypeProperty ;
+  rdfs:label "Action Type" ;
+  rdfs:comment "Type of action: Prevention, Detection, Containment, Eradication, Recovery, Forensics." ;
+  rdfs:domain car:ResponseAction ;
+  rdfs:range xsd:string .
+
+car:metricName a owl:DatatypeProperty ;
+  rdfs:label "Metric Name" ;
+  rdfs:comment "Name of the impact metric (e.g., 'CVSS Score', 'Affected User Count', 'Data Exfiltrated')." ;
+  rdfs:domain car:ImpactMetric ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+car:metricValue a owl:DatatypeProperty ;
+  rdfs:label "Metric Value" ;
+  rdfs:comment "Numeric or categorical value of the metric." ;
+  rdfs:domain car:ImpactMetric ;
+  rdfs:range xsd:string .
+
+car:metricUnit a owl:DatatypeProperty ;
+  rdfs:label "Metric Unit" ;
+  rdfs:comment "Unit of measurement for the metric (e.g., 'percentage', 'count', 'hours', 'score')." ;
+  rdfs:domain car:ImpactMetric ;
+  rdfs:range xsd:string .
+
+car:publishedDate a owl:DatatypeProperty ;
+  rdfs:label "Published Date" ;
+  rdfs:comment "Date when CAR response hub was first published or defined." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range xsd:date .
+
+car:lastModifiedDate a owl:DatatypeProperty ;
+  rdfs:label "Last Modified Date" ;
+  rdfs:comment "Date when CAR response hub was last updated." ;
+  rdfs:domain car:ResponseHub ;
+  rdfs:range xsd:date .
+
+############################
+# Class Constraints (SHACL-informative)
+############################
+
+# ResponseHub instances MUST have:
+# - car_id (functional, required)
+# - name (functional, required)
+# - status (required)
+# - at least one cross-standard mapping (addresses, mapsToTechnique, etc.)
+
+# IncidentResponseTeam SHOULD reference relevant response phases
+# ContainmentProtocol MUST trigger at least one defensive technique
+# EradicationProcedure & RecoveryProcedure SHOULD target specific platforms/assets
+
+# AnalyticFunction, DataSource, AnalyticDetection, ResponseAction MUST:
+# - have proper domain linkage to ResponseHub
+# - have descriptive properties
+
+############################
+# Example Instances (Informative)
+############################
+
+# car:CAR-2023-001 a car:ContainmentProtocol ;
+#   car:car_id "CAR-2023-001" ;
+#   car:name "Isolate Compromised Workstation" ;
+#   car:description "Protocol to immediately isolate a workstation identified as compromised to prevent lateral movement." ;
+#   car:procedure "1. Disconnect from network. 2. Preserve memory dump. 3. Notify IR team. 4. Begin forensic imaging." ;
+#   car:mass 0.85 ;
+#   car:energy 0.45 ;
+#   car:priority "Critical" ;
+#   car:status "Active" ;
+#   car:version "2.1" ;
+#   car:triggers d3f:NetworkSegmentation ;
+#   car:addresses core:T1021 ;
+#   car:targets core:PlatformWindows ;
+#   car:mapsToDefenseTechnique d3f:NetworkSegmentation ;
+#   car:mapsToTechnique core:T1021 ;
+#   car:hasAnalyticFunction car:FuncLogAnalysis ;
+#   car:requiresDataSource car:DSrcEDRLogs ;
+#   car:hasDetection car:DetectUnusualNetworkActivity ;
+#   car:executesAction car:ActionIsolateHost ;
+#   car:measuredBy car:MetricIncidentScope ;
+#   car:incompatibleWith car:CAR-2023-002 ;
+#   car:publishedDate "2023-01-15"^^xsd:date ;
+#   car:lastModifiedDate "2025-01-10"^^xsd:date .
+#
+# car:FuncLogAnalysis a car:AnalyticFunction ;
+#   car:function "Log Aggregation and Correlation" ;
+#   car:functionDescription "Aggregates logs from endpoint and network sources to identify suspicious patterns." .
+#
+# car:DSrcEDRLogs a car:DataSource ;
+#   car:dataSourceName "EDR Endpoint Logs" ;
+#   car:dataSourceType "Endpoint" .
+#
+# car:DetectUnusualNetworkActivity a car:AnalyticDetection ;
+#   car:detectionRuleName "Unusual Network Connections" ;
+#   car:detectionLogic "Flag connections from isolated host to external IPs on non-standard ports." .
+#
+# car:ActionIsolateHost a car:ResponseAction ;
+#   car:actionName "Isolate Host from Network" ;
+#   car:actionDescription "Removes host from network by disabling network interfaces or blocking at switch level." ;
+#   car:actionType "Containment" .
+#
+# car:MetricIncidentScope a car:ImpactMetric ;
+#   car:metricName "Number of Affected Systems" ;
+#   car:metricValue "1" ;
+#   car:metricUnit "count" .

@@ -1,0 +1,370 @@
+@prefix capec: <https://example.org/sec/capec#> .
+@prefix core: <https://example.org/sec/core#> .
+@prefix cwe: <https://example.org/sec/cwe#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+############################
+# Ontology Declaration
+############################
+
+capec:CAPECOntology a owl:Ontology ;
+  rdfs:label "CAPEC (Common Attack Pattern Enumeration and Classification) Ontology v1.0" ;
+  rdfs:comment "Frozen, authoritative ontology for CAPEC attack pattern classification aligned to MITRE CAPEC standard." ;
+  owl:imports core:CoreOntology ;
+  owl:imports cwe:CWEOntology .
+
+############################
+# Core Classes
+############################
+
+capec:AttackPattern a owl:Class ;
+  rdfs:label "Attack Pattern" ;
+  rdfs:comment "Individual attack pattern entry from CAPEC standard (e.g., CAPEC-130: Excessive Allocation)." ;
+  rdfs:subClassOf core:AttackPattern .
+
+capec:Category a owl:Class ;
+  rdfs:label "Category" ;
+  rdfs:comment "Grouping of attack patterns based on common attack characteristics or methodology." ;
+  rdfs:subClassOf capec:AttackPattern .
+
+capec:View a owl:Class ;
+  rdfs:label "View" ;
+  rdfs:comment "Perspective or aggregated slice of the CAPEC catalog (e.g., Graph View, Functional View)." ;
+  rdfs:subClassOf capec:AttackPattern .
+
+capec:ExternalReference a owl:Class ;
+  rdfs:label "External Reference" ;
+  rdfs:comment "External resource providing additional information, context, or documentation about an attack pattern." .
+
+capec:Prerequisite a owl:Class ;
+  rdfs:label "Prerequisite" ;
+  rdfs:comment "Condition or capability that must be met before executing an attack pattern." .
+
+capec:Consequence a owl:Class ;
+  rdfs:label "Consequence" ;
+  rdfs:comment "Potential outcome or impact of successfully executing an attack pattern." .
+
+capec:Mitigation a owl:Class ;
+  rdfs:label "Mitigation" ;
+  rdfs:comment "Strategy or control to detect, prevent, or mitigate an attack pattern." .
+
+capec:Execution a owl:Class ;
+  rdfs:label "Execution" ;
+  rdfs:comment "Tactical execution details describing how an attack pattern is carried out." .
+
+############################
+# Hierarchical Relationships
+############################
+
+capec:childOf a owl:ObjectProperty ;
+  rdfs:label "child of" ;
+  rdfs:comment "Hierarchical relationship: source attack pattern is more specific than target." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range capec:AttackPattern ;
+  owl:inverseOf capec:parentOf .
+
+capec:parentOf a owl:ObjectProperty ;
+  rdfs:label "parent of" ;
+  rdfs:comment "Hierarchical relationship: source attack pattern is more general than target (inverse of childOf)." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range capec:AttackPattern ;
+  owl:inverseOf capec:childOf .
+
+capec:peerOf a owl:ObjectProperty ;
+  rdfs:label "peer of" ;
+  rdfs:comment "Same abstraction level; source and target are attack patterns at equivalent specificity." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range capec:AttackPattern ;
+  a owl:SymmetricProperty .
+
+############################
+# Sequential & Compositional Relationships
+############################
+
+capec:canPrecede a owl:ObjectProperty ;
+  rdfs:label "can precede" ;
+  rdfs:comment "Source attack pattern can occur before target attack pattern in a causal or tactical sequence." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range capec:AttackPattern ;
+  owl:inverseOf capec:canFollow .
+
+capec:canFollow a owl:ObjectProperty ;
+  rdfs:label "can follow" ;
+  rdfs:comment "Source attack pattern can occur after target attack pattern in a causal or tactical sequence." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range capec:AttackPattern ;
+  owl:inverseOf capec:canPrecede .
+
+capec:canAlsoBe a owl:ObjectProperty ;
+  rdfs:label "can also be" ;
+  rdfs:comment "Source attack pattern is an alternative or variant classification of target pattern." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range capec:AttackPattern ;
+  a owl:SymmetricProperty .
+
+############################
+# Cross-Standard Mappings (Core & CWE Integration)
+############################
+
+capec:mapsTechnique a owl:ObjectProperty ;
+  rdfs:label "maps to technique" ;
+  rdfs:comment "Attack pattern maps to ATT&CK technique (core concept)." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range core:Technique ;
+  owl:inverseOf core:implemented_by .
+
+capec:relatedWeakness a owl:ObjectProperty ;
+  rdfs:label "related weakness" ;
+  rdfs:comment "Attack pattern exploits or is related to CWE weakness." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range cwe:Weakness ;
+  owl:inverseOf cwe:exploitedBy .
+
+############################
+# Membership & Organization
+############################
+
+capec:memberOf a owl:ObjectProperty ;
+  rdfs:label "member of" ;
+  rdfs:comment "Source attack pattern is a member of target category or view." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range [ owl:unionOf (capec:Category capec:View) ] ;
+  owl:inverseOf capec:contains .
+
+capec:contains a owl:ObjectProperty ;
+  rdfs:label "contains" ;
+  rdfs:comment "Source category or view contains target attack pattern." ;
+  rdfs:domain [ owl:unionOf (capec:Category capec:View) ] ;
+  rdfs:range capec:AttackPattern ;
+  owl:inverseOf capec:memberOf .
+
+############################
+# Characteristic Properties
+############################
+
+capec:hasPrerequisite a owl:ObjectProperty ;
+  rdfs:label "has prerequisite" ;
+  rdfs:comment "Attack pattern requires specific prerequisite condition or capability." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range capec:Prerequisite .
+
+capec:hasConsequence a owl:ObjectProperty ;
+  rdfs:label "has consequence" ;
+  rdfs:comment "Potential outcome or impact resulting from successful execution of attack pattern." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range capec:Consequence .
+
+capec:hasMitigation a owl:ObjectProperty ;
+  rdfs:label "has mitigation" ;
+  rdfs:comment "Strategy, control, or defense to detect or prevent attack pattern." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range capec:Mitigation .
+
+capec:hasExecution a owl:ObjectProperty ;
+  rdfs:label "has execution" ;
+  rdfs:comment "Tactical or operational details of how the attack pattern is executed." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range capec:Execution .
+
+capec:hasExternalReference a owl:ObjectProperty ;
+  rdfs:label "has external reference" ;
+  rdfs:comment "Link to external documentation or additional resources." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range capec:ExternalReference .
+
+############################
+# Datatype Properties
+############################
+
+capec:capec_id a owl:DatatypeProperty ;
+  rdfs:label "CAPEC ID" ;
+  rdfs:comment "Canonical CAPEC identifier (e.g., 'CAPEC-130', 'CAPEC-1')." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+capec:name a owl:DatatypeProperty ;
+  rdfs:label "Name" ;
+  rdfs:comment "Human-readable name of the attack pattern." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+capec:description a owl:DatatypeProperty ;
+  rdfs:label "Description" ;
+  rdfs:comment "Detailed description of the attack pattern, its methodology, and attack flow." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range xsd:string .
+
+capec:abstractionLevel a owl:DatatypeProperty ;
+  rdfs:label "Abstraction Level" ;
+  rdfs:comment "Level of abstraction: Meta, Standard, or Detailed." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Meta" "Standard" "Detailed") .
+
+capec:status a owl:DatatypeProperty ;
+  rdfs:label "Status" ;
+  rdfs:comment "Status of attack pattern definition (e.g., Draft, Stable, Deprecated)." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range xsd:string .
+
+capec:severity a owl:DatatypeProperty ;
+  rdfs:label "Severity" ;
+  rdfs:comment "Estimated severity or impact level of attack pattern: Low, Medium, or High." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range xsd:string .
+
+capec:likelihood a owl:DatatypeProperty ;
+  rdfs:label "Likelihood" ;
+  rdfs:comment "Estimated likelihood of attack pattern being used: Low, Medium, or High." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range xsd:string .
+
+capec:skillLevel a owl:DatatypeProperty ;
+  rdfs:label "Skill Level Required" ;
+  rdfs:comment "Skill level required to execute attack pattern: Low, Medium, High, or Expert." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range xsd:string .
+
+capec:prerequisiteDescription a owl:DatatypeProperty ;
+  rdfs:label "Prerequisite Description" ;
+  rdfs:comment "Natural language description of the prerequisite condition." ;
+  rdfs:domain capec:Prerequisite ;
+  rdfs:range xsd:string .
+
+capec:consequenceDescription a owl:DatatypeProperty ;
+  rdfs:label "Consequence Description" ;
+  rdfs:comment "Natural language description of the potential impact or outcome." ;
+  rdfs:domain capec:Consequence ;
+  rdfs:range xsd:string .
+
+capec:consequenceType a owl:DatatypeProperty ;
+  rdfs:label "Consequence Type" ;
+  rdfs:comment "Type of consequence: Confidentiality, Integrity, Availability, Access Control, or Accountability." ;
+  rdfs:domain capec:Consequence ;
+  rdfs:range xsd:string .
+
+capec:mitigationDescription a owl:DatatypeProperty ;
+  rdfs:label "Mitigation Description" ;
+  rdfs:comment "Description of mitigation strategy or control." ;
+  rdfs:domain capec:Mitigation ;
+  rdfs:range xsd:string .
+
+capec:mitigationType a owl:DatatypeProperty ;
+  rdfs:label "Mitigation Type" ;
+  rdfs:comment "Type of mitigation: Prevention, Detection, or Response." ;
+  rdfs:domain capec:Mitigation ;
+  rdfs:range xsd:string .
+
+capec:executionFlow a owl:DatatypeProperty ;
+  rdfs:label "Execution Flow" ;
+  rdfs:comment "Step-by-step tactical flow of the attack pattern execution." ;
+  rdfs:domain capec:Execution ;
+  rdfs:range xsd:string .
+
+capec:executionPhase a owl:DatatypeProperty ;
+  rdfs:label "Execution Phase" ;
+  rdfs:comment "Phase of attack execution: Reconnaissance, Weaponization, Delivery, Exploitation, Installation, Command & Control, Actions on Objectives." ;
+  rdfs:domain capec:Execution ;
+  rdfs:range xsd:string .
+
+capec:referenceTitle a owl:DatatypeProperty ;
+  rdfs:label "Reference Title" ;
+  rdfs:comment "Title or name of the external reference." ;
+  rdfs:domain capec:ExternalReference ;
+  rdfs:range xsd:string .
+
+capec:referenceURL a owl:DatatypeProperty ;
+  rdfs:label "Reference URL" ;
+  rdfs:comment "URL or URI to the external reference." ;
+  rdfs:domain capec:ExternalReference ;
+  rdfs:range xsd:anyURI .
+
+capec:referenceType a owl:DatatypeProperty ;
+  rdfs:label "Reference Type" ;
+  rdfs:comment "Type of reference: Academic, Technical, News, Attack, Tool, Detection, or Policy." ;
+  rdfs:domain capec:ExternalReference ;
+  rdfs:range xsd:string .
+
+capec:publishedDate a owl:DatatypeProperty ;
+  rdfs:label "Published Date" ;
+  rdfs:comment "Date when CAPEC entry was first published." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range xsd:gYear .
+
+capec:lastModifiedDate a owl:DatatypeProperty ;
+  rdfs:label "Last Modified Date" ;
+  rdfs:comment "Date when CAPEC entry was last updated." ;
+  rdfs:domain capec:AttackPattern ;
+  rdfs:range xsd:date .
+
+############################
+# Class Constraints (SHACL-informative)
+############################
+
+# AttackPattern instances MUST have:
+# - capec_id (functional, required)
+# - name (functional, required)
+# - abstraction level (required)
+# - status (required)
+# - at least one hierarchical or mapping relationship
+
+# Category & View instances MUST:
+# - extend capec:AttackPattern
+# - have at least one containment relationship (contains)
+
+# Prerequisite, Consequence, Mitigation, Execution instances MUST:
+# - have proper domain linkage (hasPrerequisite, hasConsequence, hasMitigation, hasExecution)
+# - have descriptive properties (description, type, etc.)
+
+############################
+# Example Instances (Informative)
+############################
+
+# capec:CAPEC-130 a capec:AttackPattern ;
+#   capec:capec_id "CAPEC-130" ;
+#   capec:name "Excessive Allocation" ;
+#   capec:description "An attacker causes the target to allocate excessive resources to unwanted operations or processes." ;
+#   capec:abstractionLevel "Standard" ;
+#   capec:status "Stable" ;
+#   capec:severity "High" ;
+#   capec:likelihood "Medium" ;
+#   capec:skillLevel "Medium" ;
+#   capec:childOf capec:CAPEC-100 ;
+#   capec:mapsTechnique core:T1499 ;
+#   capec:relatedWeakness cwe:CWE-770 ;
+#   capec:memberOf capec:CategoryDoS ;
+#   capec:hasPrerequisite capec:Prereq-NetworkAccess ;
+#   capec:hasConsequence capec:ConsqAvailability ;
+#   capec:hasMitigation capec:MitigResourceLimits ;
+#   capec:hasExecution capec:ExecAllocAttack ;
+#   capec:hasExternalReference capec:RefCAPECOfficial ;
+#   capec:publishedDate "2009"^^xsd:gYear ;
+#   capec:lastModifiedDate "2023-01-15"^^xsd:date .
+#
+# capec:Prereq-NetworkAccess a capec:Prerequisite ;
+#   capec:prerequisiteDescription "Attacker must have network access to target system." .
+#
+# capec:ConsqAvailability a capec:Consequence ;
+#   capec:consequenceDescription "System becomes unavailable due to resource exhaustion." ;
+#   capec:consequenceType "Availability" .
+#
+# capec:MitigResourceLimits a capec:Mitigation ;
+#   capec:mitigationDescription "Implement resource limits and quotas per user/application." ;
+#   capec:mitigationType "Prevention" .
+#
+# capec:ExecAllocAttack a capec:Execution ;
+#   capec:executionFlow "1. Identify resource limits. 2. Craft requests to exceed limits. 3. Send requests repeatedly." ;
+#   capec:executionPhase "Exploitation" .
+#
+# capec:CategoryDoS a capec:Category ;
+#   capec:name "Denial of Service" ;
+#   capec:contains capec:CAPEC-130 .
+#
+# capec:RefCAPECOfficial a capec:ExternalReference ;
+#   capec:referenceTitle "CAPEC-130: Excessive Allocation" ;
+#   capec:referenceURL "https://capec.mitre.org/data/definitions/130.html"^^xsd:anyURI ;
+#   capec:referenceType "Technical" .

@@ -1,0 +1,407 @@
+@prefix shield: <https://example.org/sec/shield#> .
+@prefix sec: <https://example.org/sec/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+############################
+# Ontology Declaration
+############################
+
+shield:SHIELDOntology a owl:Ontology ;
+  rdfs:label "SHIELD (Adversary Interaction & Deception) Ontology v1.0" ;
+  rdfs:comment "Formal ontology for SHIELD deception and adversary manipulation techniques. Represents methods to mislead, deceive, or socially engineer threat actors and manipulate their decision-making." ;
+  owl:imports sec:CoreOntology .
+
+############################
+# Deception Technique Classes
+############################
+
+shield:DeceptionTechnique a owl:Class ;
+  rdfs:label "Deception Technique" ;
+  rdfs:comment "Deception or adversary manipulation strategy identified by SHIELD framework. Represents methods to mislead, deceive, or socially influence threat actors to alter their behavior or reveal capabilities." .
+
+shield:HoneypotDeception a owl:Class ;
+  rdfs:label "Honeypot Deception" ;
+  rdfs:comment "Deceptive system, service, or resource designed to attract and deceive threat actors." ;
+  rdfs:subClassOf shield:DeceptionTechnique .
+
+shield:MisdirectionDeception a owl:Class ;
+  rdfs:label "Misdirection Deception" ;
+  rdfs:comment "Deception technique that misdirects adversary activities toward decoy targets or fake assets." ;
+  rdfs:subClassOf shield:DeceptionTechnique .
+
+shield:InformationDecoy a owl:Class ;
+  rdfs:label "Information Decoy" ;
+  rdfs:comment "False or misleading information planted to deceive threat actors about systems, capabilities, or defenses." ;
+  rdfs:subClassOf shield:DeceptionTechnique .
+
+shield:SocialManipulation a owl:Class ;
+  rdfs:label "Social Manipulation" ;
+  rdfs:comment "Deception technique that uses social engineering or psychological manipulation against threat actors." ;
+  rdfs:subClassOf shield:DeceptionTechnique .
+
+shield:DeceptionAsset a owl:Class ;
+  rdfs:label "Deception Asset" ;
+  rdfs:comment "Specific decoy system, service, or artifact deployed as part of deception strategy." .
+
+shield:DeceptionObjective a owl:Class ;
+  rdfs:label "Deception Objective" ;
+  rdfs:comment "Strategic objective or goal of applying deception technique (e.g., detection, disruption, intelligence gathering)." .
+
+shield:ThreatActorProfile a owl:Class ;
+  rdfs:label "Threat Actor Profile" ;
+  rdfs:comment "Profile of threat actor or adversary type that deception technique targets." .
+
+############################
+# Deception Technique Properties
+############################
+
+shield:shieldId a owl:DatatypeProperty ;
+  rdfs:label "SHIELD ID" ;
+  rdfs:comment "Canonical SHIELD identifier (e.g., 'S-DT-001', 'S-MD-002', 'S-ID-003')." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+shield:name a owl:DatatypeProperty ;
+  rdfs:label "Name" ;
+  rdfs:comment "Name of the deception technique." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+shield:description a owl:DatatypeProperty ;
+  rdfs:label "Description" ;
+  rdfs:comment "Technical description of the deception technique, how it deceives threat actors, and expected outcomes." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:string .
+
+shield:deceptionType a owl:DatatypeProperty ;
+  rdfs:label "Deception Type" ;
+  rdfs:comment "Type of deception: Honeypot, Misdirection, Information Decoy, or Social Manipulation." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Honeypot" "Misdirection" "Information Decoy" "Social Manipulation") .
+
+shield:targetAdversary a owl:DatatypeProperty ;
+  rdfs:label "Target Adversary" ;
+  rdfs:comment "Profile of threat actor or adversary type this deception targets (e.g., 'state-sponsored', 'cybercriminal', 'insider')." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:string .
+
+shield:sophisticationLevel a owl:DatatypeProperty ;
+  rdfs:label "Sophistication Level" ;
+  rdfs:comment "Sophistication level required to implement technique: Low, Medium, or High." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Low" "Medium" "High") .
+
+shield:costLevel a owl:DatatypeProperty ;
+  rdfs:label "Cost Level" ;
+  rdfs:comment "Estimated cost to implement and maintain: Low, Medium, or High." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Low" "Medium" "High") .
+
+shield:deploymentComplexity a owl:DatatypeProperty ;
+  rdfs:label "Deployment Complexity" ;
+  rdfs:comment "Complexity of deploying and managing deception assets: Low, Medium, or High." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Low" "Medium" "High") .
+
+shield:detectionRisk a owl:DatatypeProperty ;
+  rdfs:label "Detection Risk" ;
+  rdfs:comment "Risk that deception will be detected/evaded by sophisticated threat actor: Low, Medium, or High." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Low" "Medium" "High") .
+
+shield:operationalImpact a owl:DatatypeProperty ;
+  rdfs:label "Operational Impact" ;
+  rdfs:comment "Impact on legitimate operations if deception is deployed: Low, Medium, or High." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Low" "Medium" "High") .
+
+shield:primaryObjective a owl:DatatypeProperty ;
+  rdfs:label "Primary Objective" ;
+  rdfs:comment "Primary objective of deception: Detect, Disrupt, Degrade, Delay, Deny, or Deceive." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Detect" "Disrupt" "Degrade" "Delay" "Deny" "Deceive") .
+
+shield:secondaryObjective a owl:DatatypeProperty ;
+  rdfs:label "Secondary Objective" ;
+  rdfs:comment "Secondary objective(s) of deception technique (e.g., intelligence gathering, attribution)." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:string .
+
+shield:applicablePlatform a owl:DatatypeProperty ;
+  rdfs:label "Applicable Platform" ;
+  rdfs:comment "Target platform(s) for deception technique (e.g., 'Windows', 'Linux', 'Web', 'Network')." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:string .
+
+shield:implementationStatus a owl:DatatypeProperty ;
+  rdfs:label "Implementation Status" ;
+  rdfs:comment "Status of technique: Proposed, Prototype, Production, or Deprecated." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Proposed" "Prototype" "Production" "Deprecated") .
+
+shield:publishedDate a owl:DatatypeProperty ;
+  rdfs:label "Published Date" ;
+  rdfs:comment "ISO 8601 timestamp when technique was published in SHIELD framework." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:dateTime .
+
+shield:lastModifiedDate a owl:DatatypeProperty ;
+  rdfs:label "Last Modified Date" ;
+  rdfs:comment "ISO 8601 timestamp when technique was last updated." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:dateTime .
+
+shield:url a owl:DatatypeProperty ;
+  rdfs:label "URL" ;
+  rdfs:comment "Reference URL to SHIELD framework page for this technique." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range xsd:anyURI .
+
+############################
+# Deception Asset & Objective Properties
+############################
+
+shield:assetName a owl:DatatypeProperty ;
+  rdfs:label "Asset Name" ;
+  rdfs:comment "Name of decoy system, service, or artifact." ;
+  rdfs:domain shield:DeceptionAsset ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+shield:assetType a owl:DatatypeProperty ;
+  rdfs:label "Asset Type" ;
+  rdfs:comment "Type of decoy asset: Honeypot, Decoy Host, Fake Service, Fake Data, etc." ;
+  rdfs:domain shield:DeceptionAsset ;
+  rdfs:range xsd:string .
+
+shield:assetDescription a owl:DatatypeProperty ;
+  rdfs:label "Asset Description" ;
+  rdfs:comment "Technical description of the decoy asset and what it simulates." ;
+  rdfs:domain shield:DeceptionAsset ;
+  rdfs:range xsd:string .
+
+shield:realism a owl:DatatypeProperty ;
+  rdfs:label "Realism" ;
+  rdfs:comment "Realism level of decoy asset: Low, Medium, or High (how convincingly it mimics real system)." ;
+  rdfs:domain shield:DeceptionAsset ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Low" "Medium" "High") .
+
+shield:deployedLocation a owl:DatatypeProperty ;
+  rdfs:label "Deployed Location" ;
+  rdfs:comment "Network location or segment where decoy asset is deployed." ;
+  rdfs:domain shield:DeceptionAsset ;
+  rdfs:range xsd:string .
+
+shield:objectiveName a owl:DatatypeProperty ;
+  rdfs:label "Objective Name" ;
+  rdfs:comment "Name or title of deception objective." ;
+  rdfs:domain shield:DeceptionObjective ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+shield:objectiveDescription a owl:DatatypeProperty ;
+  rdfs:label "Objective Description" ;
+  rdfs:comment "Description of what deception objective seeks to achieve." ;
+  rdfs:domain shield:DeceptionObjective ;
+  rdfs:range xsd:string .
+
+shield:successMeasure a owl:DatatypeProperty ;
+  rdfs:label "Success Measure" ;
+  rdfs:comment "Metric or indicator used to measure success of deception technique." ;
+  rdfs:domain shield:DeceptionObjective ;
+  rdfs:range xsd:string .
+
+############################
+# Deception Relationships
+############################
+
+shield:counters a owl:ObjectProperty ;
+  rdfs:label "counters" ;
+  rdfs:comment "Deception technique counters, deceives, or manipulates an adversary technique." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range sec:Technique ;
+  owl:inverseOf shield:countered_by .
+
+shield:countered_by a owl:ObjectProperty ;
+  rdfs:label "countered by" ;
+  rdfs:comment "Adversary technique can be countered by a deception technique." ;
+  rdfs:domain sec:Technique ;
+  rdfs:range shield:DeceptionTechnique ;
+  owl:inverseOf shield:counters .
+
+shield:targets a owl:ObjectProperty ;
+  rdfs:label "targets" ;
+  rdfs:comment "Deception technique targets a specific threat actor or adversary group." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range shield:ThreatActorProfile ;
+  owl:inverseOf shield:targeted_by_deception .
+
+shield:targeted_by_deception a owl:ObjectProperty ;
+  rdfs:label "targeted by deception" ;
+  rdfs:comment "Threat actor profile is targeted by a deception technique." ;
+  rdfs:domain shield:ThreatActorProfile ;
+  rdfs:range shield:DeceptionTechnique ;
+  owl:inverseOf shield:targets .
+
+shield:uses a owl:ObjectProperty ;
+  rdfs:label "uses" ;
+  rdfs:comment "Deception technique deploys specific decoy asset(s)." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range shield:DeceptionAsset ;
+  owl:inverseOf shield:used_by_deception .
+
+shield:used_by_deception a owl:ObjectProperty ;
+  rdfs:label "used by deception" ;
+  rdfs:comment "Decoy asset is deployed by a deception technique." ;
+  rdfs:domain shield:DeceptionAsset ;
+  rdfs:range shield:DeceptionTechnique ;
+  owl:inverseOf shield:uses .
+
+shield:achieves a owl:ObjectProperty ;
+  rdfs:label "achieves" ;
+  rdfs:comment "Deception technique achieves one or more deception objectives." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range shield:DeceptionObjective ;
+  owl:inverseOf shield:achieved_by_deception .
+
+shield:achieved_by_deception a owl:ObjectProperty ;
+  rdfs:label "achieved by deception" ;
+  rdfs:comment "Deception objective is achieved through a deception technique." ;
+  rdfs:domain shield:DeceptionObjective ;
+  rdfs:range shield:DeceptionTechnique ;
+  owl:inverseOf shield:achieves .
+
+shield:complements a owl:ObjectProperty ;
+  rdfs:label "complements" ;
+  rdfs:comment "Deception technique complements or enhances effectiveness of another deception technique." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range shield:DeceptionTechnique ;
+  a owl:SymmetricProperty .
+
+shield:mitigates a owl:ObjectProperty ;
+  rdfs:label "mitigates" ;
+  rdfs:comment "Deception technique can mitigate impact of an adversary technique." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range sec:Technique ;
+  owl:inverseOf shield:mitigated_by_deception .
+
+shield:mitigated_by_deception a owl:ObjectProperty ;
+  rdfs:label "mitigated by deception" ;
+  rdfs:comment "Adversary technique impact can be mitigated through deception." ;
+  rdfs:domain sec:Technique ;
+  rdfs:range shield:DeceptionTechnique ;
+  owl:inverseOf shield:mitigates .
+
+shield:reveals a owl:ObjectProperty ;
+  rdfs:label "reveals" ;
+  rdfs:comment "Deception technique reveals or exposes adversary TTPs, tools, or capabilities." ;
+  rdfs:domain shield:DeceptionTechnique ;
+  rdfs:range sec:Technique ;
+  owl:inverseOf shield:revealed_by_deception .
+
+shield:revealed_by_deception a owl:ObjectProperty ;
+  rdfs:label "revealed by deception" ;
+  rdfs:comment "Adversary technique can be revealed or exposed through deception." ;
+  rdfs:domain sec:Technique ;
+  rdfs:range shield:DeceptionTechnique ;
+  owl:inverseOf shield:reveals .
+
+############################
+# Class Constraints (SHACL-informative)
+############################
+
+# DeceptionTechnique instances MUST have:
+# - shieldId (functional, required)
+# - name (functional, required)
+# - description (required)
+# - deceptionType (required: Honeypot, Misdirection, Information Decoy, or Social Manipulation)
+# - targetAdversary (required)
+# - primaryObjective (required)
+# - at least one counters or reveals relationship
+
+# DeceptionAsset instances MUST have:
+# - assetName (functional, required)
+# - assetType (required)
+# - assetDescription (required)
+# - realism (required)
+# - deployedLocation (required)
+# - at least one used_by_deception relationship
+
+# DeceptionObjective instances MUST have:
+# - objectiveName (functional, required)
+# - objectiveDescription (required)
+# - successMeasure (required)
+
+# ThreatActorProfile instances SHOULD track:
+# - Sophistication level
+# - Known TTPs
+# - Preferred targets
+# - Deception techniques that target them
+
+############################
+# Example Instances (Informative)
+############################
+
+# shield:S_Honeypot_WebServer a shield:HoneypotDeception ;
+#   shield:shieldId "S-HP-001" ;
+#   shield:name "Web Server Honeypot" ;
+#   shield:description "Decoy web server configured to appear as legitimate application host, designed to detect reconnaissance and exploit attempts." ;
+#   shield:deceptionType "Honeypot" ;
+#   shield:targetAdversary "Cybercriminals, APT groups" ;
+#   shield:sophisticationLevel "Medium" ;
+#   shield:costLevel "Medium" ;
+#   shield:primaryObjective "Detect" ;
+#   shield:secondaryObjective "Gather intelligence on attack methods" ;
+#   shield:deploymentComplexity "Medium" ;
+#   shield:detectionRisk "Medium" ;
+#   shield:operationalImpact "Low" ;
+#   shield:implementationStatus "Production" ;
+#   shield:counters sec:Technique_T1046 ;
+#   shield:counters sec:Technique_T1595 ;
+#   shield:counters sec:Technique_T1190 ;
+#   shield:uses shield:Asset_HoneypotWebServer ;
+#   shield:achieves shield:Objective_EarlyDetection ;
+#   shield:achieves shield:Objective_IntelGathering .
+#
+# shield:Asset_HoneypotWebServer a shield:DeceptionAsset ;
+#   shield:assetName "Decoy Web Application Server" ;
+#   shield:assetType "Honeypot Host" ;
+#   shield:assetDescription "Virtual machine running simulated vulnerable web application (e.g., DVWA) with monitoring." ;
+#   shield:realism "High" ;
+#   shield:deployedLocation "DMZ network segment 172.16.50.0/24" .
+#
+# shield:Objective_EarlyDetection a shield:DeceptionObjective ;
+#   shield:objectiveName "Early Detection" ;
+#   shield:objectiveDescription "Detect adversary reconnaissance and initial access attempts before they target production systems." ;
+#   shield:successMeasure "Number of attack attempts detected on honeypot versus production systems" .
+#
+# shield:Objective_IntelGathering a shield:DeceptionObjective ;
+#   shield:objectiveName "Intelligence Gathering" ;
+#   shield:objectiveDescription "Gather intelligence on adversary attack methods, tools, and TTPs by observing honeypot interactions." ;
+#   shield:successMeasure "Novel TTPs and tools discovered through honeypot analysis" .
+#
+# shield:S_Misdirection_Decoy a shield:MisdirectionDeception ;
+#   shield:shieldId "S-MD-005" ;
+#   shield:name "Fake Critical Data Decoys" ;
+#   shield:description "Plant false high-value data assets to misdirect adversary exfiltration toward decoys while monitoring access." ;
+#   shield:deceptionType "Misdirection" ;
+#   shield:targetAdversary "Data-focused threat actors, insiders" ;
+#   shield:sophisticationLevel "High" ;
+#   shield:costLevel "Medium" ;
+#   shield:primaryObjective "Disrupt" ;
+#   shield:implementationStatus "Production" ;
+#   shield:counters sec:Technique_T1567 ;
+#   shield:mitigates sec:Technique_T1020 .

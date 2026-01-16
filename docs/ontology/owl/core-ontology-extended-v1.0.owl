@@ -1,0 +1,532 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+############################
+# Ontology Declaration
+############################
+
+sec:CoreOntology a owl:Ontology ;
+  rdfs:label "Cybersecurity Core Ontology v1.0" ;
+  rdfs:comment "Authoritative, immutable cybersecurity ontology aligned to public standards: CPE (Platform), CVE (Vulnerability), CVSS (VulnerabilityScore), CWE (Weakness), CAPEC (AttackPattern), ATT&CK (Technique), D3FEND (DefensiveTechnique), CAR (DetectionAnalytic), SHIELD (DeceptionTechnique), ENGAGE (EngagementConcept)." ;
+  owl:imports <https://example.org/sec/d3fend#D3FENDOntology> ;
+  owl:imports <https://example.org/sec/shield#SHIELDOntology> ;
+  owl:imports <https://example.org/sec/engage#ENGAGEOntology> .
+
+############################
+# EXPOSURE & CONFIGURATION LAYER (CPE-aligned)
+############################
+
+sec:Platform a owl:Class ;
+  rdfs:label "Platform" ;
+  rdfs:comment "Atomic software or hardware component identified by a canonical CPE (Common Platform Enumeration) URI. Represents an immutable, versioned product/OS/device entity." .
+
+sec:PlatformConfiguration a owl:Class ;
+  rdfs:label "Platform Configuration" ;
+  rdfs:comment "Logical expression of platform versions and criteria (CPEMatch schema) defining a set of vulnerable platform instances. Critical invariant: vulnerabilities affect configurations, never platforms directly." .
+
+sec:CPEUri a owl:DatatypeProperty ;
+  rdfs:label "CPE URI" ;
+  rdfs:comment "Canonical Common Platform Enumeration URI (e.g., 'cpe:2.3:a:vendor:product:version:*:*:*:*:*:*:*')." ;
+  rdfs:domain sec:Platform ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+sec:platformPart a owl:DatatypeProperty ;
+  rdfs:label "Platform Part" ;
+  rdfs:comment "CPE part classification: 'a' (application), 'o' (operating system), or 'h' (hardware)." ;
+  rdfs:domain sec:Platform ;
+  rdfs:range xsd:string .
+
+sec:vendor a owl:DatatypeProperty ;
+  rdfs:label "Vendor" ;
+  rdfs:comment "Vendor or organization name from CPE (e.g., 'microsoft', 'linux', 'apache')." ;
+  rdfs:domain sec:Platform ;
+  rdfs:range xsd:string .
+
+sec:product a owl:DatatypeProperty ;
+  rdfs:label "Product" ;
+  rdfs:comment "Product name from CPE (e.g., 'windows', 'linux_kernel', 'apache_http_server')." ;
+  rdfs:domain sec:Platform ;
+  rdfs:range xsd:string .
+
+sec:version a owl:DatatypeProperty ;
+  rdfs:label "Version" ;
+  rdfs:comment "Product version from CPE (e.g., '10', '6.4.1', '2.4.53')." ;
+  rdfs:domain sec:Platform ;
+  rdfs:range xsd:string .
+
+sec:platformDeprecated a owl:DatatypeProperty ;
+  rdfs:label "Deprecated" ;
+  rdfs:comment "Boolean indicating if this CPE entry has been deprecated." ;
+  rdfs:domain sec:Platform ;
+  rdfs:range xsd:boolean .
+
+sec:cpeNameId a owl:DatatypeProperty ;
+  rdfs:label "CPE Name ID" ;
+  rdfs:comment "UUID identifier for the CPE entry in NVD database." ;
+  rdfs:domain sec:Platform ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+sec:cpeCreatedDate a owl:DatatypeProperty ;
+  rdfs:label "CPE Created Date" ;
+  rdfs:comment "Date when CPE entry was created in NVD." ;
+  rdfs:domain sec:Platform ;
+  rdfs:range xsd:dateTime .
+
+sec:cpeLastModifiedDate a owl:DatatypeProperty ;
+  rdfs:label "CPE Last Modified Date" ;
+  rdfs:comment "Date when CPE entry was last modified in NVD." ;
+  rdfs:domain sec:Platform ;
+  rdfs:range xsd:dateTime .
+
+############################
+# Platform Configuration (CPEMatch-aligned)
+############################
+
+sec:matchCriteriaId a owl:DatatypeProperty ;
+  rdfs:label "Match Criteria ID" ;
+  rdfs:comment "UUID identifier for this configuration/criteria in NVD database." ;
+  rdfs:domain sec:PlatformConfiguration ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+sec:configurationCriteria a owl:DatatypeProperty ;
+  rdfs:label "Configuration Criteria" ;
+  rdfs:comment "CPE expression defining this platform configuration (base criteria string)." ;
+  rdfs:domain sec:PlatformConfiguration ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+sec:versionStartIncluding a owl:DatatypeProperty ;
+  rdfs:label "Version Start (Including)" ;
+  rdfs:comment "Inclusive starting version for this configuration range." ;
+  rdfs:domain sec:PlatformConfiguration ;
+  rdfs:range xsd:string .
+
+sec:versionEndIncluding a owl:DatatypeProperty ;
+  rdfs:label "Version End (Including)" ;
+  rdfs:comment "Inclusive ending version for this configuration range." ;
+  rdfs:domain sec:PlatformConfiguration ;
+  rdfs:range xsd:string .
+
+sec:versionStartExcluding a owl:DatatypeProperty ;
+  rdfs:label "Version Start (Excluding)" ;
+  rdfs:comment "Exclusive starting version for this configuration range." ;
+  rdfs:domain sec:PlatformConfiguration ;
+  rdfs:range xsd:string .
+
+sec:versionEndExcluding a owl:DatatypeProperty ;
+  rdfs:label "Version End (Excluding)" ;
+  rdfs:comment "Exclusive ending version for this configuration range." ;
+  rdfs:domain sec:PlatformConfiguration ;
+  rdfs:range xsd:string .
+
+sec:configurationStatus a owl:DatatypeProperty ;
+  rdfs:label "Configuration Status" ;
+  rdfs:comment "Status of configuration criteria in NVD: Active or Deprecated." ;
+  rdfs:domain sec:PlatformConfiguration ;
+  rdfs:range xsd:string .
+
+sec:configCreatedDate a owl:DatatypeProperty ;
+  rdfs:label "Configuration Created Date" ;
+  rdfs:comment "Date when configuration criteria was created in NVD." ;
+  rdfs:domain sec:PlatformConfiguration ;
+  rdfs:range xsd:dateTime .
+
+sec:configLastModifiedDate a owl:DatatypeProperty ;
+  rdfs:label "Configuration Last Modified Date" ;
+  rdfs:comment "Date when configuration criteria was last modified in NVD." ;
+  rdfs:domain sec:PlatformConfiguration ;
+  rdfs:range xsd:dateTime .
+
+############################
+# Platform Configuration Relationships
+############################
+
+sec:matchesPlatform a owl:ObjectProperty ;
+  rdfs:label "matches platform" ;
+  rdfs:comment "Configuration criteria matches (includes) specific platform." ;
+  rdfs:domain sec:PlatformConfiguration ;
+  rdfs:range sec:Platform ;
+  owl:inverseOf sec:matchedBy .
+
+sec:matchedBy a owl:ObjectProperty ;
+  rdfs:label "matched by" ;
+  rdfs:comment "Platform is matched by (included in) a configuration criteria." ;
+  rdfs:domain sec:Platform ;
+  rdfs:range sec:PlatformConfiguration ;
+  owl:inverseOf sec:matchesPlatform .
+
+sec:includesConfiguration a owl:ObjectProperty ;
+  rdfs:label "includes configuration" ;
+  rdfs:comment "Platform is involved in or matched by this configuration." ;
+  rdfs:domain sec:Platform ;
+  rdfs:range sec:PlatformConfiguration ;
+  owl:inverseOf sec:configurationFor .
+
+sec:configurationFor a owl:ObjectProperty ;
+  rdfs:label "configuration for" ;
+  rdfs:comment "Configuration defines vulnerable versions/variants of platform." ;
+  rdfs:domain sec:PlatformConfiguration ;
+  rdfs:range sec:Platform ;
+  owl:inverseOf sec:includesConfiguration .
+
+############################
+# VULNERABILITY LAYER (CVE & CVSS-aligned)
+############################
+
+sec:Vulnerability a owl:Class ;
+  rdfs:label "Vulnerability" ;
+  rdfs:comment "Publicly disclosed security flaw identified by a canonical CVE (Common Vulnerabilities and Exposures) ID. Immutable once published." .
+
+sec:VulnerabilityScore a owl:Class ;
+  rdfs:label "Vulnerability Score" ;
+  rdfs:comment "Severity assessment for a vulnerability using CVSS (Common Vulnerability Scoring System). Each CVSS version is a separate node; scores never overwrite." .
+
+sec:Reference a owl:Class ;
+  rdfs:label "Reference" ;
+  rdfs:comment "External reference providing additional context, proof-of-concept, or advisory information about a vulnerability." .
+
+sec:cveId a owl:DatatypeProperty ;
+  rdfs:label "CVE ID" ;
+  rdfs:comment "Canonical CVE identifier (e.g., 'CVE-2025-1234', 'CVE-2021-44228')." ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+sec:published a owl:DatatypeProperty ;
+  rdfs:label "Published Date" ;
+  rdfs:comment "Date when CVE was publicly released." ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range xsd:dateTime .
+
+sec:lastModified a owl:DatatypeProperty ;
+  rdfs:label "Last Modified Date" ;
+  rdfs:comment "Date when CVE entry was last updated in NVD." ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range xsd:dateTime .
+
+sec:description a owl:DatatypeProperty ;
+  rdfs:label "Description" ;
+  rdfs:comment "Detailed description of the vulnerability, its nature, and potential impact." ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range xsd:string .
+
+sec:vulnStatus a owl:DatatypeProperty ;
+  rdfs:label "Vulnerability Status" ;
+  rdfs:comment "NVD status of vulnerability: Analyzed, Awaiting Analysis, Undergoing Analysis, Deferred, Disputed, Rejected." ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range xsd:string .
+
+sec:sourceIdentifier a owl:DatatypeProperty ;
+  rdfs:label "Source Identifier" ;
+  rdfs:comment "Organization that submitted this CVE to NVD (e.g., 'mitre@mitre.org', 'cna@vuldb.com')." ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range xsd:string .
+
+sec:cisaActionDue a owl:DatatypeProperty ;
+  rdfs:label "CISA Action Due Date" ;
+  rdfs:comment "CISA deadline for remediation if included in KEV catalog." ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range xsd:date .
+
+sec:cisaDateAdded a owl:DatatypeProperty ;
+  rdfs:label "CISA Date Added" ;
+  rdfs:comment "Date when vulnerability was added to CISA Known Exploited Vulnerabilities (KEV) catalog." ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range xsd:date .
+
+############################
+# Vulnerability Scoring (CVSS)
+############################
+
+sec:cvssVersion a owl:DatatypeProperty ;
+  rdfs:label "CVSS Version" ;
+  rdfs:comment "CVSS specification version (e.g., '3.1', '4.0')." ;
+  rdfs:domain sec:VulnerabilityScore ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+sec:vectorString a owl:DatatypeProperty ;
+  rdfs:label "Vector String" ;
+  rdfs:comment "CVSS vector string encoding all metrics (e.g., 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H')." ;
+  rdfs:domain sec:VulnerabilityScore ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+sec:baseScore a owl:DatatypeProperty ;
+  rdfs:label "Base Score" ;
+  rdfs:comment "CVSS base score (0.0-10.0)." ;
+  rdfs:domain sec:VulnerabilityScore ;
+  rdfs:range [ a rdfs:Datatype ;
+                owl:withRestrictions (
+                  [ xsd:minInclusive 0.0 ]
+                  [ xsd:maxInclusive 10.0 ]
+                ) ] .
+
+sec:baseSeverity a owl:DatatypeProperty ;
+  rdfs:label "Base Severity" ;
+  rdfs:comment "CVSS base severity rating: None, Low, Medium, High, Critical." ;
+  rdfs:domain sec:VulnerabilityScore ;
+  rdfs:range xsd:string .
+
+sec:attackVector a owl:DatatypeProperty ;
+  rdfs:label "Attack Vector" ;
+  rdfs:comment "CVSS AV metric: Network, Adjacent Network, Local, Physical." ;
+  rdfs:domain sec:VulnerabilityScore ;
+  rdfs:range xsd:string .
+
+sec:attackComplexity a owl:DatatypeProperty ;
+  rdfs:label "Attack Complexity" ;
+  rdfs:comment "CVSS AC metric: Low or High." ;
+  rdfs:domain sec:VulnerabilityScore ;
+  rdfs:range xsd:string .
+
+sec:privilegesRequired a owl:DatatypeProperty ;
+  rdfs:label "Privileges Required" ;
+  rdfs:comment "CVSS PR metric: None, Low, or High." ;
+  rdfs:domain sec:VulnerabilityScore ;
+  rdfs:range xsd:string .
+
+sec:userInteraction a owl:DatatypeProperty ;
+  rdfs:label "User Interaction" ;
+  rdfs:comment "CVSS UI metric: None or Required." ;
+  rdfs:domain sec:VulnerabilityScore ;
+  rdfs:range xsd:string .
+
+sec:scope a owl:DatatypeProperty ;
+  rdfs:label "Scope" ;
+  rdfs:comment "CVSS S metric (v3.x): Unchanged or Changed." ;
+  rdfs:domain sec:VulnerabilityScore ;
+  rdfs:range xsd:string .
+
+sec:confidentialityImpact a owl:DatatypeProperty ;
+  rdfs:label "Confidentiality Impact" ;
+  rdfs:comment "CVSS C impact metric: None, Low, or High." ;
+  rdfs:domain sec:VulnerabilityScore ;
+  rdfs:range xsd:string .
+
+sec:integrityImpact a owl:DatatypeProperty ;
+  rdfs:label "Integrity Impact" ;
+  rdfs:comment "CVSS I impact metric: None, Low, or High." ;
+  rdfs:domain sec:VulnerabilityScore ;
+  rdfs:range xsd:string .
+
+sec:availabilityImpact a owl:DatatypeProperty ;
+  rdfs:label "Availability Impact" ;
+  rdfs:comment "CVSS A impact metric: None, Low, or High." ;
+  rdfs:domain sec:VulnerabilityScore ;
+  rdfs:range xsd:string .
+
+sec:exploitMaturity a owl:DatatypeProperty ;
+  rdfs:label "Exploit Maturity" ;
+  rdfs:comment "CVSS E metric: Unproven, Proof of Concept, Functional, High." ;
+  rdfs:domain sec:VulnerabilityScore ;
+  rdfs:range xsd:string .
+
+sec:referenceUrl a owl:DatatypeProperty ;
+  rdfs:label "Reference URL" ;
+  rdfs:comment "URL to external reference resource." ;
+  rdfs:domain sec:Reference ;
+  rdfs:range xsd:anyURI .
+
+sec:referenceSource a owl:DatatypeProperty ;
+  rdfs:label "Reference Source" ;
+  rdfs:comment "Source of reference: Vendor, Advisory, Product, Discovery, External." ;
+  rdfs:domain sec:Reference ;
+  rdfs:range xsd:string .
+
+############################
+# Vulnerability Relationships (Critical)
+############################
+
+sec:affected_by a owl:ObjectProperty ;
+  rdfs:label "affected by" ;
+  rdfs:comment "Platform configuration is vulnerable to (affected by) a CVE vulnerability. Core invariant: vulnerabilities affect configurations, never platforms directly." ;
+  rdfs:domain sec:PlatformConfiguration ;
+  rdfs:range sec:Vulnerability ;
+  owl:inverseOf sec:affects .
+
+sec:affects a owl:ObjectProperty ;
+  rdfs:label "affects" ;
+  rdfs:comment "Vulnerability impacts platform configuration(s)." ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range sec:PlatformConfiguration ;
+  owl:inverseOf sec:affected_by .
+
+sec:scored_by a owl:ObjectProperty ;
+  rdfs:label "scored by" ;
+  rdfs:comment "Vulnerability has a CVSS severity assessment. Multiple scores for different CVSS versions can coexist." ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range sec:VulnerabilityScore ;
+  owl:inverseOf sec:scores .
+
+sec:scores a owl:ObjectProperty ;
+  rdfs:label "scores" ;
+  rdfs:comment "CVSS score applies to (scores) a vulnerability." ;
+  rdfs:domain sec:VulnerabilityScore ;
+  rdfs:range sec:Vulnerability ;
+  owl:inverseOf sec:scored_by .
+
+sec:references a owl:ObjectProperty ;
+  rdfs:label "references" ;
+  rdfs:comment "Vulnerability is documented by external reference(s)." ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range sec:Reference ;
+  owl:inverseOf sec:referencedBy .
+
+sec:referencedBy a owl:ObjectProperty ;
+  rdfs:label "referenced by" ;
+  rdfs:comment "Reference provides documentation for a vulnerability." ;
+  rdfs:domain sec:Reference ;
+  rdfs:range sec:Vulnerability ;
+  owl:inverseOf sec:references .
+
+############################
+# WEAKNESS LAYER (CWE-aligned)
+############################
+
+sec:Weakness a owl:Class ;
+  rdfs:label "Weakness" ;
+  rdfs:comment "Root cause or underlying weakness category identified by CWE (Common Weakness Enumeration). Represents a class of flaws, not a specific vulnerability." .
+
+sec:caused_by a owl:ObjectProperty ;
+  rdfs:label "caused by" ;
+  rdfs:comment "Vulnerability is caused by an underlying weakness (CWE). Part of the causal chain: Vulnerability → Weakness → AttackPattern → Technique." ;
+  rdfs:domain sec:Vulnerability ;
+  rdfs:range sec:Weakness ;
+  owl:inverseOf sec:causes .
+
+sec:causes a owl:ObjectProperty ;
+  rdfs:label "causes" ;
+  rdfs:comment "Weakness is a root cause for vulnerability instances." ;
+  rdfs:domain sec:Weakness ;
+  rdfs:range sec:Vulnerability ;
+  owl:inverseOf sec:caused_by .
+
+############################
+# ATTACK ABSTRACTION LAYER (CAPEC-aligned)
+############################
+
+sec:AttackPattern a owl:Class ;
+  rdfs:label "Attack Pattern" ;
+  rdfs:comment "Abstract exploitation pattern identified by CAPEC (Common Attack Pattern Enumeration and Classification). Represents methodologies independent of specific weaknesses." .
+
+sec:exploited_by a owl:ObjectProperty ;
+  rdfs:label "exploited by" ;
+  rdfs:comment "Weakness can be exploited using an attack pattern. Part of the causal chain." ;
+  rdfs:domain sec:Weakness ;
+  rdfs:range sec:AttackPattern ;
+  owl:inverseOf sec:exploits .
+
+sec:exploits a owl:ObjectProperty ;
+  rdfs:label "exploits" ;
+  rdfs:comment "Attack pattern exploits underlying weakness(es)." ;
+  rdfs:domain sec:AttackPattern ;
+  rdfs:range sec:Weakness ;
+  owl:inverseOf sec:exploited_by .
+
+############################
+# ADVERSARY TRADECRAFT LAYER (ATT&CK-aligned)
+############################
+
+sec:Technique a owl:Class ;
+  rdfs:label "Technique" ;
+  rdfs:comment "Concrete adversary behavior or action identified by ATT&CK (Adversarial Tactics, Techniques, and Common Knowledge). Represents tactics used in observed attacks." .
+
+sec:SubTechnique a owl:Class ;
+  rdfs:label "Sub-Technique" ;
+  rdfs:comment "Specialized variant or implementation of a parent technique with distinct detection opportunities." ;
+  rdfs:subClassOf sec:Technique .
+
+sec:Tactic a owl:Class ;
+  rdfs:label "Tactic" ;
+  rdfs:comment "High-level strategic objective of an adversary (e.g., Initial Access, Execution, Persistence). Represents the 'why', not the 'how'." .
+
+sec:implemented_as a owl:ObjectProperty ;
+  rdfs:label "implemented as" ;
+  rdfs:comment "Attack pattern is implemented in adversary techniques (ATT&CK). Part of the causal chain." ;
+  rdfs:domain sec:AttackPattern ;
+  rdfs:range sec:Technique ;
+  owl:inverseOf sec:implements .
+
+sec:implements a owl:ObjectProperty ;
+  rdfs:label "implements" ;
+  rdfs:comment "Technique implements or realizes attack pattern methodology." ;
+  rdfs:domain sec:Technique ;
+  rdfs:range sec:AttackPattern ;
+  owl:inverseOf sec:implemented_as .
+
+sec:belongs_to a owl:ObjectProperty ;
+  rdfs:label "belongs to" ;
+  rdfs:comment "Technique is a concrete method for achieving a tactic objective." ;
+  rdfs:domain sec:Technique ;
+  rdfs:range sec:Tactic ;
+  owl:inverseOf sec:contains_technique .
+
+sec:contains_technique a owl:ObjectProperty ;
+  rdfs:label "contains technique" ;
+  rdfs:comment "Tactic includes techniques as methods to achieve its objective." ;
+  rdfs:domain sec:Tactic ;
+  rdfs:range sec:Technique ;
+  owl:inverseOf sec:belongs_to .
+
+sec:subtechnique_of a owl:ObjectProperty ;
+  rdfs:label "subtechnique of" ;
+  rdfs:comment "Sub-technique is a specialized variant of parent technique (functional: each sub-technique has exactly one parent)." ;
+  rdfs:domain sec:SubTechnique ;
+  rdfs:range sec:Technique ;
+  a owl:FunctionalProperty ;
+  owl:inverseOf sec:has_subtechnique .
+
+sec:has_subtechnique a owl:ObjectProperty ;
+  rdfs:label "has subtechnique" ;
+  rdfs:comment "Technique has specialized variants." ;
+  rdfs:domain sec:Technique ;
+  rdfs:range sec:SubTechnique ;
+  owl:inverseOf sec:subtechnique_of .
+
+############################
+# DEFENSE & DETECTION LAYER
+############################
+
+sec:DetectionAnalytic a owl:Class ;
+  rdfs:label "Detection Analytic" ;
+  rdfs:comment "Detection logic or analytic identified by CAR (Cyber Analytics Repository). Represents observable behaviors and detection rules." .
+
+############################
+# CORE ONTOLOGY GUARANTEES
+############################
+
+# 1. Every node has external ID: cpeUri, cveId, technique_id, tactic_id, etc.
+# 2. Every edge has standard provenance: CPE→CVE, CVE→CWE, CWE→CAPEC, CAPEC→ATT&CK, etc.
+# 3. No temporal semantics in Core (published dates track standard release, not observations)
+# 4. No probability, likelihood, or confidence (belongs to Incident/Risk extensions)
+# 5. No "uses", "leads to", or vague edges (only authoritative standard relationships)
+# 6. No threat actors in Core (belongs to ThreatActor extension)
+# 7. No incidents or observations in Core (belongs to Incident extension)
+# 8. Vulnerabilities affect CONFIGURATIONS, not platforms directly (critical invariant)
+# 9. Each CVSS version is separate node (never overwrite, coexist)
+# 10. Subtechniques always have exactly one parent (functional property)
+
+############################
+# CANONICAL TRAVERSAL PATH (RAG-Safe)
+############################
+
+# Query: "How can we detect and mitigate a vulnerability affecting this platform?"
+# 
+# Asset
+#  ├─ hasConfiguration ──▶ PlatformConfiguration
+#  │   └─ affected_by ──▶ Vulnerability
+#  │       ├─ caused_by ──▶ Weakness
+#  │       │   └─ exploited_by ──▶ AttackPattern
+#  │       │       └─ implemented_as ──▶ Technique
+#  │       │           ├─ detected_by ──▶ DetectionAnalytic
+#  │       │           ├─ mitigated_by ──▶ DefensiveTechnique
+#  │       │           └─ belongs_to ──▶ Tactic
+#  │       └─ scored_by ──▶ VulnerabilityScore
+#  │
+#  Guaranteed traversal: NO SHORTCUTS, NO INVENTED STEPS

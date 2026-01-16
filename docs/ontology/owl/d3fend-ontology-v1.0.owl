@@ -1,0 +1,340 @@
+@prefix d3fend: <https://example.org/sec/d3fend#> .
+@prefix sec: <https://example.org/sec/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+############################
+# Ontology Declaration
+############################
+
+d3fend:D3FENDOntology a owl:Ontology ;
+  rdfs:label "D3FEND (Detection, Denial, and Disruption Framework) Ontology v1.0" ;
+  rdfs:comment "Formal ontology for D3FEND defensive techniques and mitigation strategies. Represents methods to detect, deny, and disrupt adversary activities independent of specific attack context." ;
+  owl:imports sec:CoreOntology .
+
+############################
+# Defensive Technique Classes
+############################
+
+d3fend:DefensiveTechnique a owl:Class ;
+  rdfs:label "Defensive Technique" ;
+  rdfs:comment "Mitigation, denial, or disruption strategy identified by D3FEND framework. Represents defensive methods that can mitigate or prevent adversary techniques without dependence on specific attack patterns." .
+
+d3fend:DetectionTechnique a owl:Class ;
+  rdfs:label "Detection Technique" ;
+  rdfs:comment "Method or capability to detect, identify, or expose adversary activities and techniques." ;
+  rdfs:subClassOf d3fend:DefensiveTechnique .
+
+d3fend:DenialTechnique a owl:Class ;
+  rdfs:label "Denial Technique" ;
+  rdfs:comment "Method to deny, prevent, or block adversary access, command and control, or lateral movement." ;
+  rdfs:subClassOf d3fend:DefensiveTechnique .
+
+d3fend:DisruptionTechnique a owl:Class ;
+  rdfs:label "Disruption Technique" ;
+  rdfs:comment "Method to disrupt, degrade, or interfere with adversary activities and operations." ;
+  rdfs:subClassOf d3fend:DefensiveTechnique .
+
+d3fend:PrerequisiteControl a owl:Class ;
+  rdfs:label "Prerequisite Control" ;
+  rdfs:comment "Security control or capability required as foundation for defensive technique implementation." .
+
+d3fend:Countermeasure a owl:Class ;
+  rdfs:label "Countermeasure" ;
+  rdfs:comment "Specific countermeasure, control, or implementation that realizes a defensive technique." .
+
+d3fend:MitigationScope a owl:Class ;
+  rdfs:label "Mitigation Scope" ;
+  rdfs:comment "Scope or context in which a defensive technique applies (e.g., network, host, application)." .
+
+############################
+# Defensive Technique Properties
+############################
+
+d3fend:d3fendId a owl:DatatypeProperty ;
+  rdfs:label "D3FEND ID" ;
+  rdfs:comment "Canonical D3FEND identifier (e.g., 'D3-DT', 'D3-NT', 'D3-CT' for Detection, Denial, or Disruption)." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+d3fend:name a owl:DatatypeProperty ;
+  rdfs:label "Name" ;
+  rdfs:comment "Name of the defensive technique." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+d3fend:description a owl:DatatypeProperty ;
+  rdfs:label "Description" ;
+  rdfs:comment "Technical description of the defensive technique, how it works, and what it protects against." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range xsd:string .
+
+d3fend:techniqueType a owl:DatatypeProperty ;
+  rdfs:label "Technique Type" ;
+  rdfs:comment "Classification of defensive technique: Detection, Denial, or Disruption." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Detection" "Denial" "Disruption") .
+
+d3fend:sophisticationLevel a owl:DatatypeProperty ;
+  rdfs:label "Sophistication Level" ;
+  rdfs:comment "Sophistication level required to implement technique: Low, Medium, or High." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Low" "Medium" "High") .
+
+d3fend:costLevel a owl:DatatypeProperty ;
+  rdfs:label "Cost Level" ;
+  rdfs:comment "Estimated cost to implement: Low, Medium, or High." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Low" "Medium" "High") .
+
+d3fend:applicablePlatform a owl:DatatypeProperty ;
+  rdfs:label "Applicable Platform" ;
+  rdfs:comment "Target platform(s) for defensive technique (e.g., 'Windows', 'Linux', 'macOS', 'Network', 'Cloud')." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range xsd:string .
+
+d3fend:scope a owl:DatatypeProperty ;
+  rdfs:label "Scope" ;
+  rdfs:comment "Operational scope: Host-based, Network-based, or Application-based." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Host-based" "Network-based" "Application-based" "Multi-layer") .
+
+d3fend:implementationStatus a owl:DatatypeProperty ;
+  rdfs:label "Implementation Status" ;
+  rdfs:comment "Status of technique: Proposed, Beta, Stable, or Deprecated." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Proposed" "Beta" "Stable" "Deprecated") .
+
+d3fend:publishedDate a owl:DatatypeProperty ;
+  rdfs:label "Published Date" ;
+  rdfs:comment "ISO 8601 timestamp when technique was published in D3FEND framework." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range xsd:dateTime .
+
+d3fend:lastModifiedDate a owl:DatatypeProperty ;
+  rdfs:label "Last Modified Date" ;
+  rdfs:comment "ISO 8601 timestamp when technique was last updated." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range xsd:dateTime .
+
+d3fend:url a owl:DatatypeProperty ;
+  rdfs:label "URL" ;
+  rdfs:comment "Reference URL to D3FEND framework page for this technique." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range xsd:anyURI .
+
+############################
+# Countermeasure & Control Properties
+############################
+
+d3fend:countermeasureName a owl:DatatypeProperty ;
+  rdfs:label "Countermeasure Name" ;
+  rdfs:comment "Name of specific countermeasure or control implementation." ;
+  rdfs:domain d3fend:Countermeasure ;
+  rdfs:range xsd:string .
+
+d3fend:countermeasureDescription a owl:DatatypeProperty ;
+  rdfs:label "Countermeasure Description" ;
+  rdfs:comment "Technical details of how to implement this countermeasure." ;
+  rdfs:domain d3fend:Countermeasure ;
+  rdfs:range xsd:string .
+
+d3fend:controlType a owl:DatatypeProperty ;
+  rdfs:label "Control Type" ;
+  rdfs:comment "Type of control: Preventive, Detective, Corrective, or Directive." ;
+  rdfs:domain d3fend:Countermeasure ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Preventive" "Detective" "Corrective" "Directive") .
+
+d3fend:prerequisiteName a owl:DatatypeProperty ;
+  rdfs:label "Prerequisite Name" ;
+  rdfs:comment "Name of required prerequisite control or capability." ;
+  rdfs:domain d3fend:PrerequisiteControl ;
+  rdfs:range xsd:string .
+
+d3fend:prerequisiteDescription a owl:DatatypeProperty ;
+  rdfs:label "Prerequisite Description" ;
+  rdfs:comment "Description of what prerequisite control must be in place." ;
+  rdfs:domain d3fend:PrerequisiteControl ;
+  rdfs:range xsd:string .
+
+############################
+# Defensive Relationships
+############################
+
+d3fend:mitigates a owl:ObjectProperty ;
+  rdfs:label "mitigates" ;
+  rdfs:comment "Defensive technique mitigates, prevents, or reduces impact of an adversary technique." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range sec:Technique ;
+  owl:inverseOf d3fend:mitigated_by .
+
+d3fend:mitigated_by a owl:ObjectProperty ;
+  rdfs:label "mitigated by" ;
+  rdfs:comment "Adversary technique can be mitigated by a defensive technique." ;
+  rdfs:domain sec:Technique ;
+  rdfs:range d3fend:DefensiveTechnique ;
+  owl:inverseOf d3fend:mitigates .
+
+d3fend:detects a owl:ObjectProperty ;
+  rdfs:label "detects" ;
+  rdfs:comment "Defensive detection technique can identify usage of an adversary technique." ;
+  rdfs:domain d3fend:DetectionTechnique ;
+  rdfs:range sec:Technique ;
+  owl:inverseOf d3fend:detected_by .
+
+d3fend:detected_by a owl:ObjectProperty ;
+  rdfs:label "detected by" ;
+  rdfs:comment "Adversary technique can be detected using a defensive detection technique." ;
+  rdfs:domain sec:Technique ;
+  rdfs:range d3fend:DetectionTechnique ;
+  owl:inverseOf d3fend:detects .
+
+d3fend:denies a owl:ObjectProperty ;
+  rdfs:label "denies" ;
+  rdfs:comment "Defensive denial technique denies, blocks, or prevents execution of an adversary technique." ;
+  rdfs:domain d3fend:DenialTechnique ;
+  rdfs:range sec:Technique ;
+  owl:inverseOf d3fend:denied_by .
+
+d3fend:denied_by a owl:ObjectProperty ;
+  rdfs:label "denied by" ;
+  rdfs:comment "Adversary technique can be denied by a defensive denial technique." ;
+  rdfs:domain sec:Technique ;
+  rdfs:range d3fend:DenialTechnique ;
+  owl:inverseOf d3fend:denies .
+
+d3fend:disrupts a owl:ObjectProperty ;
+  rdfs:label "disrupts" ;
+  rdfs:comment "Defensive disruption technique disrupts, degrades, or interferes with an adversary technique." ;
+  rdfs:domain d3fend:DisruptionTechnique ;
+  rdfs:range sec:Technique ;
+  owl:inverseOf d3fend:disrupted_by .
+
+d3fend:disrupted_by a owl:ObjectProperty ;
+  rdfs:label "disrupted by" ;
+  rdfs:comment "Adversary technique can be disrupted by a defensive disruption technique." ;
+  rdfs:domain sec:Technique ;
+  rdfs:range d3fend:DisruptionTechnique ;
+  owl:inverseOf d3fend:disrupts .
+
+d3fend:implements a owl:ObjectProperty ;
+  rdfs:label "implements" ;
+  rdfs:comment "Countermeasure implements a defensive technique." ;
+  rdfs:domain d3fend:Countermeasure ;
+  rdfs:range d3fend:DefensiveTechnique ;
+  owl:inverseOf d3fend:implemented_by .
+
+d3fend:implemented_by a owl:ObjectProperty ;
+  rdfs:label "implemented by" ;
+  rdfs:comment "Defensive technique is implemented through specific countermeasures." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range d3fend:Countermeasure ;
+  owl:inverseOf d3fend:implements .
+
+d3fend:requires a owl:ObjectProperty ;
+  rdfs:label "requires" ;
+  rdfs:comment "Defensive technique requires prerequisite control to be effective." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range d3fend:PrerequisiteControl ;
+  owl:inverseOf d3fend:required_by .
+
+d3fend:required_by a owl:ObjectProperty ;
+  rdfs:label "required by" ;
+  rdfs:comment "Prerequisite control is required by a defensive technique." ;
+  rdfs:domain d3fend:PrerequisiteControl ;
+  rdfs:range d3fend:DefensiveTechnique ;
+  owl:inverseOf d3fend:requires .
+
+d3fend:complementedBy a owl:ObjectProperty ;
+  rdfs:label "complemented by" ;
+  rdfs:comment "Defensive technique is complemented by another defensive technique." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range d3fend:DefensiveTechnique ;
+  a owl:SymmetricProperty .
+
+d3fend:weakens a owl:ObjectProperty ;
+  rdfs:label "weakens" ;
+  rdfs:comment "Defensive technique weakens or reduces the effectiveness of an attack pattern." ;
+  rdfs:domain d3fend:DefensiveTechnique ;
+  rdfs:range sec:AttackPattern ;
+  owl:inverseOf d3fend:weakened_by .
+
+d3fend:weakened_by a owl:ObjectProperty ;
+  rdfs:label "weakened by" ;
+  rdfs:comment "Attack pattern is weakened by a defensive technique." ;
+  rdfs:domain sec:AttackPattern ;
+  rdfs:range d3fend:DefensiveTechnique ;
+  owl:inverseOf d3fend:weakens .
+
+############################
+# Class Constraints (SHACL-informative)
+############################
+
+# DefensiveTechnique instances MUST have:
+# - d3fendId (functional, required)
+# - name (functional, required)
+# - description (required)
+# - techniqueType (required: Detection, Denial, or Disruption)
+# - scope (required)
+# - at least one of: mitigates, detects, denies, disrupts
+
+# Countermeasure instances MUST have:
+# - countermeasureName (required)
+# - countermeasureDescription (required)
+# - controlType (required)
+# - at least one implements relationship
+
+# PrerequisiteControl instances MUST have:
+# - prerequisiteName (required)
+# - prerequisiteDescription (required)
+
+############################
+# Example Instances (Informative)
+############################
+
+# d3fend:D3FEND_DT_001 a d3fend:DetectionTechnique ;
+#   d3fend:d3fendId "D3-DT-001" ;
+#   d3fend:name "Log Analysis" ;
+#   d3fend:description "Analysis of system logs to detect anomalous behavior and attack indicators." ;
+#   d3fend:techniqueType "Detection" ;
+#   d3fend:sophisticationLevel "Medium" ;
+#   d3fend:costLevel "Low" ;
+#   d3fend:scope "Host-based" ;
+#   d3fend:implementationStatus "Stable" ;
+#   d3fend:publishedDate "2023-06-15T00:00:00Z"^^xsd:dateTime ;
+#   d3fend:url "https://d3fend.mitre.org/technique/d3d:DT-001"^^xsd:anyURI ;
+#   d3fend:detects sec:Technique_T1087 ;
+#   d3fend:detects sec:Technique_T1010 ;
+#   d3fend:requires d3fend:Prereq_SyslogAggregation .
+#
+# d3fend:Countermeasure_Splunk a d3fend:Countermeasure ;
+#   d3fend:countermeasureName "Splunk Enterprise" ;
+#   d3fend:countermeasureDescription "Deploy Splunk for centralized log aggregation and analysis with detection rules." ;
+#   d3fend:controlType "Detective" ;
+#   d3fend:implements d3fend:D3FEND_DT_001 .
+#
+# d3fend:Prereq_SyslogAggregation a d3fend:PrerequisiteControl ;
+#   d3fend:prerequisiteName "Syslog Aggregation" ;
+#   d3fend:prerequisiteDescription "Centralized syslog or log aggregation infrastructure must be deployed and operational." .
+#
+# d3fend:D3FEND_DN_005 a d3fend:DenialTechnique ;
+#   d3fend:d3fendId "D3-DN-005" ;
+#   d3fend:name "Network Segmentation" ;
+#   d3fend:description "Isolation of network segments to prevent lateral movement and limit attack surface." ;
+#   d3fend:techniqueType "Denial" ;
+#   d3fend:sophisticationLevel "High" ;
+#   d3fend:costLevel "High" ;
+#   d3fend:scope "Network-based" ;
+#   d3fend:implementationStatus "Stable" ;
+#   d3fend:denies sec:Technique_T1570 ;
+#   d3fend:denies sec:Technique_T1210 ;
+#   d3fend:complementedBy d3fend:D3FEND_DN_010 .

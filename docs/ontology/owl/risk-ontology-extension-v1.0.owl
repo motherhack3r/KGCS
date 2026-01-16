@@ -1,0 +1,51 @@
+@prefix sec: <https://example.org/sec/risk#> .
+@prefix core: <https://example.org/sec/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sec:RiskOntology a owl:Ontology ;
+  rdfs:label "Risk Ontology Extension v1.0" ;
+  owl:imports core:CoreOntology .
+
+############################
+# Classes
+############################
+
+sec:RiskAssessment a owl:Class .
+sec:RiskScenario a owl:Class .
+sec:Impact a owl:Class .
+sec:Likelihood a owl:Class .
+sec:Control a owl:Class .
+
+############################
+# Object Properties
+############################
+
+sec:considers a owl:ObjectProperty ;
+  rdfs:domain sec:RiskAssessment ;
+  rdfs:range core:Vulnerability .
+
+sec:involvesTechnique a owl:ObjectProperty ;
+  rdfs:domain sec:RiskScenario ;
+  rdfs:range core:Technique .
+
+sec:mitigated_by a owl:ObjectProperty ;
+  rdfs:domain sec:RiskScenario ;
+  rdfs:range sec:Control .
+
+sec:maps_to a owl:ObjectProperty ;
+  rdfs:domain sec:Control ;
+  rdfs:range core:DefensiveTechnique .
+
+############################
+# Subjective Properties
+############################
+
+sec:hasLikelihood a owl:ObjectProperty ;
+  rdfs:domain sec:RiskScenario ;
+  rdfs:range sec:Likelihood .
+
+sec:hasImpact a owl:ObjectProperty ;
+  rdfs:domain sec:RiskScenario ;
+  rdfs:range sec:Impact .

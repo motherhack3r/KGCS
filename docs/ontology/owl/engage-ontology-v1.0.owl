@@ -1,0 +1,439 @@
+@prefix engage: <https://example.org/sec/engage#> .
+@prefix sec: <https://example.org/sec/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+############################
+# Ontology Declaration
+############################
+
+engage:ENGAGEOntology a owl:Ontology ;
+  rdfs:label "ENGAGE (Adversary Engagement & Disruption) Ontology v1.0" ;
+  rdfs:comment "Formal ontology for ENGAGE adversary engagement strategies and high-level disruption concepts. Represents strategic approaches to interact with, manipulate, disrupt, or defeat adversary operations at macro level." ;
+  owl:imports sec:CoreOntology .
+
+############################
+# Engagement Strategy Classes
+############################
+
+engage:EngagementConcept a owl:Class ;
+  rdfs:label "Engagement Concept" ;
+  rdfs:comment "Strategic adversary engagement or interaction concept identified by ENGAGE framework. Represents higher-level adversary interaction strategies, operational disruption, and strategic engagement approaches." .
+
+engage:DisruptionStrategy a owl:Class ;
+  rdfs:label "Disruption Strategy" ;
+  rdfs:comment "High-level strategy to disrupt, degrade, delay, or deny adversary operations and objectives." ;
+  rdfs:subClassOf engage:EngagementConcept .
+
+engage:OperationalInterference a owl:Class ;
+  rdfs:label "Operational Interference" ;
+  rdfs:comment "Technique to directly interfere with, obstruct, or impede adversary command-and-control, coordination, or execution." ;
+  rdfs:subClassOf engage:EngagementConcept .
+
+engage:CapabilityDegradation a owl:Class ;
+  rdfs:label "Capability Degradation" ;
+  rdfs:comment "Strategy to degrade, weaken, or reduce adversary operational capabilities over time." ;
+  rdfs:subClassOf engage:EngagementConcept .
+
+engage:AttributionStrategy a owl:Class ;
+  rdfs:label "Attribution Strategy" ;
+  rdfs:comment "Engagement approach focused on identifying, tracking, and attributing adversary operations." ;
+  rdfs:subClassOf engage:EngagementConcept .
+
+engage:CoordinationDisruption a owl:Class ;
+  rdfs:label "Coordination Disruption" ;
+  rdfs:comment "Strategy to disrupt adversary coordination, communication, or command-and-control infrastructure." ;
+  rdfs:subClassOf engage:EngagementConcept .
+
+engage:ResilienceBuilding a owl:Class ;
+  rdfs:label "Resilience Building" ;
+  rdfs:comment "Strategy to build organizational resilience and adaptive capacity against adversary operations." ;
+  rdfs:subClassOf engage:EngagementConcept .
+
+engage:EngagementObjective a owl:Class ;
+  rdfs:label "Engagement Objective" ;
+  rdfs:comment "Strategic objective or outcome sought through engagement activities." .
+
+engage:OperationalContext a owl:Class ;
+  rdfs:label "Operational Context" ;
+  rdfs:comment "Context or scenario in which engagement strategy applies (e.g., peacetime, crisis, attribution phase)." .
+
+engage:StakeholderImpact a owl:Class ;
+  rdfs:label "Stakeholder Impact" ;
+  rdfs:comment "Assessment of engagement strategy impact on organizational stakeholders, customers, or partners." .
+
+############################
+# Engagement Concept Properties
+############################
+
+engage:engageId a owl:DatatypeProperty ;
+  rdfs:label "ENGAGE ID" ;
+  rdfs:comment "Canonical ENGAGE identifier (e.g., 'E-DS-001', 'E-OI-002', 'E-CD-003')." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+engage:name a owl:DatatypeProperty ;
+  rdfs:label "Name" ;
+  rdfs:comment "Name of the engagement concept or strategy." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+engage:description a owl:DatatypeProperty ;
+  rdfs:label "Description" ;
+  rdfs:comment "Strategic description of engagement approach, how it disrupts adversary operations, and intended outcomes." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:string .
+
+engage:strategyType a owl:DatatypeProperty ;
+  rdfs:label "Strategy Type" ;
+  rdfs:comment "Classification of engagement strategy: Disruption, Interference, Degradation, Attribution, Coordination Disruption, or Resilience." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Disruption" "Interference" "Degradation" "Attribution" "Coordination Disruption" "Resilience") .
+
+engage:timeframe a owl:DatatypeProperty ;
+  rdfs:label "Timeframe" ;
+  rdfs:comment "Timeframe for effectiveness of engagement strategy: Immediate, Short-term, Medium-term, Long-term." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Immediate" "Short-term" "Medium-term" "Long-term") .
+
+engage:operationalLevel a owl:DatatypeProperty ;
+  rdfs:label "Operational Level" ;
+  rdfs:comment "Level of operations affected: Tactical, Operational, or Strategic." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Tactical" "Operational" "Strategic") .
+
+engage:riskLevel a owl:DatatypeProperty ;
+  rdfs:label "Risk Level" ;
+  rdfs:comment "Level of risk associated with engagement: Low, Medium, or High." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Low" "Medium" "High") .
+
+engage:sophisticationRequired a owl:DatatypeProperty ;
+  rdfs:label "Sophistication Required" ;
+  rdfs:comment "Sophistication level required to execute strategy: Low, Medium, or High." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Low" "Medium" "High") .
+
+engage:costLevel a owl:DatatypeProperty ;
+  rdfs:label "Cost Level" ;
+  rdfs:comment "Estimated cost to implement strategy: Low, Medium, or High." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Low" "Medium" "High") .
+
+engage:effectivenessMetric a owl:DatatypeProperty ;
+  rdfs:label "Effectiveness Metric" ;
+  rdfs:comment "Metric or KPI used to measure strategy effectiveness (e.g., incident reduction %, APT activity decline, operational costs to adversary)." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:string .
+
+engage:applicableAdversary a owl:DatatypeProperty ;
+  rdfs:label "Applicable Adversary" ;
+  rdfs:comment "Type or class of adversary most effectively targeted: Nation-state, Cybercriminal, Hacktivist, Insider, etc." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:string .
+
+engage:legalConsiderations a owl:DatatypeProperty ;
+  rdfs:label "Legal Considerations" ;
+  rdfs:comment "Legal, regulatory, or jurisdictional considerations relevant to engagement strategy." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:string .
+
+engage:implementationStatus a owl:DatatypeProperty ;
+  rdfs:label "Implementation Status" ;
+  rdfs:comment "Status of engagement strategy: Conceptual, Pilot, Operational, or Archived." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Conceptual" "Pilot" "Operational" "Archived") .
+
+engage:publishedDate a owl:DatatypeProperty ;
+  rdfs:label "Published Date" ;
+  rdfs:comment "ISO 8601 timestamp when engagement concept was published." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:dateTime .
+
+engage:lastModifiedDate a owl:DatatypeProperty ;
+  rdfs:label "Last Modified Date" ;
+  rdfs:comment "ISO 8601 timestamp when engagement concept was last updated." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:dateTime .
+
+engage:url a owl:DatatypeProperty ;
+  rdfs:label "URL" ;
+  rdfs:comment "Reference URL to ENGAGE framework page or additional documentation." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range xsd:anyURI .
+
+############################
+# Objective & Context Properties
+############################
+
+engage:objectiveName a owl:DatatypeProperty ;
+  rdfs:label "Objective Name" ;
+  rdfs:comment "Name of strategic engagement objective." ;
+  rdfs:domain engage:EngagementObjective ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+engage:objectiveDescription a owl:DatatypeProperty ;
+  rdfs:label "Objective Description" ;
+  rdfs:comment "Description of what engagement objective seeks to achieve." ;
+  rdfs:domain engage:EngagementObjective ;
+  rdfs:range xsd:string .
+
+engage:successCondition a owl:DatatypeProperty ;
+  rdfs:label "Success Condition" ;
+  rdfs:comment "Condition or metric that defines success of engagement objective." ;
+  rdfs:domain engage:EngagementObjective ;
+  rdfs:range xsd:string .
+
+engage:contextName a owl:DatatypeProperty ;
+  rdfs:label "Context Name" ;
+  rdfs:comment "Name of operational context or scenario." ;
+  rdfs:domain engage:OperationalContext ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+engage:contextDescription a owl:DatatypeProperty ;
+  rdfs:label "Context Description" ;
+  rdfs:comment "Description of operational scenario in which engagement applies." ;
+  rdfs:domain engage:OperationalContext ;
+  rdfs:range xsd:string .
+
+engage:contextTriggered a owl:DatatypeProperty ;
+  rdfs:label "Context Triggered" ;
+  rdfs:comment "Triggering condition or event that activates engagement strategy." ;
+  rdfs:domain engage:OperationalContext ;
+  rdfs:range xsd:string .
+
+engage:impactType a owl:DatatypeProperty ;
+  rdfs:label "Impact Type" ;
+  rdfs:comment "Type of stakeholder impact: Operational, Financial, Reputational, Legal, or Customer." ;
+  rdfs:domain engage:StakeholderImpact ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Operational" "Financial" "Reputational" "Legal" "Customer") .
+
+engage:impactDescription a owl:DatatypeProperty ;
+  rdfs:label "Impact Description" ;
+  rdfs:comment "Description of how engagement strategy impacts stakeholders." ;
+  rdfs:domain engage:StakeholderImpact ;
+  rdfs:range xsd:string .
+
+engage:impactSeverity a owl:DatatypeProperty ;
+  rdfs:label "Impact Severity" ;
+  rdfs:comment "Severity of stakeholder impact: Low, Medium, or High." ;
+  rdfs:domain engage:StakeholderImpact ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("Low" "Medium" "High") .
+
+############################
+# Engagement Relationships
+############################
+
+engage:disrupts a owl:ObjectProperty ;
+  rdfs:label "disrupts" ;
+  rdfs:comment "Engagement concept disrupts, interferes with, or degrades adversary use or effectiveness of a technique." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range sec:Technique ;
+  owl:inverseOf engage:disrupted_by .
+
+engage:disrupted_by a owl:ObjectProperty ;
+  rdfs:label "disrupted by" ;
+  rdfs:comment "Adversary technique can be disrupted by an engagement strategy." ;
+  rdfs:domain sec:Technique ;
+  rdfs:range engage:EngagementConcept ;
+  owl:inverseOf engage:disrupts .
+
+engage:targets a owl:ObjectProperty ;
+  rdfs:label "targets" ;
+  rdfs:comment "Engagement strategy targets a specific technique or tactic." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range sec:Technique ;
+  owl:inverseOf engage:targeted_by_engagement .
+
+engage:targeted_by_engagement a owl:ObjectProperty ;
+  rdfs:label "targeted by engagement" ;
+  rdfs:comment "Adversary technique is targeted by engagement strategy." ;
+  rdfs:domain sec:Technique ;
+  rdfs:range engage:EngagementConcept ;
+  owl:inverseOf engage:targets .
+
+engage:achieves a owl:ObjectProperty ;
+  rdfs:label "achieves" ;
+  rdfs:comment "Engagement concept achieves one or more strategic objectives." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range engage:EngagementObjective ;
+  owl:inverseOf engage:achieved_by .
+
+engage:achieved_by a owl:ObjectProperty ;
+  rdfs:label "achieved by" ;
+  rdfs:comment "Strategic objective is achieved through engagement concept." ;
+  rdfs:domain engage:EngagementObjective ;
+  rdfs:range engage:EngagementConcept ;
+  owl:inverseOf engage:achieves .
+
+engage:applicableInContext a owl:ObjectProperty ;
+  rdfs:label "applicable in context" ;
+  rdfs:comment "Engagement strategy is applicable in specific operational context." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range engage:OperationalContext ;
+  owl:inverseOf engage:context_for_engagement .
+
+engage:context_for_engagement a owl:ObjectProperty ;
+  rdfs:label "context for engagement" ;
+  rdfs:comment "Operational context applies to engagement strategy." ;
+  rdfs:domain engage:OperationalContext ;
+  rdfs:range engage:EngagementConcept ;
+  owl:inverseOf engage:applicableInContext .
+
+engage:hasImpact a owl:ObjectProperty ;
+  rdfs:label "has impact" ;
+  rdfs:comment "Engagement strategy has stakeholder impact." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range engage:StakeholderImpact ;
+  owl:inverseOf engage:impact_of .
+
+engage:impact_of a owl:ObjectProperty ;
+  rdfs:label "impact of" ;
+  rdfs:comment "Stakeholder impact is result of engagement strategy." ;
+  rdfs:domain engage:StakeholderImpact ;
+  rdfs:range engage:EngagementConcept ;
+  owl:inverseOf engage:hasImpact .
+
+engage:complementedBy a owl:ObjectProperty ;
+  rdfs:label "complemented by" ;
+  rdfs:comment "Engagement strategy is complemented by another strategy." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range engage:EngagementConcept ;
+  a owl:SymmetricProperty .
+
+engage:requiresCoordination a owl:ObjectProperty ;
+  rdfs:label "requires coordination" ;
+  rdfs:comment "Engagement strategy requires coordination with another strategy." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range engage:EngagementConcept ;
+  owl:inverseOf engage:coordinated_with .
+
+engage:coordinated_with a owl:ObjectProperty ;
+  rdfs:label "coordinated with" ;
+  rdfs:comment "Engagement strategy is coordinated with another strategy." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range engage:EngagementConcept ;
+  owl:inverseOf engage:requiresCoordination .
+
+engage:affects a owl:ObjectProperty ;
+  rdfs:label "affects" ;
+  rdfs:comment "Engagement strategy affects specific attack pattern or threat." ;
+  rdfs:domain engage:EngagementConcept ;
+  rdfs:range sec:AttackPattern ;
+  owl:inverseOf engage:affected_by_engagement .
+
+engage:affected_by_engagement a owl:ObjectProperty ;
+  rdfs:label "affected by engagement" ;
+  rdfs:comment "Attack pattern is affected by engagement strategy." ;
+  rdfs:domain sec:AttackPattern ;
+  rdfs:range engage:EngagementConcept ;
+  owl:inverseOf engage:affects .
+
+############################
+# Class Constraints (SHACL-informative)
+############################
+
+# EngagementConcept instances MUST have:
+# - engageId (functional, required)
+# - name (functional, required)
+# - description (required)
+# - strategyType (required)
+# - timeframe (required)
+# - operationalLevel (required)
+# - effectivenessMetric (required)
+# - at least one disrupts or affects relationship
+
+# EngagementObjective instances MUST have:
+# - objectiveName (functional, required)
+# - objectiveDescription (required)
+# - successCondition (required)
+
+# OperationalContext instances MUST have:
+# - contextName (functional, required)
+# - contextDescription (required)
+# - contextTriggered (required)
+
+# StakeholderImpact instances MUST have:
+# - impactType (required)
+# - impactDescription (required)
+# - impactSeverity (required)
+
+############################
+# Example Instances (Informative)
+############################
+
+# engage:E_Disrupt_C2 a engage:OperationalInterference ;
+#   engage:engageId "E-OI-001" ;
+#   engage:name "Command-and-Control Disruption" ;
+#   engage:description "Strategic approach to disrupt adversary command-and-control communications, coordination, and operational control." ;
+#   engage:strategyType "Interference" ;
+#   engage:timeframe "Medium-term" ;
+#   engage:operationalLevel "Operational" ;
+#   engage:riskLevel "High" ;
+#   engage:sophisticationRequired "High" ;
+#   engage:costLevel "High" ;
+#   engage:effectivenessMetric "Reduction in adversary operational tempo and coordinated attack frequency" ;
+#   engage:applicableAdversary "Nation-state, Organized cybercriminal groups" ;
+#   engage:legalConsiderations "Must coordinate with law enforcement; potential attribution concerns" ;
+#   engage:implementationStatus "Operational" ;
+#   engage:disrupts sec:Technique_T1071 ;
+#   engage:disrupts sec:Technique_T1008 ;
+#   engage:achieves engage:Objective_OperationalDenial ;
+#   engage:applicableInContext engage:Context_ActiveIncident .
+#
+# engage:Objective_OperationalDenial a engage:EngagementObjective ;
+#   engage:objectiveName "Operational Denial" ;
+#   engage:objectiveDescription "Deny adversary operational capability and ability to execute coordinated operations." ;
+#   engage:successCondition "Measurable reduction in coordinated attack patterns and command-and-control communications." .
+#
+# engage:Context_ActiveIncident a engage:OperationalContext ;
+#   engage:contextName "Active Incident Response" ;
+#   engage:contextDescription "Engagement during active incident investigation and response operations." ;
+#   engage:contextTriggered "Confirmation of adversary presence and active operations in enterprise." .
+#
+# engage:E_Attribution a engage:AttributionStrategy ;
+#   engage:engageId "E-AS-005" ;
+#   engage:name "Coordinated Attribution Engagement" ;
+#   engage:description "Strategic approach to identify, track, and publicly or privately attribute adversary operations to increase costs and consequences." ;
+#   engage:strategyType "Attribution" ;
+#   engage:timeframe "Long-term" ;
+#   engage:operationalLevel "Strategic" ;
+#   engage:riskLevel "High" ;
+#   engage:sophisticationRequired "High" ;
+#   engage:costLevel "High" ;
+#   engage:effectivenessMetric "Public attribution statements, law enforcement actions, sanctions, diplomatic consequences" ;
+#   engage:implementableAdversary "Nation-state actors" ;
+#   engage:implementationStatus "Operational" ;
+#   engage:complementedBy engage:E_Disrupt_C2 ;
+#   engage:hasImpact engage:Impact_DiplomaticRepercussions .
+#
+# engage:Impact_DiplomaticRepercussions a engage:StakeholderImpact ;
+#   engage:impactType "Reputational" ;
+#   engage:impactDescription "Public attribution can trigger diplomatic tensions and international responses." ;
+#   engage:impactSeverity "High" .
+#
+# engage:E_Resilience a engage:ResilienceBuilding ;
+#   engage:engageId "E-RB-010" ;
+#   engage:name "Organizational Resilience Enhancement" ;
+#   engage:description "Long-term strategic approach to build organizational capacity to withstand, adapt to, and recover from adversary operations." ;
+#   engage:strategyType "Resilience" ;
+#   engage:timeframe "Long-term" ;
+#   engage:operationalLevel "Strategic" ;
+#   engage:riskLevel "Low" ;
+#   engage:implementationStatus "Operational" ;
+#   engage:affects sec:AttackPattern_TargetedPhishing ;
+#   engage:affects sec:AttackPattern_SupplyChainCompromise .

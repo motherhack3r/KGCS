@@ -1,0 +1,425 @@
+@prefix cpe: <https://example.org/sec/cpe#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+############################
+# Ontology Declaration
+############################
+
+cpe:CPEOntology a owl:Ontology ;
+  rdfs:label "CPE (Common Platform Enumeration) Ontology v1.0" ;
+  rdfs:comment "Frozen, authoritative ontology for CPE platform identification and asset classification aligned to NIST/NVD CPE 2.3 standard and CPEMatch schema." .
+
+############################
+# Core Platform Classes
+############################
+
+cpe:Platform a owl:Class ;
+  rdfs:label "Platform" ;
+  rdfs:comment "Atomic software or hardware product identified by a canonical CPE (Common Platform Enumeration) URI. Each platform represents an immutable, versioned component entity from NVD CPE Dictionary." .
+
+cpe:PlatformConfiguration a owl:Class ;
+  rdfs:label "Platform Configuration" ;
+  rdfs:comment "Logical configuration or criteria expressing a set of platform versions. Defined by CPEMatch criteria with version ranges (inclusive/exclusive bounds). Used to specify which platform instances are affected by vulnerabilities." .
+
+cpe:DeprecatedPlatform a owl:Class ;
+  rdfs:label "Deprecated Platform" ;
+  rdfs:comment "Platform entry that has been superseded or marked as deprecated in NVD, typically replaced by a newer naming convention." ;
+  rdfs:subClassOf cpe:Platform .
+
+############################
+# Platform Properties (CPE 2.3 URI Components)
+############################
+
+cpe:cpeUri a owl:DatatypeProperty ;
+  rdfs:label "CPE URI" ;
+  rdfs:comment "Canonical Common Platform Enumeration formatted URI string (e.g., 'cpe:2.3:a:vendor:product:version:*:*:*:*:*:*:*')." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+cpe:cpeNameId a owl:DatatypeProperty ;
+  rdfs:label "CPE Name ID" ;
+  rdfs:comment "Universally unique identifier (UUID) for this CPE entry in NVD database." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+cpe:part a owl:DatatypeProperty ;
+  rdfs:label "CPE Part" ;
+  rdfs:comment "CPE part classification value: 'a' for application, 'o' for operating system, 'h' for hardware." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:string ;
+  owl:allowedValues ("a" "o" "h") .
+
+cpe:vendor a owl:DatatypeProperty ;
+  rdfs:label "Vendor" ;
+  rdfs:comment "Vendor or organization name component of CPE (e.g., 'microsoft', 'linux', 'apache', 'cisco')." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:string .
+
+cpe:product a owl:DatatypeProperty ;
+  rdfs:label "Product" ;
+  rdfs:comment "Product name component of CPE (e.g., 'windows', 'linux_kernel', 'apache_http_server', 'ios')." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:string .
+
+cpe:version a owl:DatatypeProperty ;
+  rdfs:label "Version" ;
+  rdfs:comment "Version string component of CPE (e.g., '10', '6.4.1', '2.4.53', '15.1')." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:string .
+
+cpe:update a owl:DatatypeProperty ;
+  rdfs:label "Update" ;
+  rdfs:comment "Update or patch level component of CPE (typically '*' for unspecified)." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:string .
+
+cpe:edition a owl:DatatypeProperty ;
+  rdfs:label "Edition" ;
+  rdfs:comment "Edition component of CPE for products with multiple editions." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:string .
+
+cpe:language a owl:DatatypeProperty ;
+  rdfs:label "Language" ;
+  rdfs:comment "Language component of CPE (typically '*' for language-independent)." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:string .
+
+cpe:softwareEdition a owl:DatatypeProperty ;
+  rdfs:label "Software Edition" ;
+  rdfs:comment "Software edition component of CPE (e.g., 'enterprise', 'community', 'free')." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:string .
+
+cpe:targetSoftware a owl:DatatypeProperty ;
+  rdfs:label "Target Software" ;
+  rdfs:comment "Target software component of CPE for plugins/extensions (e.g., 'wordpress', 'joomla')." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:string .
+
+cpe:targetHardware a owl:DatatypeProperty ;
+  rdfs:label "Target Hardware" ;
+  rdfs:comment "Target hardware component of CPE for hardware-dependent software." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:string .
+
+cpe:other a owl:DatatypeProperty ;
+  rdfs:label "Other" ;
+  rdfs:comment "Other attributes component of CPE (e.g., 'update_rollup', 'service_pack')." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:string .
+
+cpe:deprecated a owl:DatatypeProperty ;
+  rdfs:label "Deprecated" ;
+  rdfs:comment "Boolean flag indicating if this CPE entry has been marked as deprecated in NVD." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:boolean .
+
+cpe:title a owl:DatatypeProperty ;
+  rdfs:label "Title" ;
+  rdfs:comment "Human-readable title for the platform (e.g., 'Microsoft Windows 10', 'Linux Kernel 6.4.1')." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+cpe:cpeCreated a owl:DatatypeProperty ;
+  rdfs:label "Created Date" ;
+  rdfs:comment "ISO 8601 timestamp when this CPE entry was created in NVD." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:dateTime .
+
+cpe:cpeLastModified a owl:DatatypeProperty ;
+  rdfs:label "Last Modified Date" ;
+  rdfs:comment "ISO 8601 timestamp when this CPE entry was last updated in NVD." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range xsd:dateTime .
+
+############################
+# Platform Relationships
+############################
+
+cpe:deprecates a owl:ObjectProperty ;
+  rdfs:label "deprecates" ;
+  rdfs:comment "Current platform entry supersedes and deprecates prior platform entry(ies)." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range cpe:Platform ;
+  owl:inverseOf cpe:deprecatedBy .
+
+cpe:deprecatedBy a owl:ObjectProperty ;
+  rdfs:label "deprecated by" ;
+  rdfs:comment "Platform entry has been deprecated in favor of another platform entry." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range cpe:Platform ;
+  owl:inverseOf cpe:deprecates .
+
+cpe:isVariantOf a owl:ObjectProperty ;
+  rdfs:label "is variant of" ;
+  rdfs:comment "This platform is a variant (e.g., different edition/language) of another platform." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range cpe:Platform ;
+  a owl:SymmetricProperty .
+
+cpe:relatedTo a owl:ObjectProperty ;
+  rdfs:label "related to" ;
+  rdfs:comment "This platform is related to another platform (e.g., same product family, compatible versions)." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range cpe:Platform ;
+  a owl:SymmetricProperty .
+
+############################
+# Platform Configuration (CPEMatch-aligned)
+############################
+
+cpe:matchCriteriaId a owl:DatatypeProperty ;
+  rdfs:label "Match Criteria ID" ;
+  rdfs:comment "UUID identifier for this configuration criteria in NVD database." ;
+  rdfs:domain cpe:PlatformConfiguration ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+cpe:criteria a owl:DatatypeProperty ;
+  rdfs:label "Criteria" ;
+  rdfs:comment "CPE criteria expression string defining this platform configuration (base CPE with potential wildcards)." ;
+  rdfs:domain cpe:PlatformConfiguration ;
+  rdfs:range xsd:string ;
+  a owl:FunctionalProperty .
+
+cpe:versionStartIncluding a owl:DatatypeProperty ;
+  rdfs:label "Version Start (Including)" ;
+  rdfs:comment "Inclusive starting version bound for this configuration range." ;
+  rdfs:domain cpe:PlatformConfiguration ;
+  rdfs:range xsd:string .
+
+cpe:versionEndIncluding a owl:DatatypeProperty ;
+  rdfs:label "Version End (Including)" ;
+  rdfs:comment "Inclusive ending version bound for this configuration range." ;
+  rdfs:domain cpe:PlatformConfiguration ;
+  rdfs:range xsd:string .
+
+cpe:versionStartExcluding a owl:DatatypeProperty ;
+  rdfs:label "Version Start (Excluding)" ;
+  rdfs:comment "Exclusive starting version bound for this configuration range." ;
+  rdfs:domain cpe:PlatformConfiguration ;
+  rdfs:range xsd:string .
+
+cpe:versionEndExcluding a owl:DatatypeProperty ;
+  rdfs:label "Version End (Excluding)" ;
+  rdfs:comment "Exclusive ending version bound for this configuration range." ;
+  rdfs:domain cpe:PlatformConfiguration ;
+  rdfs:range xsd:string .
+
+cpe:configStatus a owl:DatatypeProperty ;
+  rdfs:label "Configuration Status" ;
+  rdfs:comment "Status of this configuration criteria in NVD: Active (currently used) or Deprecated (superseded)." ;
+  rdfs:domain cpe:PlatformConfiguration ;
+  rdfs:range xsd:string .
+
+cpe:configCreated a owl:DatatypeProperty ;
+  rdfs:label "Configuration Created Date" ;
+  rdfs:comment "ISO 8601 timestamp when this configuration was created in NVD." ;
+  rdfs:domain cpe:PlatformConfiguration ;
+  rdfs:range xsd:dateTime .
+
+cpe:configLastModified a owl:DatatypeProperty ;
+  rdfs:label "Configuration Last Modified Date" ;
+  rdfs:comment "ISO 8601 timestamp when this configuration was last updated in NVD." ;
+  rdfs:domain cpe:PlatformConfiguration ;
+  rdfs:range xsd:dateTime .
+
+############################
+# Configuration to Platform Relationships
+############################
+
+cpe:matches a owl:ObjectProperty ;
+  rdfs:label "matches" ;
+  rdfs:comment "Configuration criteria matches (includes) specific platform instances within version range bounds." ;
+  rdfs:domain cpe:PlatformConfiguration ;
+  rdfs:range cpe:Platform ;
+  owl:inverseOf cpe:matchedBy .
+
+cpe:matchedBy a owl:ObjectProperty ;
+  rdfs:label "matched by" ;
+  rdfs:comment "Platform is matched by (included in) configuration criteria." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range cpe:PlatformConfiguration ;
+  owl:inverseOf cpe:matches .
+
+cpe:expandsTo a owl:ObjectProperty ;
+  rdfs:label "expands to" ;
+  rdfs:comment "Configuration criteria logically expands to a set of specific platform instances." ;
+  rdfs:domain cpe:PlatformConfiguration ;
+  rdfs:range cpe:Platform ;
+  owl:inverseOf cpe:expandedFrom .
+
+cpe:expandedFrom a owl:ObjectProperty ;
+  rdfs:label "expanded from" ;
+  rdfs:comment "Platform instance is expanded from (is a concrete instance of) configuration criteria." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range cpe:PlatformConfiguration ;
+  owl:inverseOf cpe:expandsTo .
+
+############################
+# Version Ordering & Comparison
+############################
+
+cpe:isVersionOf a owl:ObjectProperty ;
+  rdfs:label "is version of" ;
+  rdfs:comment "This platform is a specific version of a product family." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range cpe:Platform ;
+  owl:inverseOf cpe:hasVersion .
+
+cpe:hasVersion a owl:ObjectProperty ;
+  rdfs:label "has version" ;
+  rdfs:comment "Product family has specific version instances." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range cpe:Platform ;
+  owl:inverseOf cpe:isVersionOf .
+
+cpe:newerThan a owl:ObjectProperty ;
+  rdfs:label "newer than" ;
+  rdfs:comment "This platform version is newer than another (partial ordering, transitivity implied by version semantics)." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range cpe:Platform .
+
+cpe:olderThan a owl:ObjectProperty ;
+  rdfs:label "older than" ;
+  rdfs:comment "This platform version is older than another (inverse of newerThan)." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range cpe:Platform ;
+  owl:inverseOf cpe:newerThan .
+
+cpe:successorOf a owl:ObjectProperty ;
+  rdfs:label "successor of" ;
+  rdfs:comment "Platform is immediate successor/next version of another." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range cpe:Platform ;
+  owl:inverseOf cpe:predecessorOf .
+
+cpe:predecessorOf a owl:ObjectProperty ;
+  rdfs:label "predecessor of" ;
+  rdfs:comment "Platform is immediate predecessor/previous version of another." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range cpe:Platform ;
+  owl:inverseOf cpe:successorOf .
+
+############################
+# Reference & Documentation
+############################
+
+cpe:Reference a owl:Class ;
+  rdfs:label "Reference" ;
+  rdfs:comment "External reference providing documentation, product information, or additional context for a platform." .
+
+cpe:hasReference a owl:ObjectProperty ;
+  rdfs:label "has reference" ;
+  rdfs:comment "Platform has external references providing additional information." ;
+  rdfs:domain cpe:Platform ;
+  rdfs:range cpe:Reference ;
+  owl:inverseOf cpe:referenceFor .
+
+cpe:referenceFor a owl:ObjectProperty ;
+  rdfs:label "reference for" ;
+  rdfs:comment "Reference provides information for a platform." ;
+  rdfs:domain cpe:Reference ;
+  rdfs:range cpe:Platform ;
+  owl:inverseOf cpe:hasReference .
+
+cpe:referenceUrl a owl:DatatypeProperty ;
+  rdfs:label "Reference URL" ;
+  rdfs:comment "URL or URI to the external reference resource." ;
+  rdfs:domain cpe:Reference ;
+  rdfs:range xsd:anyURI .
+
+cpe:referenceType a owl:DatatypeProperty ;
+  rdfs:label "Reference Type" ;
+  rdfs:comment "Type of reference: Product, Change Log, Advisory, Documentation, Release Notes." ;
+  rdfs:domain cpe:Reference ;
+  rdfs:range xsd:string .
+
+cpe:referenceTitle a owl:DatatypeProperty ;
+  rdfs:label "Reference Title" ;
+  rdfs:comment "Human-readable title for the reference." ;
+  rdfs:domain cpe:Reference ;
+  rdfs:range xsd:string .
+
+############################
+# Class Constraints (SHACL-informative)
+############################
+
+# Platform instances MUST have:
+# - cpeUri (functional, required)
+# - part (required, one of: a, o, h)
+# - vendor (required)
+# - product (required)
+# - version (required)
+# - cpeNameId (functional, required)
+# - title (functional, required)
+
+# Deprecated platforms SHOULD have:
+# - deprecated = true
+# - deprecatedBy relationship to successor platform
+
+# PlatformConfiguration instances MUST have:
+# - criteria (functional, required)
+# - matchCriteriaId (functional, required)
+# - configStatus (required)
+# - at least one matches relationship to Platform
+
+# Version range bounds SHOULD be:
+# - Mutually exclusive (startIncluding XOR startExcluding)
+# - Logically consistent (start < end)
+# - If both bounds exist, endInclusive > startInclusive
+
+############################
+# Example Instances (Informative)
+############################
+
+# cpe:Platform_Windows10_22H2 a cpe:Platform ;
+#   cpe:cpeUri "cpe:2.3:o:microsoft:windows_10:22h2:*:*:*:*:*:*:*" ;
+#   cpe:cpeNameId "12345678-1234-1234-1234-123456789012" ;
+#   cpe:part "o" ;
+#   cpe:vendor "microsoft" ;
+#   cpe:product "windows_10" ;
+#   cpe:version "22h2" ;
+#   cpe:title "Microsoft Windows 10 22H2" ;
+#   cpe:deprecated false ;
+#   cpe:cpeCreated "2022-10-18T00:00:00Z"^^xsd:dateTime ;
+#   cpe:cpeLastModified "2025-01-15T12:30:00Z"^^xsd:dateTime ;
+#   cpe:hasReference cpe:RefMicrosoftWindows10Home ;
+#   cpe:successorOf cpe:Platform_Windows10_21H2 .
+#
+# cpe:Platform_Windows10_21H2 a cpe:Platform ;
+#   cpe:cpeUri "cpe:2.3:o:microsoft:windows_10:21h2:*:*:*:*:*:*:*" ;
+#   cpe:cpeNameId "87654321-4321-4321-4321-210987654321" ;
+#   cpe:part "o" ;
+#   cpe:vendor "microsoft" ;
+#   cpe:product "windows_10" ;
+#   cpe:version "21h2" ;
+#   cpe:title "Microsoft Windows 10 21H2" ;
+#   cpe:deprecated false ;
+#   cpe:cpeCreated "2021-11-16T00:00:00Z"^^xsd:dateTime ;
+#   cpe:cpeLastModified "2024-06-10T10:15:00Z"^^xsd:dateTime ;
+#   cpe:predecessorOf cpe:Platform_Windows10_22H2 .
+#
+# cpe:Config_Windows10_20H2_21H2 a cpe:PlatformConfiguration ;
+#   cpe:matchCriteriaId "ABCD1234-ABCD-1234-ABCD-1234ABCD5678" ;
+#   cpe:criteria "cpe:2.3:o:microsoft:windows_10:*:*:*:*:*:*:*:*" ;
+#   cpe:versionStartIncluding "20h2" ;
+#   cpe:versionEndIncluding "21h2" ;
+#   cpe:configStatus "Active" ;
+#   cpe:configCreated "2021-11-10T00:00:00Z"^^xsd:dateTime ;
+#   cpe:configLastModified "2023-08-20T14:30:00Z"^^xsd:dateTime ;
+#   cpe:matches cpe:Platform_Windows10_20H2 ;
+#   cpe:matches cpe:Platform_Windows10_21H2 ;
+#   cpe:matches cpe:Platform_Windows10_21H2_KB5016629 ;
+#   cpe:matches cpe:Platform_Windows10_22H2 .
+#
+# cpe:RefMicrosoftWindows10Home a cpe:Reference ;
+#   cpe:referenceUrl "https://www.microsoft.com/en-us/windows/windows-10"^^xsd:anyURI ;
+#   cpe:referenceType "Product" ;
+#   cpe:referenceTitle "Microsoft Windows 10 Official Product Page" .

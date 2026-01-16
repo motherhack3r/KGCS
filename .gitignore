@@ -1,0 +1,10 @@
+data/*/raw/
+/data/*/raw/
+
+data/cpe/raw/
+data/cve/raw/
+data/cwe/raw/
+data/capec/raw/
+data/d3fend/raw/
+data/cti-stix/raw/
+data/attack/raw/

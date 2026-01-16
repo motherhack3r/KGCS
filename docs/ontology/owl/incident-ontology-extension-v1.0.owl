@@ -1,0 +1,51 @@
+@prefix sec: <https://example.org/sec/incident#> .
+@prefix core: <https://example.org/sec/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sec:IncidentOntology a owl:Ontology ;
+  rdfs:label "Incident Ontology Extension v1.0" ;
+  owl:imports core:CoreOntology .
+
+############################
+# Classes
+############################
+
+sec:Incident a owl:Class .
+sec:ObservedTechnique a owl:Class .
+sec:Evidence a owl:Class .
+sec:DetectionEvent a owl:Class .
+sec:AffectedAsset a owl:Class .
+
+############################
+# Object Properties
+############################
+
+sec:observed a owl:ObjectProperty ;
+  rdfs:domain sec:Incident ;
+  rdfs:range sec:ObservedTechnique .
+
+sec:instance_of a owl:ObjectProperty ;
+  rdfs:domain sec:ObservedTechnique ;
+  rdfs:range core:Technique .
+
+sec:involves a owl:ObjectProperty ;
+  rdfs:domain sec:Incident ;
+  rdfs:range sec:AffectedAsset .
+
+sec:detected_by a owl:ObjectProperty ;
+  rdfs:domain sec:ObservedTechnique ;
+  rdfs:range sec:DetectionEvent .
+
+sec:supported_by a owl:ObjectProperty ;
+  rdfs:domain sec:DetectionEvent ;
+  rdfs:range sec:Evidence .
+
+############################
+# Temporal Properties
+############################
+
+sec:occurredAt a owl:DatatypeProperty ;
+  rdfs:domain sec:Incident ;
+  rdfs:range xsd:dateTime .

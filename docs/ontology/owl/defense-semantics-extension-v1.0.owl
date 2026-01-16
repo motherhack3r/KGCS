@@ -1,0 +1,63 @@
+@prefix sec: <https://example.org/sec/defense#> .
+@prefix core: <https://example.org/sec/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+############################
+# Ontology Declaration
+############################
+
+sec:D3FENDDefenseOntology a owl:Ontology ;
+  rdfs:label "Defense Semantics Extension v1.0 (D3FEND-aligned)" ;
+  rdfs:comment "Defensive behavior semantics aligned with MITRE D3FEND. No operational or temporal semantics." ;
+  owl:imports core:CoreOntology .
+
+############################
+# Classes
+############################
+
+sec:DefensiveTechnique a owl:Class ;
+  rdfs:subClassOf core:DefensiveTechnique ;
+  rdfs:label "Defensive Technique (D3FEND)" .
+
+sec:DefensiveEffect a owl:Class ;
+  rdfs:label "Defensive Effect" ;
+  rdfs:comment "The outcome produced by a defensive technique, without implying success or effectiveness." .
+
+############################
+# Defensive Effects (Controlled Individuals)
+############################
+
+sec:Detect a sec:DefensiveEffect .
+sec:Prevent a sec:DefensiveEffect .
+sec:Delay a sec:DefensiveEffect .
+sec:Degrade a sec:DefensiveEffect .
+sec:Disrupt a sec:DefensiveEffect .
+sec:Contain a sec:DefensiveEffect .
+sec:Restore a sec:DefensiveEffect .
+sec:Reveal a sec:DefensiveEffect .
+
+############################
+# Object Properties
+############################
+
+# DefensiveTechnique ↔ ATT&CK Technique
+sec:countersTechnique a owl:ObjectProperty ;
+  rdfs:domain sec:DefensiveTechnique ;
+  rdfs:range core:Technique ;
+  rdfs:label "counters technique" ;
+  rdfs:comment "Indicates that a defensive technique counteracts an adversary technique (D3FEND semantics)." .
+
+# DefensiveTechnique ↔ DigitalArtifact
+sec:actsOnArtifact a owl:ObjectProperty ;
+  rdfs:domain sec:DefensiveTechnique ;
+  rdfs:range core:DigitalArtifact ;
+  rdfs:label "acts on artifact" ;
+  rdfs:comment "Specifies the digital artifact that the defensive technique operates on." .
+
+# DefensiveTechnique ↔ DefensiveEffect
+sec:producesEffect a owl:ObjectProperty ;
+  rdfs:domain sec:DefensiveTechnique ;
+  rdfs:range sec:DefensiveEffect ;
+  rdfs:label "produces effect" ;
+  rdfs:comment "Declares the effect produced by a defensive technique, without asserting success." .

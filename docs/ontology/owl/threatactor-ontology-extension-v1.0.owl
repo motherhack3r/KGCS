@@ -1,0 +1,43 @@
+@prefix sec: <https://example.org/sec/threatactor#> .
+@prefix core: <https://example.org/sec/core#> .
+@prefix incident: <https://example.org/sec/incident#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+sec:ThreatActorOntology a owl:Ontology ;
+  rdfs:label "Threat Actor Ontology Extension v1.0" ;
+  owl:imports core:CoreOntology , incident:IncidentOntology .
+
+############################
+# Classes
+############################
+
+sec:ThreatActor a owl:Class .
+sec:Tool a owl:Class .
+sec:Malware a owl:Class .
+sec:Capability a owl:Class .
+sec:AttributionClaim a owl:Class .
+
+############################
+# Object Properties
+############################
+
+sec:uses a owl:ObjectProperty ;
+  rdfs:domain sec:ThreatActor ;
+  rdfs:range core:Technique .
+
+sec:employs a owl:ObjectProperty ;
+  rdfs:domain sec:ThreatActor ;
+  rdfs:range sec:Tool .
+
+sec:implements a owl:ObjectProperty ;
+  rdfs:domain sec:Tool ;
+  rdfs:range core:Technique .
+
+sec:attributed_to a owl:ObjectProperty ;
+  rdfs:domain sec:AttributionClaim ;
+  rdfs:range sec:ThreatActor .
+
+sec:based_on_incident a owl:ObjectProperty ;
+  rdfs:domain sec:AttributionClaim ;
+  rdfs:range incident:Incident .
