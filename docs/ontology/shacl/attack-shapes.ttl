@@ -1,0 +1,125 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix sec: <https://example.org/sec/core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+############################
+# Technique Shape (Core Ontology v1.0)
+############################
+
+sec:TechniqueShape a sh:NodeShape ;
+  sh:targetClass sec:Technique ;
+  sh:description "Validates ATT&CK Technique instances conform to Core Ontology v1.0" ;
+  
+  # Required: attackTechniqueId (unique identifier)
+  sh:property [
+    sh:path sec:attackTechniqueId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:pattern "^T[0-9]+$" ;
+    sh:description "ATT&CK Technique identifier (e.g., 'T1059')"
+  ] ;
+  
+  # Required: rdfs:label (human-readable name)
+  sh:property [
+    sh:path rdfs:label ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:description "Human-readable name of the technique"
+  ] ;
+  
+  # Optional: description
+  sh:property [
+    sh:path sec:description ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:description "Detailed description of the technique"
+  ] ;
+  
+  # Mandatory: belongs_to (at least one tactic)
+  sh:property [
+    sh:path sec:belongs_to ;
+    sh:class sec:Tactic ;
+    sh:minCount 1 ;
+    sh:description "Tactic(s) this technique belongs to"
+  ] .
+
+############################
+# SubTechnique Shape (Core Ontology v1.0)
+############################
+
+sec:SubTechniqueShape a sh:NodeShape ;
+  sh:targetClass sec:SubTechnique ;
+  sh:description "Validates ATT&CK SubTechnique instances conform to Core Ontology v1.0" ;
+  
+  # Required: attackTechniqueId (unique identifier)
+  sh:property [
+    sh:path sec:attackTechniqueId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:pattern "^T[0-9]+\\.[0-9]+$" ;
+    sh:description "ATT&CK SubTechnique identifier (e.g., 'T1059.001')"
+  ] ;
+  
+  # Required: rdfs:label (human-readable name)
+  sh:property [
+    sh:path rdfs:label ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:description "Human-readable name of the subtechnique"
+  ] ;
+  
+  # Optional: description
+  sh:property [
+    sh:path sec:description ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:description "Detailed description of the subtechnique"
+  ] ;
+  
+  # Mandatory: belongs_to (at least one tactic)
+  sh:property [
+    sh:path sec:belongs_to ;
+    sh:class sec:Tactic ;
+    sh:minCount 1 ;
+    sh:description "Tactic(s) this subtechnique belongs to"
+  ] ;
+  
+  # Mandatory: subtechnique_of (parent technique)
+  sh:property [
+    sh:path sec:subtechnique_of ;
+    sh:class sec:Technique ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:description "Parent technique this is a specialization of"
+  ] .
+
+############################
+# Tactic Shape (Core Ontology v1.0)
+############################
+
+sec:TacticShape a sh:NodeShape ;
+  sh:targetClass sec:Tactic ;
+  sh:description "Validates ATT&CK Tactic instances conform to Core Ontology v1.0" ;
+  
+  # Required: tacticId (unique identifier)
+  sh:property [
+    sh:path sec:tacticId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:description "Tactic identifier (e.g., 'reconnaissance', 'execution')"
+  ] ;
+  
+  # Required: rdfs:label (human-readable name)
+  sh:property [
+    sh:path rdfs:label ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:description "Human-readable name of the tactic"
+  ] .

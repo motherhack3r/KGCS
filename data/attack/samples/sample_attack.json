@@ -1,0 +1,128 @@
+{
+  "objects": [
+    {
+      "type": "x-mitre-tactic",
+      "id": "x-mitre-tactic--2558fd61-8c75-423c-8bff-5caea2d54101",
+      "created": "2018-04-05T19:37:59.547Z",
+      "modified": "2019-04-29T17:46:01.739Z",
+      "name": "Reconnaissance",
+      "x_mitre_shortname": "reconnaissance"
+    },
+    {
+      "type": "x-mitre-tactic",
+      "id": "x-mitre-tactic--9b52642f-c65d-4b26-8bc4-60fb46dd755d",
+      "created": "2018-04-05T19:37:59.547Z",
+      "modified": "2019-04-29T17:46:00.000Z",
+      "name": "Execution",
+      "x_mitre_shortname": "execution"
+    },
+    {
+      "type": "x-mitre-tactic",
+      "id": "x-mitre-tactic--dcbb8b6e-d74c-4461-8aa2-fa31ccc18a39",
+      "created": "2018-04-05T19:37:59.547Z",
+      "modified": "2019-04-29T17:46:00.000Z",
+      "name": "Persistence",
+      "x_mitre_shortname": "persistence"
+    },
+    {
+      "type": "attack-pattern",
+      "id": "attack-pattern--ae676644-d2d9-41b7-8386-788bc3995395",
+      "created": "2018-04-05T19:38:06.820Z",
+      "modified": "2019-04-29T23:53:00.000Z",
+      "name": "T1566: Phishing",
+      "description": "Adversaries may send phishing messages to gain access to victim systems. All forms of phishing are electronically delivered social engineering targeted at a user individual, company, or industry.",
+      "kill_chain_phases": [
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "reconnaissance"
+        }
+      ],
+      "external_references": [
+        {
+          "source_name": "mitre-attack",
+          "external_id": "T1566"
+        }
+      ]
+    },
+    {
+      "type": "attack-pattern",
+      "id": "attack-pattern--40f5e89e-677b-4dfa-bc3d-50832c73a235",
+      "created": "2018-04-05T19:38:06.820Z",
+      "modified": "2019-04-29T23:53:00.000Z",
+      "name": "T1589: Gather Victim Identity Information",
+      "description": "Adversaries may gather information about victim identity that can be used during targeting. Information about identities may also reveal more about the victim and their role within an organization.",
+      "kill_chain_phases": [
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "reconnaissance"
+        }
+      ],
+      "external_references": [
+        {
+          "source_name": "mitre-attack",
+          "external_id": "T1589"
+        }
+      ]
+    },
+    {
+      "type": "attack-pattern",
+      "id": "attack-pattern--3c4ab46f-a77f-4fa7-b12c-1656c6069d61",
+      "created": "2019-04-02T18:01:37.903Z",
+      "modified": "2019-04-29T23:53:00.000Z",
+      "name": "T1059: Command and Scripting Interpreter",
+      "description": "An adversary may use command and scripting interpreters to execute commands, scripts, or binaries. These interfaces and languages provide ways of interacting with computer systems and are a common feature across many different platforms.",
+      "kill_chain_phases": [
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "execution"
+        }
+      ],
+      "external_references": [
+        {
+          "source_name": "mitre-attack",
+          "external_id": "T1059"
+        }
+      ]
+    },
+    {
+      "type": "attack-pattern",
+      "id": "attack-pattern--2d3f5b3c-6cca-4b94-a50a-3da21f65d395",
+      "created": "2019-04-01T17:49:39.903Z",
+      "modified": "2019-04-29T23:53:00.000Z",
+      "name": "T1059.001: PowerShell",
+      "description": "Adversaries may use PowerShell to perform a number of actions, including discovery of information and execution of code. PowerShell is a powerful interactive command-line interface and scripting environment included in the Windows operating system.",
+      "kill_chain_phases": [
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "execution"
+        }
+      ],
+      "external_references": [
+        {
+          "source_name": "mitre-attack",
+          "external_id": "T1059.001"
+        }
+      ]
+    },
+    {
+      "type": "attack-pattern",
+      "id": "attack-pattern--5bfccc3b-b8a9-48a5-8d3e-1fb88d5e2e8f",
+      "created": "2018-04-05T19:38:06.820Z",
+      "modified": "2019-04-29T23:53:00.000Z",
+      "name": "T1543: Create or Modify System Process",
+      "description": "Adversaries may create or modify system-level processes to repeatedly execute malicious payloads as part of persistence. Modifications to system processes may mask malicious activity from security tools and monitoring.",
+      "kill_chain_phases": [
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "persistence"
+        }
+      ],
+      "external_references": [
+        {
+          "source_name": "mitre-attack",
+          "external_id": "T1543"
+        }
+      ]
+    }
+  ]
+}

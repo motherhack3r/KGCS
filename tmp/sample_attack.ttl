@@ -1,0 +1,47 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sec: <https://example.org/sec/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://example.org/subtechnique/T1059.001> a sec:SubTechnique ;
+    rdfs:label "PowerShell"^^xsd:string ;
+    sec:attackTechniqueId "T1059.001"^^xsd:string ;
+    sec:belongs_to <https://example.org/tactic/x-mitre-tactic--9b52642f-c65d-4b26-8bc4-60fb46dd755d> ;
+    sec:description "Adversaries may use PowerShell to perform a number of actions, including discovery of information and execution of code. PowerShell is a powerful interactive command-line interface and scripting environment included in the Windows operating system."^^xsd:string ;
+    sec:subtechnique_of <https://example.org/technique/T1059> .
+
+<https://example.org/technique/T1543> a sec:Technique ;
+    rdfs:label "Create or Modify System Process"^^xsd:string ;
+    sec:attackTechniqueId "T1543"^^xsd:string ;
+    sec:belongs_to <https://example.org/tactic/x-mitre-tactic--dcbb8b6e-d74c-4461-8aa2-fa31ccc18a39> ;
+    sec:description "Adversaries may create or modify system-level processes to repeatedly execute malicious payloads as part of persistence. Modifications to system processes may mask malicious activity from security tools and monitoring."^^xsd:string .
+
+<https://example.org/technique/T1566> a sec:Technique ;
+    rdfs:label "Phishing"^^xsd:string ;
+    sec:attackTechniqueId "T1566"^^xsd:string ;
+    sec:belongs_to <https://example.org/tactic/x-mitre-tactic--2558fd61-8c75-423c-8bff-5caea2d54101> ;
+    sec:description "Adversaries may send phishing messages to gain access to victim systems. All forms of phishing are electronically delivered social engineering targeted at a user individual, company, or industry."^^xsd:string .
+
+<https://example.org/technique/T1589> a sec:Technique ;
+    rdfs:label "Gather Victim Identity Information"^^xsd:string ;
+    sec:attackTechniqueId "T1589"^^xsd:string ;
+    sec:belongs_to <https://example.org/tactic/x-mitre-tactic--2558fd61-8c75-423c-8bff-5caea2d54101> ;
+    sec:description "Adversaries may gather information about victim identity that can be used during targeting. Information about identities may also reveal more about the victim and their role within an organization."^^xsd:string .
+
+<https://example.org/tactic/x-mitre-tactic--dcbb8b6e-d74c-4461-8aa2-fa31ccc18a39> a sec:Tactic ;
+    rdfs:label "Persistence"^^xsd:string ;
+    sec:tacticId "persistence"^^xsd:string .
+
+<https://example.org/technique/T1059> a sec:Technique ;
+    rdfs:label "Command and Scripting Interpreter"^^xsd:string ;
+    sec:attackTechniqueId "T1059"^^xsd:string ;
+    sec:belongs_to <https://example.org/tactic/x-mitre-tactic--9b52642f-c65d-4b26-8bc4-60fb46dd755d> ;
+    sec:description "An adversary may use command and scripting interpreters to execute commands, scripts, or binaries. These interfaces and languages provide ways of interacting with computer systems and are a common feature across many different platforms."^^xsd:string .
+
+<https://example.org/tactic/x-mitre-tactic--2558fd61-8c75-423c-8bff-5caea2d54101> a sec:Tactic ;
+    rdfs:label "Reconnaissance"^^xsd:string ;
+    sec:tacticId "reconnaissance"^^xsd:string .
+
+<https://example.org/tactic/x-mitre-tactic--9b52642f-c65d-4b26-8bc4-60fb46dd755d> a sec:Tactic ;
+    rdfs:label "Execution"^^xsd:string ;
+    sec:tacticId "execution"^^xsd:string .
+

@@ -1,14 +1,82 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
-@prefix ex: <https://example.org/sec/core#> .
-@prefix capec: <https://example.org/sec/capec#> .
+@prefix sec: <https://example.org/sec/core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-# CAPEC shapes: AttackPattern identifier (accepts ex:capecId or capec:capecId)
-ex:CAPECAttackPatternShape a sh:NodeShape ;
-  sh:targetClass ex:AttackPattern ;
-  sh:targetClass capec:AttackPattern ;
-  sh:or (
-    [ a sh:PropertyShape ; sh:path ex:capecId ; sh:datatype xsd:string ; sh:minCount 1 ]
-    [ a sh:PropertyShape ; sh:path capec:capecId ; sh:datatype xsd:string ; sh:minCount 1 ]
-  ) ;
-  sh:message "AttackPattern must include a capecId (either ex:capecId or capec:capecId)." .
+############################
+# CAPEC AttackPattern Shape (Core Ontology v1.0)
+############################
+
+sec:AttackPatternShape a sh:NodeShape ;
+  sh:targetClass sec:AttackPattern ;
+  sh:description "Validates CAPEC AttackPattern instances conform to Core Ontology v1.0" ;
+  
+  # Required: capecId (unique identifier)
+  sh:property [
+    sh:path sec:capecId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:description "CAPEC identifier (e.g., 'CAPEC-1')"
+  ] ;
+  
+  # Required: rdfs:label (human-readable name)
+  sh:property [
+    sh:path rdfs:label ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:description "Human-readable name of the attack pattern"
+  ] ;
+  
+  # Optional: description
+  sh:property [
+    sh:path sec:description ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:description "Detailed description of the attack pattern"
+  ] ;
+  
+  # Optional: prerequisite (0 or more)
+  sh:property [
+    sh:path sec:prerequisite ;
+    sh:datatype xsd:string ;
+    sh:description "Prerequisites needed to execute this attack pattern"
+  ] ;
+  
+  # Optional: consequence (0 or more)
+  sh:property [
+    sh:path sec:consequence ;
+    sh:datatype xsd:string ;
+    sh:description "Potential consequences of this attack pattern"
+  ] ;
+  
+  # Mandatory: exploits (at least one weakness reference)
+  sh:property [
+    sh:path sec:exploits ;
+    sh:nodeKind sh:IRI ;
+    sh:minCount 1 ;
+    sh:description "Weakness URI(s) that this attack pattern exploits (IRI reference)"
+  ] ;
+  
+  # Optional: parentOf (specializations)
+  sh:property [
+    sh:path sec:parentOf ;
+    sh:class sec:AttackPattern ;
+    sh:description "More specialized attack patterns derived from this one"
+  ] ;
+  
+  # Optional: childOf (generalization)
+  sh:property [
+    sh:path sec:childOf ;
+    sh:class sec:AttackPattern ;
+    sh:maxCount 1 ;
+    sh:description "More general attack pattern this one specializes"
+  ] ;
+  
+  # Optional: peerOf (related pattern)
+  sh:property [
+    sh:path sec:peerOf ;
+    sh:class sec:AttackPattern ;
+    sh:description "Related attack patterns at same abstraction level"
+  ] .

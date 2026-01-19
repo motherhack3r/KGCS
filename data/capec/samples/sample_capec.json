@@ -1,0 +1,154 @@
+{
+  "AttackPatterns": [
+    {
+      "ID": "1",
+      "Name": "Spear Phishing",
+      "Description": {
+        "Text": "An attacker targets a specific individual or organization with a fraudulent communication that appears to come from a trusted source. The attacker uses information about the target to craft a convincing message that tricks the victim into revealing sensitive information or executing malicious code."
+      },
+      "Prerequisites": [
+        {
+          "Description": "The attacker must know something about the target to make the phishing email convincing"
+        },
+        {
+          "Description": "The target must have an email account"
+        }
+      ],
+      "Consequences": [
+        {
+          "Description": "The attacker can steal credentials or sensitive information"
+        },
+        {
+          "Description": "The attacker can execute malware on the victim's system"
+        }
+      ],
+      "RelatedWeaknesses": [
+        {
+          "ID": "287",
+          "Relationship": "Exploits"
+        }
+      ],
+      "RelatedAttackPatterns": []
+    },
+    {
+      "ID": "2",
+      "Name": "Phishing",
+      "Description": {
+        "Text": "An attacker sends a fraudulent communication that appears to come from a trusted source. The communication tricks the victim into revealing sensitive information or executing malicious code."
+      },
+      "Prerequisites": [
+        {
+          "Description": "The target must have an email account"
+        }
+      ],
+      "Consequences": [
+        {
+          "Description": "The attacker can steal credentials"
+        }
+      ],
+      "RelatedWeaknesses": [
+        {
+          "ID": "287",
+          "Relationship": "Exploits"
+        }
+      ],
+      "RelatedAttackPatterns": [
+        {
+          "ID": "1",
+          "Relationship": "ParentOf"
+        }
+      ]
+    },
+    {
+      "ID": "100",
+      "Name": "Overflow Buffers",
+      "Description": {
+        "Text": "An attacker exploits the way applications process data by inputting more data than the buffer is designed to hold. This causes the overflow to write data beyond the buffer boundaries, potentially overwriting adjacent memory and causing the program to crash or allowing arbitrary code execution."
+      },
+      "Prerequisites": [
+        {
+          "Description": "The target application must use a buffer to store data"
+        },
+        {
+          "Description": "The application must not properly validate input size"
+        }
+      ],
+      "Consequences": [
+        {
+          "Description": "Arbitrary code execution on the target system"
+        },
+        {
+          "Description": "Denial of service by crashing the application"
+        }
+      ],
+      "RelatedWeaknesses": [
+        {
+          "ID": "120",
+          "Relationship": "Exploits"
+        },
+        {
+          "ID": "119",
+          "Relationship": "Exploits"
+        }
+      ],
+      "RelatedAttackPatterns": []
+    },
+    {
+      "ID": "88",
+      "Name": "OS Command Injection",
+      "Description": {
+        "Text": "An attacker injects arbitrary OS commands into the input stream of a vulnerable application. The application fails to properly neutralize the input, allowing the injected commands to be executed with the privileges of the application."
+      },
+      "Prerequisites": [
+        {
+          "Description": "The target application must accept user input"
+        },
+        {
+          "Description": "The application must pass user input to an OS command processor"
+        }
+      ],
+      "Consequences": [
+        {
+          "Description": "Arbitrary OS command execution"
+        }
+      ],
+      "RelatedWeaknesses": [
+        {
+          "ID": "78",
+          "Relationship": "Exploits"
+        }
+      ],
+      "RelatedAttackPatterns": []
+    },
+    {
+      "ID": "589",
+      "Name": "SQL Injection",
+      "Description": {
+        "Text": "An attacker injects SQL commands into input fields, which are then executed by the application's database. This allows the attacker to bypass authentication, extract data, modify data, or execute administrative operations."
+      },
+      "Prerequisites": [
+        {
+          "Description": "The target application must accept user input"
+        },
+        {
+          "Description": "The application must construct SQL queries from user input without proper sanitization"
+        }
+      ],
+      "Consequences": [
+        {
+          "Description": "Unauthorized database access"
+        },
+        {
+          "Description": "Data extraction or modification"
+        }
+      ],
+      "RelatedWeaknesses": [
+        {
+          "ID": "89",
+          "Relationship": "Exploits"
+        }
+      ],
+      "RelatedAttackPatterns": []
+    }
+  ]
+}
