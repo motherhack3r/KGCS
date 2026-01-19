@@ -12,13 +12,23 @@ Use this checklist when submitting PRs that complete or modify Phase 2 artifacts
 
 ## Blocking items (must pass before Phase 3 rollout)
 
-- [ ] Expand SHACL coverage to all OWL modules and RAG templates (`docs/ontology/owl/`, `docs/ontology/rag/`) (partial: canonical bundle and per-OWL identifier shapes added)
-
 - [ ] Add or update SHACL constraint docs (`docs/ontology/shacl/`) and a short checklist of constraints changed
 
-- [ ] Add positive/negative SHACL samples under `data/shacl-samples/` and include a validation manifest
+ [ ] Ensure `scripts/validate_shacl.py` exposes a stable `run_validator()` entry and is called from `scripts/ingest_pipeline.py` (ETL integration pending; validator CLI added)
 
-- [ ] Ensure `scripts/validate_shacl.py` exposes a stable `run_validator()` entry and is called from `scripts/ingest_pipeline.py` (ETL integration pending; validator CLI added)
+## Recent progress (phase2 updates)
+
+- [x] Added canonical SHACL bundle: `docs/ontology/shacl/kgcs-shapes.ttl`
+
+- [x] Added per-OWL SHACL bundles (cpe/cve/cwe/capec/attck/d3fend/car/shield/engage)
+
+- [x] Added SHACL manifest: `docs/ontology/shacl/manifest.md` mapping OWL → shape bundles
+
+- [x] Added RAG→SHACL mapping: `docs/ontology/shacl/rag-to-shacl.md`
+
+- [x] `scripts/validate_shacl.py` updated: CLI supports `--template` and `--owl` to validate shape subsets per RAG template or per-OWL bundles
+
+- [x] CI workflow updated: `.github/workflows/shacl-validation.yml` validates changed OWL modules using the manifest
 
 - [ ] Finalize CI workflow `.github/workflows/shacl-validation.yml` to run the SHACL validator and fail on violations
 

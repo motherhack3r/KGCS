@@ -1,0 +1,5 @@
+@prefix ex: <https://example.org/sec/core#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+# Negative sample for ATT&CK: Technique missing belongs_to and technique_id
+ex:T_MISSING a ex:Technique .

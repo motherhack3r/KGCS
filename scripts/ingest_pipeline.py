@@ -17,14 +17,28 @@
 import argparse
 import subprocess
 import sys
+import os
+
+# Try to import the validator helper directly for programmatic validation.
+try:
+    from scripts.validate_shacl import run_validator, load_graph
+except Exception:
+    # Fallback: ensure scripts directory is on sys.path and try again
+    sys.path.insert(0, os.path.dirname(__file__))
+    try:
+        from validate_shacl import run_validator, load_graph
+    except Exception:
+        # If import still fails, we'll fallback to subprocess invocation in run_validator_subprocess
+        run_validator = None
+        load_graph = None
 
 
-def run_validator(data_file: str) -> bool:
-    """Run the SHACL validator on a single file.
+def run_validator_subprocess(data_file: str) -> bool:
+    """Run the SHACL validator as a subprocess (fallback).
     Returns True if validation passes, False otherwise.
     """
     result = subprocess.run(
-        ["python", "scripts/validate_shacl.py", data_file],
+        [sys.executable, "scripts/validate_shacl.py", "--data", data_file],
         capture_output=True,
         text=True,
     )
@@ -47,17 +61,27 @@ def main():
     parser.add_argument("--data-dir", default="data/shacl-samples", help="Directory containing RDF/Turtle files to ingest")
     args = parser.parse_args()
 
-    import os
     for root, _, files in os.walk(args.data_dir):
         for f in files:
             if not f.lower().endswith(".ttl"):
                 continue
             path = os.path.join(root, f)
             print(f"\nProcessing {path}")
-            if run_validator(path):
-                index_data(path)
+            # Prefer programmatic validator when available
+            if run_validator is not None and load_graph is not None:
+                shapes_graph = load_graph('docs/ontology/shacl/kgcs-shapes.ttl')
+                conforms, report_path, results_text = run_validator(path, shapes_graph, output='artifacts')
+                print(results_text)
+                if conforms:
+                    index_data(path)
+                else:
+                    print(f"Skipping {path} due to validation errors (see {report_path})")
             else:
-                print(f"Skipping {path} due to validation errors")
+                # Fallback to subprocess invocation
+                if run_validator_subprocess(path):
+                    index_data(path)
+                else:
+                    print(f"Skipping {path} due to validation errors")
 
 if __name__ == "__main__":
     main()

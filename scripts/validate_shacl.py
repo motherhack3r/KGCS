@@ -68,6 +68,27 @@ def extract_shape_subset(full_shapes_graph: Graph, shape_local_names):
                     out.add((ss, pp, oo))
     return out
 
+def run_validator(data_file: str, shapes_graph: Graph, output: str = 'artifacts'):
+    """Run pyshacl validation for the given data_graph/shapes_graph.
+
+    Returns: (conforms: bool, report_path: str, results_text: str)
+    """
+    # Data graph
+    data = Graph()
+    data.parse(data_file, format='turtle')
+
+    # Run validation
+    conforms, results_graph, results_text = validate(data_graph=data, shacl_graph=shapes_graph, inference='rdfs', abort_on_first=False, serialize_report_graph=True)
+    os.makedirs(output, exist_ok=True)
+    report_path = os.path.join(output, f'shacl-report-{os.path.basename(data_file)}.json')
+    report = {
+        'data_file': data_file,
+        'conforms': bool(conforms),
+        'results_text': results_text
+    }
+    with open(report_path, 'w', encoding='utf-8') as fh:
+        json.dump(report, fh, indent=2)
+    return bool(conforms), report_path, results_text
 
 def main():
     args = parse_args()
@@ -147,18 +168,9 @@ def main():
         print(f"Error parsing data file: {e}")
         raise SystemExit(2)
 
-    # Run validation
+    # Run validation via helper
     try:
-        conforms, results_graph, results_text = validate(data_graph=data, shacl_graph=shapes_graph, inference='rdfs', abort_on_first=False, serialize_report_graph=True)
-        os.makedirs(args.output, exist_ok=True)
-        report_path = os.path.join(args.output, f'shacl-report-{os.path.basename(data_file)}.json')
-        report = {
-            'data_file': data_file,
-            'conforms': bool(conforms),
-            'results_text': results_text
-        }
-        with open(report_path, 'w', encoding='utf-8') as fh:
-            json.dump(report, fh, indent=2)
+        conforms, report_path, results_text = run_validator(data_file=data_file, shapes_graph=shapes_graph, output=args.output)
         print(results_text)
         print(f"Wrote report: {report_path}")
         if conforms:
@@ -174,3 +186,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+

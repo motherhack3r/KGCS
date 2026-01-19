@@ -1,0 +1,5 @@
+{
+  "data_file": "data/shacl-samples/attck-t1_good.ttl",
+  "conforms": true,
+  "results_text": "Validation Report\nConforms: True\n"
+}

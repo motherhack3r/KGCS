@@ -1,0 +1,10 @@
+@prefix ex: <https://example.org/sec/core#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+# Positive sample for ATT&CK: Technique linked to a Tactic and has an identifier
+ex:T1059 a ex:Technique ;
+  ex:technique_id "T1059" ;
+  ex:belongs_to ex:Tactic_Execution .
+
+ex:Tactic_Execution a ex:Tactic ;
+  ex:tacticId "TA0002" .

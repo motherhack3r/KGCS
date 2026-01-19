@@ -1,0 +1,9 @@
+@prefix ex: <https://example.org/sec/core#> .
+
+# Positive CPE sample: Platform and PlatformConfiguration
+ex:Platform1 a ex:Platform ;
+  ex:cpeNameId "cpe:2.3:a:vendor:product:1.0" .
+
+ex:PC1 a ex:PlatformConfiguration ;
+  ex:matchCriteriaId "mc-uuid-001" ;
+  ex:matchesPlatform ex:Platform1 .
