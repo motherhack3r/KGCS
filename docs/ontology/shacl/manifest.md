@@ -1,3 +1,10 @@
+SHACL manifest (machine)
+=========================
+
+The authoritative, machine-readable OWL → SHACL mapping is in
+`docs/ontology/shacl/manifest.json`.
+
+Use `manifest.json` for tooling and CI. This markdown file is a short human-facing note and may be updated to reference or document policies; mapping edits should be made in the JSON manifest.
 SHACL manifest: OWL → shape bundles
 ===================================
 

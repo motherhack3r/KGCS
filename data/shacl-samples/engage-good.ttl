@@ -1,0 +1,7 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix eg: <https://example.org/sec/engage#> .
+
+# ENGAGE good sample: EngagementConcept with id and description
+eg:engage-1 a eg:EngagementConcept ;
+  eg:engageId "ENGAGE-001" ;
+  eg:description "Example engagement concept for testing." .

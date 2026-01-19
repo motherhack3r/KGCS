@@ -1,0 +1,7 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix d3: <https://example.org/sec/d3fend#> .
+
+# D3FEND good sample: defensive technique with identifier and label
+d3:deftech-001 a d3:DefensiveTechnique ;
+  d3:d3fendId "D3-0001" ;
+  d3:label "Example defensive technique" .

@@ -1,0 +1,7 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix sh: <https://example.org/sec/shield#> .
+
+# SHIELD good sample: DeceptionTechnique with id and label
+sh:deception-1 a sh:DeceptionTechnique ;
+  sh:shieldId "SHIELD-001" ;
+  sh:label "Example deception technique" .

@@ -1,0 +1,7 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix car: <https://example.org/sec/car#> .
+
+# CAR good sample: includes identifier and description expected by CAR shapes
+car:analytic-0001 a car:DetectionAnalytic ;
+  car:carId "CAR-0001" ;
+  car:description "Example CAR analytic with ID and description." .

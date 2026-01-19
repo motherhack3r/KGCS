@@ -1,0 +1,7 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix capec: <https://example.org/sec/capec#> .
+
+# CAPEC good sample: AttackPattern with capecId and title
+capec:ap-123 a capec:AttackPattern ;
+  capec:capecId "CAPEC-123" ;
+  capec:title "Example attack pattern" .

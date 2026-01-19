@@ -1,0 +1,7 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix cwe: <https://example.org/sec/cwe#> .
+
+# CWE good sample: Weakness with canonical CWE id and description
+cwe:weakness-79 a cwe:Weakness ;
+  cwe:cweId "CWE-79" ;
+  cwe:description "Cross-site Scripting example weakness." .

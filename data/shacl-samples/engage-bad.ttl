@@ -1,0 +1,6 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix eg: <https://example.org/sec/engage#> .
+
+# ENGAGE bad sample: missing engageId
+eg:engage-unknown a eg:EngagementConcept ;
+  eg:description "Missing engageId - should fail identifier constraint." .

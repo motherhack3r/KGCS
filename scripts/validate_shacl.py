@@ -112,25 +112,34 @@ def main():
     if args.shapes:
         shapes_paths = args.shapes
     elif args.owl:
-        # parse manifest to map owl -> shapes
-        manifest_path = 'docs/ontology/shacl/manifest.md'
+        # Prefer a machine manifest (JSON); fall back to the human-readable manifest.md
+        json_manifest = 'docs/ontology/shacl/manifest.json'
+        md_manifest = 'docs/ontology/shacl/manifest.md'
         mapping = {}
-        try:
-            with open(manifest_path, 'r', encoding='utf-8') as fh:
-                for line in fh:
-                    line = line.strip()
-                    # expect lines like: - `cpe-ontology-v1.0.owl` → `docs/ontology/shacl/cpe-shapes.ttl`
-                    if line.startswith('- `') and '→' in line:
-                        try:
-                            left, right = line.split('→', 1)
-                            owl_name = left.split('`')[1]
-                            shapes_list = [s.strip(' `') for s in right.split(',')]
-                            mapping[owl_name] = shapes_list
-                        except Exception:
-                            continue
-        except FileNotFoundError:
-            print(f"Manifest not found: {manifest_path}; falling back to default shapes")
-            shapes_paths = default_shapes
+        if os.path.exists(json_manifest):
+            try:
+                with open(json_manifest, 'r', encoding='utf-8') as fh:
+                    mapping = json.load(fh)
+            except Exception as e:
+                print(f"Error parsing JSON manifest {json_manifest}: {e}; falling back to markdown manifest")
+                mapping = {}
+        if not mapping and os.path.exists(md_manifest):
+            try:
+                with open(md_manifest, 'r', encoding='utf-8') as fh:
+                    for line in fh:
+                        line = line.strip()
+                        # expect lines like: - `cpe-ontology-v1.0.owl` → `docs/ontology/shacl/cpe-shapes.ttl`
+                        if line.startswith('- `') and '→' in line:
+                            try:
+                                left, right = line.split('→', 1)
+                                owl_name = left.split('`')[1]
+                                shapes_list = [s.strip(' `') for s in right.split(',')]
+                                mapping[owl_name] = shapes_list
+                            except Exception:
+                                continue
+            except FileNotFoundError:
+                print(f"Manifest not found: {md_manifest}; falling back to default shapes")
+                shapes_paths = default_shapes
 
         if shapes_paths is None:
             shapes_paths = mapping.get(args.owl)

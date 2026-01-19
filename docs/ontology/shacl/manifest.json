@@ -1,0 +1,15 @@
+{
+  "cpe-ontology-v1.0.owl": ["docs/ontology/shacl/cpe-shapes.ttl"],
+  "cve-ontology-v1.0.owl": ["docs/ontology/shacl/cve-shapes.ttl"],
+  "cwe-ontology-v1.0.owl": ["docs/ontology/shacl/cwe-shapes.ttl"],
+  "capec-ontology-v1.0.owl": ["docs/ontology/shacl/capec-shapes.ttl"],
+  "attck-ontology-v1.0.owl": ["docs/ontology/shacl/attck-shapes.ttl"],
+  "d3fend-ontology-v1.0.owl": ["docs/ontology/shacl/d3fend-shapes.ttl"],
+  "car-ontology-v1.0.owl": ["docs/ontology/shacl/car-shapes.ttl"],
+  "shield-ontology-v1.0.owl": ["docs/ontology/shacl/shield-shapes.ttl"],
+  "engage-ontology-v1.0.owl": ["docs/ontology/shacl/engage-shapes.ttl"],
+  "core-ontology-extended-v1.0.owl": ["docs/ontology/shacl/core-extended-shapes.ttl"],
+  "incident-ontology-extension-v1.0.owl": ["docs/ontology/shacl/kgcs-shapes.ttl"],
+  "risk-ontology-extension-v1.0.owl": ["docs/ontology/shacl/kgcs-shapes.ttl"],
+  "threatactor-ontology-extension-v1.0.owl": ["docs/ontology/shacl/kgcs-shapes.ttl"]
+}

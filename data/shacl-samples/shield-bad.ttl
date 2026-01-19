@@ -1,0 +1,6 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix sh: <https://example.org/sec/shield#> .
+
+# SHIELD bad sample: missing shieldId
+sh:deception-unknown a sh:DeceptionTechnique ;
+  sh:label "Missing shieldId - should fail." .

@@ -1,0 +1,6 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix cwe: <https://example.org/sec/cwe#> .
+
+# CWE bad sample: missing cweId
+cwe:weakness-unknown a cwe:Weakness ;
+  cwe:description "No CWE identifier provided - should fail identifier constraint." .
