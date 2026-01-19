@@ -1,50 +1,125 @@
 """Validate SHACL shapes against a target TTL using pyshacl.
 
-Usage:
-  python scripts/validate_shacl.py data/shacl-samples/good-example.ttl
-  python scripts/validate_shacl.py data/shacl-samples/bad-example.ttl
+This script supports selecting a subset of shapes by RAG template name
+or by passing an explicit list of shape files. It writes a JSON report to
+`artifacts/shacl-report-<data-file>.json`.
 
-Exit code: 0 = valid, 1 = invalid, 2 = error
+Examples:
+  python scripts/validate_shacl.py --data data/shacl-samples/t1_good.ttl
+  python scripts/validate_shacl.py --data data/shacl-samples/t1_bad.ttl --template T1
+  python scripts/validate_shacl.py --data data/shacl-samples/t1_good.ttl --shapes docs/ontology/shacl/kgcs-shapes.ttl
+
+Exit codes: 0 = valid, 1 = invalid, 2 = error
 """
-import sys
-from rdflib import Graph
-from pyshacl import validate
+
+import argparse
 import json
 import os
+from rdflib import Graph, Namespace, URIRef, BNode
+from pyshacl import validate
+
+
+EX = Namespace('https://example.org/sec/core#')
+
+
+TEMPLATE_SHAPE_MAP = {
+    'T1': ['VulnerabilityShape', 'WeaknessShape', 'AttackPatternShape', 'TechniqueShape', 'TacticShape'],
+    'T2': ['VulnerabilityShape', 'VulnerabilityScoreShape'],
+    'T3': ['TechniqueShape', 'DetectionAnalyticShape'],
+    'T4': ['TechniqueShape', 'DefensiveTechniqueShape'],
+    'T5': ['TechniqueShape', 'TacticShape', 'DeceptionTechniqueShape'],
+    'T6': ['VulnerabilityShape', 'ReferenceShape'],
+    'T7': ['VulnerabilityShape', 'WeaknessShape', 'AttackPatternShape', 'TechniqueShape', 'DetectionAnalyticShape', 'DefensiveTechniqueShape']
+}
+
+
+def parse_args():
+    p = argparse.ArgumentParser(description='Validate TTL data against SHACL shapes (KGCS)')
+    p.add_argument('--data', '-d', required=True, help='Data file (Turtle) to validate')
+    p.add_argument('--shapes', '-s', action='append', help='Path to SHACL shapes file (Turtle). Can be passed multiple times')
+    p.add_argument('--template', '-t', choices=list(TEMPLATE_SHAPE_MAP.keys()), help='RAG template name to select a subset of shapes')
+    p.add_argument('--list-templates', action='store_true', help='List available RAG templates and exit')
+    p.add_argument('--output', '-o', default='artifacts', help='Output folder for JSON reports')
+    return p.parse_args()
+
+
+def load_graph(path):
+    g = Graph()
+    g.parse(path, format='turtle')
+    return g
+
+
+def extract_shape_subset(full_shapes_graph: Graph, shape_local_names):
+    """Return a new Graph containing only the node-shapes with the given local names.
+
+    This performs a shallow copy of triples where the subject is the shape node
+    and any directly referenced blank node property definitions (e.g., sh:property bnode).
+    """
+    out = Graph()
+    for name in shape_local_names:
+        node = EX[name]
+        # copy triples where subject is node
+        for s, p, o in full_shapes_graph.triples((node, None, None)):
+            out.add((s, p, o))
+            if isinstance(o, BNode):
+                # copy bnode definition triples
+                for ss, pp, oo in full_shapes_graph.triples((o, None, None)):
+                    out.add((ss, pp, oo))
+    return out
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python scripts/validate_shacl.py <data-file.ttl>")
-        sys.exit(2)
+    args = parse_args()
+    if args.list_templates:
+        print('Available RAG templates:')
+        for k, v in TEMPLATE_SHAPE_MAP.items():
+            print(f" - {k}: {', '.join(v)}")
+        return
 
-    data_file = sys.argv[1]
-    shapes = [
-        'docs/ontology/shacl/core-shapes.ttl',
-        'docs/ontology/shacl/rag-shapes.ttl',
-        'docs/ontology/shacl/ai-strict-profile.ttl'
-    ]
+    data_file = args.data
 
+    if not os.path.exists(data_file):
+        print(f"Data file not found: {data_file}")
+        raise SystemExit(2)
+
+    # Default shapes bundle
+    default_shapes = ['docs/ontology/shacl/kgcs-shapes.ttl']
+
+    shapes_paths = args.shapes or default_shapes
+
+    # Load full shapes graph
+    full_shapes = Graph()
+    for sp in shapes_paths:
+        try:
+            full_shapes.parse(sp, format='turtle')
+        except Exception as e:
+            print(f"Error parsing shapes file {sp}: {e}")
+            raise SystemExit(2)
+
+    # If template specified, extract subset from full_shapes
+    if args.template:
+        template = args.template
+        local_names = TEMPLATE_SHAPE_MAP.get(template, [])
+        if not local_names:
+            print(f"No shapes configured for template {template}")
+            raise SystemExit(2)
+        shapes_graph = extract_shape_subset(full_shapes, local_names)
+    else:
+        shapes_graph = full_shapes
+
+    # Load data
     data = Graph()
     try:
         data.parse(data_file, format='turtle')
     except Exception as e:
         print(f"Error parsing data file: {e}")
-        sys.exit(2)
+        raise SystemExit(2)
 
-    sh = Graph()
-    for s in shapes:
-        try:
-            sh.parse(s, format='turtle')
-        except Exception as e:
-            print(f"Error parsing shapes file {s}: {e}")
-            sys.exit(2)
-
+    # Run validation
     try:
-        conforms, results_graph, results_text = validate(data_graph=data, shacl_graph=sh, inference='rdfs', abort_on_first=False, serialize_report_graph=True)
-        # Ensure artifacts dir
-        os.makedirs('artifacts', exist_ok=True)
-        report_path = os.path.join('artifacts', f'shacl-report-{os.path.basename(data_file)}.json')
+        conforms, results_graph, results_text = validate(data_graph=data, shacl_graph=shapes_graph, inference='rdfs', abort_on_first=False, serialize_report_graph=True)
+        os.makedirs(args.output, exist_ok=True)
+        report_path = os.path.join(args.output, f'shacl-report-{os.path.basename(data_file)}.json')
         report = {
             'data_file': data_file,
             'conforms': bool(conforms),
@@ -56,13 +131,13 @@ def main():
         print(f"Wrote report: {report_path}")
         if conforms:
             print("Validation: CONFORMS")
-            sys.exit(0)
+            raise SystemExit(0)
         else:
             print("Validation: DOES NOT CONFORM")
-            sys.exit(1)
+            raise SystemExit(1)
     except Exception as e:
         print(f"Error running pyshacl.validate: {e}")
-        sys.exit(2)
+        raise SystemExit(2)
 
 
 if __name__ == '__main__':
