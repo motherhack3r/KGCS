@@ -1,0 +1,204 @@
+{
+  "Weakness": [
+    {
+      "ID": "78",
+      "Name": "Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')",
+      "Description": {
+        "Text": "The software constructs all or part of an OS command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended OS command when it is sent to a downstream component."
+      },
+      "WeaknessAbstraction": "Base",
+      "Status": "Incomplete",
+      "ApplicablePlatforms": [
+        {
+          "Language": "PHP",
+          "Prevalence": "Undetermined"
+        },
+        {
+          "Language": "Python",
+          "Prevalence": "Undetermined"
+        },
+        {
+          "Language": "Java",
+          "Prevalence": "Undetermined"
+        }
+      ],
+      "CommonConsequences": [
+        {
+          "Consequence": "Confidentiality",
+          "Note": "The attacker can read sensitive information from the operating system"
+        },
+        {
+          "Consequence": "Integrity",
+          "Note": "The attacker can modify system files and settings"
+        },
+        {
+          "Consequence": "Availability",
+          "Note": "The attacker can disable or crash the system"
+        }
+      ],
+      "RelatedWeaknesses": [
+        {
+          "Relationship": "ChildOf",
+          "ID": "77",
+          "ViewID": "1000"
+        }
+      ]
+    },
+    {
+      "ID": "79",
+      "Name": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')",
+      "Description": {
+        "Text": "The software does not neutralize or incorrectly neutralizes user-controllable input before it is placed in output that is used as a web page that is served to other users."
+      },
+      "WeaknessAbstraction": "Base",
+      "Status": "Incomplete",
+      "ApplicablePlatforms": [
+        {
+          "Language": "JavaScript",
+          "Prevalence": "Undetermined"
+        },
+        {
+          "Language": "HTML",
+          "Prevalence": "Undetermined"
+        }
+      ],
+      "CommonConsequences": [
+        {
+          "Consequence": "Confidentiality",
+          "Note": "The attacker can steal session cookies or other credentials"
+        },
+        {
+          "Consequence": "Integrity",
+          "Note": "The attacker can modify the web page content"
+        }
+      ],
+      "RelatedWeaknesses": [
+        {
+          "Relationship": "ChildOf",
+          "ID": "77",
+          "ViewID": "1000"
+        }
+      ]
+    },
+    {
+      "ID": "89",
+      "Name": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+      "Description": {
+        "Text": "The software constructs all or part of an SQL command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended SQL command when it is sent to a downstream component."
+      },
+      "WeaknessAbstraction": "Base",
+      "Status": "Incomplete",
+      "ApplicablePlatforms": [
+        {
+          "Language": "PHP",
+          "Prevalence": "Undetermined"
+        },
+        {
+          "Language": "Python",
+          "Prevalence": "Undetermined"
+        },
+        {
+          "Language": "Java",
+          "Prevalence": "Undetermined"
+        },
+        {
+          "Language": "C",
+          "Prevalence": "Undetermined"
+        }
+      ],
+      "CommonConsequences": [
+        {
+          "Consequence": "Confidentiality",
+          "Note": "The attacker can read sensitive data from the database"
+        },
+        {
+          "Consequence": "Integrity",
+          "Note": "The attacker can modify or delete database records"
+        },
+        {
+          "Consequence": "Availability",
+          "Note": "The attacker can drop tables or disable the database"
+        }
+      ],
+      "RelatedWeaknesses": [
+        {
+          "Relationship": "ChildOf",
+          "ID": "77",
+          "ViewID": "1000"
+        }
+      ]
+    },
+    {
+      "ID": "287",
+      "Name": "Improper Authentication",
+      "Description": {
+        "Text": "When an actor claims to have a given identity, the software does not prove or insufficiently proves that the claim is correct."
+      },
+      "WeaknessAbstraction": "Class",
+      "Status": "Incomplete",
+      "ApplicablePlatforms": [
+        {
+          "Language": "All",
+          "Prevalence": "Undetermined"
+        }
+      ],
+      "CommonConsequences": [
+        {
+          "Consequence": "Confidentiality",
+          "Note": "The attacker can access sensitive information"
+        },
+        {
+          "Consequence": "Integrity",
+          "Note": "The attacker can modify user data"
+        }
+      ],
+      "RelatedWeaknesses": []
+    },
+    {
+      "ID": "77",
+      "Name": "Improper Neutralization of Special Elements used in a Command ('Command Injection')",
+      "Description": {
+        "Text": "The software constructs all or part of a command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended command when it is sent to a downstream component."
+      },
+      "WeaknessAbstraction": "Class",
+      "Status": "Incomplete",
+      "ApplicablePlatforms": [
+        {
+          "Language": "All",
+          "Prevalence": "Undetermined"
+        }
+      ],
+      "CommonConsequences": [
+        {
+          "Consequence": "Confidentiality",
+          "Note": "The attacker can read sensitive data"
+        },
+        {
+          "Consequence": "Integrity",
+          "Note": "The attacker can modify system state"
+        },
+        {
+          "Consequence": "Availability",
+          "Note": "The attacker can crash or disable the system"
+        }
+      ],
+      "RelatedWeaknesses": [
+        {
+          "Relationship": "ParentOf",
+          "ID": "78",
+          "ViewID": "1000"
+        },
+        {
+          "Relationship": "ParentOf",
+          "ID": "79",
+          "ViewID": "1000"
+        },
+        {
+          "Relationship": "ParentOf",
+          "ID": "89",
+          "ViewID": "1000"
+        }
+      ]
+    }
+  ]
+}

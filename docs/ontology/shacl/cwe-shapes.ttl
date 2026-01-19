@@ -1,14 +1,92 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
-@prefix ex: <https://example.org/sec/core#> .
-@prefix cwe: <https://example.org/sec/cwe#> .
+@prefix sec: <https://example.org/sec/core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-# CWE shapes: Weakness identifier (accepts ex:cweId or cwe:cweId)
-ex:CWEWeaknessShape a sh:NodeShape ;
-  sh:targetClass ex:Weakness ;
-  sh:targetClass cwe:Weakness ;
-  sh:or (
-    [ a sh:PropertyShape ; sh:path ex:cweId ; sh:datatype xsd:string ; sh:minCount 1 ]
-    [ a sh:PropertyShape ; sh:path cwe:cweId ; sh:datatype xsd:string ; sh:minCount 1 ]
-  ) ;
-  sh:message "Weakness must include a cweId (either ex:cweId or cwe:cweId)." .
+############################
+# CWE Weakness Shape (Core Ontology v1.0)
+############################
+
+sec:WeaknessShape a sh:NodeShape ;
+  sh:targetClass sec:Weakness ;
+  sh:description "Validates CWE Weakness instances conform to Core Ontology v1.0" ;
+  
+  # Required: cweId (unique identifier)
+  sh:property [
+    sh:path sec:cweId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:description "CWE identifier (e.g., 'CWE-78')"
+  ] ;
+  
+  # Required: rdfs:label (human-readable name)
+  sh:property [
+    sh:path rdfs:label ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:description "Human-readable name of the weakness"
+  ] ;
+  
+  # Optional: description
+  sh:property [
+    sh:path sec:description ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:description "Detailed description of the weakness"
+  ] ;
+  
+  # Optional: weaknessAbstraction (Class, Base, Variant)
+  sh:property [
+    sh:path sec:weaknessAbstraction ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:pattern "^(Class|Base|Variant)$" ;
+    sh:description "Abstraction level: Class, Base, or Variant"
+  ] ;
+  
+  # Optional: status (Active, Draft, Incomplete, Deprecated)
+  sh:property [
+    sh:path sec:status ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:pattern "^(Active|Draft|Incomplete|Deprecated)$" ;
+    sh:description "Status of the weakness definition"
+  ] ;
+  
+  # Optional: applicablePlatform (0 or more)
+  sh:property [
+    sh:path sec:applicablePlatform ;
+    sh:datatype xsd:string ;
+    sh:description "Programming language, OS, or architecture where weakness is applicable"
+  ] ;
+  
+  # Optional: commonConsequence (0 or more)
+  sh:property [
+    sh:path sec:commonConsequence ;
+    sh:datatype xsd:string ;
+    sh:description "Common consequence categories (Confidentiality, Integrity, Availability)"
+  ] ;
+  
+  # Optional: childOf (parent weakness relationship)
+  sh:property [
+    sh:path sec:childOf ;
+    sh:class sec:Weakness ;
+    sh:maxCount 1 ;
+    sh:description "Parent weakness if this is a specialized variant"
+  ] ;
+  
+  # Optional: parentOf (child weakness relationships)
+  sh:property [
+    sh:path sec:parentOf ;
+    sh:class sec:Weakness ;
+    sh:description "Child weaknesses that specialize this weakness"
+  ] ;
+  
+  # Optional: peerOf (related weakness)
+  sh:property [
+    sh:path sec:peerOf ;
+    sh:class sec:Weakness ;
+    sh:description "Related weakness at same abstraction level"
+  ] .

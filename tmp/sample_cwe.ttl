@@ -1,0 +1,69 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sec: <https://example.org/sec/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://example.org/weakness/CWE-287> a sec:Weakness ;
+    rdfs:label "Improper Authentication"^^xsd:string ;
+    sec:applicablePlatform "All (Prevalence: Undetermined)"^^xsd:string ;
+    sec:commonConsequence "Confidentiality"^^xsd:string,
+        "Integrity"^^xsd:string ;
+    sec:cweId "CWE-287"^^xsd:string ;
+    sec:description "When an actor claims to have a given identity, the software does not prove or insufficiently proves that the claim is correct."^^xsd:string ;
+    sec:status "Incomplete"^^xsd:string ;
+    sec:weaknessAbstraction "Class"^^xsd:string .
+
+<https://example.org/weakness/CWE-78> a sec:Weakness ;
+    rdfs:label "Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"^^xsd:string ;
+    sec:applicablePlatform "Java (Prevalence: Undetermined)"^^xsd:string,
+        "PHP (Prevalence: Undetermined)"^^xsd:string,
+        "Python (Prevalence: Undetermined)"^^xsd:string ;
+    sec:childOf <https://example.org/weakness/CWE-77> ;
+    sec:commonConsequence "Availability"^^xsd:string,
+        "Confidentiality"^^xsd:string,
+        "Integrity"^^xsd:string ;
+    sec:cweId "CWE-78"^^xsd:string ;
+    sec:description "The software constructs all or part of an OS command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended OS command when it is sent to a downstream component."^^xsd:string ;
+    sec:status "Incomplete"^^xsd:string ;
+    sec:weaknessAbstraction "Base"^^xsd:string .
+
+<https://example.org/weakness/CWE-79> a sec:Weakness ;
+    rdfs:label "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"^^xsd:string ;
+    sec:applicablePlatform "HTML (Prevalence: Undetermined)"^^xsd:string,
+        "JavaScript (Prevalence: Undetermined)"^^xsd:string ;
+    sec:childOf <https://example.org/weakness/CWE-77> ;
+    sec:commonConsequence "Confidentiality"^^xsd:string,
+        "Integrity"^^xsd:string ;
+    sec:cweId "CWE-79"^^xsd:string ;
+    sec:description "The software does not neutralize or incorrectly neutralizes user-controllable input before it is placed in output that is used as a web page that is served to other users."^^xsd:string ;
+    sec:status "Incomplete"^^xsd:string ;
+    sec:weaknessAbstraction "Base"^^xsd:string .
+
+<https://example.org/weakness/CWE-89> a sec:Weakness ;
+    rdfs:label "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"^^xsd:string ;
+    sec:applicablePlatform "C (Prevalence: Undetermined)"^^xsd:string,
+        "Java (Prevalence: Undetermined)"^^xsd:string,
+        "PHP (Prevalence: Undetermined)"^^xsd:string,
+        "Python (Prevalence: Undetermined)"^^xsd:string ;
+    sec:childOf <https://example.org/weakness/CWE-77> ;
+    sec:commonConsequence "Availability"^^xsd:string,
+        "Confidentiality"^^xsd:string,
+        "Integrity"^^xsd:string ;
+    sec:cweId "CWE-89"^^xsd:string ;
+    sec:description "The software constructs all or part of an SQL command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended SQL command when it is sent to a downstream component."^^xsd:string ;
+    sec:status "Incomplete"^^xsd:string ;
+    sec:weaknessAbstraction "Base"^^xsd:string .
+
+<https://example.org/weakness/CWE-77> a sec:Weakness ;
+    rdfs:label "Improper Neutralization of Special Elements used in a Command ('Command Injection')"^^xsd:string ;
+    sec:applicablePlatform "All (Prevalence: Undetermined)"^^xsd:string ;
+    sec:commonConsequence "Availability"^^xsd:string,
+        "Confidentiality"^^xsd:string,
+        "Integrity"^^xsd:string ;
+    sec:cweId "CWE-77"^^xsd:string ;
+    sec:description "The software constructs all or part of a command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended command when it is sent to a downstream component."^^xsd:string ;
+    sec:parentOf <https://example.org/weakness/CWE-78>,
+        <https://example.org/weakness/CWE-79>,
+        <https://example.org/weakness/CWE-89> ;
+    sec:status "Incomplete"^^xsd:string ;
+    sec:weaknessAbstraction "Class"^^xsd:string .
+
