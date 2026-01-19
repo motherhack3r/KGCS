@@ -1,0 +1,9 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix shield: <https://example.org/sec/shield#> .
+
+sec:tech-t5 a sec:Technique ;
+  sec:technique_id "T-T5" ;
+  sec:countered_by shield:s-001 .
+
+shield:s-001 a sec:DeceptionTechnique ;
+  shield:shieldId "S-001" .

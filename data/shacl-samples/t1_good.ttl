@@ -1,0 +1,23 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix capec: <https://example.org/sec/capec#> .
+@prefix cwe: <https://example.org/sec/cwe#> .
+@prefix attck: <https://example.org/sec/attck#> .
+
+sec:vuln-t1 a sec:Vulnerability ;
+  sec:cveId "CVE-TEST-T1" ;
+  sec:caused_by sec:weak-t1 .
+
+sec:weak-t1 a sec:Weakness ;
+  cwe:cwe_id "CWE-999" ;
+  sec:exploited_by capec:capec-t1 .
+
+capec:capec-t1 a sec:AttackPattern ;
+  capec:capec_id "CAPEC-T1" ;
+  sec:implemented_as sec:tech-t1 .
+
+sec:tech-t1 a sec:Technique ;
+  attck:technique_id "T-T1" ;
+  sec:belongs_to sec:tactic-t1 .
+
+sec:tactic-t1 a sec:Tactic ;
+  attck:tactic_id "TA-T1" .

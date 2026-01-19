@@ -648,12 +648,27 @@ AttributionClaim
 
 ### Phase 2: SHACL Validation (Next)
 
-- [ ] Create SHACL shapes for each ontology
-- [ ] Define constraint profiles: SOC (observational), EXEC (decision-focused), AI (hallucination-safe)
-- [ ] Integrate pre-ingest validation (reject non-conforming data)
-- [ ] Add runtime validation gates
+- [x] Create SHACL shapes for Core + RAG templates (`docs/ontology/shacl/core-shapes.ttl`, `rag-shapes.ttl`)
+- [x] Define an `AI-Strict` profile that includes core + RAG checks (`docs/ontology/shacl/ai-strict-profile.ttl`)
+- [x] Add representative positive/negative sample TTLs (`data/shacl-samples/`) and a small validator script (`scripts/validate_shacl.py`)
+- [ ] Expand SHACL coverage to every OWL module and RAG template (test matrix)
+- [ ] Add CI validation job (GitHub Actions) to run `pyshacl` on push/PR
+- [ ] Add governance artifacts: stable rule IDs, provenance URIs, and standard failure payload schema
+- [ ] Integrate pre-ingest and pre-index validation into the ETL pipeline
 
-**Deliverable:** SHACL shape files + validation pipeline
+**Deliverable:** Completed Phase 2 will include:
+
+- A complete SHACL suite that covers Core ontology invariants and RAG traversal templates
+- A validation matrix of test cases (positive/negative) that exercise every shape
+- CI that blocks non-conforming data on push/PR and produces machine-readable failure reports
+- Documentation for running validation locally and for CI integration
+
+**Acceptance criteria:**
+
+- All Core SHACL shapes pass the provided "good" sample and fail the "bad" sample with expected violations
+- Each RAG template has at least one positive and one negative test case in `data/shacl-samples/`
+- CI workflow runs `pyshacl` and returns non-zero on validation failure
+- Every SHACL constraint includes a stable rule identifier and an audit-friendly message
 
 ### Phase 3: Data Ingestion (Planned)
 
@@ -796,39 +811,50 @@ Every query result includes:
 ---
 
 ## 12. Limitations and Future Work
-
-### 12.1 Current Scope
+### 12.1 Current Scope & Status
 
 KGCS 1.0 covers:
 
-✅ Core standards (CVE, CWE, CPE, CVSS, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE)  
-✅ 1:1 alignment with JSON/STIX schemas  
-✅ Modular OWL ontologies  
-✅ Formal semantics + constraints  
-🔄 SHACL validation (in progress)  
-🔄 Data ingestion pipeline (planned)  
-🔄 RAG integration (planned)  
+- ✅ Core standards (CVE, CWE, CPE, CVSS, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE)
+- ✅ 1:1 alignment with JSON/STIX schemas
+- ✅ Modular OWL ontologies
+- ✅ Formal semantics and canonical invariants
+- ✅ SHACL validation: core shapes, RAG shapes, AI profile, sample data, and a validator script (Phase 2 in-progress; see Section 9)
+- 🔲 Data ingestion pipeline (planned)
+- 🔲 RAG runtime enforcement & retrieval integration (planned)
 
-### 12.2 Intentional Exclusions
+### 12.2 Intentional Exclusions (Remains)
 
-These are **contextual, not authoritative**, so they belong in Extensions:
+The following remain out of Core and belong in Extensions or operational layers:
 
-- Threat actor motivations (organizational intel)
-- Incident timelines (operational data)
-- Asset inventory (CMDB)
-- Risk scores (business decision)
-- Detection rules (SOC implementation)
-- Exploit code (ethical concerns)
+- Threat actor motivations and attributions
+- Incident timelines and raw sensor telemetry
+- Asset CMDB data (organization-specific)
+- Business risk scores and prioritization decisions
+- SOC-specific detection rule implementations
+- Exploit code and payloads (ethical/legal constraints)
 
-### 12.3 Future Enhancements
+### 12.3 Remaining Limitations and Prioritized Next Work
 
-1. **Formal Verification:** Prove consistency of ontology using theorem provers
-2. **Temporal Reasoning:** Track when relationships were discovered/confirmed
-3. **Uncertainty Quantification:** Bayesian inference over relationship weights
-4. **Fine-Grained Provenance:** Link individual CVSS metrics to scoring rationale
-5. **Multi-Language Support:** Translate ontology labels/descriptions to non-English
-6. **Linked Data Publishing:** Expose as SPARQL endpoints for external systems
+We have progressed SHACL validation but the project still requires targeted effort in these high-priority areas:
 
+1. Governance & provenance: assign stable rule IDs, include provenance URIs, and standardize failure payloads for automation and audits.
+2. Test matrix & coverage: add positive/negative tests for every shape and every RAG template; expand `data/shacl-samples/`.
+3. CI integration: add a GitHub Actions job that runs `pyshacl` and publishes machine-readable reports on failure.
+4. ETL integration: wire SHACL validation into pre-ingest and pre-index stages of the ingestion pipeline to prevent bad data from entering the graph.
+5. Performance & scale: review and optimize SPARQL-based SHACL constraints for large graphs or move expensive checks to batch validation steps.
+6. RAG runtime enforcement: implement query-time enforcement of approved traversal templates to prevent hallucinated paths.
+7. Formal verification & backlog: schedule formal ontology consistency checks (reasoner runs) as part of the release process.
+
+### 12.4 Long-Term Enhancements (Lower Priority)
+
+1. Temporal reasoning and versioned edge semantics (when relationships were discovered and by whom).
+2. Uncertainty quantification (explicit probability models in Risk extension).
+3. Fine-grained provenance linking of CVSS metric derivations.
+4. Linked-data/SPARQL publishing and subscription endpoints for downstream systems.
+5. Multi-language labels and user-facing documentation improvements.
+
+These steps complete the roadmap from "SHACL implemented" to "SHACL productionized" and will move Phase 2 from partial to done when CI, governance, and ETL integration are in place.
 ---
 
 ## 13. For the AI Engineer

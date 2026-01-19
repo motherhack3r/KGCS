@@ -9,6 +9,8 @@ Exit code: 0 = valid, 1 = invalid, 2 = error
 import sys
 from rdflib import Graph
 from pyshacl import validate
+import json
+import os
 
 
 def main():
@@ -40,7 +42,18 @@ def main():
 
     try:
         conforms, results_graph, results_text = validate(data_graph=data, shacl_graph=sh, inference='rdfs', abort_on_first=False, serialize_report_graph=True)
+        # Ensure artifacts dir
+        os.makedirs('artifacts', exist_ok=True)
+        report_path = os.path.join('artifacts', f'shacl-report-{os.path.basename(data_file)}.json')
+        report = {
+            'data_file': data_file,
+            'conforms': bool(conforms),
+            'results_text': results_text
+        }
+        with open(report_path, 'w', encoding='utf-8') as fh:
+            json.dump(report, fh, indent=2)
         print(results_text)
+        print(f"Wrote report: {report_path}")
         if conforms:
             print("Validation: CONFORMS")
             sys.exit(0)

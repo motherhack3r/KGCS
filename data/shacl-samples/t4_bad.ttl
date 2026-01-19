@@ -1,0 +1,5 @@
+@prefix sec: <https://example.org/sec/core#> .
+
+sec:tech-t4-bad a sec:Technique ;
+  sec:technique_id "T-T4-BAD" .
+# Missing mitigated_by

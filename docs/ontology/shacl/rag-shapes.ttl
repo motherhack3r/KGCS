@@ -3,6 +3,7 @@
 @prefix inc: <https://example.org/incident#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix kgcs: <https://example.org/kgcs/shacl#> .
 
 # RAG-aligned SHACL shapes implementing Templates T1–T7
 
@@ -11,6 +12,8 @@
 # Ensures Vulnerability has canonical chain to Tactic
 ########################
 sec:VulnerabilityImpactChainShape a sh:NodeShape ;
+  kgcs:ruleId "KGCS-RAG-T1" ;
+  kgcs:provenance <https://example.org/docs/ontology/shacl/rag-shapes.ttl#VulnerabilityImpactChainShape> ;
   sh:targetClass sec:Vulnerability ;
   sh:select ( 
     [
@@ -28,6 +31,8 @@ sec:VulnerabilityImpactChainShape a sh:NodeShape ;
 # Ensure at least one VulnerabilityScore node with a cvssVersion exists
 ########################
 sec:VulnerabilityScoringShape a sh:NodeShape ;
+  kgcs:ruleId "KGCS-RAG-T2" ;
+  kgcs:provenance <https://example.org/docs/ontology/shacl/rag-shapes.ttl#VulnerabilityScoringShape> ;
   sh:targetClass sec:Vulnerability ;
   sh:property [
     sh:predicate sec:scored_by ;
@@ -50,6 +55,8 @@ sec:VulnerabilityScoringShape a sh:NodeShape ;
 ########################
 # Technique-level simple check
 sec:TechniqueDetectionShape a sh:NodeShape ;
+  kgcs:ruleId "KGCS-RAG-T3A" ;
+  kgcs:provenance <https://example.org/docs/ontology/shacl/rag-shapes.ttl#TechniqueDetectionShape> ;
   sh:targetClass sec:Technique ;
   sh:property [
     sh:predicate sec:detected_by ;
@@ -61,6 +68,8 @@ sec:TechniqueDetectionShape a sh:NodeShape ;
 
 # Vulnerability-level detection path check (via causal chain)
 sec:VulnerabilityDetectionPathShape a sh:NodeShape ;
+  kgcs:ruleId "KGCS-RAG-T3B" ;
+  kgcs:provenance <https://example.org/docs/ontology/shacl/rag-shapes.ttl#VulnerabilityDetectionPathShape> ;
   sh:targetClass sec:Vulnerability ;
   sh:select (
     [
@@ -76,6 +85,8 @@ sec:VulnerabilityDetectionPathShape a sh:NodeShape ;
 # Ensure path from Vulnerability to DefensiveTechnique
 ########################
 sec:VulnerabilityMitigationPathShape a sh:NodeShape ;
+  kgcs:ruleId "KGCS-RAG-T4" ;
+  kgcs:provenance <https://example.org/docs/ontology/shacl/rag-shapes.ttl#VulnerabilityMitigationPathShape> ;
   sh:targetClass sec:Vulnerability ;
   sh:select (
     [
@@ -91,6 +102,8 @@ sec:VulnerabilityMitigationPathShape a sh:NodeShape ;
 # Technique -> DeceptionTechnique (countered_by) optional EngagementConcept
 ########################
 sec:TechniqueDeceptionShape a sh:NodeShape ;
+  kgcs:ruleId "KGCS-RAG-T5" ;
+  kgcs:provenance <https://example.org/docs/ontology/shacl/rag-shapes.ttl#TechniqueDeceptionShape> ;
   sh:targetClass sec:Technique ;
   sh:property [
     sh:predicate sec:countered_by ;
@@ -107,6 +120,8 @@ sec:TechniqueDeceptionShape a sh:NodeShape ;
 # Ensure Vulnerability references include at least one URL and Reference nodes have referenceUrl
 ########################
 sec:ReferenceUrlShape a sh:NodeShape ;
+  kgcs:ruleId "KGCS-RAG-T6" ;
+  kgcs:provenance <https://example.org/docs/ontology/shacl/rag-shapes.ttl#ReferenceUrlShape> ;
   sh:targetClass sec:Reference ;
   sh:property [
     sh:predicate sec:referenceUrl ;
@@ -119,6 +134,8 @@ sec:ReferenceUrlShape a sh:NodeShape ;
 # T7 — End-to-End Defensive Reasoning (both detection and mitigation exist)
 ########################
 sec:VulnerabilityEndToEndShape a sh:NodeShape ;
+  kgcs:ruleId "KGCS-RAG-T7" ;
+  kgcs:provenance <https://example.org/docs/ontology/shacl/rag-shapes.ttl#VulnerabilityEndToEndShape> ;
   sh:targetClass sec:Vulnerability ;
   sh:select (
     [

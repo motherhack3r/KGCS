@@ -1,0 +1,6 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sec:ref-t6 a sec:Reference ;
+  sec:referenceUrl "https://example.org/ref/t6"^^xsd:anyURI ;
+  sec:referenceSource "Test" .

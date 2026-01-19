@@ -1,0 +1,9 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix d3fend: <https://example.org/sec/d3fend#> .
+
+sec:tech-t4 a sec:Technique ;
+  sec:technique_id "T-T4" ;
+  sec:mitigated_by d3fend:d3-t4 .
+
+d3fend:d3-t4 a sec:DefensiveTechnique ;
+  d3fend:d3fendId "D3-T4" .

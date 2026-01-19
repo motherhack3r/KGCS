@@ -1,0 +1,32 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix capec: <https://example.org/sec/capec#> .
+@prefix cwe: <https://example.org/sec/cwe#> .
+@prefix attck: <https://example.org/sec/attck#> .
+
+sec:vuln-t7 a sec:Vulnerability ;
+  sec:cveId "CVE-TEST-T7" ;
+  sec:caused_by sec:weak-t7 ;
+  sec:affects sec:config-t7 .
+
+sec:weak-t7 a sec:Weakness ;
+  cwe:cwe_id "CWE-777" ;
+  sec:exploited_by capec:capec-t7 .
+
+capec:capec-t7 a sec:AttackPattern ;
+  capec:capec_id "CAPEC-T7" ;
+  sec:implemented_as sec:tech-t7 .
+
+sec:tech-t7 a sec:Technique ;
+  attck:technique_id "T-T7" ;
+  sec:detected_by sec:car-t7 ;
+  sec:mitigated_by d3fend:d3-t7 ;
+  sec:belongs_to sec:tactic-t7 .
+
+sec:car-t7 a sec:DetectionAnalytic ;
+  car:car_id "CAR-T7" .
+
+d3fend:d3-t7 a sec:DefensiveTechnique ;
+  d3fend:d3fendId "D3-T7" .
+
+sec:tactic-t7 a sec:Tactic ;
+  attck:tactic_id "TA-T7" .
