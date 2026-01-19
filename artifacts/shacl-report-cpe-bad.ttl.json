@@ -1,0 +1,5 @@
+{
+  "data_file": "E:\\DEVEL\\LAIA\\KGCS\\data\\shacl-samples\\cpe-bad.ttl",
+  "conforms": false,
+  "results_text": "Validation Report\nConforms: False\nResults (2):\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:string ; sh:message Literal(\"Platform must include a cpeNameId.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:cpeNameId ]\n\tFocus Node: ex:PlatformX\n\tResult Path: ex:cpeNameId\n\tMessage: Platform must include a cpeNameId.\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:string ; sh:message Literal(\"PlatformConfiguration must include a matchCriteriaId.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:matchCriteriaId ]\n\tFocus Node: ex:PCX\n\tResult Path: ex:matchCriteriaId\n\tMessage: PlatformConfiguration must include a matchCriteriaId.\n"
+}

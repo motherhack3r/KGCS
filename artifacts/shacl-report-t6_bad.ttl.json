@@ -1,0 +1,5 @@
+{
+  "data_file": "E:\\DEVEL\\LAIA\\KGCS\\data\\shacl-samples\\t6_bad.ttl",
+  "conforms": false,
+  "results_text": "Validation Report\nConforms: False\nResults (2):\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: sec:ref-t6-bad\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:string ; sh:message Literal(\"Reference nodes must include a referenceSource (string).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceSource ]\n\tFocus Node: sec:ref-t6-bad\n\tResult Path: ex:referenceSource\n\tMessage: Reference nodes must include a referenceSource (string).\n"
+}
