@@ -1,0 +1,17 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex: <https://example.org/sec/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ATT&CK shapes: Technique, SubTechnique, Tactic identifiers
+ex:TechniqueIdShape a sh:NodeShape ;
+  sh:targetClass ex:Technique ;
+  sh:property [ sh:path ex:technique_id ; sh:datatype xsd:string ; sh:minCount 1 ; sh:message "Technique must include a technique_id." ] ;
+  sh:property [ sh:path ex:belongs_to ; sh:class ex:Tactic ; sh:minCount 1 ; sh:message "Technique must link to at least one Tactic." ] .
+
+ex:SubTechniqueIdShape a sh:NodeShape ;
+  sh:targetClass ex:SubTechnique ;
+  sh:property [ sh:path ex:subtechnique_of ; sh:class ex:Technique ; sh:minCount 1 ; sh:message "SubTechnique must reference parent Technique." ] .
+
+ex:TacticIdShape a sh:NodeShape ;
+  sh:targetClass ex:Tactic ;
+  sh:property [ sh:path ex:tacticId ; sh:datatype xsd:string ; sh:minCount 1 ; sh:message "Tactic must include a tacticId." ] .

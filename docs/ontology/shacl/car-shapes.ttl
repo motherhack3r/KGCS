@@ -1,0 +1,8 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex: <https://example.org/sec/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# CAR shapes: DetectionAnalytic identifier
+ex:CARDetectionShape a sh:NodeShape ;
+  sh:targetClass ex:DetectionAnalytic ;
+  sh:property [ sh:path ex:carId ; sh:datatype xsd:string ; sh:minCount 1 ; sh:message "DetectionAnalytic must include a carId." ] .

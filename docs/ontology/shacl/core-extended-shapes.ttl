@@ -1,0 +1,12 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex: <https://example.org/sec/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Core-extended: top-level checks that apply across imported modules
+ex:CoreExtendedShape a sh:NodeShape ;
+  sh:targetClass ex:Vulnerability ;
+  sh:property [ sh:path ex:cveId ; sh:datatype xsd:string ; sh:minCount 1 ; sh:message "Vulnerability must include cveId." ] .
+
+ex:CoreIdentifierConsistency a sh:NodeShape ;
+  sh:targetClass ex:PlatformConfiguration ;
+  sh:property [ sh:path ex:matchCriteriaId ; sh:minCount 1 ] .

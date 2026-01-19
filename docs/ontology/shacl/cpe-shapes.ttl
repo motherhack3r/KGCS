@@ -1,0 +1,12 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex: <https://example.org/sec/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# CPE shapes: Platform and PlatformConfiguration identifiers
+ex:CPEPlatformShape a sh:NodeShape ;
+  sh:targetClass ex:Platform ;
+  sh:property [ sh:path ex:cpeNameId ; sh:datatype xsd:string ; sh:minCount 1 ; sh:message "Platform must include a cpeNameId." ] .
+
+ex:CPEPlatformConfigurationShape a sh:NodeShape ;
+  sh:targetClass ex:PlatformConfiguration ;
+  sh:property [ sh:path ex:matchCriteriaId ; sh:datatype xsd:string ; sh:minCount 1 ; sh:message "PlatformConfiguration must include a matchCriteriaId." ] .

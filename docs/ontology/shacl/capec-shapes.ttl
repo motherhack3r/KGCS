@@ -1,0 +1,8 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex: <https://example.org/sec/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# CAPEC shapes: AttackPattern identifier
+ex:CAPECAttackPatternShape a sh:NodeShape ;
+  sh:targetClass ex:AttackPattern ;
+  sh:property [ sh:path ex:capecId ; sh:datatype xsd:string ; sh:minCount 1 ; sh:message "AttackPattern must include a capecId." ] .
