@@ -681,13 +681,55 @@ AttributionClaim
 
 ### Phase 3: Data Ingestion (Planned)
 
-- [ ] ETL scripts to load NVD CVE/CPE JSON
-- [ ] MITRE STIX 2.1 parser for ATT&CK / D3FEND / SHIELD
-- [ ] CWE / CAPEC / CAR JSON loaders
-- [ ] Neo4j or RDF graph database setup
-- [ ] Re-ingestion safety tests (versioning, conflict detection)
+Overview
 
-**Deliverable:** Production-ready data pipeline
+Phase 3 builds a repeatable, auditable ETL to ingest authoritative standards (NVD, MITRE), validate inputs with SHACL, preserve provenance and versioning, and write canonical KG nodes/edges into the selected graph store (Neo4j or RDF). The plan below is staged so we can deliver a minimal MVP quickly and iterate to full coverage.
+
+Priority steps (MVP first)
+
+1) Bootstrap infra & dependencies (1–2 days)
+  - Tasks: `requirements.txt`, `infra/docker-compose.yml` with Neo4j (or triple store) service, `scripts/setup_env.ps1` / `scripts/setup_env.sh` for local dev.
+  - Deliverable: reproducible dev environment and dependency manifest.
+  - Acceptance: `pip install -r requirements.txt` and `docker-compose up -d` start services.
+
+2) CPE / CVE / CVSS ingest (3–5 days)
+  - Tasks: `scripts/ingest_cpe.py`, `scripts/ingest_nvd_cve.py` to parse NVD JSON (preserve CVSS versions as separate `VulnerabilityScore` nodes), map `configurations` → `PlatformConfiguration` → `Platform`.
+  - Deliverable: CVE nodes with linked CVSS nodes + platform configuration edges, provenance metadata (`source_uri`, `source_hash`, `ingest_time`).
+  - Acceptance: sample `data/*/samples` ingest produces nodes/edges visible in DB and includes provenance properties.
+
+3) STIX ingestion (ATT&CK, D3FEND, SHIELD) (3–5 days)
+  - Tasks: `scripts/ingest_stix.py` using `stix2` to extract Techniques, Tactics, DefensiveTechnique and DeceptionTechnique objects and map to ontology classes and IDs.
+  - Deliverable: Technique/Tactic nodes and edges (`implements`, `belongs_to`, `mitigated_by`).
+
+4) CAPEC / CWE / CAR ingestion (2–4 days)
+  - Tasks: XML/JSON parsers for CAPEC/CWE and CAR loader to create `AttackPattern`, `Weakness`, and `DetectionAnalytic` nodes and link them per the core causal chain.
+
+5) SHACL pre-ingest and pipeline integration (2 days)
+  - Tasks: call existing `run_validator()` in `scripts/ingest_pipeline.py` before index/write. On failure, emit the failure payload conforming to `docs/ontology/shacl/failure_payload_schema.json` and abort the write for offending input.
+  - Acceptance: bad sample aborts with a valid failure payload; good sample proceeds.
+
+6) Versioning & re-ingest safety (2–4 days)
+  - Tasks: add `ingest_metadata` (job id, source_hash, ingest_time), implement transactional writes and deterministic upserts, and an edge-diff rollback procedure.
+  - Acceptance: reingestion is idempotent and logged with provenance.
+
+7) Tests, CI, and artifacts (2–3 days)
+  - Tasks: unit tests for parsers, integration tests using `data/*/samples`, GitHub Actions job to run `validate_shacl.py` and `ingest_pipeline.py --dry-run`, publish `artifacts/` and optionally fail the job on configured `rule_id` values.
+  - Deliverable: `.github/workflows/ingest-and-validate.yml`, `tests/`, `docs/PHASE3.md` runbook.
+
+Performance & scale (optional)
+ - Run batched ingest on larger samples, measure resource usage, and optimize SHACL checks or move expensive checks to offline batch jobs.
+
+Acceptance criteria (Phase 3 complete)
+ - Core standards (CPE, CVE, CVSS, CWE, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE) can be ingested into the KG with provenance recorded.
+ - SHACL validation runs pre-ingest and blocks invalid inputs, emitting machine-readable failure payloads.
+ - CI runs a dry-run ingest + SHACL validation on PRs and produces artifacts; fail-on-rule behavior is configurable.
+ - Re-ingestion is deterministic, auditable, and reversible via logged transactions.
+
+Estimated timeline
+ - MVP (steps 1,2,5,7): 7–10 days
+ - Full Phase 3 (all steps): ~3–4 weeks depending on parallelization and review cadence
+
+Deliverable: Production-ready data pipeline
 
 ### Phase 4: Extension Layers (Planned)
 
