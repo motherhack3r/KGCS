@@ -1,0 +1,6 @@
+{
+  "data_file": "tmp\\\\test-cpe.ttl",
+  "conforms": true,
+  "results_text": "Validation Report\nConforms: True\n",
+  "violations": []
+}

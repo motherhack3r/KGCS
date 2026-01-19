@@ -1,0 +1,147 @@
+{
+  "data_file": "tmp\\\\test-cve.ttl",
+  "conforms": false,
+  "results_text": "Validation Report\nConforms: False\nResults (20):\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2022-50930#cvss-v31-2663813588195542295>\n\tValue Node: Literal(\"8.4\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2022-50931#cvss-v31-2663813588195542295>\n\tValue Node: Literal(\"8.4\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-14124#cvss-v31-2201459590044919946>\n\tValue Node: Literal(\"8.6\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15456#cvss-v31-8420892846852086724>\n\tValue Node: Literal(\"7.3\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15457#cvss-v31-8420892846852086724>\n\tValue Node: Literal(\"7.3\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15458#cvss-v31-7996432359271161917>\n\tValue Node: Literal(\"7.3\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15459#cvss-v31-3851792966138528548>\n\tValue Node: Literal(\"8.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15460#cvss-v31-3851792966138528548>\n\tValue Node: Literal(\"8.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15461#cvss-v31-3851792966138528548>\n\tValue Node: Literal(\"8.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-20800#cvss-v31--9099044462600038363>\n\tValue Node: Literal(\"7.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-20801#cvss-v31--2015710327945885035>\n\tValue Node: Literal(\"7.0\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-66698#cvss-v31-2201459590044919946>\n\tValue Node: Literal(\"8.6\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-9543#cvss-v31-9018345229176241192>\n\tValue Node: Literal(\"3.5\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-0716#cvss-v31-33798511352675472>\n\tValue Node: Literal(\"4.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20867#cvss-v31-6989441388260245332>\n\tValue Node: Literal(\"7.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20868#cvss-v31--575776606778380609>\n\tValue Node: Literal(\"8.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20869#cvss-v31--417764612320752448>\n\tValue Node: Literal(\"7.0\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20870#cvss-v31--7771269078086043317>\n\tValue Node: Literal(\"7.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20871#cvss-v31--7771269078086043317>\n\tValue Node: Literal(\"7.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-22686#cvss-v31--489518371341206003>\n\tValue Node: Literal(\"10.0\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\n",
+  "violations": [
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore.",
+      "focus_node": null,
+      "path": null
+    }
+  ]
+}
