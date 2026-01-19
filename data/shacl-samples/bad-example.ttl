@@ -1,0 +1,32 @@
+@prefix sec: <https://example.org/sec/core#> .
+@prefix inc: <https://example.org/incident#> .
+@prefix attck: <https://example.org/sec/attck#> .
+@prefix capec: <https://example.org/sec/capec#> .
+@prefix cwe: <https://example.org/sec/cwe#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Bad example demonstrating violations
+
+# 1) Vulnerability missing cveId and directly implements a Technique (forbidden)
+sec:vuln-bad-1 a sec:Vulnerability ;
+  sec:description "Missing cveId and bad link" ;
+  sec:implemented_as sec:tech-bad-1 ;
+  sec:affects sec:platform-bad-1 .
+
+# 2) Vulnerability affects Platform directly (forbidden)
+sec:platform-bad-1 a sec:Platform ;
+  sec:product "broken-product" .
+
+# 3) Technique without belongs_to (violates TechniqueTacticShape)
+sec:tech-bad-1 a sec:Technique ;
+  attck:technique_id "T0000" .
+
+# 4) Reference missing URL and source
+sec:ref-bad a sec:Reference .
+
+# 5) VulnerabilityScore without cvssVersion
+sec:cvss-bad a sec:VulnerabilityScore ;
+  sec:baseScore "5.0" .
+
+# 6) SubTechnique without parent
+sec:subtech-bad a sec:SubTechnique .

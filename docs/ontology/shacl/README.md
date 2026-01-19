@@ -26,3 +26,14 @@ Notes:
 Next steps I can take:
 - Combine shapes into a single profile TTL and add more rules from RAG templates.
 - Add example data snippets under `data/` and CI job to run `pyshacl` on push.
+ - Example data and a validator script have been added under `data/shacl-samples/` and `scripts/validate_shacl.py`.
+
+Quick run (from repository root):
+
+```bash
+python -m pip install pyshacl rdflib
+python scripts/validate_shacl.py data/shacl-samples/good-example.ttl
+python scripts/validate_shacl.py data/shacl-samples/bad-example.ttl
+```
+
+The script loads the core shapes and AI profile and exits with code `0` on success, `1` on validation failures, `2` on parse/error.

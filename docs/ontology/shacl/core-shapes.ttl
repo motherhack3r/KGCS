@@ -3,6 +3,14 @@
 @prefix inc: <https://example.org/incident#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix cve: <https://example.org/sec/cve#> .
+@prefix cwe: <https://example.org/sec/cwe#> .
+@prefix capec: <https://example.org/sec/capec#> .
+@prefix attck: <https://example.org/sec/attck#> .
+@prefix d3fend: <https://example.org/sec/d3fend#> .
+@prefix car: <https://example.org/sec/car#> .
+@prefix shield: <https://example.org/sec/shield#> .
+@prefix engage: <https://example.org/sec/engage#> .
 
 # Core SHACL shapes for KGCS Core + Incident safety
 
@@ -128,6 +136,94 @@ sec:NoVulnAffectsPlatformShape a sh:NodeShape ;
       sh:prefixes (sec: <https://example.org/sec/core#>)
       sh:message "Vulnerability must not directly affect a Platform; use PlatformConfiguration (sec:affects -> sec:PlatformConfiguration)."
       sh:select "SELECT $this ?p ?o WHERE { $this sec:affects ?o . ?o a sec:Platform . }"
+    ]
+  ) ;
+.
+
+# 1) External identifier presence for core node types (every core node must expose a stable external id)
+
+sec:PlatformExternalIdShape a sh:NodeShape ;
+  sh:targetClass sec:Platform ;
+  sh:or (
+    [ sh:property ( [ sh:predicate sec:CPEUri ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ sh:predicate sec:cpeNameId ; sh:minCount 1 ] ) ]
+  ) ;
+  sh:message "Platform must expose a stable CPE identifier via sec:CPEUri or sec:cpeNameId." ;
+.
+
+sec:PlatformConfigurationExternalIdShape a sh:NodeShape ;
+  sh:targetClass sec:PlatformConfiguration ;
+  sh:property [ sh:predicate sec:matchCriteriaId ; sh:minCount 1 ; sh:message "PlatformConfiguration must include sec:matchCriteriaId." ] ;
+.
+
+sec:VulnerabilityExternalIdShape a sh:NodeShape ;
+  sh:targetClass sec:Vulnerability ;
+  sh:property [ sh:predicate sec:cveId ; sh:minCount 1 ; sh:message "Vulnerability must include sec:cveId." ] ;
+.
+
+sec:WeaknessExternalIdShape a sh:NodeShape ;
+  sh:targetClass sec:Weakness ;
+  sh:or (
+    [ sh:property ( [ sh:predicate cwe:cwe_id ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ sh:predicate sec:cwe_id ; sh:minCount 1 ] ) ]
+  ) ;
+  sh:message "Weakness must include a CWE identifier (cwe:cwe_id or sec:cwe_id)." ;
+.
+
+sec:AttackPatternExternalIdShape a sh:NodeShape ;
+  sh:targetClass sec:AttackPattern ;
+  sh:property [ sh:predicate capec:capec_id ; sh:minCount 1 ; sh:message "AttackPattern must include capec:capec_id." ] ;
+.
+
+sec:TechniqueExternalIdShape a sh:NodeShape ;
+  sh:targetClass sec:Technique ;
+  sh:or (
+    [ sh:property ( [ sh:predicate attck:technique_id ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ sh:predicate sec:technique_id ; sh:minCount 1 ] ) ]
+  ) ;
+  sh:message "Technique must include an ATT&CK technique identifier (attck:technique_id)." ;
+.
+
+sec:TacticExternalIdShape a sh:NodeShape ;
+  sh:targetClass sec:Tactic ;
+  sh:property [ sh:predicate attck:tactic_id ; sh:minCount 1 ; sh:message "Tactic must include attck:tactic_id." ] ;
+.
+
+sec:DefensiveTechniqueExternalIdShape a sh:NodeShape ;
+  sh:targetClass sec:DefensiveTechnique ;
+  sh:property [ sh:predicate d3fend:d3fendId ; sh:minCount 1 ; sh:message "DefensiveTechnique must include d3fend:d3fendId." ] ;
+.
+
+sec:DetectionAnalyticExternalIdShape a sh:NodeShape ;
+  sh:targetClass sec:DetectionAnalytic ;
+  sh:property [ sh:predicate car:car_id ; sh:minCount 1 ; sh:message "DetectionAnalytic must include car:car_id." ] ;
+.
+
+sec:DeceptionTechniqueExternalIdShape a sh:NodeShape ;
+  sh:targetClass sec:DeceptionTechnique ;
+  sh:property [ sh:predicate shield:shieldId ; sh:minCount 1 ; sh:message "DeceptionTechnique must include shield:shieldId." ] ;
+.
+
+sec:EngagementConceptExternalIdShape a sh:NodeShape ;
+  sh:targetClass sec:EngagementConcept ;
+  sh:property [ sh:predicate engage:engageId ; sh:minCount 1 ; sh:message "EngagementConcept must include engage:engageId." ] ;
+.
+
+# 2) Ensure references include source and URL for verifiability
+sec:ReferenceCompletenessShape a sh:NodeShape ;
+  sh:targetClass sec:Reference ;
+  sh:property [ sh:predicate sec:referenceUrl ; sh:minCount 1 ; sh:message "Reference must include a referenceUrl." ] ;
+  sh:property [ sh:predicate sec:referenceSource ; sh:minCount 1 ; sh:message "Reference must include a referenceSource." ] ;
+.
+
+# 3) Enforce canonical causal chain exists for Vulnerabilities (stronger SPARQL check)
+sec:VulnerabilityCanonicalChainShape a sh:NodeShape ;
+  sh:targetClass sec:Vulnerability ;
+  sh:select (
+    [
+      sh:prefixes (sec: <https://example.org/sec/core#>)
+      sh:message "Vulnerability must have the canonical causal chain: caused_by Weakness -> exploited_by AttackPattern -> implemented_as Technique." 
+      sh:select "SELECT $this WHERE { FILTER NOT EXISTS { $this sec:caused_by ?w . ?w sec:exploited_by ?ap . ?ap sec:implemented_as ?t . } }"
     ]
   ) ;
 .
