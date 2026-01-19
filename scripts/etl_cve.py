@@ -18,6 +18,7 @@ Reference:
 import argparse
 import json
 import os
+import urllib.parse
 from datetime import datetime
 from rdflib import Graph, Namespace, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD
@@ -162,7 +163,7 @@ class CVEtoRDFTransformer:
 
             if cvss_data.get('baseScore') is not None:
                 score_value = float(cvss_data['baseScore'])
-                self.graph.add((score_node, SEC.baseScore, Literal(score_value, datatype=XSD.float)))
+                self.graph.add((score_node, SEC.baseScore, Literal(score_value, datatype=XSD.decimal)))
 
             if cvss_data.get('baseSeverity'):
                 self.graph.add((score_node, SEC.baseSeverity, Literal(cvss_data['baseSeverity'], datatype=XSD.string)))
@@ -197,7 +198,7 @@ class CVEtoRDFTransformer:
                 self.graph.add((score_node, SEC.vectorString, Literal(cvss_data['vectorString'], datatype=XSD.string)))
             if cvss_data.get('baseScore') is not None:
                 score_value = float(cvss_data['baseScore'])
-                self.graph.add((score_node, SEC.baseScore, Literal(score_value, datatype=XSD.float)))
+                self.graph.add((score_node, SEC.baseScore, Literal(score_value, datatype=XSD.decimal)))
             # (similar metrics as v3.1)
 
     def _add_configurations(self, vuln_node, configurations: list):
@@ -223,8 +224,15 @@ class CVEtoRDFTransformer:
         self.graph.add((config_node, SEC.matchCriteriaId, Literal(match_id, datatype=XSD.string)))
 
         # Add CPE criteria
-        if cpe_match.get('criteria'):
-            self.graph.add((config_node, SEC.configurationCriteria, Literal(cpe_match['criteria'], datatype=XSD.string)))
+        cpe_criteria = cpe_match.get('criteria')
+        if cpe_criteria:
+            self.graph.add((config_node, SEC.configurationCriteria, Literal(cpe_criteria, datatype=XSD.string)))
+            # Link configuration to a Platform node for matchesPlatform requirement
+            platform_id = urllib.parse.quote(cpe_criteria, safe='')
+            platform_node = URIRef(f"{EX}platform/{platform_id}")
+            self.graph.add((platform_node, RDF.type, SEC.Platform))
+            self.graph.add((platform_node, SEC.CPEUri, Literal(cpe_criteria, datatype=XSD.string)))
+            self.graph.add((config_node, SEC.matchesPlatform, platform_node))
 
         # Add version ranges
         if cpe_match.get('versionStartIncluding'):
@@ -249,7 +257,7 @@ class CVEtoRDFTransformer:
             # Create Reference node
             ref_node = URIRef(f"{EX}reference/{hash(ref_url)}")
             self.graph.add((ref_node, RDF.type, SEC.Reference))
-            self.graph.add((ref_node, SEC.referenceUrl, URIRef(ref_url)))
+            self.graph.add((ref_node, SEC.referenceUrl, Literal(ref_url, datatype=XSD.anyURI)))
 
             if ref.get('source'):
                 self.graph.add((ref_node, SEC.referenceSource, Literal(ref['source'], datatype=XSD.string)))

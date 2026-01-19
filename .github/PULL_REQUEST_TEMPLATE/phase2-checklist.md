@@ -22,7 +22,7 @@ Use this checklist when submitting PRs that complete or modify Phase 2 artifacts
 
 - [x] Added per-OWL SHACL bundles (cpe/cve/cwe/capec/attck/d3fend/car/shield/engage)
 
- - [x] Added SHACL manifest: `docs/ontology/shacl/manifest.json` mapping OWL → shape bundles
+- [x] Added SHACL manifest: `docs/ontology/shacl/manifest.json` mapping OWL → shape bundles
 
 - [x] Added RAG→SHACL mapping: `docs/ontology/shacl/rag-to-shacl.md`
 
@@ -32,7 +32,7 @@ Use this checklist when submitting PRs that complete or modify Phase 2 artifacts
 
 - [ ] Finalize CI workflow `.github/workflows/shacl-validation.yml` to run the SHACL validator and fail on violations
 
- - [x] Add governance artifacts: rule IDs, failure payload schema, and responsible owners (see `docs/ontology/shacl/rule_catalog.json` and `docs/ontology/shacl/failure_payload_schema.json`)
+- [x] Add governance artifacts: rule IDs, failure payload schema, and responsible owners (see `docs/ontology/shacl/rule_catalog.json` and `docs/ontology/shacl/failure_payload_schema.json`)
 
 ## Recent progress (quick wins)
 

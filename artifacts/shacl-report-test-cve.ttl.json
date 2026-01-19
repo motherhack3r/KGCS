@@ -1,145 +1,572 @@
 {
-  "data_file": "tmp\\\\test-cve.ttl",
+  "data_file": "tmp\\test-cve.ttl",
   "conforms": false,
-  "results_text": "Validation Report\nConforms: False\nResults (20):\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2022-50930#cvss-v31-2663813588195542295>\n\tValue Node: Literal(\"8.4\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2022-50931#cvss-v31-2663813588195542295>\n\tValue Node: Literal(\"8.4\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-14124#cvss-v31-2201459590044919946>\n\tValue Node: Literal(\"8.6\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15456#cvss-v31-8420892846852086724>\n\tValue Node: Literal(\"7.3\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15457#cvss-v31-8420892846852086724>\n\tValue Node: Literal(\"7.3\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15458#cvss-v31-7996432359271161917>\n\tValue Node: Literal(\"7.3\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15459#cvss-v31-3851792966138528548>\n\tValue Node: Literal(\"8.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15460#cvss-v31-3851792966138528548>\n\tValue Node: Literal(\"8.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15461#cvss-v31-3851792966138528548>\n\tValue Node: Literal(\"8.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-20800#cvss-v31--9099044462600038363>\n\tValue Node: Literal(\"7.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-20801#cvss-v31--2015710327945885035>\n\tValue Node: Literal(\"7.0\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-66698#cvss-v31-2201459590044919946>\n\tValue Node: Literal(\"8.6\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-9543#cvss-v31-9018345229176241192>\n\tValue Node: Literal(\"3.5\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-0716#cvss-v31-33798511352675472>\n\tValue Node: Literal(\"4.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20867#cvss-v31-6989441388260245332>\n\tValue Node: Literal(\"7.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20868#cvss-v31--575776606778380609>\n\tValue Node: Literal(\"8.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20869#cvss-v31--417764612320752448>\n\tValue Node: Literal(\"7.0\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20870#cvss-v31--7771269078086043317>\n\tValue Node: Literal(\"7.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20871#cvss-v31--7771269078086043317>\n\tValue Node: Literal(\"7.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-22686#cvss-v31--489518371341206003>\n\tValue Node: Literal(\"10.0\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore.\n",
+  "results_text": "Validation Report\nConforms: False\nResults (81):\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-1038222786066165909>\n\tValue Node: <https://wpscan.com/vulnerability/6cc212f4-aa61-409a-b257-9c920956a401/>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-1101932274377938795>\n\tValue Node: <https://vuldb.com/?id.339490>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-1321888273935864100>\n\tValue Node: <https://vuldb.com/?submit.725139>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-1333313444114633916>\n\tValue Node: <https://vuldb.com/?ctiid.339491>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-1580074504766017800>\n\tValue Node: <https://wpscan.com/vulnerability/fdd19027-b70e-45a4-882b-77ab1819af91/>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-1718579570185163897>\n\tValue Node: <https://github.com/cymiao1978/cve/blob/main/new/23.md>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-193598940843026231>\n\tValue Node: <https://git.kernel.org/stable/c/edfb2e602b5ba5ca6bf31cbac20b366efb72b156>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-2573803357802439734>\n\tValue Node: <https://git.kernel.org/stable/c/05ec9af3cc430683c97f76027e1c55ac6fd25c59>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-2688273066290121344>\n\tValue Node: <https://www.opertek.com/descargar-software/?prc=_326>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-2689669703471374315>\n\tValue Node: <https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20870>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-336016416338662990>\n\tValue Node: <https://www.exploit-db.com/exploits/50745>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-357400224027434390>\n\tValue Node: <https://github.com/ueh1013/VULN/issues/12>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-3720716689045754005>\n\tValue Node: <https://vuldb.com/?id.339495>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-405572736032539037>\n\tValue Node: <https://vuldb.com/?submit.725816>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-4332219878603968728>\n\tValue Node: <https://vuldb.com/?id.339497>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-6266948327399020307>\n\tValue Node: <https://vuldb.com/?id.339491>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-6724248918846259150>\n\tValue Node: <https://github.com/cymiao1978/cve/blob/main/new/22.md>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-7054455530025023960>\n\tValue Node: <https://www.emerson.com/en-us>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-7344634491170267320>\n\tValue Node: <https://vuldb.com/?id.339489>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-7541532664604375251>\n\tValue Node: <https://www.exploit-db.com/exploits/50743>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-790341440957480031>\n\tValue Node: <https://gitlab.gnome.org/GNOME/libsoup/-/issues/476>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-8305054069136185687>\n\tValue Node: <https://git.kernel.org/stable/c/001f44982587ad462b3002ee40c75e8df67d597d>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-8416056036532307418>\n\tValue Node: <https://vuldb.com/?ctiid.339497>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-8778446309289798388>\n\tValue Node: <https://vuldb.com/?submit.725142>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-882342646191294186>\n\tValue Node: <https://bugzilla.redhat.com/show_bug.cgi?id=2427896>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-8978180398238817481>\n\tValue Node: <https://github.com/Perunchess/CVE-2025-66698>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/-9166321692788775001>\n\tValue Node: <https://www.vulncheck.com/advisories/teamspeak-insecure-file-permissions>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/1301609275630267311>\n\tValue Node: <https://github.com/cymiao1978/cve/blob/main/new/23.md#poc>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/146212843000175601>\n\tValue Node: <https://github.com/cymiao1978/cve/blob/main/new/24.md>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/1478692265580116646>\n\tValue Node: <https://vuldb.com/?ctiid.339495>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/1539851675528663484>\n\tValue Node: <https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20868>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/1692923357328940311>\n\tValue Node: <https://github.com/ueh1013/VULN/issues/9>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/1945022228143507563>\n\tValue Node: <https://vuldb.com/?submit.725138>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/2311003776174274016>\n\tValue Node: <https://github.com/cymiao1978/cve/blob/main/new/22.md#poc>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/2636184147125360311>\n\tValue Node: <https://vuldb.com/?id.339496>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/2673550786445384745>\n\tValue Node: <https://git.kernel.org/stable/c/005d4b0d33f6b4a23d382b7930f7a96b95b01f39>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/2807028458605376586>\n\tValue Node: <https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20871>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/3340923008304382881>\n\tValue Node: <http://semantic.com>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/3414398701098540933>\n\tValue Node: <https://access.redhat.com/security/cve/CVE-2026-0716>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/34973658346761994>\n\tValue Node: <https://www.teamspeak.com/en/downloads>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/3864131493432868560>\n\tValue Node: <https://github.com/cymiao1978/cve/blob/main/new/24.md#poc>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/4276506484744085046>\n\tValue Node: <https://git.kernel.org/stable/c/91f114bffa36ce56d0e1f60a0a44fc09baaefc79>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/4640305719418310519>\n\tValue Node: <https://vuldb.com/?ctiid.339490>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/4696131247655381600>\n\tValue Node: <https://www.vulncheck.com/advisories/emerson-pac-machine-edition-build-trapiserver-unquoted-service-path>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/5141104257354346209>\n\tValue Node: <https://corp.mediatek.com/product-security-bulletin/January-2026>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/5307414770911233357>\n\tValue Node: <https://vuldb.com/?submit.725818>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/5759410455593089174>\n\tValue Node: <https://vuldb.com/?ctiid.339496>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/6059064127008851465>\n\tValue Node: <https://vuldb.com/?ctiid.339489>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/6501374442518278784>\n\tValue Node: <https://www.teamspeak.com>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/6753262516755836861>\n\tValue Node: <https://github.com/agentfront/enclave/commit/ed8bc438b2cd6e6f0b5f2de321e5be6f0169b5a1>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/6756808761947177510>\n\tValue Node: <https://vuldb.com/?submit.725817>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/701632655184604057>\n\tValue Node: <https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20867>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/7455061077135097304>\n\tValue Node: <https://github.com/agentfront/enclave/security/advisories/GHSA-7qm7-455j-5p63>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/8142170712468190681>\n\tValue Node: <http://veda.com>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/8877257377912328101>\n\tValue Node: <https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-20869>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:anyURI ; sh:message Literal(\"Reference nodes must include a referenceUrl (URI).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:referenceUrl ]\n\tFocus Node: <https://example.org/reference/993352749793433763>\n\tValue Node: <https://github.com/ueh1013/VULN/issues/13>\n\tResult Path: ex:referenceUrl\n\tMessage: Reference nodes must include a referenceUrl (URI).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2022-50930#cvss-v31-2663813588195542295>\n\tValue Node: Literal(\"8.4\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2022-50931#cvss-v31-2663813588195542295>\n\tValue Node: Literal(\"8.4\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-14124#cvss-v31-2201459590044919946>\n\tValue Node: Literal(\"8.6\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15456#cvss-v31-8420892846852086724>\n\tValue Node: Literal(\"7.3\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15457#cvss-v31-8420892846852086724>\n\tValue Node: Literal(\"7.3\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15458#cvss-v31-7996432359271161917>\n\tValue Node: Literal(\"7.3\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15459#cvss-v31-3851792966138528548>\n\tValue Node: Literal(\"8.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15460#cvss-v31-3851792966138528548>\n\tValue Node: Literal(\"8.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-15461#cvss-v31-3851792966138528548>\n\tValue Node: Literal(\"8.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-20800#cvss-v31--9099044462600038363>\n\tValue Node: Literal(\"7.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-20801#cvss-v31--2015710327945885035>\n\tValue Node: Literal(\"7.0\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-66698#cvss-v31-2201459590044919946>\n\tValue Node: Literal(\"8.6\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2025-9543#cvss-v31-9018345229176241192>\n\tValue Node: Literal(\"3.5\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-0716#cvss-v31-33798511352675472>\n\tValue Node: Literal(\"4.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20867#cvss-v31-6989441388260245332>\n\tValue Node: Literal(\"7.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20868#cvss-v31--575776606778380609>\n\tValue Node: Literal(\"8.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20869#cvss-v31--417764612320752448>\n\tValue Node: Literal(\"7.0\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20870#cvss-v31--7771269078086043317>\n\tValue Node: Literal(\"7.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-20871#cvss-v31--7771269078086043317>\n\tValue Node: Literal(\"7.8\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: <https://example.org/vulnerability/CVE-2026-22686#cvss-v31--489518371341206003>\n\tValue Node: Literal(\"10.0\", datatype=xsd:float)\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:class ex:Platform ; sh:message Literal(\"PlatformConfiguration should reference at least one Platform via matchesPlatform.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:matchesPlatform ]\n\tFocus Node: <https://example.org/platformConfiguration/02882AB1-7993-47DD-84A0-8DF4272D85ED>\n\tResult Path: ex:matchesPlatform\n\tMessage: PlatformConfiguration should reference at least one Platform via matchesPlatform.\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:class ex:Platform ; sh:message Literal(\"PlatformConfiguration should reference at least one Platform via matchesPlatform.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:matchesPlatform ]\n\tFocus Node: <https://example.org/platformConfiguration/1ED9CE5B-AC0E-4C53-A084-7777D5050400>\n\tResult Path: ex:matchesPlatform\n\tMessage: PlatformConfiguration should reference at least one Platform via matchesPlatform.\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:class ex:Platform ; sh:message Literal(\"PlatformConfiguration should reference at least one Platform via matchesPlatform.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:matchesPlatform ]\n\tFocus Node: <https://example.org/platformConfiguration/2700BCC5-634D-4EC6-AB67-5B678D5F951D>\n\tResult Path: ex:matchesPlatform\n\tMessage: PlatformConfiguration should reference at least one Platform via matchesPlatform.\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:class ex:Platform ; sh:message Literal(\"PlatformConfiguration should reference at least one Platform via matchesPlatform.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:matchesPlatform ]\n\tFocus Node: <https://example.org/platformConfiguration/8538774C-906D-4B03-A3E7-FA7A55E0DA9E>\n\tResult Path: ex:matchesPlatform\n\tMessage: PlatformConfiguration should reference at least one Platform via matchesPlatform.\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:class ex:Platform ; sh:message Literal(\"PlatformConfiguration should reference at least one Platform via matchesPlatform.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:matchesPlatform ]\n\tFocus Node: <https://example.org/platformConfiguration/879FFD0C-9B38-4CAA-B057-1086D794D469>\n\tResult Path: ex:matchesPlatform\n\tMessage: PlatformConfiguration should reference at least one Platform via matchesPlatform.\n",
   "violations": [
     {
       "rule_id": null,
-      "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "referenceUrl ]",
+      "message": "Reference nodes must include a referenceUrl (URI).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
       "focus_node": null,
       "path": null
     },
     {
       "rule_id": null,
       "shape": "baseScore ]",
-      "message": "VulnerabilityScore must include a baseScore.",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "baseScore ]",
+      "message": "VulnerabilityScore must include a baseScore (0.0-10.0).",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "matchesPlatform ]",
+      "message": "PlatformConfiguration should reference at least one Platform via matchesPlatform.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "matchesPlatform ]",
+      "message": "PlatformConfiguration should reference at least one Platform via matchesPlatform.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "matchesPlatform ]",
+      "message": "PlatformConfiguration should reference at least one Platform via matchesPlatform.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "matchesPlatform ]",
+      "message": "PlatformConfiguration should reference at least one Platform via matchesPlatform.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "matchesPlatform ]",
+      "message": "PlatformConfiguration should reference at least one Platform via matchesPlatform.",
       "focus_node": null,
       "path": null
     }
