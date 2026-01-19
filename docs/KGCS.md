@@ -657,9 +657,11 @@ AttributionClaim
  - [x] Add CI validation job (GitHub Actions) to run `pyshacl` on push/PR (validates changed OWL modules via manifest)
  - [ ] Add governance artifacts: stable rule IDs, provenance URIs, and standard failure payload schema
  - [ ] Integrate pre-ingest and pre-index validation into the ETL pipeline
-- [ ] Add governance artifacts: stable rule IDs, provenance URIs, and standard failure payload schema
-
-- [ ] Integrate pre-ingest and pre-index validation into the ETL pipeline
+ - [x] Add representative positive/negative sample TTLs (`data/shacl-samples/`) and a small validator script (`scripts/validate_shacl.py`)
+ - [x] Expand SHACL coverage to every OWL module and RAG template (per-OWL identifier shapes added; further shapes may be added iteratively)
+ - [x] Add CI validation job (GitHub Actions) to run `pyshacl` on push/PR (validates changed OWL modules via manifest)
+ - [x] Add governance artifacts: stable rule IDs, provenance URIs, and standard failure payload schema (`docs/ontology/shacl/rule_catalog.json`, `failure_payload_schema.json`)
+ - [x] Integrate pre-ingest and pre-index validation into the ETL pipeline (`scripts/ingest_pipeline.py` calls `run_validator()`) — validator emits per-file JSON reports to `artifacts/` and a consolidated index `artifacts/shacl-report-consolidated.json`
 - A complete SHACL suite that covers Core ontology invariants and RAG traversal templates
  - Each RAG template has at least one positive and one negative test case in `data/shacl-samples/`
  - CI workflow runs `pyshacl` and validates changed OWL modules using the manifest mapping

@@ -95,7 +95,7 @@ Each extension lives in its own OWL file and imports the core ontology.
 ## 📈 Future Work
 
 * Add new standards (e.g., NIST SP 800‑53).  
-* SHACL validation: canonical shapes, per-OWL bundles and manifest, validator CLI (`--template` / `--owl`) implemented; CI job added. ETL integration and governance artifacts pending.  
+* SHACL validation: canonical shapes, per-OWL bundles and manifest, validator CLI (`--template` / `--owl`) implemented; ETL integration and governance artifacts added. Validator emits machine-readable reports to `artifacts/` and a consolidated index `artifacts/shacl-report-consolidated.json`. CI gating remains scaffolded and requires rule‑ID policy selection.
 * Build a UI for visualizing traversal paths.  
 * Integrate with an LLM for explainable answers.
 

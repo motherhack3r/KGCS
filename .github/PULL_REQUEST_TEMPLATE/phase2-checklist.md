@@ -12,9 +12,9 @@ Use this checklist when submitting PRs that complete or modify Phase 2 artifacts
 
 ## Blocking items (must pass before Phase 3 rollout)
 
-- [ ] Add or update SHACL constraint docs (`docs/ontology/shacl/`) and a short checklist of constraints changed
+- [x] Add or update SHACL constraint docs (`docs/ontology/shacl/`) and a short checklist of constraints changed
 
- [ ] Ensure `scripts/validate_shacl.py` exposes a stable `run_validator()` entry and is called from `scripts/ingest_pipeline.py` (ETL integration pending; validator CLI added)
+- [x] Ensure `scripts/validate_shacl.py` exposes a stable `run_validator()` entry and is called from `scripts/ingest_pipeline.py` (ETL integration wired)
 
 ## Recent progress (phase2 updates)
 
@@ -22,7 +22,7 @@ Use this checklist when submitting PRs that complete or modify Phase 2 artifacts
 
 - [x] Added per-OWL SHACL bundles (cpe/cve/cwe/capec/attck/d3fend/car/shield/engage)
 
-- [x] Added SHACL manifest: `docs/ontology/shacl/manifest.md` mapping OWL → shape bundles
+ - [x] Added SHACL manifest: `docs/ontology/shacl/manifest.json` mapping OWL → shape bundles
 
 - [x] Added RAG→SHACL mapping: `docs/ontology/shacl/rag-to-shacl.md`
 
@@ -32,7 +32,7 @@ Use this checklist when submitting PRs that complete or modify Phase 2 artifacts
 
 - [ ] Finalize CI workflow `.github/workflows/shacl-validation.yml` to run the SHACL validator and fail on violations
 
-- [ ] Add governance artifacts: rule IDs, failure payload schema, and responsible owners in `docs/KGCS.md` or governance doc referenced there
+ - [x] Add governance artifacts: rule IDs, failure payload schema, and responsible owners (see `docs/ontology/shacl/rule_catalog.json` and `docs/ontology/shacl/failure_payload_schema.json`)
 
 ## Recent progress (quick wins)
 
