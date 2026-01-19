@@ -12,17 +12,25 @@ Use this checklist when submitting PRs that complete or modify Phase 2 artifacts
 
 ## Blocking items (must pass before Phase 3 rollout)
 
-- [ ] Expand SHACL coverage to all OWL modules and RAG templates (`docs/ontology/owl/`, `docs/ontology/rag/`)
+- [ ] Expand SHACL coverage to all OWL modules and RAG templates (`docs/ontology/owl/`, `docs/ontology/rag/`) (partial: canonical bundle and per-OWL identifier shapes added)
 
 - [ ] Add or update SHACL constraint docs (`docs/ontology/shacl/`) and a short checklist of constraints changed
 
 - [ ] Add positive/negative SHACL samples under `data/shacl-samples/` and include a validation manifest
 
-- [ ] Ensure `scripts/validate_shacl.py` exposes a stable `run_validator()` entry and is called from `scripts/ingest_pipeline.py`
+- [ ] Ensure `scripts/validate_shacl.py` exposes a stable `run_validator()` entry and is called from `scripts/ingest_pipeline.py` (ETL integration pending; validator CLI added)
 
 - [ ] Finalize CI workflow `.github/workflows/shacl-validation.yml` to run the SHACL validator and fail on violations
 
 - [ ] Add governance artifacts: rule IDs, failure payload schema, and responsible owners in `docs/KGCS.md` or governance doc referenced there
+
+## Recent progress (quick wins)
+
+- [x] Added canonical SHACL bundle: `docs/ontology/shacl/kgcs-shapes.ttl`
+
+- [x] Added RAG→SHACL mapping: `docs/ontology/shacl/rag-to-shacl.md`
+
+- [x] `scripts/validate_shacl.py` updated: CLI supports `--template` to validate shape subsets per RAG template
 
 ## Non-blocking / recommended
 

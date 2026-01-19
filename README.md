@@ -95,7 +95,7 @@ Each extension lives in its own OWL file and imports the core ontology.
 ## 📈 Future Work
 
 * Add new standards (e.g., NIST SP 800‑53).  
-* Implement SHACL validation.  
+* SHACL validation: canonical shapes and validator CLI implemented; CI & ETL integration pending.  
 * Build a UI for visualizing traversal paths.  
 * Integrate with an LLM for explainable answers.
 

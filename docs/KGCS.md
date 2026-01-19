@@ -646,14 +646,21 @@ AttributionClaim
 
 **Deliverable:** 10 OWL/Turtle files with full 1:1 alignment to JSON/STIX schemas.
 
+
 ### Phase 2: SHACL Validation (Next)
 
-- [x] Create SHACL shapes for Core + RAG templates (`docs/ontology/shacl/core-shapes.ttl`, `rag-shapes.ttl`)
+- [x] Create SHACL shapes for Core + RAG templates (canonical bundle: `docs/ontology/shacl/kgcs-shapes.ttl`)
+
 - [x] Define an `AI-Strict` profile that includes core + RAG checks (`docs/ontology/shacl/ai-strict-profile.ttl`)
-- [x] Add representative positive/negative sample TTLs (`data/shacl-samples/`) and a small validator script (`scripts/validate_shacl.py`)
-- [ ] Expand SHACL coverage to every OWL module and RAG template (test matrix)
+
+- [x] Add representative positive/negative sample TTLs (`data/shacl-samples/`) and a small validator script (`scripts/validate_shacl.py`) — validator CLI supports `--template`
+
+- [ ] Expand SHACL coverage to every OWL module and RAG template (partial: per-OWL identifier shapes added; additional shapes required)
+
 - [ ] Add CI validation job (GitHub Actions) to run `pyshacl` on push/PR
+
 - [ ] Add governance artifacts: stable rule IDs, provenance URIs, and standard failure payload schema
+
 - [ ] Integrate pre-ingest and pre-index validation into the ETL pipeline
 
 **Deliverable:** Completed Phase 2 will include:
@@ -669,6 +676,7 @@ AttributionClaim
 - Each RAG template has at least one positive and one negative test case in `data/shacl-samples/`
 - CI workflow runs `pyshacl` and returns non-zero on validation failure
 - Every SHACL constraint includes a stable rule identifier and an audit-friendly message
+ - Validator supports RAG template selection (e.g., `scripts/validate_shacl.py --template T1`) and shape-subset validation
 
 ### Phase 3: Data Ingestion (Planned)
 
