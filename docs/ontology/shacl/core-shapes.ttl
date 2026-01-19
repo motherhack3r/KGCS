@@ -53,3 +53,81 @@ sec:NoIncidentVulnerabilityShape a sh:NodeShape ;
     ]
   ) ;
 .
+
+# Additional Core constraints
+
+# Platform must provide a CPE URI or identifier (CPEURI)
+sec:PlatformCpeUriShape a sh:NodeShape ;
+  sh:targetClass sec:Platform ;
+  sh:property [
+    sh:predicate sec:CPEUri ;
+    sh:minCount 1 ;
+    sh:message "Platform must include a canonical CPE URI (sec:CPEUri)." ;
+  ] ;
+.
+
+# PlatformConfiguration must include match criteria or an id
+sec:PlatformConfigurationShape a sh:NodeShape ;
+  sh:targetClass sec:PlatformConfiguration ;
+  sh:property [
+    sh:predicate sec:configurationCriteria ;
+    sh:minCount 1 ;
+    sh:message "PlatformConfiguration must include configuration criteria (sec:configurationCriteria)." ;
+  ] ;
+.
+
+# Vulnerability must be caused_by at least one Weakness (causal chain start)
+sec:VulnerabilityCausedByShape a sh:NodeShape ;
+  sh:targetClass sec:Vulnerability ;
+  sh:property [
+    sh:predicate sec:caused_by ;
+    sh:minCount 1 ;
+    sh:class sec:Weakness ;
+    sh:message "Vulnerability must be linked to at least one Weakness (sec:caused_by)." ;
+  ] ;
+.
+
+# AttackPattern must implement into at least one Technique
+sec:AttackPatternImplementsShape a sh:NodeShape ;
+  sh:targetClass sec:AttackPattern ;
+  sh:property [
+    sh:predicate sec:implemented_as ;
+    sh:minCount 1 ;
+    sh:class sec:Technique ;
+    sh:message "AttackPattern should be implemented by at least one Technique (sec:implemented_as)." ;
+  ] ;
+.
+
+# VulnerabilityScore must declare a cvssVersion
+sec:VulnerabilityScoreVersionShape a sh:NodeShape ;
+  sh:targetClass sec:VulnerabilityScore ;
+  sh:property [
+    sh:predicate sec:cvssVersion ;
+    sh:minCount 1 ;
+    sh:message "VulnerabilityScore must include a cvssVersion (e.g., '3.1', '4.0')." ;
+  ] ;
+.
+
+# SubTechnique must have exactly one parent Technique
+sec:SubTechniqueParentShape a sh:NodeShape ;
+  sh:targetClass sec:SubTechnique ;
+  sh:property [
+    sh:predicate sec:subtechnique_of ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class sec:Technique ;
+    sh:message "SubTechnique must reference exactly one parent Technique via sec:subtechnique_of." ;
+  ] ;
+.
+
+# Forbid Vulnerability -> Platform direct affects (must be PlatformConfiguration)
+sec:NoVulnAffectsPlatformShape a sh:NodeShape ;
+  sh:targetClass sec:Vulnerability ;
+  sh:select (
+    [
+      sh:prefixes (sec: <https://example.org/sec/core#>)
+      sh:message "Vulnerability must not directly affect a Platform; use PlatformConfiguration (sec:affects -> sec:PlatformConfiguration)."
+      sh:select "SELECT $this ?p ?o WHERE { $this sec:affects ?o . ?o a sec:Platform . }"
+    ]
+  ) ;
+.
