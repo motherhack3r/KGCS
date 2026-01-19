@@ -23,10 +23,10 @@ sec:NoDirectVulnTechniqueShape a sh:NodeShape ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#NoDirectVulnTechniqueShape> ;
   sh:targetClass sec:Vulnerability ;
   sh:property [
-    sh:predicate sec:implemented_as ;
+    a sh:PropertyShape ;
+    sh:path sec:implemented_as ;
     sh:maxCount 0 ;
-    sh:message "Direct Vulnerability -> Technique links are forbidden; use the canonical chain (Vulnerability -> Weakness -> AttackPattern -> Technique)." ;
-  ] ;
+    sh:message "Direct Vulnerability -> Technique links are forbidden; use the canonical chain (Vulnerability -> Weakness -> AttackPattern -> Technique)." ] ;
 .
 
 # 2) Technique must belong to at least one Tactic
@@ -35,11 +35,11 @@ sec:TechniqueTacticShape a sh:NodeShape ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#TechniqueTacticShape> ;
   sh:targetClass sec:Technique ;
   sh:property [
-    sh:predicate sec:belongs_to ;
+    a sh:PropertyShape ;
+    sh:path sec:belongs_to ;
     sh:minCount 1 ;
     sh:message "A Technique must be linked to a Tactic (sec:belongs_to)." ;
-    sh:class sec:Tactic ;
-  ] ;
+    sh:class sec:Tactic ] ;
 .
 
 # 3) ObservedTechnique (Incident extension) must anchor to a Core Technique
@@ -48,11 +48,11 @@ inc:ObservedTechniqueAnchorShape a sh:NodeShape ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#ObservedTechniqueAnchorShape> ;
   sh:targetClass inc:ObservedTechnique ;
   sh:property [
-    sh:predicate inc:instance_of ;
+    a sh:PropertyShape ;
+    sh:path inc:instance_of ;
     sh:minCount 1 ;
     sh:class sec:Technique ;
-    sh:message "ObservedTechnique must have an inc:instance_of link to a sec:Technique." ;
-  ] ;
+    sh:message "ObservedTechnique must have an inc:instance_of link to a sec:Technique." ] ;
 .
 
 # 4) Incidents MUST NOT directly reference Vulnerabilities (claim-based separation)
@@ -78,11 +78,7 @@ sec:PlatformCpeUriShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-CORE-003" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#PlatformCpeUriShape> ;
   sh:targetClass sec:Platform ;
-  sh:property [
-    sh:predicate sec:CPEUri ;
-    sh:minCount 1 ;
-    sh:message "Platform must include a canonical CPE URI (sec:CPEUri)." ;
-  ] ;
+  sh:property [ a sh:PropertyShape ; sh:path sec:CPEUri ; sh:minCount 1 ; sh:message "Platform must include a canonical CPE URI (sec:CPEUri)." ] ;
 .
 
 # PlatformConfiguration must include match criteria or an id
@@ -90,11 +86,7 @@ sec:PlatformConfigurationShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-CORE-004" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#PlatformConfigurationShape> ;
   sh:targetClass sec:PlatformConfiguration ;
-  sh:property [
-    sh:predicate sec:configurationCriteria ;
-    sh:minCount 1 ;
-    sh:message "PlatformConfiguration must include configuration criteria (sec:configurationCriteria)." ;
-  ] ;
+  sh:property [ a sh:PropertyShape ; sh:path sec:configurationCriteria ; sh:minCount 1 ; sh:message "PlatformConfiguration must include configuration criteria (sec:configurationCriteria)." ] ;
 .
 
 # Vulnerability must be caused_by at least one Weakness (causal chain start)
@@ -102,12 +94,7 @@ sec:VulnerabilityCausedByShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-CORE-005" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#VulnerabilityCausedByShape> ;
   sh:targetClass sec:Vulnerability ;
-  sh:property [
-    sh:predicate sec:caused_by ;
-    sh:minCount 1 ;
-    sh:class sec:Weakness ;
-    sh:message "Vulnerability must be linked to at least one Weakness (sec:caused_by)." ;
-  ] ;
+  sh:property [ a sh:PropertyShape ; sh:path sec:caused_by ; sh:minCount 1 ; sh:class sec:Weakness ; sh:message "Vulnerability must be linked to at least one Weakness (sec:caused_by)." ] ;
 .
 
 # AttackPattern must implement into at least one Technique
@@ -115,12 +102,7 @@ sec:AttackPatternImplementsShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-CORE-006" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#AttackPatternImplementsShape> ;
   sh:targetClass sec:AttackPattern ;
-  sh:property [
-    sh:predicate sec:implemented_as ;
-    sh:minCount 1 ;
-    sh:class sec:Technique ;
-    sh:message "AttackPattern should be implemented by at least one Technique (sec:implemented_as)." ;
-  ] ;
+  sh:property [ a sh:PropertyShape ; sh:path sec:implemented_as ; sh:minCount 1 ; sh:class sec:Technique ; sh:message "AttackPattern should be implemented by at least one Technique (sec:implemented_as)." ] ;
 .
 
 # VulnerabilityScore must declare a cvssVersion
@@ -128,11 +110,7 @@ sec:VulnerabilityScoreVersionShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-CORE-007" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#VulnerabilityScoreVersionShape> ;
   sh:targetClass sec:VulnerabilityScore ;
-  sh:property [
-    sh:predicate sec:cvssVersion ;
-    sh:minCount 1 ;
-    sh:message "VulnerabilityScore must include a cvssVersion (e.g., '3.1', '4.0')." ;
-  ] ;
+  sh:property [ a sh:PropertyShape ; sh:path sec:cvssVersion ; sh:minCount 1 ; sh:message "VulnerabilityScore must include a cvssVersion (e.g., '3.1', '4.0')." ] ;
 .
 
 # SubTechnique must have exactly one parent Technique
@@ -140,13 +118,7 @@ sec:SubTechniqueParentShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-ATTCK-001" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#SubTechniqueParentShape> ;
   sh:targetClass sec:SubTechnique ;
-  sh:property [
-    sh:predicate sec:subtechnique_of ;
-    sh:minCount 1 ;
-    sh:maxCount 1 ;
-    sh:class sec:Technique ;
-    sh:message "SubTechnique must reference exactly one parent Technique via sec:subtechnique_of." ;
-  ] ;
+  sh:property [ a sh:PropertyShape ; sh:path sec:subtechnique_of ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sec:Technique ; sh:message "SubTechnique must reference exactly one parent Technique via sec:subtechnique_of." ] ;
 .
 
 # Forbid Vulnerability -> Platform direct affects (must be PlatformConfiguration)
@@ -187,7 +159,7 @@ sec:VulnerabilityExternalIdShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-CORE-011" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#VulnerabilityExternalIdShape> ;
   sh:targetClass sec:Vulnerability ;
-  sh:property [ sh:predicate sec:cveId ; sh:minCount 1 ; sh:message "Vulnerability must include sec:cveId." ] ;
+  sh:property [ a sh:PropertyShape ; sh:path sec:cveId ; sh:minCount 1 ; sh:message "Vulnerability must include sec:cveId." ] ;
 .
 
 sec:WeaknessExternalIdShape a sh:NodeShape ;
@@ -195,8 +167,8 @@ sec:WeaknessExternalIdShape a sh:NodeShape ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#WeaknessExternalIdShape> ;
   sh:targetClass sec:Weakness ;
   sh:or (
-    [ sh:property ( [ a sh:PropertyShape ; sh:predicate cwe:cwe_id ; sh:minCount 1 ] ) ]
-    [ sh:property ( [ a sh:PropertyShape ; sh:predicate sec:cwe_id ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:path cwe:cwe_id ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:path sec:cwe_id ; sh:minCount 1 ] ) ]
   ) ;
   sh:message "Weakness must include a CWE identifier (cwe:cwe_id or sec:cwe_id)." ;
 .
@@ -205,7 +177,7 @@ sec:AttackPatternExternalIdShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-CORE-013" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#AttackPatternExternalIdShape> ;
   sh:targetClass sec:AttackPattern ;
-  sh:property [ sh:predicate capec:capec_id ; sh:minCount 1 ; sh:message "AttackPattern must include capec:capec_id." ] ;
+  sh:property [ a sh:PropertyShape ; sh:path capec:capec_id ; sh:minCount 1 ; sh:message "AttackPattern must include capec:capec_id." ] ;
 .
 
 sec:TechniqueExternalIdShape a sh:NodeShape ;
@@ -213,8 +185,8 @@ sec:TechniqueExternalIdShape a sh:NodeShape ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#TechniqueExternalIdShape> ;
   sh:targetClass sec:Technique ;
   sh:or (
-    [ sh:property ( [ a sh:PropertyShape ; sh:predicate attck:technique_id ; sh:minCount 1 ] ) ]
-    [ sh:property ( [ a sh:PropertyShape ; sh:predicate sec:technique_id ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:path attck:technique_id ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:path sec:technique_id ; sh:minCount 1 ] ) ]
   ) ;
   sh:message "Technique must include an ATT&CK technique identifier (attck:technique_id)." ;
 .
@@ -223,35 +195,35 @@ sec:TacticExternalIdShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-ATTCK-003" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#TacticExternalIdShape> ;
   sh:targetClass sec:Tactic ;
-  sh:property [ sh:predicate attck:tactic_id ; sh:minCount 1 ; sh:message "Tactic must include attck:tactic_id." ] ;
+  sh:property [ a sh:PropertyShape ; sh:path attck:tactic_id ; sh:minCount 1 ; sh:message "Tactic must include attck:tactic_id." ] ;
 .
 
 sec:DefensiveTechniqueExternalIdShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-D3FEND-001" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#DefensiveTechniqueExternalIdShape> ;
   sh:targetClass sec:DefensiveTechnique ;
-  sh:property [ sh:predicate d3fend:d3fendId ; sh:minCount 1 ; sh:message "DefensiveTechnique must include d3fend:d3fendId." ] ;
+  sh:property [ a sh:PropertyShape ; sh:path d3fend:d3fendId ; sh:minCount 1 ; sh:message "DefensiveTechnique must include d3fend:d3fendId." ] ;
 .
 
 sec:DetectionAnalyticExternalIdShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-CAR-001" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#DetectionAnalyticExternalIdShape> ;
   sh:targetClass sec:DetectionAnalytic ;
-  sh:property [ sh:predicate car:car_id ; sh:minCount 1 ; sh:message "DetectionAnalytic must include car:car_id." ] ;
+  sh:property [ a sh:PropertyShape ; sh:path car:car_id ; sh:minCount 1 ; sh:message "DetectionAnalytic must include car:car_id." ] ;
 .
 
 sec:DeceptionTechniqueExternalIdShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-SHIELD-001" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#DeceptionTechniqueExternalIdShape> ;
   sh:targetClass sec:DeceptionTechnique ;
-  sh:property [ sh:predicate shield:shieldId ; sh:minCount 1 ; sh:message "DeceptionTechnique must include shield:shieldId." ] ;
+  sh:property [ a sh:PropertyShape ; sh:path shield:shieldId ; sh:minCount 1 ; sh:message "DeceptionTechnique must include shield:shieldId." ] ;
 .
 
 sec:EngagementConceptExternalIdShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-ENGAGE-001" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#EngagementConceptExternalIdShape> ;
   sh:targetClass sec:EngagementConcept ;
-  sh:property [ sh:predicate engage:engageId ; sh:minCount 1 ; sh:message "EngagementConcept must include engage:engageId." ] ;
+  sh:property [ a sh:PropertyShape ; sh:path engage:engageId ; sh:minCount 1 ; sh:message "EngagementConcept must include engage:engageId." ] ;
 .
 
 # 2) Ensure references include source and URL for verifiability
@@ -259,8 +231,8 @@ sec:ReferenceCompletenessShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-CORE-014" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#ReferenceCompletenessShape> ;
   sh:targetClass sec:Reference ;
-  sh:property [ sh:predicate sec:referenceUrl ; sh:minCount 1 ; sh:message "Reference must include a referenceUrl." ] ;
-  sh:property [ sh:predicate sec:referenceSource ; sh:minCount 1 ; sh:message "Reference must include a referenceSource." ] ;
+  sh:property [ a sh:PropertyShape ; sh:path sec:referenceUrl ; sh:minCount 1 ; sh:message "Reference must include a referenceUrl." ] ;
+  sh:property [ a sh:PropertyShape ; sh:path sec:referenceSource ; sh:minCount 1 ; sh:message "Reference must include a referenceSource." ] ;
 .
 
 # 3) Enforce canonical causal chain exists for Vulnerabilities (stronger SPARQL check)

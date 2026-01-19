@@ -8,7 +8,7 @@ ex:ShieldShape a sh:NodeShape ;
   sh:targetClass ex:DeceptionTechnique ;
   sh:targetClass shield:DeceptionTechnique ;
   sh:or (
-    [ sh:property ( [ a sh:PropertyShape ; sh:path ex:shieldId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
-    [ sh:property ( [ a sh:PropertyShape ; sh:path shield:shieldId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
+    [ a sh:PropertyShape ; sh:path ex:shieldId ; sh:datatype xsd:string ; sh:minCount 1 ]
+    [ a sh:PropertyShape ; sh:path shield:shieldId ; sh:datatype xsd:string ; sh:minCount 1 ]
   ) ;
   sh:message "DeceptionTechnique must include a shieldId (either ex:shieldId or shield:shieldId)." .

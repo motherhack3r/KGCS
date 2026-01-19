@@ -8,7 +8,7 @@ ex:CAPECAttackPatternShape a sh:NodeShape ;
   sh:targetClass ex:AttackPattern ;
   sh:targetClass capec:AttackPattern ;
   sh:or (
-    [ sh:property ( [ a sh:PropertyShape ; sh:path ex:capecId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
-    [ sh:property ( [ a sh:PropertyShape ; sh:path capec:capecId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
+    [ a sh:PropertyShape ; sh:path ex:capecId ; sh:datatype xsd:string ; sh:minCount 1 ]
+    [ a sh:PropertyShape ; sh:path capec:capecId ; sh:datatype xsd:string ; sh:minCount 1 ]
   ) ;
   sh:message "AttackPattern must include a capecId (either ex:capecId or capec:capecId)." .

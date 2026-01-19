@@ -8,7 +8,7 @@ ex:CWEWeaknessShape a sh:NodeShape ;
   sh:targetClass ex:Weakness ;
   sh:targetClass cwe:Weakness ;
   sh:or (
-    [ sh:property ( [ a sh:PropertyShape ; sh:path ex:cweId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
-    [ sh:property ( [ a sh:PropertyShape ; sh:path cwe:cweId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
+    [ a sh:PropertyShape ; sh:path ex:cweId ; sh:datatype xsd:string ; sh:minCount 1 ]
+    [ a sh:PropertyShape ; sh:path cwe:cweId ; sh:datatype xsd:string ; sh:minCount 1 ]
   ) ;
   sh:message "Weakness must include a cweId (either ex:cweId or cwe:cweId)." .

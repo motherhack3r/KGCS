@@ -8,7 +8,7 @@ ex:CARDetectionShape a sh:NodeShape ;
   sh:targetClass ex:DetectionAnalytic ;
   sh:targetClass car:DetectionAnalytic ;
   sh:or (
-    [ sh:property ( [ a sh:PropertyShape ; sh:path ex:carId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
-    [ sh:property ( [ a sh:PropertyShape ; sh:path car:carId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
+    [ a sh:PropertyShape ; sh:path ex:carId ; sh:datatype xsd:string ; sh:minCount 1 ]
+    [ a sh:PropertyShape ; sh:path car:carId ; sh:datatype xsd:string ; sh:minCount 1 ]
   ) ;
   sh:message "DetectionAnalytic must include a carId (either ex:carId or car:carId)." .

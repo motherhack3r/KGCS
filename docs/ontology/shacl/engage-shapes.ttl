@@ -8,7 +8,7 @@ ex:EngageShape a sh:NodeShape ;
   sh:targetClass ex:EngagementConcept ;
   sh:targetClass eg:EngagementConcept ;
   sh:or (
-    [ sh:property ( [ a sh:PropertyShape ; sh:path ex:engageId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
-    [ sh:property ( [ a sh:PropertyShape ; sh:path eg:engageId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
+    [ a sh:PropertyShape ; sh:path ex:engageId ; sh:datatype xsd:string ; sh:minCount 1 ]
+    [ a sh:PropertyShape ; sh:path eg:engageId ; sh:datatype xsd:string ; sh:minCount 1 ]
   ) ;
     sh:message "EngagementConcept must include an engageId (either ex:engageId or eg:engageId)." .

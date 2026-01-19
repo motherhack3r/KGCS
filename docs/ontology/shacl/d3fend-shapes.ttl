@@ -8,7 +8,7 @@ ex:D3fendShape a sh:NodeShape ;
   sh:targetClass ex:DefensiveTechnique ;
   sh:targetClass d3:DefensiveTechnique ;
   sh:or (
-    [ sh:property ( [ a sh:PropertyShape ; sh:path ex:d3fendId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
-    [ sh:property ( [ a sh:PropertyShape ; sh:path d3:d3fendId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
+    [ a sh:PropertyShape ; sh:path ex:d3fendId ; sh:datatype xsd:string ; sh:minCount 1 ]
+    [ a sh:PropertyShape ; sh:path d3:d3fendId ; sh:datatype xsd:string ; sh:minCount 1 ]
   ) ;
   sh:message "DefensiveTechnique must include a d3fendId (either ex:d3fendId or d3:d3fendId)." .
