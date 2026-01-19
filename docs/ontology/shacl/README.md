@@ -1,39 +1,26 @@
-This folder contains SHACL shapes and profiles for KGCS.
+KGCS SHACL shapes
+==================
 
-Files added:
+This folder contains SHACL shapes that validate critical invariants derived from the Core Ontology v1.0 and its extensions. Use `kgcs-shapes.ttl` as the canonical shape bundle for CI and local validation.
 
-- `core-shapes.ttl` — Core invariants and incident separation shapes.
-- `ai-strict-profile.ttl` — Minimal AI-focused profile that includes core shapes and adds a few stricter rules.
+Key invariants enforced (non-exhaustive):
 
-Quick validation (example using pyshacl):
+- `Vulnerability` must have a `cveId`.
 
-1. Install:
+- `VulnerabilityScore` must have a `cvssVersion` and `baseScore`.
 
-```bash
-python -m pip install pyshacl rdflib
-```
+- `Platform` must have a `cpeNameId`.
 
-2. Validate an RDF data file (`data.ttl`) against the shapes:
+- `PlatformConfiguration` must have a `matchCriteriaId`.
 
-```bash
-pyshacl -s docs/ontology/shacl/core-shapes.ttl -s docs/ontology/shacl/ai-strict-profile.ttl -d data.ttl -f turtle
-```
+- `Technique` must link to at least one `Tactic` via `belongs_to`.
 
-Notes:
-- `pyshacl` accepts multiple `-s` shapes files.
-- For large validation runs, run shapes as a combined graph and consider streaming or incremental validation.
+- `SubTechnique` must have a `subtechnique_of` parent.
 
-Next steps I can take:
-- Combine shapes into a single profile TTL and add more rules from RAG templates.
-- Add example data snippets under `data/` and CI job to run `pyshacl` on push.
- - Example data and a validator script have been added under `data/shacl-samples/` and `scripts/validate_shacl.py`.
-
-Quick run (from repository root):
+Run validator (example):
 
 ```bash
-python -m pip install pyshacl rdflib
-python scripts/validate_shacl.py data/shacl-samples/good-example.ttl
-python scripts/validate_shacl.py data/shacl-samples/bad-example.ttl
+python scripts/validate_shacl.py --shapes docs/ontology/shacl/kgcs-shapes.ttl --data data/samples/example.ttl
 ```
 
-The script loads the core shapes and AI profile and exits with code `0` on success, `1` on validation failures, `2` on parse/error.
+See `rag-to-shacl.md` for how RAG templates map to shape groups.

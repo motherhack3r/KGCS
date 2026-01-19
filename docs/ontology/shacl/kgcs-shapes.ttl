@@ -1,0 +1,126 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex: <https://example.org/sec/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# KGCS SHACL shapes - canonical bundle
+
+########################
+# Vulnerability
+########################
+ex:VulnerabilityShape a sh:NodeShape ;
+  sh:targetClass ex:Vulnerability ;
+  sh:property [
+    sh:path ex:cveId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "Vulnerability must have a cveId (string)." ;
+  ] ;
+  sh:property [
+    sh:path ex:references ;
+    sh:minCount 0 ;
+  ] .
+
+########################
+# VulnerabilityScore (CVSS)
+########################
+ex:VulnerabilityScoreShape a sh:NodeShape ;
+  sh:targetClass ex:VulnerabilityScore ;
+  sh:property [
+    sh:path ex:cvssVersion ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "VulnerabilityScore must state a CVSS version (e.g., '3.1')." ;
+  ] ;
+  sh:property [
+    sh:path ex:baseScore ;
+    sh:datatype xsd:decimal ;
+    sh:minCount 1 ;
+    sh:message "VulnerabilityScore must include a baseScore (0.0-10.0)." ;
+  ] .
+
+########################
+# Platform & Configuration (CPE)
+########################
+ex:PlatformShape a sh:NodeShape ;
+  sh:targetClass ex:Platform ;
+  sh:property [
+    sh:path ex:cpeNameId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "Platform must include a cpeNameId." ;
+  ] .
+
+ex:PlatformConfigurationShape a sh:NodeShape ;
+  sh:targetClass ex:PlatformConfiguration ;
+  sh:property [
+    sh:path ex:matchCriteriaId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "PlatformConfiguration must include a matchCriteriaId." ;
+  ] ;
+  sh:property [
+    sh:path ex:matchesPlatform ;
+    sh:minCount 1 ;
+    sh:class ex:Platform ;
+    sh:message "PlatformConfiguration should reference at least one Platform via matchesPlatform." ;
+  ] .
+
+########################
+# Weakness & AttackPattern
+########################
+ex:WeaknessShape a sh:NodeShape ;
+  sh:targetClass ex:Weakness ;
+  sh:property [ sh:path ex:causes ; sh:minCount 0 ] .
+
+ex:AttackPatternShape a sh:NodeShape ;
+  sh:targetClass ex:AttackPattern ;
+  sh:property [ sh:path ex:implements ; sh:minCount 0 ] .
+
+########################
+# ATT&CK: Technique / SubTechnique / Tactic
+########################
+ex:TechniqueShape a sh:NodeShape ;
+  sh:targetClass ex:Technique ;
+  sh:property [
+    sh:path ex:belongs_to ;
+    sh:class ex:Tactic ;
+    sh:minCount 1 ;
+    sh:message "Technique must belong to at least one Tactic (belongs_to)." ;
+  ] .
+
+ex:SubTechniqueShape a sh:NodeShape ;
+  sh:targetClass ex:SubTechnique ;
+  sh:property [
+    sh:path ex:subtechnique_of ;
+    sh:class ex:Technique ;
+    sh:minCount 1 ;
+    sh:message "SubTechnique must reference its parent Technique via subtechnique_of." ;
+  ] .
+
+ex:TacticShape a sh:NodeShape ;
+  sh:targetClass ex:Tactic ;
+  sh:property [ sh:path ex:contains_technique ; sh:minCount 0 ] .
+
+########################
+# Defense & Detection
+########################
+ex:DetectionAnalyticShape a sh:NodeShape ;
+  sh:targetClass ex:DetectionAnalytic ;
+  sh:property [ sh:path ex:referenceUrl ; sh:minCount 0 ] .
+
+########################
+# Core invariants (multi-property checks)
+########################
+# Ensure Vulnerability -> caused_by -> Weakness if present
+ex:VulnerabilityCausalShape a sh:NodeShape ;
+  sh:targetClass ex:Vulnerability ;
+  sh:property [
+    sh:path ex:caused_by ;
+    sh:class ex:Weakness ;
+    sh:minCount 0 ;
+  ] .
+
+########################
+# RAG template mapping hints (non-enforced)
+########################
+# See rag-to-shacl.md for mapping between RAG templates and these shapes.
