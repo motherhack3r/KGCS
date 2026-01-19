@@ -15,6 +15,7 @@ Exit codes: 0 = valid, 1 = invalid, 2 = error
 import argparse
 import json
 import os
+import re
 from rdflib import Graph, Namespace, URIRef, BNode
 from rdflib.namespace import RDF
 from pyshacl import validate
@@ -90,6 +91,7 @@ def run_validator(data_file: str, shapes_graph: Graph, output: str = 'artifacts'
                 catalog = json.load(fh)
         except Exception:
             catalog = {}
+    # catalog loaded (used to map shapes -> rule_ids)
 
     # Extract structured violations from the results_graph
     SH = Namespace('http://www.w3.org/ns/shacl#')
@@ -125,6 +127,30 @@ def run_validator(data_file: str, shapes_graph: Graph, output: str = 'artifacts'
     except Exception:
         # If parsing the results graph fails, leave violations empty
         violations = []
+
+    # Fallback: if results_graph did not contain SH:ValidationResult nodes (older pyshacl/text output),
+    # try to parse the human-readable `results_text` for one-off extraction of Source Shape and Message.
+    if not violations and results_text:
+        # Look for blocks like: "Source Shape: ex:CARDetectionShape" and "Message: ..."
+        pattern = r"Source Shape:\s*(?P<shape>[^\n]+)\n[\s\S]*?Message:\s*(?P<message>.+?)\n"
+        matches = re.finditer(pattern, results_text)
+        for m in matches:
+            shape_raw = m.group('shape').strip()
+            msg = m.group('message').strip()
+            # normalize shape local name
+            if '#' in shape_raw:
+                local = shape_raw.split('#')[-1]
+            else:
+                local = shape_raw.split(':')[-1] if ':' in shape_raw else shape_raw
+            entry = catalog.get(shape_raw) or catalog.get(local)
+            rule_id = entry if isinstance(entry, str) else (entry.get('rule_id') if isinstance(entry, dict) else None)
+            violations.append({
+                'rule_id': rule_id,
+                'shape': local,
+                'message': msg,
+                'focus_node': None,
+                'path': None
+            })
 
     report = {
         'data_file': data_file,

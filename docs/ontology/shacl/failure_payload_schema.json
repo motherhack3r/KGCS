@@ -1,5 +1,31 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "KGCS SHACL Failure Payload",
+  "type": "object",
+  "required": ["data_file", "conforms", "violations"],
+  "properties": {
+    "data_file": { "type": "string", "description": "Path to validated data file." },
+    "conforms": { "type": "boolean", "description": "Overall conformance result." },
+    "results_text": { "type": "string", "description": "Raw pyshacl results text (human readable)." },
+    "violations": {
+      "type": "array",
+      "description": "List of structured violations extracted from SHACL validation report.",
+      "items": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "rule_id": { "type": ["string", "null"], "description": "Governance rule id (if mapped)." },
+          "shape": { "type": ["string", "null"], "description": "Local shape name or URI that triggered the violation." },
+          "message": { "type": "string", "description": "Human-readable violation message." },
+          "focus_node": { "type": ["string", "null"], "description": "RDF node that failed the constraint." },
+          "path": { "type": ["string", "null"], "description": "Predicate/path involved in the failure (if available)." }
+        }
+      }
+    }
+  }
+}
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "SHACL Validation Failure Payload",
   "type": "object",
   "required": ["data_file", "conforms", "violations"],
