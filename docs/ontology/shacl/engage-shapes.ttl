@@ -1,8 +1,14 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix ex: <https://example.org/sec/core#> .
+@prefix eg: <https://example.org/sec/engage#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-# ENGAGE shapes: EngagementConcept identifier
+# ENGAGE shapes: EngagementConcept identifier (accepts ex:engageId or eg:engageId)
 ex:EngageShape a sh:NodeShape ;
   sh:targetClass ex:EngagementConcept ;
-  sh:property [ sh:path ex:engageId ; sh:datatype xsd:string ; sh:minCount 1 ; sh:message "EngagementConcept must include an engageId." ] .
+  sh:targetClass eg:EngagementConcept ;
+  sh:or (
+    [ sh:property ( [ a sh:PropertyShape ; sh:path ex:engageId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:path eg:engageId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
+  ) ;
+    sh:message "EngagementConcept must include an engageId (either ex:engageId or eg:engageId)." .

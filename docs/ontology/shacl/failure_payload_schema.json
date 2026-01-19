@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SHACL Validation Failure Payload",
+  "type": "object",
+  "required": ["data_file", "conforms", "violations"],
+  "properties": {
+    "data_file": { "type": "string" },
+    "conforms": { "type": "boolean" },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["rule_id", "shape", "message", "focus_node"],
+        "properties": {
+          "rule_id": { "type": ["string", "null"] },
+          "shape": { "type": ["string", "null"] },
+          "message": { "type": "string" },
+          "focus_node": { "type": ["string", "null"] },
+          "path": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}

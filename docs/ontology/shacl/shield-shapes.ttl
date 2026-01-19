@@ -1,8 +1,14 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix ex: <https://example.org/sec/core#> .
+@prefix shield: <https://example.org/sec/shield#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-# SHIELD shapes: DeceptionTechnique identifier
+# SHIELD shapes: DeceptionTechnique identifier (accepts ex:shieldId or shield:shieldId)
 ex:ShieldShape a sh:NodeShape ;
   sh:targetClass ex:DeceptionTechnique ;
-  sh:property [ sh:path ex:shieldId ; sh:datatype xsd:string ; sh:minCount 1 ; sh:message "DeceptionTechnique must include a shieldId." ] .
+  sh:targetClass shield:DeceptionTechnique ;
+  sh:or (
+    [ sh:property ( [ a sh:PropertyShape ; sh:path ex:shieldId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:path shield:shieldId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
+  ) ;
+  sh:message "DeceptionTechnique must include a shieldId (either ex:shieldId or shield:shieldId)." .

@@ -16,6 +16,7 @@ import argparse
 import json
 import os
 from rdflib import Graph, Namespace, URIRef, BNode
+from rdflib.namespace import RDF
 from pyshacl import validate
 
 
@@ -68,7 +69,7 @@ def extract_shape_subset(full_shapes_graph: Graph, shape_local_names):
                     out.add((ss, pp, oo))
     return out
 
-def run_validator(data_file: str, shapes_graph: Graph, output: str = 'artifacts'):
+def run_validator(data_file: str, shapes_graph: Graph, output: str = 'artifacts', rule_catalog_path: str = 'docs/ontology/shacl/rule_catalog.json'):
     """Run pyshacl validation for the given data_graph/shapes_graph.
 
     Returns: (conforms: bool, report_path: str, results_text: str)
@@ -81,10 +82,55 @@ def run_validator(data_file: str, shapes_graph: Graph, output: str = 'artifacts'
     conforms, results_graph, results_text = validate(data_graph=data, shacl_graph=shapes_graph, inference='rdfs', abort_on_first=False, serialize_report_graph=True)
     os.makedirs(output, exist_ok=True)
     report_path = os.path.join(output, f'shacl-report-{os.path.basename(data_file)}.json')
+    # Load rule catalog if available
+    catalog = {}
+    if os.path.exists(rule_catalog_path):
+        try:
+            with open(rule_catalog_path, 'r', encoding='utf-8') as fh:
+                catalog = json.load(fh)
+        except Exception:
+            catalog = {}
+
+    # Extract structured violations from the results_graph
+    SH = Namespace('http://www.w3.org/ns/shacl#')
+    violations = []
+    try:
+        for r in results_graph.subjects(RDF.type, SH.ValidationResult):
+            message = results_graph.value(r, SH.resultMessage)
+            focus = results_graph.value(r, SH.focusNode)
+            source_shape = results_graph.value(r, SH.sourceShape)
+            result_path = results_graph.value(r, SH.resultPath)
+            shape_key = None
+            rule_id = None
+            if source_shape is not None:
+                s_str = str(source_shape)
+                # local name fallback
+                if '#' in s_str:
+                    local = s_str.split('#')[-1]
+                else:
+                    local = s_str.split('/')[-1]
+                shape_key = local
+                entry = catalog.get(s_str) or catalog.get(local)
+                if isinstance(entry, dict):
+                    rule_id = entry.get('rule_id')
+                elif isinstance(entry, str):
+                    rule_id = entry
+            violations.append({
+                'rule_id': rule_id,
+                'shape': shape_key,
+                'message': str(message) if message is not None else '',
+                'focus_node': str(focus) if focus is not None else None,
+                'path': str(result_path) if result_path is not None else None
+            })
+    except Exception:
+        # If parsing the results graph fails, leave violations empty
+        violations = []
+
     report = {
         'data_file': data_file,
         'conforms': bool(conforms),
-        'results_text': results_text
+        'results_text': results_text,
+        'violations': violations
     }
     with open(report_path, 'w', encoding='utf-8') as fh:
         json.dump(report, fh, indent=2)

@@ -1,5 +1,6 @@
 {
-  "data_file": "E:\\DEVEL\\LAIA\\KGCS\\data\\shacl-samples\\d3fend-bad.ttl",
-  "conforms": true,
-  "results_text": "Validation Report\nConforms: True\n"
+  "data_file": "data/shacl-samples/d3fend-bad.ttl",
+  "conforms": false,
+  "results_text": "Validation Report\nConforms: False\nResults (2):\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:string ; sh:message Literal(\"DefensiveTechnique must include a d3fendId (d3:d3fendId).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path d3:d3fendId ]\n\tFocus Node: d3:deftech-002\n\tResult Path: d3:d3fendId\n\tMessage: DefensiveTechnique must include a d3fendId (d3:d3fendId).\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:string ; sh:message Literal(\"DefensiveTechnique must include a d3fendId (ex:d3fendId).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:d3fendId ]\n\tFocus Node: d3:deftech-002\n\tResult Path: ex:d3fendId\n\tMessage: DefensiveTechnique must include a d3fendId (ex:d3fendId).\n",
+  "violations": []
 }

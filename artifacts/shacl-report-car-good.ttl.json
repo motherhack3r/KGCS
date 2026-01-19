@@ -1,5 +1,6 @@
 {
-  "data_file": "E:\\DEVEL\\LAIA\\KGCS\\data\\shacl-samples\\car-good.ttl",
-  "conforms": true,
-  "results_text": "Validation Report\nConforms: True\n"
+  "data_file": "data/shacl-samples/car-good.ttl",
+  "conforms": false,
+  "results_text": "Validation Report\nConforms: False\nResults (1):\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:string ; sh:message Literal(\"DetectionAnalytic must include a carId (ex:carId).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:carId ]\n\tFocus Node: car:analytic-0001\n\tResult Path: ex:carId\n\tMessage: DetectionAnalytic must include a carId (ex:carId).\n",
+  "violations": []
 }

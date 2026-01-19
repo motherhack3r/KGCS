@@ -1,5 +1,6 @@
 {
   "data_file": "E:\\DEVEL\\LAIA\\KGCS\\data\\shacl-samples\\attck-t1_bad.ttl",
   "conforms": false,
-  "results_text": "Validation Report\nConforms: False\nResults (1):\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:class ex:Tactic ; sh:message Literal(\"Technique must belong to at least one Tactic (belongs_to).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:belongs_to ]\n\tFocus Node: ex:T_MISSING\n\tResult Path: ex:belongs_to\n\tMessage: Technique must belong to at least one Tactic (belongs_to).\n"
+  "results_text": "Validation Report\nConforms: False\nResults (1):\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:class ex:Tactic ; sh:message Literal(\"Technique must belong to at least one Tactic (belongs_to).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:belongs_to ]\n\tFocus Node: ex:T_MISSING\n\tResult Path: ex:belongs_to\n\tMessage: Technique must belong to at least one Tactic (belongs_to).\n",
+  "violations": []
 }

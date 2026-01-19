@@ -1,0 +1,11 @@
+{
+  "CARDetectionShape": { "rule_id": "KGCS-SHACL-001", "description": "CAR DetectionAnalytic must include carId" },
+  "D3fendShape": { "rule_id": "KGCS-SHACL-002", "description": "D3FEND DefensiveTechnique must include d3fendId" },
+  "CWEWeaknessShape": { "rule_id": "KGCS-SHACL-003", "description": "CWE Weakness must include cweId" },
+  "CAPECAttackPatternShape": { "rule_id": "KGCS-SHACL-004", "description": "CAPEC AttackPattern must include capecId" },
+  "ShieldShape": { "rule_id": "KGCS-SHACL-005", "description": "SHIELD DeceptionTechnique must include shieldId" },
+  "EngageShape": { "rule_id": "KGCS-SHACL-006", "description": "ENGAGE EngagementConcept must include engageId" },
+  "VulnerabilityShape": { "rule_id": "KGCS-SHACL-010", "description": "Vulnerability must include cveId" },
+  "VulnerabilityScoreShape": { "rule_id": "KGCS-SHACL-011", "description": "VulnerabilityScore must include baseScore and cvssVersion" },
+  "TechniqueShape": { "rule_id": "KGCS-SHACL-020", "description": "Technique must belong to a Tactic" }
+}

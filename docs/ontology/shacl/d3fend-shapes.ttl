@@ -1,8 +1,14 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix ex: <https://example.org/sec/core#> .
+@prefix d3: <https://example.org/sec/d3fend#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-# D3FEND shapes: DefensiveTechnique identifier
+# D3FEND shapes: DefensiveTechnique identifier (accepts ex:d3fendId or d3:d3fendId)
 ex:D3fendShape a sh:NodeShape ;
   sh:targetClass ex:DefensiveTechnique ;
-  sh:property [ sh:path ex:d3fendId ; sh:datatype xsd:string ; sh:minCount 1 ; sh:message "DefensiveTechnique must include a d3fendId." ] .
+  sh:targetClass d3:DefensiveTechnique ;
+  sh:or (
+    [ sh:property ( [ a sh:PropertyShape ; sh:path ex:d3fendId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:path d3:d3fendId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
+  ) ;
+  sh:message "DefensiveTechnique must include a d3fendId (either ex:d3fendId or d3:d3fendId)." .

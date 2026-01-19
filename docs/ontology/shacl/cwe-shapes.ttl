@@ -1,8 +1,14 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix ex: <https://example.org/sec/core#> .
+@prefix cwe: <https://example.org/sec/cwe#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-# CWE shapes: Weakness identifier
+# CWE shapes: Weakness identifier (accepts ex:cweId or cwe:cweId)
 ex:CWEWeaknessShape a sh:NodeShape ;
   sh:targetClass ex:Weakness ;
-  sh:property [ sh:path ex:cweId ; sh:datatype xsd:string ; sh:minCount 1 ; sh:message "Weakness must include a cweId." ] .
+  sh:targetClass cwe:Weakness ;
+  sh:or (
+    [ sh:property ( [ a sh:PropertyShape ; sh:path ex:cweId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:path cwe:cweId ; sh:datatype xsd:string ; sh:minCount 1 ] ) ]
+  ) ;
+  sh:message "Weakness must include a cweId (either ex:cweId or cwe:cweId)." .

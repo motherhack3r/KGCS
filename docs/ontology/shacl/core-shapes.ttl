@@ -170,8 +170,8 @@ sec:PlatformExternalIdShape a sh:NodeShape ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#PlatformExternalIdShape> ;
   sh:targetClass sec:Platform ;
   sh:or (
-    [ sh:property ( [ sh:predicate sec:CPEUri ; sh:minCount 1 ] ) ]
-    [ sh:property ( [ sh:predicate sec:cpeNameId ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:predicate sec:CPEUri ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:predicate sec:cpeNameId ; sh:minCount 1 ] ) ]
   ) ;
   sh:message "Platform must expose a stable CPE identifier via sec:CPEUri or sec:cpeNameId." ;
 .
@@ -195,8 +195,8 @@ sec:WeaknessExternalIdShape a sh:NodeShape ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#WeaknessExternalIdShape> ;
   sh:targetClass sec:Weakness ;
   sh:or (
-    [ sh:property ( [ sh:predicate cwe:cwe_id ; sh:minCount 1 ] ) ]
-    [ sh:property ( [ sh:predicate sec:cwe_id ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:predicate cwe:cwe_id ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:predicate sec:cwe_id ; sh:minCount 1 ] ) ]
   ) ;
   sh:message "Weakness must include a CWE identifier (cwe:cwe_id or sec:cwe_id)." ;
 .
@@ -213,8 +213,8 @@ sec:TechniqueExternalIdShape a sh:NodeShape ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#TechniqueExternalIdShape> ;
   sh:targetClass sec:Technique ;
   sh:or (
-    [ sh:property ( [ sh:predicate attck:technique_id ; sh:minCount 1 ] ) ]
-    [ sh:property ( [ sh:predicate sec:technique_id ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:predicate attck:technique_id ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:predicate sec:technique_id ; sh:minCount 1 ] ) ]
   ) ;
   sh:message "Technique must include an ATT&CK technique identifier (attck:technique_id)." ;
 .

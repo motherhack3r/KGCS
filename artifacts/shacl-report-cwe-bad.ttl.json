@@ -1,5 +1,6 @@
 {
-  "data_file": "E:\\DEVEL\\LAIA\\KGCS\\data\\shacl-samples\\cwe-bad.ttl",
-  "conforms": true,
-  "results_text": "Validation Report\nConforms: True\n"
+  "data_file": "data/shacl-samples/cwe-bad.ttl",
+  "conforms": false,
+  "results_text": "Validation Report\nConforms: False\nResults (2):\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:string ; sh:message Literal(\"Weakness must include a cweId (cwe:cweId).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path cwe:cweId ]\n\tFocus Node: cwe:weakness-unknown\n\tResult Path: cwe:cweId\n\tMessage: Weakness must include a cweId (cwe:cweId).\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:string ; sh:message Literal(\"Weakness must include a cweId (ex:cweId).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:cweId ]\n\tFocus Node: cwe:weakness-unknown\n\tResult Path: ex:cweId\n\tMessage: Weakness must include a cweId (ex:cweId).\n",
+  "violations": []
 }
