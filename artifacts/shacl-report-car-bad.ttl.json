@@ -1,5 +1,5 @@
 {
-  "data_file": "data/shacl-samples/car-bad.ttl",
+  "data_file": "E:\\DEVEL\\LAIA\\KGCS\\data\\shacl-samples\\car-bad.ttl",
   "conforms": false,
   "results_text": "Validation Report\nConforms: False\nResults (1):\nConstraint Violation in OrConstraintComponent (http://www.w3.org/ns/shacl#OrConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: ex:CARDetectionShape\n\tFocus Node: car:analytic-0002\n\tValue Node: car:analytic-0002\n\tMessage: DetectionAnalytic must include a carId (either ex:carId or car:carId).\n",
   "violations": [

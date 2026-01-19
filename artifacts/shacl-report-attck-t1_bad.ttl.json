@@ -2,5 +2,20 @@
   "data_file": "E:\\DEVEL\\LAIA\\KGCS\\data\\shacl-samples\\attck-t1_bad.ttl",
   "conforms": false,
   "results_text": "Validation Report\nConforms: False\nResults (2):\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:class ex:Tactic ; sh:message Literal(\"Technique must link to at least one Tactic.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:belongs_to ]\n\tFocus Node: ex:T_MISSING\n\tResult Path: ex:belongs_to\n\tMessage: Technique must link to at least one Tactic.\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:string ; sh:message Literal(\"Technique must include a technique_id.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:technique_id ]\n\tFocus Node: ex:T_MISSING\n\tResult Path: ex:technique_id\n\tMessage: Technique must include a technique_id.\n",
-  "violations": []
+  "violations": [
+    {
+      "rule_id": null,
+      "shape": "belongs_to ]",
+      "message": "Technique must link to at least one Tactic.",
+      "focus_node": null,
+      "path": null
+    },
+    {
+      "rule_id": null,
+      "shape": "technique_id ]",
+      "message": "Technique must include a technique_id.",
+      "focus_node": null,
+      "path": null
+    }
+  ]
 }
