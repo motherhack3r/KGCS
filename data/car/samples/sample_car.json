@@ -1,0 +1,51 @@
+{
+  "DetectionAnalytics": [
+    {
+      "ID": "CAR-2013-01-002",
+      "Name": "Autorun Registry Modification",
+      "Description": {
+        "Text": "Detect modifications to autorun registry keys used for persistence."
+      },
+      "LogicExpression": "Registry(\"HKLM\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run*\") OR Registry(\"HKCU\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run*\")",
+      "DataSources": [
+        "Windows Event Logs",
+        "Registry Monitoring"
+      ],
+      "DetectsTechniques": [
+        "T1547"
+      ]
+    },
+    {
+      "ID": "CAR-2013-01-003",
+      "Name": "Process Termination",
+      "Description": {
+        "Text": "Detect process termination patterns used to disable security software."
+      },
+      "LogicExpression": "ProcessTerminationEvent WHERE (TargetImage LIKE '%\\\\svchost.exe%' OR TargetImage LIKE '%\\\\defender%')",
+      "DataSources": [
+        "Sysmon",
+        "Event Logs"
+      ],
+      "DetectsTechniques": [
+        "T1562",
+        "T1106"
+      ]
+    },
+    {
+      "ID": "CAR-2015-04-001",
+      "Name": "Curl Activity",
+      "Description": {
+        "Text": "Detect curl command usage for data exfiltration or downloading payloads."
+      },
+      "LogicExpression": "Process CONTAINS ('curl' OR 'wget') AND CommandLine CONTAINS ('-O' OR '--output')",
+      "DataSources": [
+        "Process Logs",
+        "Network Traffic"
+      ],
+      "DetectsTechniques": [
+        "T1105",
+        "T1041"
+      ]
+    }
+  ]
+}

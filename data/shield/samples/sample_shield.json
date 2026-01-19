@@ -1,0 +1,43 @@
+{
+  "DeceptionTechniques": [
+    {
+      "ID": "SD-1",
+      "Name": "Honeypot User Account",
+      "Description": {
+        "Text": "Create decoy user accounts with realistic credentials to detect reconnaissance and lateral movement attempts."
+      },
+      "OperationalImpact": "High",
+      "EaseOfEmployment": "Low",
+      "CountersTechniques": [
+        "T1087",
+        "T1110"
+      ]
+    },
+    {
+      "ID": "SD-2",
+      "Name": "Honeypot Services",
+      "Description": {
+        "Text": "Deploy decoy services and ports to attract and detect attacker reconnaissance and exploitation attempts."
+      },
+      "OperationalImpact": "High",
+      "EaseOfEmployment": "Medium",
+      "CountersTechniques": [
+        "T1046",
+        "T1595"
+      ]
+    },
+    {
+      "ID": "SD-3",
+      "Name": "Decoy File System",
+      "Description": {
+        "Text": "Plant fake files and sensitive-looking documents to detect data exfiltration attempts and identify attacker interests."
+      },
+      "OperationalImpact": "Medium",
+      "EaseOfEmployment": "Medium",
+      "CountersTechniques": [
+        "T1005",
+        "T1040"
+      ]
+    }
+  ]
+}

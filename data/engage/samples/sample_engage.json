@@ -1,0 +1,43 @@
+{
+  "EngagementConcepts": [
+    {
+      "ID": "ENG-1",
+      "Name": "Deception by Disinformation",
+      "Description": {
+        "Text": "Provide false information about capabilities, vulnerabilities, or security posture to mislead adversaries about true defensive capabilities."
+      },
+      "Category": "Strategic",
+      "StrategicValue": "High",
+      "DisruptsTechniques": [
+        "T1592",
+        "T1598"
+      ]
+    },
+    {
+      "ID": "ENG-2",
+      "Name": "Decoy Network Segments",
+      "Description": {
+        "Text": "Create isolated network segments with decoy systems to contain and study attacker behavior while protecting critical systems."
+      },
+      "Category": "Tactical",
+      "StrategicValue": "Medium",
+      "DisruptsTechniques": [
+        "T1046",
+        "T1057"
+      ]
+    },
+    {
+      "ID": "ENG-3",
+      "Name": "Controlled Engagement",
+      "Description": {
+        "Text": "Allow controlled interaction with attacker tools and techniques in a monitored environment to gather intelligence and improve defenses."
+      },
+      "Category": "Strategic",
+      "StrategicValue": "High",
+      "DisruptsTechniques": [
+        "T1566",
+        "T1566.002"
+      ]
+    }
+  ]
+}

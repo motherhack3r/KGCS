@@ -1,0 +1,46 @@
+{
+  "DefensiveTechniques": [
+    {
+      "ID": "DT-1",
+      "Name": "Credential Access Protection",
+      "Description": {
+        "Text": "Implement multi-factor authentication and secure credential storage to prevent credential theft."
+      },
+      "MitigatesTechniques": [
+        "T1110",
+        "T1187"
+      ],
+      "ParentID": null,
+      "References": [
+        {
+          "URL": "https://d3fend.mitre.org"
+        }
+      ]
+    },
+    {
+      "ID": "DT-2",
+      "Name": "Command Execution Prevention",
+      "Description": {
+        "Text": "Restrict execution of system commands and script interpreters through application whitelisting and execution policies."
+      },
+      "MitigatesTechniques": [
+        "T1059"
+      ],
+      "ParentID": null,
+      "References": []
+    },
+    {
+      "ID": "DT-3",
+      "Name": "Input Validation",
+      "Description": {
+        "Text": "Validate and sanitize all user inputs to prevent injection attacks (SQL, command, code)."
+      },
+      "MitigatesTechniques": [
+        "T1190",
+        "T1059"
+      ],
+      "ParentID": null,
+      "References": []
+    }
+  ]
+}
