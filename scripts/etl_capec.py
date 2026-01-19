@@ -122,6 +122,10 @@ class CAPECtoRDFTransformer:
         if pattern.get("RelatedWeaknesses"):
             self._add_weakness_relationships(pattern_node, pattern["RelatedWeaknesses"])
 
+        # Add related techniques (implements relationship)
+        if pattern.get("RelatedTechniques"):
+            self._add_technique_relationships(pattern_node, pattern["RelatedTechniques"])
+
     def _extract_description(self, description_obj) -> str:
         """Extract description text from potentially nested structure."""
         if isinstance(description_obj, str):
@@ -147,6 +151,19 @@ class CAPECtoRDFTransformer:
 
             # Create the exploits edge (this pattern exploits the weakness)
             self.graph.add((pattern_node, SEC.exploits, weakness_node))
+
+    def _add_technique_relationships(self, pattern_node, related_techniques: list):
+        """Add implements relationships to ATT&CK techniques."""
+        for rel in related_techniques:
+            technique_id = rel.get("ID", "")
+            if not technique_id:
+                continue
+
+            technique_id_full = f"{technique_id}" if technique_id.startswith("T") else f"T{technique_id}"
+            technique_node = URIRef(f"{EX}technique/{technique_id_full}")
+
+            # Create the implements edge (this pattern is implemented by the technique)
+            self.graph.add((pattern_node, SEC.implements, technique_node))
 
     def _add_pattern_relationships(self, patterns: list):
         """Add relationships between attack patterns (parent/child/related)."""

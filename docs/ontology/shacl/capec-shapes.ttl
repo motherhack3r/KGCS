@@ -58,6 +58,13 @@ sec:AttackPatternShape a sh:NodeShape ;
     sh:minCount 1 ;
     sh:description "Weakness URI(s) that this attack pattern exploits (IRI reference)"
   ] ;
+
+  # Optional: implements (0 or more technique references)
+  sh:property [
+    sh:path sec:implements ;
+    sh:nodeKind sh:IRI ;
+    sh:description "ATT&CK Technique URI(s) that implement this attack pattern (IRI reference)"
+  ] ;
   
   # Optional: parentOf (specializations)
   sh:property [

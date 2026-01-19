@@ -28,6 +28,12 @@
           "Relationship": "Exploits"
         }
       ],
+      "RelatedTechniques": [
+        {
+          "ID": "T1566",
+          "Relationship": "ImplementedBy"
+        }
+      ],
       "RelatedAttackPatterns": []
     },
     {
@@ -118,6 +124,12 @@
           "Relationship": "Exploits"
         }
       ],
+      "RelatedTechniques": [
+        {
+          "ID": "T1059",
+          "Relationship": "ImplementedBy"
+        }
+      ],
       "RelatedAttackPatterns": []
     },
     {
@@ -146,6 +158,12 @@
         {
           "ID": "89",
           "Relationship": "Exploits"
+        }
+      ],
+      "RelatedTechniques": [
+        {
+          "ID": "T1190",
+          "Relationship": "ImplementedBy"
         }
       ],
       "RelatedAttackPatterns": []

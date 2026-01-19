@@ -1,0 +1,56 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sec: <https://example.org/sec/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://example.org/attackPattern/CAPEC-100> a sec:AttackPattern ;
+    rdfs:label "Overflow Buffers"^^xsd:string ;
+    sec:capecId "CAPEC-100"^^xsd:string ;
+    sec:consequence "Arbitrary code execution on the target system"^^xsd:string,
+        "Denial of service by crashing the application"^^xsd:string ;
+    sec:description "An attacker exploits the way applications process data by inputting more data than the buffer is designed to hold. This causes the overflow to write data beyond the buffer boundaries, potentially overwriting adjacent memory and causing the program to crash or allowing arbitrary code execution."^^xsd:string ;
+    sec:exploits <https://example.org/weakness/CWE-119>,
+        <https://example.org/weakness/CWE-120> ;
+    sec:prerequisite "The application must not properly validate input size"^^xsd:string,
+        "The target application must use a buffer to store data"^^xsd:string .
+
+<https://example.org/attackPattern/CAPEC-2> a sec:AttackPattern ;
+    rdfs:label "Phishing"^^xsd:string ;
+    sec:capecId "CAPEC-2"^^xsd:string ;
+    sec:consequence "The attacker can steal credentials"^^xsd:string ;
+    sec:description "An attacker sends a fraudulent communication that appears to come from a trusted source. The communication tricks the victim into revealing sensitive information or executing malicious code."^^xsd:string ;
+    sec:exploits <https://example.org/weakness/CWE-287> ;
+    sec:parentOf <https://example.org/attackPattern/CAPEC-1> ;
+    sec:prerequisite "The target must have an email account"^^xsd:string .
+
+<https://example.org/attackPattern/CAPEC-589> a sec:AttackPattern ;
+    rdfs:label "SQL Injection"^^xsd:string ;
+    sec:capecId "CAPEC-589"^^xsd:string ;
+    sec:consequence "Data extraction or modification"^^xsd:string,
+        "Unauthorized database access"^^xsd:string ;
+    sec:description "An attacker injects SQL commands into input fields, which are then executed by the application's database. This allows the attacker to bypass authentication, extract data, modify data, or execute administrative operations."^^xsd:string ;
+    sec:exploits <https://example.org/weakness/CWE-89> ;
+    sec:implements <https://example.org/technique/T1190> ;
+    sec:prerequisite "The application must construct SQL queries from user input without proper sanitization"^^xsd:string,
+        "The target application must accept user input"^^xsd:string .
+
+<https://example.org/attackPattern/CAPEC-88> a sec:AttackPattern ;
+    rdfs:label "OS Command Injection"^^xsd:string ;
+    sec:capecId "CAPEC-88"^^xsd:string ;
+    sec:consequence "Arbitrary OS command execution"^^xsd:string ;
+    sec:description "An attacker injects arbitrary OS commands into the input stream of a vulnerable application. The application fails to properly neutralize the input, allowing the injected commands to be executed with the privileges of the application."^^xsd:string ;
+    sec:exploits <https://example.org/weakness/CWE-78> ;
+    sec:implements <https://example.org/technique/T1059> ;
+    sec:prerequisite "The application must pass user input to an OS command processor"^^xsd:string,
+        "The target application must accept user input"^^xsd:string .
+
+<https://example.org/attackPattern/CAPEC-1> a sec:AttackPattern ;
+    rdfs:label "Spear Phishing"^^xsd:string ;
+    sec:capecId "CAPEC-1"^^xsd:string ;
+    sec:consequence "The attacker can execute malware on the victim's system"^^xsd:string,
+        "The attacker can steal credentials or sensitive information"^^xsd:string ;
+    sec:description "An attacker targets a specific individual or organization with a fraudulent communication that appears to come from a trusted source. The attacker uses information about the target to craft a convincing message that tricks the victim into revealing sensitive information or executing malicious code."^^xsd:string ;
+    sec:exploits <https://example.org/weakness/CWE-287> ;
+    sec:implements <https://example.org/technique/T1566> ;
+    sec:prerequisite "The attacker must know something about the target to make the phishing email convincing"^^xsd:string,
+        "The target must have an email account"^^xsd:string .
+

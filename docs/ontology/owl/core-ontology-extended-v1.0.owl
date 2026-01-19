@@ -429,6 +429,20 @@ sec:exploits a owl:ObjectProperty ;
   rdfs:range sec:Weakness ;
   owl:inverseOf sec:exploited_by .
 
+sec:implements a owl:ObjectProperty ;
+  rdfs:label "implements" ;
+  rdfs:comment "Attack pattern is implemented by ATT&CK technique(s). Links CAPEC patterns to concrete adversary techniques." ;
+  rdfs:domain sec:AttackPattern ;
+  rdfs:range sec:Technique ;
+  owl:inverseOf sec:implements_pattern .
+
+sec:implements_pattern a owl:ObjectProperty ;
+  rdfs:label "implements pattern" ;
+  rdfs:comment "Technique implements attack pattern methodology." ;
+  rdfs:domain sec:Technique ;
+  rdfs:range sec:AttackPattern ;
+  owl:inverseOf sec:implements .
+
 ############################
 # ADVERSARY TRADECRAFT LAYER (ATT&CK-aligned)
 ############################
