@@ -1,167 +1,275 @@
-# Copilot Instructions for KGCS
+# AI Coding Instructions for KGCS
 
-**KGCS** (Cybersecurity Knowledge Graph) is a **frozen, standards-backed knowledge graph** that integrates 9 MITRE security taxonomies (CVE, CWE, CPE, CVSS, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE) with strict semantic boundaries for safe, hallucination-free AI reasoning.
+**Project:** KGCS (Cybersecurity Knowledge Graph) — A frozen, standards-backed knowledge graph integrating 9 MITRE security taxonomies with strict semantic boundaries for hallucination-free AI reasoning.
 
-**Core Principle:** External standards = authoritative truth. Inferred or temporal data = extension layers only.
-
----
-
-## Architecture at a Glance
-
-### Four Immutable Layers
-
-1. **Core Ontology** (`docs/ontology/core-ontology-v1.0.md`)
-   - Frozen, standards-backed classes: `Platform` (CPE), `Vulnerability` (CVE), `Weakness` (CWE), `Technique` (ATT&CK), `DefensiveTechnique` (D3FEND), `DetectionAnalytic` (CAR), etc.
-   - No inheritance between classes; no temporal properties
-   - Critical invariant: vulnerabilities affect *configurations*, not platforms directly
-   - Each CVSS version = separate node (never overwrite)
-
-2. **Incident Extension** (`docs/ontology/incident-ontology-extension-v1.0.md`)
-   - Temporal, observational layer: `Incident`, `ObservedTechnique`, `DetectionEvent`, `Evidence`
-   - Instantiates Core concepts without altering their semantics
-   - Always carries: timestamp, confidence level, source system
-
-3. **Risk Extension** (`docs/ontology/risk-ontology-extension-v1.0.md`)
-   - Decision layer: `RiskAssessment`, `RiskScenario` with decisions (ACCEPT/MITIGATE/TRANSFER/AVOID)
-   - Only place where subjectivity is allowed
-
-4. **ThreatActor Extension** (`docs/ontology/threatactor-ontology-extension-v1.0.md`)
-   - Attribution claims only; always includes confidence level
-   - Never asserts ground truth
+**Core Invariant:** External standards (NVD, MITRE) = authoritative truth; inferred/temporal data = extension layers only.
 
 ---
 
-## Critical Patterns
+## Architecture Overview
 
-### Pattern 1: Standards-Backed Data Only in Core
+### Four Immutable Layers (No Cross-Pollution)
 
-**Rule:** If it cannot be traced to an external standard with a stable ID, it is **not Core Ontology**.
-
-**Examples:**
-- ✅ `Vulnerability` → CVE ID is stable
-- ✅ `AttackPattern` → CAPEC ID is stable
-- ❌ Business impact scoring → Risk extension only
-- ❌ Temporal observations → Incident extension only
-
-### Pattern 2: RAG Must Use Pre-Approved Traversal Templates
-
-**Location:** `docs/ontology/rag/RAG-travesal-templates-extension.md`
-
-LLMs **never reason freely** over the graph. Instead:
-1. Use only approved traversal templates (e.g., `T-CORE-01`)
-2. Never skip layers
-3. Never cross extensions unless explicitly allowed
-4. Always terminate on authoritative Core nodes for explanations
-
-**Example allowed path:**
 ```
-Vulnerability → Weakness → AttackPattern → Technique → DefensiveTechnique
+Layer 4: Extensions          → Incident, Risk, ThreatActor (contextual, temporal, inferred)
+Layer 3: Core Ontology      → CPE, CVE, CWE, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE (frozen facts)
+Layer 2: Modular Ontologies → 9 independent OWL files (cpe, cve, cwe, capec, attck, d3fend, car, shield, engage)
+Layer 1: External Standards → NVD APIs, MITRE STIX/JSON/XML (sources of truth, never modified)
 ```
 
-**Example forbidden path:**
+**Key Rule:** If a concept cannot be traced to an external standard with a stable ID, it belongs in an extension, never Core.
+
+---
+
+## Critical Patterns & Rules
+
+### Pattern 1: The Vulnerability Causality Chain (Core Only)
+
+The canonical reasoning path **must follow this exact sequence**:
+
 ```
-CVE → ThreatActor (direct) 
-→ Must go through Incident extension first
-```
-
-### Pattern 3: SHACL Validation at Three Gates
-
-**Locations:** `docs/ontology/shacl/SHACL-constraints.md`, `docs/ontology/shacl/SHACL-profiles.md`
-
-Data must pass SHACL validation at:
-1. **Ingest time** (ETL/pipeline): enforce schema purity
-2. **Pre-RAG index build**: ensure no hallucination surfaces
-3. **Pre-query execution** (optional): runtime safeguards
-
-**Three trust profiles** control what semantics survive:
-- **SOC profile:** observational truth only; evidence mandatory
-- **EXEC profile:** decision clarity; allows aggregation
-- **AI profile:** hallucination safety (strictest)
-
-If SHACL fails → reject or downgrade confidence.
-
-### Pattern 4: Extension Boundaries Are Immutable
-
-**Core never receives inputs from extensions.**
-
-- Extensions **reference** Core concepts
-- Extensions **never** add properties to Core classes
-- If you need a hybrid concept, create it in the extension layer (e.g., `ObservedTechnique` references `Technique` but adds temporal properties)
-
-### Pattern 5: Evidence & Provenance Non-Negotiable
-
-Every Incident and Attribution claim must track:
-```json
-{
-  "claim_id": "claim-123",
-  "source_system": "EDR-X",
-  "timestamp": "2025-01-15T10:30:00Z",
-  "confidence": "HIGH",  // LOW | MEDIUM | HIGH
-  "evidence_ids": ["evt-001", "evt-002"]
-}
+CPE (Platform) → CVE (Vulnerability) → CVSS (Score) → CWE (Weakness)
+                                      → CAPEC (Pattern) → ATT&CK Technique → {D3FEND, CAR, SHIELD, ENGAGE}
 ```
 
-This enables explainable RAG: "Here's what we think, here's why."
+- ✅ Every edge exists in authoritative JSON/STIX
+- ✅ Every step is independently verifiable
+- ❌ No shortcuts (e.g., CVE → Technique directly skips essential context)
+- ❌ No invented edges between standards
+
+**Location:** [../docs/ontology/rag/RAG-travesal-templates.md](../docs/ontology/rag/RAG-travesal-templates.md) defines allowed traversal templates.
+
+### Pattern 2: Vulnerability Affects Configurations, Not Platforms
+
+**Critical Invariant:** `affected_by` relationships point to `PlatformConfiguration`, not `Platform`.
+
+- A CVE affects **specific versions/updates** of software (configuration)
+- A Platform (CPE) is the atomic identifier; vulnerabilities don't affect all versions equally
+- `PlatformConfiguration` models NVD's affected version ranges
+
+**Example:** CVE-2025-1234 affects Apache 2.4.41 running on Linux x86-64, not "Apache" in general.
+
+### Pattern 3: CVSS Versioning (Never Overwrite)
+
+Each CVSS version is a **separate ontology node**:
+- `VulnerabilityScore_v2.0`
+- `VulnerabilityScore_v3.1`
+- `VulnerabilityScore_v4.0`
+
+Never merge or update; add new versions alongside existing ones. Extensions may reason about which version to use in specific contexts.
+
+### Pattern 4: RAG Uses Pre-Approved Traversal Templates Only
+
+Located: [../docs/ontology/rag/RAG-travesal-templates.md](../docs/ontology/rag/RAG-travesal-templates.md)
+
+LLMs must **not reason freely** over the graph. Instead:
+- Select a template matching the intent (e.g., T1: Vulnerability Impact, T3: Defense Coverage)
+- Follow the exact edge sequence
+- Stop at explicit boundaries
+- Reject the query if no template matches
+
+**Example:** "Explain CVE-2025-1234" → Use Template T1, traverse: CVE → CWE → CAPEC → Technique → Tactic. Stop. Do not add Risk Assessment or business impact (that's T-Risk-1, a separate template).
+
+### Pattern 5: Standards Alignment (1:1 Mapping Rule)
+
+Every ontology class has a **direct, lossless correspondence** to one standard:
+
+| Class | Standard | Source | Unique ID |
+|-------|----------|--------|-----------|
+| `Platform` | CPE 2.3 | NVD CPE API | `cpeUri` |
+| `Vulnerability` | CVE | NVD CVE API 2.0 | `cveId` |
+| `VulnerabilityScore` | CVSS | NVD CVSS JSON | `cveId` + version |
+| `Weakness` | CWE | MITRE CWE JSON | `cweId` |
+| `AttackPattern` | CAPEC | MITRE CAPEC JSON | `capecId` |
+| `Technique` / `Tactic` | ATT&CK | MITRE ATT&CK STIX 2.1 | `attackTechnique_id` / `tacticId` |
+| `DefensiveTechnique` | D3FEND | MITRE D3FEND STIX | `d3fendId` |
+| `DetectionAnalytic` | CAR | MITRE CAR JSON | `carId` |
+| `DeceptionTechnique` | SHIELD | MITRE SHIELD STIX | `shieldId` |
+| `EngagementConcept` | ENGAGE | MITRE ENGAGE Framework | `engageId` |
+
+**Enforcement:** Every ontology property must derive from source JSON/XML fields. If the source doesn't have it, the class doesn't have it.
 
 ---
 
-## File Map & Responsibilities
+## Modular Ontology Structure
 
-| File | Purpose |
-|------|---------|
-| `docs/ontology/core-ontology-v1.0.md` | Authoritative class/edge definitions; read first |
-| `docs/ontology/formal_ontology_draft.md` | Class/edge tables in tabular form; Mermaid diagrams |
-| `docs/ontology/incident-ontology-extension-v1.0.md` | Temporal, observational modeling |
-| `docs/ontology/risk-ontology-extension-v1.0.md` | Decision/prioritization modeling |
-| `docs/ontology/threatactor-ontology-extension-v1.0.md` | Attribution claims with confidence |
-| `docs/ontology/rag/RAG-travesal-templates-extension.md` | Approved query paths for safe AI reasoning |
-| `docs/ontology/shacl/SHACL-constraints.md` | Data validation rules (enforce purity) |
-| `docs/ontology/shacl/SHACL-profiles.md` | Trust-level filtering (SOC/EXEC/AI) |
-| `docs/ontology/owl/` | OWL/Turtle formal definitions |
-| `data/{cve,cwe,capec,cpe,attack,cti-stix}/` | Standard sample data and JSON schemas |
+Located: [../docs/ontology/owl/](../docs/ontology/owl/)
 
----
+### Independence Without Isolation
 
-## Decision Tree for New Work
+Each standard = independent OWL module, **no circular imports**:
 
-1. **Is this fact in an external standard with a stable ID?**
-   - Yes → Core Ontology
-   - No → go to (2)
+```
+cpe-ontology-v1.0.owl          (standalone)
+cve-ontology-v1.0.owl          (imports: cpe)
+cwe-ontology-v1.0.owl          (standalone)
+capec-ontology-v1.0.owl        (imports: cwe)
+attck-ontology-v1.0.owl        (standalone)
+d3fend-ontology-v1.0.owl       (imports: core for linking)
+car-ontology-v1.0.owl          (imports: core for linking)
+shield-ontology-v1.0.owl       (imports: core for linking)
+engage-ontology-v1.0.owl       (imports: core for linking)
+core-ontology-extended-v1.0.owl (integrates all + defines causal chain)
 
-2. **Does this fact have a timestamp?**
-   - Yes → Incident extension
-   - No → go to (3)
+Extensions (always import Core, never Core imports Extensions):
+  incident-ontology-extension-v1.0.owl
+  risk-ontology-extension-v1.0.owl
+  threatactor-ontology-extension-v1.0.owl
+```
 
-3. **Is this a "should we do this?" decision?**
-   - Yes → Risk extension
-   - No → go to (4)
-
-4. **Is this an attribution claim?**
-   - Yes → ThreatActor extension (always with confidence)
-   - No → Likely not in scope or needs new extension
+**When adding a new standard or extension:**
+1. Create the module file in `../docs/ontology/owl/`
+2. Define classes 1:1 with source schema
+3. Add to corresponding markdown in `../docs/ontology/` (e.g., `capec-ontology-v1.0.md`)
+4. Update `core-ontology-extended-v1.0.owl` to import if it's in Core
+5. Update RAG traversal templates if it introduces new reasoning paths
 
 ---
 
-## Project Conventions
+## Extension Layers (Non-Core Semantics)
 
-1. **Identifiers** are always external: `cve_id`, `cwe_id`, `capec_id`, `technique_id`, `actor_id`. Never invent new IDs.
+### Layer 4A: Incident Extension
 
-2. **Relationships are immutable.** Before implementing a new edge, add it to `formal_ontology_draft.md` first.
+Located: [../docs/ontology/incident-ontology-extension-v1.0.md](../docs/ontology/incident-ontology-extension-v1.0.md)
 
-3. **No temporal properties in Core.** Incidents, observations, and assessments add `first_seen`, `last_seen`, `timestamp`, `confidence`. Core classes have none.
+**What it models:** Observational reality — what actually happened.
 
-4. **SHACL before deployment.** Always validate new data or schema changes against the applicable profile (SOC/EXEC/AI).
+**Key classes:** `Incident`, `ObservedTechnique`, `DetectionEvent`, `Evidence`, `AffectedAsset`
 
-5. **No inheritance in Core.** If two classes need shared properties, document the pattern in Core, don't inherit.
+**Critical invariant:** Incidents **instantiate** Core concepts (e.g., ObservedTechnique points to ATT&CK Technique), they do **not redefine** them.
 
-6. **Extension isolation.** When adding to an extension, verify it doesn't reference or modify Core class properties.
+**Properties:** Always temporal (`timestamp`, `first_seen`, `last_seen`) + confidence level.
+
+### Layer 4B: Risk Extension
+
+Located: [../docs/ontology/risk-ontology-extension-v1.0.md](../docs/ontology/risk-ontology-extension-v1.0.md)
+
+**What it models:** Decision context — risk assessments, scenarios, remediation choices.
+
+**Key classes:** `RiskAssessment`, `RiskScenario`
+
+**Critical rule:** Only place where subjectivity (probability, business impact) is allowed. Links to Core concepts but does not alter them.
+
+### Layer 4C: ThreatActor Extension
+
+Located: [../docs/ontology/threatactor-ontology-extension-v1.0.md](../docs/ontology/threatactor-ontology-extension-v1.0.md)
+
+**What it models:** Attribution claims, group capabilities, tools/malware used.
+
+**Key classes:** `ThreatActor`, `AttributionClaim`, `Capability`, `Tool`, `Malware`
+
+**Critical rule:** Attribution is **always confidence-qualified**; never asserts ground truth. Links to Core techniques/TTPs but does not invent new ones.
 
 ---
 
-## Common Pitfalls to Avoid
+## Data Organization
 
-- ❌ Adding temporal fields to Core classes (they belong in Incident extension)
-- ❌ Creating edges that skip ontology layers (e.g., CVE directly to Technique)
-- ❌ Forgetting SHACL validation when loading new standard data
-- ❌ Using confidence levels in Core (they belong in extension claims only)
-- ❌ Altering MITRE semantics to fit a use case (extend instead; never replace)
+Located: [../data/](../data/) — mirrors standard structure:
+
+```
+data/
+  cpe/          CPE platform identifiers (NVD)
+  cve/          CVE vulnerability disclosures (NVD)
+  cwe/          CWE weakness taxonomy (MITRE)
+  capec/        CAPEC attack patterns (MITRE)
+  attack/       ATT&CK techniques & tactics (MITRE)
+  d3fend/       D3FEND defensive techniques (MITRE)
+  cti-stix/     STIX bundles (ATT&CK, D3FEND in STIX 2.1 format)
+  
+Each contains:
+  raw/          Original NVD/MITRE JSON/XML/STIX (read-only)
+  samples/      Annotated examples for testing/documentation
+  schemas/      JSON Schemas, XSD, or SHACL validation rules
+```
+
+**Pattern:** Never commit modified external data; if you need to adjust mappings, do it in the ontology class definitions, not the raw data files.
+
+---
+
+## Documentation Structure
+
+Located: [../docs/](../docs/)
+
+- [../KGCS.md](../KGCS.md) — Executive summary + architecture overview (start here)
+- [../docs/KGCS-draft.md](../docs/KGCS-draft.md) — Detailed specification with examples
+- [../docs/ontology/](../docs/ontology/) — Formal ontology definitions
+  - `core-ontology-v1.0.md` — Core classes, properties, invariants
+  - `*-ontology-v1.0.md` — Per-standard mappings
+  - `*-ontology-extension-v1.0.md` — Extensions (incident, risk, threat actor)
+  - `owl/` — OWL 2.0 formal definitions
+  - `rag/` — RAG traversal templates & safety constraints
+  - `shacl/` — SHACL constraints for validation
+
+**When implementing features:** Read the corresponding markdown first, then the OWL formalization. The markdown is the human-readable spec; OWL is the formal constraint.
+
+---
+
+## Common Tasks & Patterns
+
+### Task: Add a New Relationship Between Standards
+
+**Example:** "D3FEND technique D3-XYZ now mitigates CAPEC-123"
+
+1. **Verify the relationship exists** in source data (D3FEND JSON or MITRE documentation)
+2. **Find the edge definition** in [../docs/ontology/core-ontology-v1.0.md](../docs/ontology/core-ontology-v1.0.md)
+3. **Add the OWL axiom** to [../docs/ontology/owl/core-ontology-extended-v1.0.owl](../docs/ontology/owl/core-ontology-extended-v1.0.owl)
+4. **Update RAG templates** in [../docs/ontology/rag/](../docs/ontology/rag/) if it opens a new reasoning path
+5. **Test with samples:** Ensure sample data in [../data/](../data/) still validates
+
+### Task: Ingest New Standard Version (e.g., CPE 3.0)
+
+1. **Check scope:** Does CPE 3.0 introduce new classes/properties?
+2. **Create versioned module:** `cpe-ontology-v3.0.owl` (keep v2.3 for backward compatibility)
+3. **Update mappings:** Add to [../docs/ontology/](../docs/ontology/) with migration guide
+4. **Update Core imports:** Decide if v3.0 replaces v2.3 or coexists
+5. **Do not break existing data:** Ensure old CPE URIs still resolve
+
+### Task: Support a New Use Case (e.g., Incident Investigation)
+
+1. **Check if it's Core or Extension:** Does it require temporal/contextual data?
+   - Temporal or observational? → Incident Extension
+   - Risk decisions? → Risk Extension
+   - Attribution claims? → ThreatActor Extension
+   - Authoritative mapping to a standard? → Core Ontology
+2. **Create/extend appropriate layer** (never modify Core for use cases)
+3. **Define traversal templates** in [../docs/ontology/rag/](../docs/ontology/rag/) for safe RAG paths
+4. **Add SHACL constraints** in [../docs/ontology/shacl/](../docs/ontology/shacl/) to validate instance data
+
+---
+
+## Validation & Testing
+
+No automated test suite is present; validation is **formal and manual**:
+
+- **Syntax:** OWL 2.0 files must parse in Protégé or similar
+- **Schema compliance:** JSON samples must validate against `.schema` files in [../data/](../data/)
+- **Alignment:** Every ontology property must be traceable to source standard
+- **No pollution:** Extensions must never reference Core in ways that would break it if extended independently
+- **Circular imports:** Check that [../docs/ontology/owl/](../docs/ontology/owl/) has no cycles
+
+**Before committing changes:**
+1. Verify ontology markdown matches OWL
+2. Check that edge sequences in RAG templates exist in core-ontology-extended
+3. Validate sample data against schema files
+4. Ensure no new Core properties without source standard justification
+
+---
+
+## Key Files to Read First
+
+1. [../KGCS.md](../KGCS.md) (897 lines) — Architecture, causality chain, coverage model
+2. [../docs/ontology/core-ontology-v1.0.md](../docs/ontology/core-ontology-v1.0.md) (283 lines) — Core classes, invariants
+3. [../docs/KGCS-draft.md](../docs/KGCS-draft.md) (1989 lines) — Detailed spec with alignment rules
+4. [../docs/ontology/rag/RAG-travesal-templates.md](../docs/ontology/rag/RAG-travesal-templates.md) (385 lines) — Safe reasoning boundaries
+
+---
+
+## Golden Rules
+
+1. **External standards are authoritative.** If MITRE/NVD say it, we model it. If they don't, it's an extension.
+2. **Frozen Core, flowing Extensions.** Core Ontology v1.0 should rarely change; extensions are where complexity grows.
+3. **RAG is templated, not freeform.** LLM reasoning must follow pre-approved traversal patterns.
+4. **Trace everything back.** Every statement must be traceable to a source with a stable ID.
+5. **One-way import flow.** Core is never polluted by extensions; extensions always reference Core.
+6. **CVSS versions coexist.** New scoring versions don't replace old ones; they expand the graph.
+7. **No circular dependencies.** Ontology modules form a DAG; circular reasoning paths are forbidden.

@@ -42,6 +42,10 @@ The result is an AI that can reason confidently, explain its reasoning, and rema
 - [8. Extension Layers (Incident, Risk, Threat Actor)](#8-extension-layers-incident-risk-threat-actor)
 - [9. Implementation Roadmap](#9-implementation-roadmap)
 - [10. Why This Architecture Scales](#10-why-this-architecture-scales)
+- [11. Security Guarantees](#11-security-guarantees)
+- [12. Limitations and Future Work](#12-limitations-and-future-work)
+- [13. For the AI Engineer](#13-for-the-ai-engineer)
+- [Conclusion](#conclusion)
 
 ---
 
