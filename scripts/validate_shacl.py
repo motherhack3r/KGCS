@@ -38,6 +38,7 @@ def parse_args():
     p.add_argument('--data', '-d', required=True, help='Data file (Turtle) to validate')
     p.add_argument('--shapes', '-s', action='append', help='Path to SHACL shapes file (Turtle). Can be passed multiple times')
     p.add_argument('--template', '-t', choices=list(TEMPLATE_SHAPE_MAP.keys()), help='RAG template name to select a subset of shapes')
+    p.add_argument('--owl', help='OWL module filename (e.g., attck-ontology-v1.0.owl) to auto-select mapped shape bundle')
     p.add_argument('--list-templates', action='store_true', help='List available RAG templates and exit')
     p.add_argument('--output', '-o', default='artifacts', help='Output folder for JSON reports')
     return p.parse_args()
@@ -85,7 +86,38 @@ def main():
     # Default shapes bundle
     default_shapes = ['docs/ontology/shacl/kgcs-shapes.ttl']
 
-    shapes_paths = args.shapes or default_shapes
+    # If explicit shapes provided, use them; else if --owl provided, map via manifest; otherwise use default
+    shapes_paths = None
+    if args.shapes:
+        shapes_paths = args.shapes
+    elif args.owl:
+        # parse manifest to map owl -> shapes
+        manifest_path = 'docs/ontology/shacl/manifest.md'
+        mapping = {}
+        try:
+            with open(manifest_path, 'r', encoding='utf-8') as fh:
+                for line in fh:
+                    line = line.strip()
+                    # expect lines like: - `cpe-ontology-v1.0.owl` → `docs/ontology/shacl/cpe-shapes.ttl`
+                    if line.startswith('- `') and '→' in line:
+                        try:
+                            left, right = line.split('→', 1)
+                            owl_name = left.split('`')[1]
+                            shapes_list = [s.strip(' `') for s in right.split(',')]
+                            mapping[owl_name] = shapes_list
+                        except Exception:
+                            continue
+        except FileNotFoundError:
+            print(f"Manifest not found: {manifest_path}; falling back to default shapes")
+            shapes_paths = default_shapes
+
+        if shapes_paths is None:
+            shapes_paths = mapping.get(args.owl)
+            if not shapes_paths:
+                print(f"No SHACL mapping found for {args.owl}; using default shapes bundle")
+                shapes_paths = default_shapes
+    else:
+        shapes_paths = default_shapes
 
     # Load full shapes graph
     full_shapes = Graph()

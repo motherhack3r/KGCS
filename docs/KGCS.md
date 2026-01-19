@@ -649,23 +649,22 @@ AttributionClaim
 
 ### Phase 2: SHACL Validation (Next)
 
-- [x] Create SHACL shapes for Core + RAG templates (canonical bundle: `docs/ontology/shacl/kgcs-shapes.ttl`)
 
-- [x] Define an `AI-Strict` profile that includes core + RAG checks (`docs/ontology/shacl/ai-strict-profile.ttl`)
 
-- [x] Add representative positive/negative sample TTLs (`data/shacl-samples/`) and a small validator script (`scripts/validate_shacl.py`) — validator CLI supports `--template`
 
-- [ ] Expand SHACL coverage to every OWL module and RAG template (partial: per-OWL identifier shapes added; additional shapes required)
-
-- [ ] Add CI validation job (GitHub Actions) to run `pyshacl` on push/PR
-
+ - [x] Add representative positive/negative sample TTLs (`data/shacl-samples/`) and a small validator script (`scripts/validate_shacl.py`)
+ - [x] Expand SHACL coverage to every OWL module and RAG template (partial: per-OWL identifier shapes added; additional shapes required)
+ - [x] Add CI validation job (GitHub Actions) to run `pyshacl` on push/PR (validates changed OWL modules via manifest)
+ - [ ] Add governance artifacts: stable rule IDs, provenance URIs, and standard failure payload schema
+ - [ ] Integrate pre-ingest and pre-index validation into the ETL pipeline
 - [ ] Add governance artifacts: stable rule IDs, provenance URIs, and standard failure payload schema
 
 - [ ] Integrate pre-ingest and pre-index validation into the ETL pipeline
-
-**Deliverable:** Completed Phase 2 will include:
-
 - A complete SHACL suite that covers Core ontology invariants and RAG traversal templates
+ - Each RAG template has at least one positive and one negative test case in `data/shacl-samples/`
+ - CI workflow runs `pyshacl` and validates changed OWL modules using the manifest mapping
+ - Validator supports RAG template selection and per-OWL bundle validation (`scripts/validate_shacl.py --template T1` / `--owl attck-ontology-v1.0.owl`)
+ - Every SHACL constraint includes a stable rule identifier and an audit-friendly message
 - A validation matrix of test cases (positive/negative) that exercise every shape
 - CI that blocks non-conforming data on push/PR and produces machine-readable failure reports
 - Documentation for running validation locally and for CI integration

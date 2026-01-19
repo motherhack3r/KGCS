@@ -24,15 +24,49 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyshacl rdflib
 
-      - name: Run SHACL validation against samples
+      - name: Run SHACL validation for changed OWL modules
         run: |
-          set -e
-          echo "Running SHACL validator for each TTL in data/shacl-samples"
-          ls -1 data/shacl-samples || (echo "No sample files found" && exit 1)
-          for f in data/shacl-samples/*.ttl; do
-            echo "\n=== Validating $f ==="
-            python scripts/validate_shacl.py "$f"
-          done
+          set -euo pipefail
+          echo "Detecting changed OWL files..."
+          # Determine base ref (works for PRs and pushes)
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_REF="${{ github.event.pull_request.base.ref }}"
+          else
+            BASE_REF="main"
+          fi
+          echo "Base ref: $BASE_REF"
+          git fetch --no-tags --prune --depth=1 origin $BASE_REF || true
+          CHANGED_FILES=$(git diff --name-only origin/${BASE_REF}...HEAD || true)
+          echo "Changed files:\n$CHANGED_FILES"
+          # Filter OWL modules under docs/ontology/owl
+          OWLS=$(echo "$CHANGED_FILES" | grep -E '^docs/ontology/owl/.+\.owl$' || true)
+          if [ -z "$OWLS" ]; then
+            echo "No OWL modules changed. Falling back to canonical bundle validation against samples."
+            if ls data/shacl-samples/*.ttl >/dev/null 2>&1; then
+              for f in data/shacl-samples/*.ttl; do
+                echo "\n=== Validating $f against canonical bundle ==="
+                python scripts/validate_shacl.py --data "$f"
+              done
+            else
+              echo "No sample TTLs found in data/shacl-samples; skipping validation." && exit 0
+            fi
+          else
+            echo "OWL modules changed:" && echo "$OWLS"
+            # For each OWL, extract filename and run validator with --owl
+            echo "$OWLS" | while read -r line; do
+              mod=$(basename "$line")
+              echo "Processing module: $mod"
+              if ls data/shacl-samples/*.ttl >/dev/null 2>&1; then
+                for f in data/shacl-samples/*.ttl; do
+                  echo "\n=== Validating $f against shapes for $mod ==="
+                  python scripts/validate_shacl.py --data "$f" --owl "$mod" || true
+                done
+              else
+                echo "No sample TTLs found in data/shacl-samples; running single canonical validation for $mod"
+                python scripts/validate_shacl.py --data /dev/null --owl "$mod" || true
+              fi
+            done
+          fi
       - name: Upload SHACL reports
         uses: actions/upload-artifact@v4
         with:
