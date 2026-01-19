@@ -1,0 +1,55 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix sec: <https://example.org/sec/core#> .
+@prefix inc: <https://example.org/incident#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Core SHACL shapes for KGCS Core + Incident safety
+
+# 1) Forbid a direct edge from Vulnerability -> Technique (no CVE -> Technique shortcut)
+# If any Vulnerability has an 'implemented_as' predicate pointing at a Technique, this shape fails.
+
+sec:NoDirectVulnTechniqueShape a sh:NodeShape ;
+  sh:targetClass sec:Vulnerability ;
+  sh:property [
+    sh:predicate sec:implemented_as ;
+    sh:maxCount 0 ;
+    sh:message "Direct Vulnerability -> Technique links are forbidden; use the canonical chain (Vulnerability -> Weakness -> AttackPattern -> Technique)." ;
+  ] ;
+.
+
+# 2) Technique must belong to at least one Tactic
+sec:TechniqueTacticShape a sh:NodeShape ;
+  sh:targetClass sec:Technique ;
+  sh:property [
+    sh:predicate sec:belongs_to ;
+    sh:minCount 1 ;
+    sh:message "A Technique must be linked to a Tactic (sec:belongs_to)." ;
+    sh:class sec:Tactic ;
+  ] ;
+.
+
+# 3) ObservedTechnique (Incident extension) must anchor to a Core Technique
+inc:ObservedTechniqueAnchorShape a sh:NodeShape ;
+  sh:targetClass inc:ObservedTechnique ;
+  sh:property [
+    sh:predicate inc:instance_of ;
+    sh:minCount 1 ;
+    sh:class sec:Technique ;
+    sh:message "ObservedTechnique must have an inc:instance_of link to a sec:Technique." ;
+  ] ;
+.
+
+# 4) Incidents MUST NOT directly reference Vulnerabilities (claim-based separation)
+# This uses a SPARQL constraint: any triple where the object is a Vulnerability is a violation.
+sec:NoIncidentVulnerabilityShape a sh:NodeShape ;
+  sh:targetClass inc:Incident ;
+  sh:select (
+    [
+      sh:prefixes (
+        sec: <https://example.org/sec/core#> )
+      sh:message "Incidents must not directly reference Vulnerability nodes; link via ObservedTechnique -> Technique -> ... instead."
+      sh:select "SELECT $this ?p ?v WHERE { $this ?p ?v . ?v a sec:Vulnerability . }"
+    ]
+  ) ;
+.

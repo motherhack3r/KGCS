@@ -1,0 +1,24 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix sec: <https://example.org/sec/core#> .
+@prefix inc: <https://example.org/incident#> .
+@prefix kgcs: <https://example.org/kgcs/profile#> .
+
+# AI Strict Profile: enforces core hard guarantees + incident separation + extra checks
+
+kgcs:AI-Strict-Profile a sh:NodeShape ;
+  sh:include <core-shapes.ttl> ;
+  # Profile-level informational label
+  sh:message "KGCS AI Strict SHACL profile: minimal, non-ambiguous core constraints for RAG usage." ;
+.
+
+# Additional AI-focused rule suggestions can be added here (e.g., require references, disallow freeform text in certain fields).
+
+# Example: Ensure vulnerabilities have at least one Reference
+sec:VulnerabilityReferenceRequirement a sh:NodeShape ;
+  sh:targetClass sec:Vulnerability ;
+  sh:property [
+    sh:predicate sec:references ;
+    sh:minCount 1 ;
+    sh:message "Vulnerability nodes must include at least one sec:Reference for verifiability in AI workflows." ;
+  ] ;
+.
