@@ -7,8 +7,9 @@
 
 kgcs:AI-Strict-Profile a sh:NodeShape ;
   sh:include <core-shapes.ttl> ;
+  sh:include <rag-shapes.ttl> ;
   # Profile-level informational label
-  sh:message "KGCS AI Strict SHACL profile: minimal, non-ambiguous core constraints for RAG usage." ;
+  sh:message "KGCS AI Strict SHACL profile: minimal, non-ambiguous core + RAG constraints for safe reasoning." ;
 .
 
 # Additional AI-focused rule suggestions can be added here (e.g., require references, disallow freeform text in certain fields).

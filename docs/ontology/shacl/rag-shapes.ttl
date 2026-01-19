@@ -1,0 +1,130 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix sec: <https://example.org/sec/core#> .
+@prefix inc: <https://example.org/incident#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# RAG-aligned SHACL shapes implementing Templates T1–T7
+
+########################
+# T1 — Vulnerability Impact Explanation
+# Ensures Vulnerability has canonical chain to Tactic
+########################
+sec:VulnerabilityImpactChainShape a sh:NodeShape ;
+  sh:targetClass sec:Vulnerability ;
+  sh:select ( 
+    [
+      sh:prefixes (
+        sec: <https://example.org/sec/core#>
+      )
+      sh:message "Vulnerability must connect to Weakness -> AttackPattern -> Technique -> Tactic (T1 canonical chain)."
+      sh:select "SELECT $this WHERE { FILTER NOT EXISTS { $this sec:caused_by ?w . ?w sec:exploited_by ?ap . ?ap sec:implemented_as ?t . ?t sec:belongs_to ?ta . } }"
+    ]
+  ) ;
+.
+
+########################
+# T2 — Severity & Scoring Explanation
+# Ensure at least one VulnerabilityScore node with a cvssVersion exists
+########################
+sec:VulnerabilityScoringShape a sh:NodeShape ;
+  sh:targetClass sec:Vulnerability ;
+  sh:property [
+    sh:predicate sec:scored_by ;
+    sh:minCount 1 ;
+    sh:message "Vulnerability must have one or more VulnerabilityScore nodes (CVSS versions)." ;
+  ] ;
+  # Also ensure the score nodes include a cvssVersion
+  sh:select (
+    [
+      sh:prefixes (sec: <https://example.org/sec/core#>)
+      sh:message "Each VulnerabilityScore must declare a cvssVersion." 
+      sh:select "SELECT $this ?score WHERE { $this sec:scored_by ?score . FILTER NOT EXISTS { ?score sec:cvssVersion ?v . } }"
+    ]
+  ) ;
+.
+
+########################
+# T3 — Detection-Centric Reasoning
+# Vulnerability or Technique should lead to a DetectionAnalytic
+########################
+# Technique-level simple check
+sec:TechniqueDetectionShape a sh:NodeShape ;
+  sh:targetClass sec:Technique ;
+  sh:property [
+    sh:predicate sec:detected_by ;
+    sh:minCount 1 ;
+    sh:message "Technique should have one or more DetectionAnalytic links (detected_by)." ;
+    sh:class sec:DetectionAnalytic ;
+  ] ;
+.
+
+# Vulnerability-level detection path check (via causal chain)
+sec:VulnerabilityDetectionPathShape a sh:NodeShape ;
+  sh:targetClass sec:Vulnerability ;
+  sh:select (
+    [
+      sh:prefixes (sec: <https://example.org/sec/core#>)
+      sh:message "Vulnerability must be explainable to a Technique that has DetectionAnalytic (T3 detection path)."
+      sh:select "SELECT $this WHERE { FILTER NOT EXISTS { $this sec:caused_by ?w . ?w sec:exploited_by ?ap . ?ap sec:implemented_as ?t . ?t sec:detected_by ?d . } }"
+    ]
+  ) ;
+.
+
+########################
+# T4 — Mitigation-Centric Reasoning
+# Ensure path from Vulnerability to DefensiveTechnique
+########################
+sec:VulnerabilityMitigationPathShape a sh:NodeShape ;
+  sh:targetClass sec:Vulnerability ;
+  sh:select (
+    [
+      sh:prefixes (sec: <https://example.org/sec/core#>)
+      sh:message "Vulnerability must connect to a Technique that is mitigated_by a DefensiveTechnique (T4 mitigation path)."
+      sh:select "SELECT $this WHERE { FILTER NOT EXISTS { $this sec:caused_by ?w . ?w sec:exploited_by ?ap . ?ap sec:implemented_as ?t . ?t sec:mitigated_by ?m . } }"
+    ]
+  ) ;
+.
+
+########################
+# T5 — Deception & Adversary Disruption
+# Technique -> DeceptionTechnique (countered_by) optional EngagementConcept
+########################
+sec:TechniqueDeceptionShape a sh:NodeShape ;
+  sh:targetClass sec:Technique ;
+  sh:property [
+    sh:predicate sec:countered_by ;
+    sh:minCount 1 ;
+    sh:message "Technique should have a countered_by relation to a DeceptionTechnique (SHIELD)." ;
+    sh:class sec:DeceptionTechnique ;
+  ] ;
+.
+
+# Optional extension: if DeceptionTechnique present, allow EngagementConcept linkage (no hard enforcement)
+
+########################
+# T6 — Reference & Evidence Grounding
+# Ensure Vulnerability references include at least one URL and Reference nodes have referenceUrl
+########################
+sec:ReferenceUrlShape a sh:NodeShape ;
+  sh:targetClass sec:Reference ;
+  sh:property [
+    sh:predicate sec:referenceUrl ;
+    sh:minCount 1 ;
+    sh:message "Reference must include at least one reference URL for verifiability." ;
+  ] ;
+.
+
+########################
+# T7 — End-to-End Defensive Reasoning (both detection and mitigation exist)
+########################
+sec:VulnerabilityEndToEndShape a sh:NodeShape ;
+  sh:targetClass sec:Vulnerability ;
+  sh:select (
+    [
+      sh:prefixes (sec: <https://example.org/sec/core#>)
+      sh:message "Vulnerability must have both detection and mitigation branches resolved (DetectionAnalytic and DefensiveTechnique)."
+      sh:select "SELECT $this WHERE { FILTER NOT EXISTS { $this sec:caused_by ?w . ?w sec:exploited_by ?ap . ?ap sec:implemented_as ?t . ?t sec:detected_by ?d . ?t sec:mitigated_by ?m . } }"
+    ]
+  ) ;
+.
