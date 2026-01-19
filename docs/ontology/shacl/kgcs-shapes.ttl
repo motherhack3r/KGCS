@@ -109,6 +109,120 @@ ex:DetectionAnalyticShape a sh:NodeShape ;
   sh:property [ sh:path ex:referenceUrl ; sh:minCount 0 ] .
 
 ########################
+# Reference, DefensiveTechnique, DeceptionTechnique, EngagementConcept
+########################
+ex:ReferenceShape a sh:NodeShape ;
+  sh:targetClass ex:Reference ;
+  sh:property [
+    sh:path ex:referenceUrl ;
+    sh:datatype xsd:anyURI ;
+    sh:minCount 1 ;
+    sh:message "Reference nodes must include a referenceUrl (URI)." ;
+  ] ;
+  sh:property [
+    sh:path ex:referenceSource ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "Reference nodes must include a referenceSource (string)." ;
+  ] .
+
+ex:DefensiveTechniqueShape a sh:NodeShape ;
+  sh:targetClass ex:DefensiveTechnique ;
+  sh:property [
+    sh:path ex:d3fendId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "DefensiveTechnique must include a d3fendId." ;
+  ] ;
+  sh:property [
+    sh:path ex:controlType ;
+    sh:datatype xsd:string ;
+    sh:minCount 0 ;
+  ] .
+
+ex:DeceptionTechniqueShape a sh:NodeShape ;
+  sh:targetClass ex:DeceptionTechnique ;
+  sh:property [
+    sh:path ex:shieldId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "DeceptionTechnique must include a shieldId." ;
+  ] .
+
+ex:EngagementConceptShape a sh:NodeShape ;
+  sh:targetClass ex:EngagementConcept ;
+  sh:property [
+    sh:path ex:engageId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "EngagementConcept must include an engageId." ;
+  ] .
+
+########################
+# Per-OWL-file stricter identifier constraints
+########################
+# CWE
+ex:WeaknessIdShape a sh:NodeShape ;
+  sh:targetClass ex:Weakness ;
+  sh:property [
+    sh:path ex:cweId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "Weakness (CWE) must include a cweId." ;
+  ] .
+
+# CAPEC
+ex:AttackPatternIdShape a sh:NodeShape ;
+  sh:targetClass ex:AttackPattern ;
+  sh:property [
+    sh:path ex:capecId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "AttackPattern (CAPEC) must include a capecId." ;
+  ] .
+
+# CAR
+ex:DetectionAnalyticIdShape a sh:NodeShape ;
+  sh:targetClass ex:DetectionAnalytic ;
+  sh:property [
+    sh:path ex:carId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "DetectionAnalytic (CAR) must include a carId." ;
+  ] .
+
+# D3FEND
+ex:DefensiveTechniqueIdShape a sh:NodeShape ;
+  sh:targetClass ex:DefensiveTechnique ;
+  sh:property [
+    sh:path ex:d3fendId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "DefensiveTechnique (D3FEND) must include a d3fendId." ;
+  ] .
+
+# SHIELD
+ex:DeceptionTechniqueIdShape a sh:NodeShape ;
+  sh:targetClass ex:DeceptionTechnique ;
+  sh:property [
+    sh:path ex:shieldId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "DeceptionTechnique (SHIELD) must include a shieldId." ;
+  ] .
+
+# ENGAGE
+ex:EngagementConceptIdShape a sh:NodeShape ;
+  sh:targetClass ex:EngagementConcept ;
+  sh:property [
+    sh:path ex:engageId ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "EngagementConcept (ENGAGE) must include an engageId." ;
+  ] .
+
+
+########################
 # Core invariants (multi-property checks)
 ########################
 # Ensure Vulnerability -> caused_by -> Weakness if present
