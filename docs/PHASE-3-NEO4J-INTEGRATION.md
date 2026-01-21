@@ -22,7 +22,7 @@ Implemented complete RDF-to-Neo4j transformation pipeline and successfully loade
 
 ### RDF-to-Neo4j Pipeline
 
-```
+```text
 RDF Turtle File
 (tmp/phase3_combined.ttl - 12,978 triples)
          ↓
@@ -40,13 +40,15 @@ Neo4j Database
 ### Data Model
 
 **Node Types:**
+
 - `Platform`: CPE identifiers with vendor/product/version info
 - `Vulnerability`: CVE identifiers with descriptions and publication dates
 - `Reference`: Reference URLs and sources
 - `Score`: CVSS scoring information (when available)
 
 **Node Properties:**
-```
+
+```text
 Platform {
   uri: "https://example.org/platform/UUID"
   cpeUri: "cpe:2.3:a:vendor:product:version:..."
@@ -124,7 +126,7 @@ python -m src.etl.rdf_to_neo4j
 ### Node Distribution
 
 | Type | Count | Complete | Notes |
-|------|-------|----------|-------|
+| ------ | ------- | ---------- | ------- |
 | Platform | 1,371 | 99.6% | CPE standards, 1,366 with vendor/product |
 | Vulnerability | 21 | 100% | CVE standards, all with descriptions |
 | Reference | 56 | ~100% | URLs to vulnerability sources |
@@ -133,12 +135,14 @@ python -m src.etl.rdf_to_neo4j
 ### Data Quality
 
 **Platform Completeness:**
+
 - CPE URI: 1,366/1,371 (99.6%)
 - Vendor: 1,366/1,371 (99.6%)
 - Product: 1,366/1,371 (99.6%)
 - Version: 950/1,371 (69.3%)
 
 **Vulnerability Completeness:**
+
 - CVE ID: 21/21 (100%)
 - Description: 21/21 (100%)
 - Published Date: 21/21 (100%)
@@ -147,7 +151,8 @@ python -m src.etl.rdf_to_neo4j
 ### Sample Data
 
 **Platform Examples:**
-```
+
+```text
 CPE: cpe:2.3:o:dell:vostro_13_5310_firmware:2.33.0:*:*:*:*:*:*:*
      Vendor: vostro_13_5310_firmware, Product: 2.33.0
 
@@ -156,7 +161,8 @@ CPE: cpe:2.3:a:catchthemes:essential_widgets:2.3.1:*:*:*:pro:wordpress:*:*
 ```
 
 **Vulnerability Examples:**
-```
+
+```text
 CVE-2022-50931: TeamSpeak 3.5.6 contains an insecure file permissions 
                 vulnerability that allows local attackers...
 
@@ -202,16 +208,19 @@ CREATE CONSTRAINT vulnerability_uri_unique
 ### Completed (MVP)
 
 ✅ **CPE → Node Creation**
+
 - 1,371 Platform nodes created from RDF
 - CPE identifiers properly extracted
 - Vendor/product/version properties loaded
 
 ✅ **CVE → Node Creation**  
+
 - 21 Vulnerability nodes created from RDF
 - Full descriptions and metadata preserved
 - Publication/modification dates stored
 
 ✅ **Database Integration**
+
 - Neo4j connection verified
 - Data persisted successfully
 - Indexes and constraints created
@@ -219,18 +228,22 @@ CREATE CONSTRAINT vulnerability_uri_unique
 ### Pending (Phase 3 Continuation)
 
 ⏳ **CVE → CWE Mapping**
+
 - Requires CWE ontology data
 - Creates `CAUSED_BY` relationships
 
 ⏳ **CWE → CAPEC Mapping**
+
 - Requires CAPEC ontology data
 - Creates `ENABLES` relationships
 
 ⏳ **CAPEC → ATT&CK Mapping**
+
 - Requires MITRE ATT&CK data
 - Creates `IMPLEMENTS` relationships
 
 ⏳ **Defense Layer Integration**
+
 - D3FEND (defensive techniques)
 - CAR (cyber analytic rules)
 - SHIELD (defense strategies)
@@ -241,18 +254,21 @@ CREATE CONSTRAINT vulnerability_uri_unique
 ## Testing
 
 ### Connection Test
+
 ```bash
 python test_neo4j_connection.py
 # Output: SUCCESS - Connected to Neo4j 2025.12.1
 ```
 
 ### Data Load Test
+
 ```bash
 python -m src.etl.rdf_to_neo4j
 # Output: SUCCESS - 1,448 nodes loaded
 ```
 
 ### Causal Chain Verification
+
 ```bash
 python test_causal_chain.py
 # Output: SUCCESS - All node types verified
@@ -261,6 +277,7 @@ python test_causal_chain.py
 ### Sample Cypher Queries
 
 **Get all CPE platforms:**
+
 ```cypher
 MATCH (p:Platform)
 RETURN p.cpeUri, p.vendor, p.product
@@ -268,12 +285,14 @@ LIMIT 10
 ```
 
 **Get all CVE vulnerabilities:**
+
 ```cypher
 MATCH (v:Vulnerability)
 RETURN v.cveId, v.description, v.published
 ```
 
 **Count nodes by type:**
+
 ```cypher
 MATCH (n)
 RETURN labels(n)[0] as type, COUNT(n) as count
@@ -337,7 +356,8 @@ ORDER BY count DESC
 
 ### Testing & Validation
 
-5. **End-to-End Queries**
+1. **End-to-End Queries**
+
    ```cypher
    MATCH path = (cpe:Platform)-[:AFFECTS_BY]->(cve:Vulnerability)
      -[:CAUSED_BY]->(cwe:CWE)-[:ENABLES]->(capec:CAPEC)
@@ -346,12 +366,12 @@ ORDER BY count DESC
    LIMIT 5
    ```
 
-6. **Performance Optimization**
+2. **Performance Optimization**
    - Profile large queries
    - Add missing indexes
    - Optimize relationship density
 
-7. **Data Quality Checks**
+3. **Data Quality Checks**
    - Validate all node properties
    - Check for orphaned nodes
    - Verify relationship cardinality
@@ -363,6 +383,7 @@ ORDER BY count DESC
 ### With SHACL Validation (Phase 2)
 
 The RDF-to-Neo4j transformer respects SHACL constraints:
+
 - Preserves URI uniqueness (no duplicate CPE/CVE IDs)
 - Maintains required properties (cpeUri, cveId, descriptions)
 - Validates before insertion (future enhancement)
@@ -370,6 +391,7 @@ The RDF-to-Neo4j transformer respects SHACL constraints:
 ### With ETL Pipeline (Phase 3)
 
 The transformer integrates with existing ETL:
+
 - Uses same RDF namespace definitions
 - Respects batching configuration from src/config.py
 - Compatible with ingest_pipeline.py workflow
@@ -377,6 +399,7 @@ The transformer integrates with existing ETL:
 ### With Query API (Phase 4 - Future)
 
 Neo4j data ready for:
+
 - REST API endpoints
 - Cypher query builders
 - RAG traversal templates
