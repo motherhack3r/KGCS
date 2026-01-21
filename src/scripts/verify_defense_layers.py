@@ -24,7 +24,7 @@ print()
 # Query techniques and their relationships
 techniques = list(g.subjects(RDF.type, SEC.Technique))
 
-for tech in sorted(techniques):
+for tech in sorted(techniques, key=str):
     tech_id = g.value(tech, SEC.attackTechniqueId)
     tech_label = g.value(tech, RDFS.label)
     
@@ -103,3 +103,7 @@ print(f'Defense Links:        {len(list(g.triples((None, SEC.mitigates, None))))
 print(f'Detection Links:      {len(list(g.triples((None, SEC.detects, None))))} (CAR→Technique)')
 print(f'Counter Links:        {len(list(g.triples((None, SEC.counters, None))))} (SHIELD→Technique)')
 print(f'Disruption Links:     {len(list(g.triples((None, SEC.disrupts, None))))} (ENGAGE→Technique)')
+
+
+if __name__ == '__main__':
+    pass

@@ -44,3 +44,7 @@ print(f'CAPEC patterns: {len(patterns)}')
 print(f'ATT&CK techniques: {len(list(g.subjects(RDF.type, SEC.Technique)))}')
 print(f'ATT&CK tactics: {len(list(g.subjects(RDF.type, SEC.Tactic)))}')
 print(f'\nCAPEC→Technique implements edges: {len([p for p in patterns if list(g.objects(p, SEC.implements))])}')
+
+
+if __name__ == '__main__':
+    pass

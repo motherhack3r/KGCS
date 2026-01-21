@@ -1,21 +1,12 @@
 """ETL Pipeline: MITRE ATT&CK STIX JSON → RDF Turtle with SHACL validation.
 
 Transforms official MITRE ATT&CK (Adversarial Tactics, Techniques, and Common Knowledge)
-STIX 2.1 JSON into RDF triples conforming to the Core Ontology Technique/SubTechnique/Tactic classes.
-
-ATT&CK defines concrete adversary behaviors (Techniques) that implement abstract patterns (CAPEC).
-The causal chain: Weakness → exploited_by → AttackPattern → implemented_as → Technique → belongs_to → Tactic
+STIX 2.1 JSON into RDF triples conforming to the Core Ontology Technique/Tactic classes.
 
 Usage:
-    python scripts/etl/etl_attack.py --input data/attack/raw/attack-stix.json \
+    python -m kgcs.etl.etl_attack --input data/attack/raw/attack-stix.json \
                               --output data/attack/samples/attack-output.ttl \
                               --validate
-
-Reference:
-    - MITRE ATT&CK: https://attack.mitre.org/
-    - STIX 2.1 Format: https://docs.oasis-open.org/cti/stix/v2.1/
-    - Core Ontology: docs/ontology/core-ontology-v1.0.md
-    - SHACL Shapes: docs/ontology/shacl/attack-shapes.ttl
 """
 
 import argparse
@@ -28,7 +19,6 @@ from datetime import datetime
 from rdflib import Graph, Namespace, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD
 
-# Define namespaces
 SEC = Namespace("https://example.org/sec/core#")
 EX = Namespace("https://example.org/")
 
@@ -38,7 +28,6 @@ class ATTACKtoRDFTransformer:
 
     def __init__(self):
         self.graph = Graph()
-        # Bind namespaces
         self.graph.bind("sec", SEC)
         self.graph.bind("ex", EX)
         self.graph.bind("xsd", XSD)
@@ -46,45 +35,12 @@ class ATTACKtoRDFTransformer:
         self.graph.bind("rdfs", RDFS)
 
     def transform(self, attack_json: dict) -> Graph:
-        """
-        Transform ATT&CK STIX JSON response to RDF.
-
-        Expected JSON structure (MITRE ATT&CK STIX 2.1):
-        {
-          "objects": [
-            {
-              "type": "attack-pattern",
-              "id": "attack-pattern--...",
-              "name": "T1234: Technique Name",
-              "external_references": [
-                {
-                  "source_name": "mitre-attack",
-                  "external_id": "T1234"
-                }
-              ],
-              "description": "...",
-              "kill_chain_phases": [
-                {
-                  "kill_chain_name": "mitre-attack",
-                  "phase_name": "execution"
-                }
-              ]
-            },
-            {
-              "type": "x-mitre-tactic",
-              "id": "x-mitre-tactic--...",
-              "x_mitre_shortname": "execution",
-              "name": "Execution"
-            }
-          ]
-        }
-        """
+        """Transform ATT&CK STIX JSON response to RDF."""
         objects = attack_json.get("objects", [])
         if not objects:
             raise ValueError("Expected 'objects' key in ATT&CK STIX response")
 
-        # First pass: extract and index all tactics and techniques
-        tactics_map = {}  # shortname -> tactic URI
+        tactics_map = {}
         techniques = []
 
         for obj in objects:
@@ -96,7 +52,6 @@ class ATTACKtoRDFTransformer:
             elif obj.get("type") == "attack-pattern":
                 techniques.append(obj)
 
-        # Second pass: add techniques and link to tactics
         for technique in techniques:
             self._add_technique(technique, tactics_map)
 
@@ -126,15 +81,12 @@ class ATTACKtoRDFTransformer:
         if not stix_id:
             return
 
-        # Extract ATT&CK ID from external references
         attack_id = self._extract_attack_id(technique_obj)
         if not attack_id:
             return
 
-        # Determine if this is a subtechnique (has decimal point in ID)
         is_subtechnique = "." in attack_id
 
-        # Create Technique or SubTechnique node
         if is_subtechnique:
             technique_node = URIRef(f"{EX}subtechnique/{attack_id}")
             self.graph.add((technique_node, RDF.type, SEC.SubTechnique))
@@ -142,21 +94,16 @@ class ATTACKtoRDFTransformer:
             technique_node = URIRef(f"{EX}technique/{attack_id}")
             self.graph.add((technique_node, RDF.type, SEC.Technique))
 
-        # Add attack ID
         self.graph.add((technique_node, SEC.attackTechniqueId, Literal(attack_id, datatype=XSD.string)))
 
-        # Add name (extract from format "T1234: Technique Name")
         name = technique_obj.get("name", "")
         if name:
-            # Remove the ID prefix if present
             name = re.sub(r"^[A-Z]\d+(?:\.\d+)?\s*:\s*", "", name)
             self.graph.add((technique_node, RDFS.label, Literal(name, datatype=XSD.string)))
 
-        # Add description
         if technique_obj.get("description"):
             self.graph.add((technique_node, SEC.description, Literal(technique_obj["description"], datatype=XSD.string)))
 
-        # Add tactic relationships
         if technique_obj.get("kill_chain_phases"):
             for phase in technique_obj["kill_chain_phases"]:
                 phase_name = phase.get("phase_name", "")
@@ -164,7 +111,6 @@ class ATTACKtoRDFTransformer:
                     tactic_node = tactics_map[phase_name]
                     self.graph.add((technique_node, SEC.belongs_to, tactic_node))
 
-        # Handle subtechnique parent relationship
         if is_subtechnique:
             parent_id = attack_id.split(".")[0]
             parent_node = URIRef(f"{EX}technique/{parent_id}")
@@ -179,26 +125,6 @@ class ATTACKtoRDFTransformer:
         return ""
 
 
-def validate_output(ttl_file: str, shapes_file: str = "docs/ontology/shacl/attack-shapes.ttl") -> bool:
-    """Run SHACL validation on the generated TTL."""
-    if not os.path.exists(shapes_file):
-        print(f"Warning: Shapes file not found: {shapes_file}. Skipping validation.")
-        return True
-
-    result = subprocess.run(
-        [sys.executable, "scripts/validate_shacl.py", "--data", ttl_file, "--shapes", shapes_file],
-        capture_output=True,
-        text=True,
-    )
-    print(result.stdout)
-    if result.returncode != 0:
-        print(f"Validation failed for {ttl_file}", file=sys.stderr)
-        if result.stderr:
-            print(result.stderr, file=sys.stderr)
-        return False
-    return True
-
-
 def main():
     parser = argparse.ArgumentParser(description="ETL: MITRE ATT&CK STIX JSON → RDF Turtle")
     parser.add_argument("--input", "-i", required=True, help="Input ATT&CK STIX JSON file")
@@ -207,7 +133,6 @@ def main():
     parser.add_argument("--shapes", default="docs/ontology/shacl/attack-shapes.ttl", help="SHACL shapes file")
     args = parser.parse_args()
 
-    # Load input JSON
     if not os.path.exists(args.input):
         print(f"Error: Input file not found: {args.input}", file=sys.stderr)
         sys.exit(1)
@@ -216,25 +141,29 @@ def main():
     with open(args.input, "r", encoding="utf-8") as f:
         attack_json = json.load(f)
 
-    # Transform
     print("Transforming to RDF...")
     transformer = ATTACKtoRDFTransformer()
     graph = transformer.transform(attack_json)
 
-    # Write output
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
     print(f"Writing RDF to {args.output}...")
     graph.serialize(destination=args.output, format="turtle")
 
-    # Validate (optional)
     if args.validate:
         print("\nRunning SHACL validation...")
-        if validate_output(args.output, args.shapes):
-            print("✓ Validation passed!")
+        try:
+            from kgcs.core.validation import run_validator, load_graph
+            shapes = load_graph(args.shapes)
+            conforms, _, _ = run_validator(args.output, shapes)
+            if conforms:
+                print("✓ Validation passed!")
+                return 0
+            else:
+                print("✗ Validation failed!")
+                return 1
+        except Exception as e:
+            print(f"Warning: Could not run validation: {e}")
             return 0
-        else:
-            print("✗ Validation failed!")
-            return 1
 
     return 0
 

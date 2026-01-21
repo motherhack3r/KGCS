@@ -1,10 +1,10 @@
 """Load KGCS Turtle exports into Neo4j with Core-aligned constraints.
 
 Usage examples:
-  python scripts/load_to_neo4j.py --input tmp/sample_cve.ttl \
+  python -m kgcs.utils.load_to_neo4j --input tmp/sample_cve.ttl \
       --uri bolt://localhost:7687 --user neo4j --password password
 
-  python scripts/load_to_neo4j.py --input data/cve/samples \
+  python -m kgcs.utils.load_to_neo4j --input data/cve/samples \
       --uri bolt://localhost:7687 --user neo4j --password password --database neo4j
 """
 import argparse
@@ -84,10 +84,6 @@ class TTLExtractor:
                     "vendor": literal_value(self.graph.value(subject, SEC.vendor)),
                     "product": literal_value(self.graph.value(subject, SEC.product)),
                     "version": literal_value(self.graph.value(subject, SEC.version)),
-                    "platformDeprecated": literal_value(self.graph.value(subject, SEC.platformDeprecated)),
-                    "cpeNameId": literal_value(self.graph.value(subject, SEC.cpeNameId)),
-                    "cpeCreatedDate": literal_value(self.graph.value(subject, SEC.cpeCreatedDate)),
-                    "cpeLastModifiedDate": literal_value(self.graph.value(subject, SEC.cpeLastModifiedDate)),
                 }
             )
             rows.append({"uri": str(subject), "cpeUri": cpe_uri, "props": props})
@@ -105,11 +101,6 @@ class TTLExtractor:
                     "configurationCriteria": literal_value(self.graph.value(subject, SEC.configurationCriteria)),
                     "versionStartIncluding": literal_value(self.graph.value(subject, SEC.versionStartIncluding)),
                     "versionEndIncluding": literal_value(self.graph.value(subject, SEC.versionEndIncluding)),
-                    "versionStartExcluding": literal_value(self.graph.value(subject, SEC.versionStartExcluding)),
-                    "versionEndExcluding": literal_value(self.graph.value(subject, SEC.versionEndExcluding)),
-                    "configurationStatus": literal_value(self.graph.value(subject, SEC.configurationStatus)),
-                    "configCreatedDate": literal_value(self.graph.value(subject, SEC.configCreatedDate)),
-                    "configLastModifiedDate": literal_value(self.graph.value(subject, SEC.configLastModifiedDate)),
                 }
             )
             rows.append({"uri": str(subject), "matchCriteriaId": match_id, "props": props})
@@ -143,15 +134,6 @@ class TTLExtractor:
                     "vectorString": literal_value(self.graph.value(subject, SEC.vectorString)),
                     "baseScore": literal_value(self.graph.value(subject, SEC.baseScore)),
                     "baseSeverity": literal_value(self.graph.value(subject, SEC.baseSeverity)),
-                    "attackVector": literal_value(self.graph.value(subject, SEC.attackVector)),
-                    "attackComplexity": literal_value(self.graph.value(subject, SEC.attackComplexity)),
-                    "privilegesRequired": literal_value(self.graph.value(subject, SEC.privilegesRequired)),
-                    "userInteraction": literal_value(self.graph.value(subject, SEC.userInteraction)),
-                    "scope": literal_value(self.graph.value(subject, SEC.scope)),
-                    "confidentialityImpact": literal_value(self.graph.value(subject, SEC.confidentialityImpact)),
-                    "integrityImpact": literal_value(self.graph.value(subject, SEC.integrityImpact)),
-                    "availabilityImpact": literal_value(self.graph.value(subject, SEC.availabilityImpact)),
-                    "exploitMaturity": literal_value(self.graph.value(subject, SEC.exploitMaturity)),
                 }
             )
             rows.append({"uri": str(subject), "props": props})
@@ -213,22 +195,6 @@ class Neo4jLoader:
         with self.driver.session(database=self.database) as session:
             try:
                 session.run("CREATE CONSTRAINT platform_cpe IF NOT EXISTS FOR (p:Platform) REQUIRE p.cpeUri IS UNIQUE")
-            except Exception as e:
-                print(f"Warning: Constraint query failed (may already exist): {e}", file=sys.stderr)
-            try:
-                session.run("CREATE CONSTRAINT config_match IF NOT EXISTS FOR (c:PlatformConfiguration) REQUIRE c.matchCriteriaId IS UNIQUE")
-            except Exception as e:
-                print(f"Warning: Constraint query failed (may already exist): {e}", file=sys.stderr)
-            try:
-                session.run("CREATE CONSTRAINT vuln_cve IF NOT EXISTS FOR (v:Vulnerability) REQUIRE v.cveId IS UNIQUE")
-            except Exception as e:
-                print(f"Warning: Constraint query failed (may already exist): {e}", file=sys.stderr)
-            try:
-                session.run("CREATE CONSTRAINT score_uri IF NOT EXISTS FOR (s:VulnerabilityScore) REQUIRE s.uri IS UNIQUE")
-            except Exception as e:
-                print(f"Warning: Constraint query failed (may already exist): {e}", file=sys.stderr)
-            try:
-                session.run("CREATE CONSTRAINT reference_url IF NOT EXISTS FOR (r:Reference) REQUIRE r.url IS UNIQUE")
             except Exception as e:
                 print(f"Warning: Constraint query failed (may already exist): {e}", file=sys.stderr)
 
@@ -332,26 +298,6 @@ class Neo4jLoader:
                 """,
                 rows=edges["config_vulnerability"],
             )
-        if edges.get("vulnerability_score"):
-            session.run(
-                """
-                UNWIND $rows AS row
-                MATCH (v:Vulnerability {cveId: row.cveId})
-                MATCH (s:VulnerabilityScore {uri: row.score_uri})
-                MERGE (v)-[:SCORED_BY]->(s)
-                """,
-                rows=edges["vulnerability_score"],
-            )
-        if edges.get("vulnerability_reference"):
-            session.run(
-                """
-                UNWIND $rows AS row
-                MATCH (v:Vulnerability {cveId: row.cveId})
-                MATCH (r:Reference {url: row.url})
-                MERGE (v)-[:REFERENCES]->(r)
-                """,
-                rows=edges["vulnerability_reference"],
-            )
 
 
 def parse_args():
@@ -361,7 +307,7 @@ def parse_args():
     parser.add_argument("--user", default=os.getenv("NEO4J_USER", "neo4j"), help="Neo4j user")
     parser.add_argument("--password", default=os.getenv("NEO4J_PASSWORD"), help="Neo4j password")
     parser.add_argument("--database", default=os.getenv("NEO4J_DATABASE"), help="Neo4j database name")
-    parser.add_argument("--dry-run", action="store_true", help="Parse TTL and report counts without writing to Neo4j")
+    parser.add_argument("--dry-run", action="store_true", help="Parse TTL without writing to Neo4j")
     return parser.parse_args()
 
 
@@ -383,7 +329,7 @@ def main():
             g.parse(path, format="turtle")
             data = TTLExtractor(g).extract()
             extractor_data.append((path, data))
-            print(f"Parsed {path}: platforms={len(data['platforms'])}, configs={len(data['configurations'])}, vulns={len(data['vulnerabilities'])}, scores={len(data['scores'])}, refs={len(data['references'])}")
+            print(f"Parsed {path}: platforms={len(data['platforms'])}, configs={len(data['configurations'])}, vulns={len(data['vulnerabilities'])}")
         except Exception as e:
             print(f"Error parsing {path}: {e}", file=sys.stderr)
             continue
