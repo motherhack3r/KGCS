@@ -20,7 +20,7 @@ PowerShell:
 python -m pip install --upgrade pip; pip install rdflib pyshacl
 foreach ($f in Get-ChildItem -Path 'data/shacl-samples' -Filter '*.ttl') {
   Write-Host "Validating $($f.FullName)";
-  python scripts/validate_shacl.py --data $f.FullName --shapes docs/ontology/shacl/kgcs-shapes.ttl
+  python -m src.cli.validate --data $f.FullName --shapes docs/ontology/shacl/kgcs-shapes.ttl
 }
 ```
 
@@ -31,7 +31,7 @@ python -m pip install --upgrade pip
 pip install rdflib pyshacl
 for f in data/shacl-samples/*.ttl; do
   echo "Validating $f"
-  python scripts/validate_shacl.py --data "$f" --shapes docs/ontology/shacl/kgcs-shapes.ttl
+  python -m src.cli.validate --data "$f" --shapes docs/ontology/shacl/kgcs-shapes.ttl
 done
 ```
 
