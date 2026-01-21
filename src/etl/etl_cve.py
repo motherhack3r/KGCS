@@ -3,6 +3,15 @@
 Transforms official NVD CVE API JSON (2.0) into RDF triples conforming to the
 Core Ontology Vulnerability/VulnerabilityScore classes.
 
+**IMPORTANT: This transformer assumes PlatformConfiguration entities have been created
+by etl_cpematch.py. CVE records reference existing PlatformConfiguration nodes by
+matchCriteriaId (foreign key relationship).**
+
+Recommended ingestion order:
+  1. etl_cpe.py       → Create Platform nodes from CPE definitions
+  2. etl_cpematch.py  → Create PlatformConfiguration nodes from match criteria
+  3. etl_cve.py       → Create Vulnerability nodes (references existing configs)
+
 Usage:
     python -m src.etl.etl_cve --input data/cve/raw/cve-api-response.json \
                               --output data/cve/samples/cve-output.ttl \
@@ -115,60 +124,20 @@ class CVEtoRDFTransformer:
                     self._add_configuration(vuln_node, match)
 
     def _add_configuration(self, vuln_node, cpe_match: dict):
-        """Add a single PlatformConfiguration affected by this vulnerability."""
+        """Reference an existing PlatformConfiguration by matchCriteriaId.
+        
+        This assumes the PlatformConfiguration has already been created by the
+        CPEMatch ETL transformer. The CVE transformer simply links the vulnerability
+        to the pre-existing configuration.
+        """
         match_id = cpe_match.get('matchCriteriaId', '')
         if not match_id:
             return
 
+        # Reference the PlatformConfiguration created by etl_cpematch.py
         config_node = URIRef(f"{EX}platformConfiguration/{match_id}")
-        self.graph.add((config_node, RDF.type, SEC.PlatformConfiguration))
-        self.graph.add((config_node, SEC.matchCriteriaId, Literal(match_id, datatype=XSD.string)))
 
-        cpe_criteria = cpe_match.get('criteria')
-        if cpe_criteria:
-            self.graph.add((config_node, SEC.configurationCriteria, Literal(cpe_criteria, datatype=XSD.string)))
-            platform_id = cpe_match.get('cpeNameId') or urllib.parse.quote(cpe_criteria, safe='')
-            platform_node = URIRef(f"{EX}platform/{platform_id}")
-            self.graph.add((platform_node, RDF.type, SEC.Platform))
-            self.graph.add((platform_node, SEC.CPEUri, Literal(cpe_criteria, datatype=XSD.string)))
-            self.graph.add((config_node, SEC.matchesPlatform, platform_node))
-
-        if cpe_match.get('versionStartIncluding'):
-            self.graph.add((config_node, SEC.versionStartIncluding, Literal(cpe_match['versionStartIncluding'], datatype=XSD.string)))
-        if cpe_match.get('versionEndIncluding'):
-            self.graph.add((config_node, SEC.versionEndIncluding, Literal(cpe_match['versionEndIncluding'], datatype=XSD.string)))
-        if cpe_match.get('versionStartExcluding'):
-            self.graph.add((config_node, SEC.versionStartExcluding, Literal(cpe_match['versionStartExcluding'], datatype=XSD.string)))
-        if cpe_match.get('versionEndExcluding'):
-            self.graph.add((config_node, SEC.versionEndExcluding, Literal(cpe_match['versionEndExcluding'], datatype=XSD.string)))
-
-        if cpe_match.get('status'):
-            self.graph.add((config_node, SEC.configurationStatus, Literal(cpe_match['status'], datatype=XSD.string)))
-
-        if cpe_match.get('created'):
-            try:
-                created = datetime.fromisoformat(cpe_match['created'].replace('Z', '+00:00'))
-                self.graph.add((config_node, SEC.configCreatedDate, Literal(created, datatype=XSD.dateTime)))
-            except Exception:
-                pass
-
-        if cpe_match.get('lastModified'):
-            try:
-                modified = datetime.fromisoformat(cpe_match['lastModified'].replace('Z', '+00:00'))
-                self.graph.add((config_node, SEC.configLastModifiedDate, Literal(modified, datatype=XSD.dateTime)))
-            except Exception:
-                pass
-
-        for match in cpe_match.get('matches', []):
-            match_cpe = match.get('cpeName')
-            if not match_cpe:
-                continue
-            match_platform_id = match.get('cpeNameId') or urllib.parse.quote(match_cpe, safe='')
-            match_platform_node = URIRef(f"{EX}platform/{match_platform_id}")
-            self.graph.add((match_platform_node, RDF.type, SEC.Platform))
-            self.graph.add((match_platform_node, SEC.CPEUri, Literal(match_cpe, datatype=XSD.string)))
-            self.graph.add((config_node, SEC.matchesPlatform, match_platform_node))
-
+        # Create the relationship: Vulnerability --(affected_by)--> PlatformConfiguration
         self.graph.add((config_node, SEC.affected_by, vuln_node))
 
     def _add_references(self, vuln_node, references: list):
