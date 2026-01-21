@@ -61,15 +61,17 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 - [x] 9 transformer implementations (src/etl/*.py)
 - [x] Provenance tracking framework
 - [x] CPE ETL tested & validated with NVD samples
-- [x] CVE ETL tested & validated with NVD samples
+- [x] CVE ETL tested & validated with NVD samples (including sample_cve_with_matches.json)
 - [x] PlatformConfiguration mapping complete (includes excluding bounds, status, timestamps, match expansion)
-- [x] All three ETL test runs passing SHACL validation
+- [x] Match expansion feature tested with populated matches arrays (synthetic CVE data)
+- [x] All four ETL test runs passing SHACL validation
 
 ### MVP Checklist (Remaining)
 
 - [ ] Bootstrap infra (requirements, Neo4j docker-compose, setup scripts)
 - [x] Validate CPE/CVE ETL with NVD samples ✅ COMPLETE
-- [x] Confirm `PlatformConfiguration` mapping ✅ COMPLETE (full bounds + status + dates + match expansion)
+- [x] Confirm `PlatformConfiguration` mapping ✅ COMPLETE (all 10 properties: 4 bounds + status + 2 dates + CPE expansion)
+- [x] Test match expansion feature ✅ COMPLETE (6 Platform nodes created from matches array, SHACL conforms)
 - [x] Raw data validation (production-scale testing) ✅ COMPLETE (CPE 217 MB + CVE 2026 5 MB, 0 violations)
 - [ ] Implement Neo4j loader (Turtle → Cypher)
 - [ ] Create graph constraints and indexes

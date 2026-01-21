@@ -1,0 +1,102 @@
+{
+  "resultsPerPage": 2,
+  "startIndex": 0,
+  "totalResults": 2,
+  "format": "NVD_CVE",
+  "version": "2.0",
+  "timestamp": "2026-01-21T00:00:00Z",
+  "vulnerabilities": [
+    {
+      "cve": {
+        "id": "CVE-2026-9999",
+        "sourceIdentifier": "nvd@nist.gov",
+        "published": "2026-01-21T00:00:00Z",
+        "lastModified": "2026-01-21T00:00:00Z",
+        "vulnStatus": "Active",
+        "descriptions": [
+          {
+            "lang": "en",
+            "value": "Test CVE with populated matches array for validation"
+          }
+        ],
+        "metrics": {},
+        "references": [],
+        "weaknesses": [],
+        "configurations": [
+          {
+            "operator": "AND",
+            "nodes": [
+              {
+                "operator": "OR",
+                "cpeMatch": [
+                  {
+                    "vulnerable": true,
+                    "criteria": "cpe:2.3:a:vendor:product:1.0:*:*:*:*:*:*:*",
+                    "matchCriteriaId": "A1B2C3D4-1111-2222-3333-444444444444",
+                    "versionStartIncluding": "1.0",
+                    "versionEndExcluding": "2.0",
+                    "matches": [
+                      {
+                        "cpeName": "cpe:2.3:a:vendor:product:1.0:*:*:*:*:*:*:*",
+                        "cpeNameId": "vendor-product-1.0-001"
+                      },
+                      {
+                        "cpeName": "cpe:2.3:a:vendor:product:1.0.1:*:*:*:*:*:*:*",
+                        "cpeNameId": "vendor-product-1.0.1-001"
+                      },
+                      {
+                        "cpeName": "cpe:2.3:a:vendor:product:1.0.2:*:*:*:*:*:*:*",
+                        "cpeNameId": "vendor-product-1.0.2-001"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "cve": {
+        "id": "CVE-2026-8888",
+        "sourceIdentifier": "nvd@nist.gov",
+        "published": "2026-01-21T00:00:00Z",
+        "lastModified": "2026-01-21T00:00:00Z",
+        "vulnStatus": "Active",
+        "descriptions": [
+          {
+            "lang": "en",
+            "value": "Another test CVE with multiple configurations"
+          }
+        ],
+        "metrics": {},
+        "references": [],
+        "weaknesses": [],
+        "configurations": [
+          {
+            "operator": "OR",
+            "nodes": [
+              {
+                "operator": "OR",
+                "cpeMatch": [
+                  {
+                    "vulnerable": true,
+                    "criteria": "cpe:2.3:a:another_vendor:another_product:2.0:*:*:*:*:*:*:*",
+                    "matchCriteriaId": "B2C3D4E5-5555-6666-7777-888888888888",
+                    "matches": [
+                      {
+                        "cpeName": "cpe:2.3:a:another_vendor:another_product:2.0:*:*:*:*:*:*:*",
+                        "cpeNameId": "another-product-2.0-001"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
