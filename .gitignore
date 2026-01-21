@@ -39,6 +39,12 @@ ENV/
 env/
 .venv
 
+# Configuration (secrets)
+.env
+.env.local
+.env.*.local
+config.local.py
+
 # IDEs
 .vscode/
 .idea/
