@@ -18,8 +18,9 @@ env_devel_path = Path(__file__).parent.parent.parent / ".env.devel"
 load_dotenv(env_devel_path)
 
 from src.config import neo4j_config
-from rdflib import Graph, Namespace, RDF
+from rdflib import Graph, Namespace, RDF, Literal
 from neo4j import GraphDatabase
+from datetime import datetime
 
 
 @dataclass
@@ -99,21 +100,26 @@ class RDFtoNeo4jTransformer:
         
         # Extract relationships
         for subject, predicate, obj in g:
-            # Skip if target is not a URI reference
-            if isinstance(obj, str) or hasattr(obj, 'toPython'):
+            # Skip if target is not a URI reference (literals only)
+            if isinstance(obj, Literal):
                 continue
             
             predicate_name = str(predicate).split('#')[-1]
             
-            # Known relationship predicates
-            if predicate_name in ['affects_by', 'scored_by', 'references', 'caused_by', 'mitigated_by']:
-                self.relationships.append(RelationshipData(
-                    source_uri=str(subject),
-                    target_uri=str(obj),
-                    relationship_type=predicate_name.upper(),
-                    properties={}
-                ))
-                self.stats['relationships'] += 1
+            # Convert predicate to relationship type (UPPER_SNAKE_CASE)
+            rel_type = self._predicate_to_relationship(predicate_name)
+            
+            # Skip internal RDF predicates
+            if rel_type in ['TYPE', 'VALUE', 'LABEL']:
+                continue
+            
+            self.relationships.append(RelationshipData(
+                source_uri=str(subject),
+                target_uri=str(obj),
+                relationship_type=rel_type,
+                properties={}
+            ))
+            self.stats['relationships'] += 1
         
         print(f"   * Platforms: {self.stats['platforms']}")
         print(f"   * Vulnerabilities: {self.stats['vulnerabilities']}")
@@ -181,14 +187,56 @@ class RDFtoNeo4jTransformer:
         self.nodes[uri] = NodeData(label='Reference', uri=uri, properties=properties)
         self.stats['references'] += 1
     
-    def _parse_literal(self, obj) -> Optional[any]:
-        """Parse RDF literal to Python value."""
-        if hasattr(obj, 'toPython'):
-            return obj.toPython()
+    def _parse_literal(self, obj):
+        """Parse RDF literal to Python value with proper type conversion."""
+        if isinstance(obj, Literal):
+            # Get the datatype
+            datatype = obj.datatype
+            value = obj.toPython()
+            
+            # Handle XSD datatypes
+            if datatype:
+                datatype_str = str(datatype)
+                
+                # Boolean
+                if 'boolean' in datatype_str:
+                    return isinstance(value, bool) and value or str(value).lower() in ('true', '1', 'yes')
+                
+                # Numeric types
+                if 'integer' in datatype_str or 'int' in datatype_str:
+                    try:
+                        return int(value)
+                    except (ValueError, TypeError):
+                        return value
+                
+                if 'float' in datatype_str or 'double' in datatype_str:
+                    try:
+                        return float(value)
+                    except (ValueError, TypeError):
+                        return value
+                
+                # DateTime types
+                if any(x in datatype_str for x in ['dateTime', 'datetime', 'date', 'time']):
+                    if isinstance(value, datetime):
+                        return value.isoformat()
+                    return str(value)
+            
+            # Default: return toPython() result
+            return value
+        
         elif isinstance(obj, str):
             return obj
         else:
             return str(obj)
+    
+    def _predicate_to_relationship(self, predicate_name: str) -> str:
+        """Convert RDF predicate name to Neo4j relationship type (UPPER_SNAKE_CASE)."""
+        # Convert camelCase or snake_case to UPPER_SNAKE_CASE
+        import re
+        # Insert underscore before uppercase letters
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', predicate_name)
+        # Insert underscore before uppercase in sequences
+        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).upper()
     
     def load_to_neo4j(self, driver) -> bool:
         """Load nodes and relationships into Neo4j."""
