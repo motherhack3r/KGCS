@@ -110,3 +110,20 @@ Pull requests are welcome. Please follow the style guidelines in ontology and ke
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
+
+**Roadmap**
+
+- **Short-term (03 months):** Complete CI SHACL gating, add missing per-OWL positive/negative samples, and automate validator runs in `scripts/`.
+- **Mid-term (39 months):** Expand modular OWL coverage (additional standards), automate ingestion pipelines, add RAG enforcement hooks, and produce more example traversal templates.
+- **Long-term (918 months):** Build a web UI for traversal visualization, full CI enforcement for OWL/SHACL changes, and integrate explainable LLM-backed query interfaces.
+
+**Current Status**
+
+- **Core Ontology:** Modular OWL files and core invariants are implemented under `docs/ontology/`.
+- **SHACL Validation:** Validation scripts exist (`scripts/validate_shacl.py`), and machine-readable reports are stored in `artifacts/`; CI gating is scaffolded but not fully enforced.
+- **Ingestion:** ETL/ingest scripts for standards live in `scripts/` (e.g., `etl_cve.py`, `etl_cpe.py`); they work manually and need automation/orchestration.
+- **RAG Safety:** Traversal templates and safety rules are documented; runtime enforcement and query-time validation remain to be completed.
+- **Integrations & UI:** Neo4j loader and sample data are present; a production UI is planned but not yet implemented.
+
+_For detailed technical documentation, please refer to the files in the `docs/` directory._
+_The document KGCS.md provides a comprehensive overview of the architecture and design principles._
