@@ -8,10 +8,8 @@ import sys
 import os
 import argparse
 
-# Add src to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..', 'src'))
-
-from kgcs.ingest.pipeline import ingest_file, ingest_directory
+# Import from src modules
+from src.ingest.pipeline import ingest_file, ingest_directory
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

@@ -5,7 +5,7 @@ Provides both programmatic and CLI interfaces for validating and ingesting RDF d
 
 import argparse
 import os
-from kgcs.ingest import ingest_file, ingest_directory
+from src.ingest import ingest_file, ingest_directory
 
 
 def default_indexer(data_file: str) -> None:

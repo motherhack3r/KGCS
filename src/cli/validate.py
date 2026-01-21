@@ -7,10 +7,8 @@ Entry point: python -m kgcs.cli.validate or python scripts/validate_shacl_cli.py
 import sys
 import os
 
-# Add src to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..', 'src'))
-
-from kgcs.core.validation import parse_args, load_graph, run_validator, TEMPLATE_SHAPE_MAP
+# Import from src modules
+from src.core.validation import parse_args, run_validator, TEMPLATE_SHAPE_MAP
 
 if __name__ == '__main__':
     args = parse_args()

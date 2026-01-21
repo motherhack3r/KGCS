@@ -7,11 +7,10 @@ with extensible modules for temporal, contextual, and inference-driven use cases
 __version__ = "0.3.0"
 __author__ = "KGCS Team"
 
-from kgcs.core.validation import validate_data, run_validator
-from kgcs.ingest.pipeline import ingest_file, ingest_directory
+from src.core.validation import run_validator
+from src.ingest.pipeline import ingest_file, ingest_directory
 
 __all__ = [
-    'validate_data',
     'run_validator',
     'ingest_file',
     'ingest_directory',

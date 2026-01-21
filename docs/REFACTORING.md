@@ -80,7 +80,7 @@ ingest_directory(data_dir, indexer, shapes_file, output) -> (success, fail)
 
 ### 4. Package Initialization
 
-- **src/kgcs/__init__.py:** Exports public API
+- **`src/kgcs/__init__.py`:** Exports public API
 
 ```python
 from kgcs.core.validation import validate_data, run_validator
@@ -153,4 +153,3 @@ python scripts/validate_shacl.py --list-templates  # Still works (with deprecati
 
 **Prepared by:** GitHub Copilot  
 **Refactoring Status:** Complete and Tested
-

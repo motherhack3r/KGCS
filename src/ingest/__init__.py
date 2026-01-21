@@ -5,7 +5,7 @@ Enforces validation before writes, aborts on invalid input, and logs to artifact
 
 import os
 from typing import Callable, Optional
-from kgcs.core.validation import run_validator, load_graph
+from src.core.validation import run_validator, load_graph
 
 
 def validate_before_ingest(data_file: str, shapes_file: str = 'docs/ontology/shacl/kgcs-shapes.ttl', output: str = 'artifacts') -> bool:
