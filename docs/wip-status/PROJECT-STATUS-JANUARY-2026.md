@@ -10,6 +10,7 @@
 KGCS (Cybersecurity Knowledge Graph) has successfully completed Phase 1 (core ontologies) and Phase 2 (SHACL validation framework). All 9 authoritative security standards are now ontologically represented and validated. Phase 3 (data ingestion) infrastructure is in place with ETL wrappers for all standards; actual implementations and Neo4j integration remain. Phases 4-5 (extensions, AI integration) are designed but not yet implemented.
 
 **Key Metrics:**
+
 - **11 OWL Ontologies** — Core + 1 bridge + 9 standards (Phase 1) ✅
 - **25+ SHACL Shapes** — Validation rules for Core, standards, RAG templates (Phase 2) ✅
 - **36 Test Cases** — Positive/negative samples for regression testing (Phase 2) ✅
@@ -26,7 +27,7 @@ KGCS (Cybersecurity Knowledge Graph) has successfully completed Phase 1 (core on
 All core ontologies are complete, aligned 1:1 with external standards, and immutable for Phases 2–5.
 
 | Standard | File | Classes | Status |
-|----------|------|---------|--------|
+| -------- | ---- | ------- | ------ |
 | **CPE** | cpe-ontology-v1.0.owl | Platform, Deprecated, isVariantOf | ✅ Complete |
 | **CVE** | cve-ontology-v1.0.owl | Vulnerability, PlatformConfiguration, VulnerabilityScore (v2/3.1/4.0), Reference | ✅ Complete |
 | **CWE** | cwe-ontology-v1.0.owl | Weakness, WeaknessView, parent_of, member_of | ✅ Complete |
@@ -39,7 +40,8 @@ All core ontologies are complete, aligned 1:1 with external standards, and immut
 | **Core Extended** | core-ontology-extended-v1.0.owl | Integrates all 9 above with causal chain | ✅ Complete |
 | **Defense Semantics** | defense-semantics-extension-v1.0.owl | Bridge relationships (mitigates, detects, counters) | ✅ Complete |
 
-### Key Features:
+### Key Features
+
 - **1:1 Standards Alignment:** Every class maps directly to authoritative JSON/STIX
 - **Immutable:** Frozen per Copilot instructions; no changes across phases
 - **Causal Chain:** CPE → CVE → CWE → CAPEC → ATT&CK → {D3FEND, CAR, SHIELD, ENGAGE}
@@ -57,7 +59,7 @@ All validation rules are in place, test coverage is comprehensive, CI/CD is inte
 ### 2.1 SHACL Shapes Suite
 
 | Component | File | Rules | Status |
-|-----------|------|-------|--------|
+| --------- | ---- | ----- | ------ |
 | **Core Ontology Shapes** | core-shapes.ttl, core-extended-shapes.ttl | 8 | ✅ Complete |
 | **Standard Ontology Shapes** | cpe-shapes.ttl, cve-shapes.ttl, cwe-shapes.ttl, capec-shapes.ttl, attck-shapes.ttl | 12 | ✅ Complete |
 | **Defense/Detection/Deception Shapes** | d3fend-shapes.ttl, car-shapes.ttl, shield-shapes.ttl, engage-shapes.ttl | 8 | ✅ Complete |
@@ -69,7 +71,7 @@ All validation rules are in place, test coverage is comprehensive, CI/CD is inte
 ### 2.2 Test Datasets
 
 | Category | Count | Examples | Status |
-|----------|-------|----------|--------|
+| -------- | ----- | -------- | ------ |
 | **Positive Samples** | 13 | good-example.ttl, cpe-good.ttl, cve-good.ttl, ..., d3fend-good.ttl | ✅ All Pass |
 | **Negative Samples** | 13 | bad-example.ttl, cpe-bad.ttl, cve-bad.ttl, ..., engage-bad.ttl | ✅ All Fail (Expected) |
 | **RAG Template Samples** | 14 | t1_good.ttl/t1_bad.ttl, t2_good.ttl/t2_bad.ttl, ..., t7_good.ttl/t7_bad.ttl | ✅ T1-T7 Passing |
@@ -81,7 +83,7 @@ All validation rules are in place, test coverage is comprehensive, CI/CD is inte
 **Location:** artifacts/ directory
 
 | Report | Samples | Pass/Fail | Generated |
-|--------|---------|-----------|-----------|
+| ------ | ------- | --------- | --------- |
 | shacl-report-consolidated.json | Index of all reports | 31 entries | ✅ Consolidated |
 | shacl-report-cpe-*.ttl.json | 2 (good/bad) | ✅/❌ | ✅ Both |
 | shacl-report-cve-*.ttl.json | 2 (good/bad) | ✅/❌ | ✅ Both |
@@ -99,7 +101,7 @@ All validation rules are in place, test coverage is comprehensive, CI/CD is inte
 ### 2.4 Governance Artifacts
 
 | Artifact | Location | Purpose | Status |
-|----------|----------|---------|--------|
+| -------- | -------- | ------- | ------ |
 | **Rule Catalog** | docs/ontology/shacl/rule_catalog.json | Registry of 36 stable rule IDs | ✅ Complete |
 | **Failure Payload Schema** | docs/ontology/shacl/failure_payload_schema.json | Standard format for validation errors | ✅ Complete |
 | **Constraint Documentation** | docs/ontology/shacl/CONSTRAINTS.md | Human-readable constraint explanations | ✅ Complete |
@@ -110,7 +112,7 @@ All validation rules are in place, test coverage is comprehensive, CI/CD is inte
 ### 2.5 CI/CD Integration
 
 | Component | File | Status | Notes |
-|-----------|------|--------|-------|
+| --------- | ---- | ------ | ----- |
 | **GitHub Actions Workflow** | .github/workflows/shacl-validation.yml | ✅ Active | Auto-detects changed OWL files, runs pyshacl, blocks on failure |
 | **Validator Script** | scripts/validate_shacl.py | ✅ Ready | Supports --template T1-T7, --owl module, --manifest |
 | **Manifest** | docs/ontology/shacl/manifest.json / manifest.md | ✅ Complete | Maps OWL files to shapes for validation |
@@ -118,7 +120,7 @@ All validation rules are in place, test coverage is comprehensive, CI/CD is inte
 ### 2.6 ETL Pipeline Integration
 
 | Component | File | Status |
-|-----------|------|--------|
+| --------- | ---- | ------ |
 | **Ingest Pipeline** | scripts/ingest_pipeline.py | ✅ Ready with validation hooks |
 | **Validator Call** | run_validator() in pipeline | ✅ Integrated |
 | **Failure Reporting** | artifacts/ output + consolidated index | ✅ Operational |
@@ -132,7 +134,7 @@ All validation rules are in place, test coverage is comprehensive, CI/CD is inte
 ### 3.1 Infrastructure & Frameworks
 
 | Component | File | Status | Details |
-|-----------|------|--------|---------|
+| --------- | ---- | ------ | ------- |
 | **Pipeline Orchestrator** | scripts/ingest_pipeline.py | ✅ Complete | Framework for ETL execution, validation, provenance tracking |
 | **Transformer Classes** | scripts/etl/*.py | ✅ Implemented | 9 transformers (CPE, CVE, CWE, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE) with JSON→Turtle conversion |
 | **Wrapper Scripts** | scripts/etl_*.py | ✅ Complete | Public API forwarding to scripts/etl/*.py |
@@ -142,7 +144,7 @@ All validation rules are in place, test coverage is comprehensive, CI/CD is inte
 ### 3.2 ETL Scripts by Standard
 
 | Standard | Wrapper | Implementation | Transformer | Transform() Method | Get RDF() | SHACL Validate | Status |
-|----------|---------|-----------------|---------------|-------------------|-----------|-----------------|--------|
+| -------- | ------- | --------------- | ------------- | ----------------- | --------- | --------------- | ------ |
 | **CPE** | etl_cpe.py | etl/etl_cpe.py | CPEtoRDFTransformer | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Ready |
 | **CVE** | etl_cve.py | etl/etl_cve.py | CVEtoRDFTransformer | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Ready |
 | **CWE** | etl_cwe.py | etl/etl_cwe.py | CWEtoRDFTransformer | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Ready |
@@ -154,6 +156,7 @@ All validation rules are in place, test coverage is comprehensive, CI/CD is inte
 | **ENGAGE** | etl_engage.py | etl/etl_engage.py | ENGAGEtoRDFTransformer | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Ready |
 
 **Key Features (All Scripts):**
+
 - Command-line args: --input, --output, --shapes (optional), --validate (optional flag)
 - Argparse integration for CLI
 - JSON data loading (from input file)
@@ -208,7 +211,7 @@ All validation rules are in place, test coverage is comprehensive, CI/CD is inte
 ### 4.1 Completed Ontology Designs
 
 | Extension | File | Classes | Status |
-|-----------|------|---------|--------|
+| --------- | ---- | ------- | ------ |
 | **Incident** | incident-ontology-extension-v1.0.md | ObservedTechnique, DetectionEvent, IncidentTimeline | ✅ Designed |
 | **Risk** | risk-ontology-extension-v1.0.md | RiskAssessment, RiskScenario, RemediationDecision | ✅ Designed |
 | **ThreatActor** | threatactor-ontology-extension-v1.0.md | AttributionClaim, ThreatActorObservation | ✅ Designed |
@@ -216,7 +219,7 @@ All validation rules are in place, test coverage is comprehensive, CI/CD is inte
 ### 4.2 RAG Traversal Templates (Designed)
 
 | Template | Purpose | Status |
-|----------|---------|--------|
+| -------- | ------- | ------ |
 | **T1: CVE→Impact** | Affected platforms | ✅ Designed, samples exist |
 | **T2: CVE→Root Cause** | CWE chain | ✅ Designed, samples exist |
 | **T3: CWE→Attack Patterns** | CAPEC mapping | ✅ Designed, samples exist |
@@ -253,7 +256,7 @@ All validation rules are in place, test coverage is comprehensive, CI/CD is inte
 ### 5.1 Planned Components
 
 | Component | Timeline | Dependencies |
-|-----------|----------|--------------|
+| --------- | -------- | ------------ |
 | **RAG Retrieval Layer** | 3-5 days | Phase 3 Neo4j + Phase 4 templates |
 | **Explanation Generation** | 2-3 days | RAG layer + provenance data |
 | **Confidence Scoring** | 1-2 days | Source metadata (Phase 3) |
@@ -267,7 +270,7 @@ All validation rules are in place, test coverage is comprehensive, CI/CD is inte
 
 ## Critical Path & Dependencies
 
-```
+```text
 Phase 1 (Complete) ✅
     ↓ (11 OWL files, immutable)
 Phase 2 (Complete) ✅
@@ -302,7 +305,7 @@ Phase 5 (Planned 🔵)
 ## Key Metrics & Achievements
 
 | Metric | Value | Status |
-|--------|-------|--------|
+| ------ | ----- | ------ |
 | **Core Ontologies** | 11 (9 standards + Core + Bridge) | ✅ Complete |
 | **Ontology Files** | .owl files under docs/ontology/owl/ | ✅ 15 files |
 | **SHACL Shape Files** | 25+ constraint files | ✅ Complete |
@@ -320,11 +323,13 @@ Phase 5 (Planned 🔵)
 ## Known Limitations & Future Considerations
 
 ### Current Scope
+
 - **Phase 3:** No actual data ingestion yet; infrastructure only
 - **Phase 4:** Ontologies designed but not implemented
 - **Phase 5:** Designed but not started
 
 ### Future Work
+
 - **Data Quality Dashboard:** Coverage metrics, missing mappings
 - **Incremental Updates:** Only new/changed records
 - **Performance Optimization:** Batch processing, query caching
@@ -336,19 +341,23 @@ Phase 5 (Planned 🔵)
 ## Recommendations for Next Steps
 
 ### Immediate (This Week)
+
 1. **Start Phase 3 MVP** — Bootstrap infrastructure + CPE/CVE test
 2. **Parallelize** — Begin CWE/CAPEC ETL development while Neo4j integration happens
 
 ### Short-Term (Next 2-3 Weeks)
+
 1. **Complete Phase 3 MVP** — Load CPE/CVE into Neo4j, validate causal chain
 2. **Finish Phase 3 Full** — All 9 standards loaded and queryable
 3. **Design Phase 4 Loaders** — Begin extension ETL implementation
 
 ### Medium-Term (Weeks 4-6)
+
 1. **Phase 4 Implementation** — Extensions + RAG templates
 2. **Phase 5 Prep** — Dataset creation, LLM selection
 
 ### Long-Term (Weeks 6+)
+
 1. **Phase 5 Implementation** — RAG API, LLM fine-tuning, deployment
 2. **Production Hardening** — Performance, security, operational readiness
 
@@ -357,28 +366,33 @@ Phase 5 (Planned 🔵)
 ## Files & Locations Reference
 
 ### Core Documentation
+
 - **Main Design:** docs/KGCS.md (this file)
 - **Status Updates:** docs/wip-status/ (this directory)
 - **Phase 2 Quick Start:** docs/wip-status/PHASE-2-QUICK-START.md
 
 ### Ontologies
+
 - **OWL Files:** docs/ontology/owl/ (11 files)
 - **Markdown Documentation:** docs/ontology/ (*.md files)
 - **Extensions:** docs/ontology/incident/risk/threatactor*.md
 
 ### Validation
+
 - **SHACL Shapes:** docs/ontology/shacl/ (25+ TTL files)
 - **Validator Script:** scripts/validate_shacl.py
 - **Test Samples:** data/shacl-samples/ (36 TTL files)
 - **Validation Reports:** artifacts/ (31 JSON files)
 
 ### ETL & Ingestion
+
 - **Pipeline:** scripts/ingest_pipeline.py
 - **Wrappers:** scripts/etl_*.py (9 files)
 - **Implementations:** scripts/etl/ (9 files)
 - **Neo4j Loader:** scripts/load_to_neo4j.py (stub)
 
 ### CI/CD
+
 - **Workflow:** .github/workflows/shacl-validation.yml
 - **Manifest:** docs/ontology/shacl/manifest.json
 
@@ -387,6 +401,7 @@ Phase 5 (Planned 🔵)
 ## Contact & Questions
 
 For questions about:
+
 - **Ontology design** → See docs/KGCS.md sections 1-8
 - **SHACL validation** → See docs/ontology/shacl/README.md
 - **Phase 2 completion** → See docs/wip-status/PHASE-2-COMPLETE.md
