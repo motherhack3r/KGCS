@@ -42,19 +42,19 @@
 ### Codebase Additions (Phase 3)
 
 #### Test Scripts (13 total)
-1. `test_neo4j_connection.py` - Neo4j connectivity verification
-2. `test_neo4j_data_load.py` - RDF data loading test
-3. `test_causal_chain.py` - CVE→CWE verification
-4. `test_cwe_integration.py` - CWE integration and relationship creation
-5. `test_capec_integration.py` - CAPEC pattern loading and relationships
-6. `test_full_causal_chain.py` - Complete 4-layer verification
-7. `test_attack_integration.py` - ATT&CK technique loading
-8. `test_complete_chain.py` - 5-layer chain verification
-9. `test_defense_layers_integration.py` - Defense framework loading
-10. `test_extended_chain.py` - Extended chain with defenses
-11. `test_etl_pipeline.py` - Single ETL transformer testing
-12. `test_phase3_comprehensive.py` - All 9 ETL transformers
-13. `test_phase3_e2e.py` - End-to-end CPE↔CVE integration
+1. `tests/test_neo4j_connection.py` - Neo4j connectivity verification
+2. `tests/test_neo4j_data_load.py` - RDF data loading test
+3. `tests/test_causal_chain.py` - CVE→CWE verification
+4. `tests/test_cwe_integration.py` - CWE integration and relationship creation
+5. `tests/test_capec_integration.py` - CAPEC pattern loading and relationships
+6. `tests/test_full_causal_chain.py` - Complete 4-layer verification
+7. `tests/test_attack_integration.py` - ATT&CK technique loading
+8. `tests/test_complete_chain.py` - 5-layer chain verification
+9. `tests/test_defense_layers_integration.py` - Defense framework loading
+10. `tests/test_extended_chain.py` - Extended chain with defenses
+11. `tests/test_etl_pipeline.py` - Single ETL transformer testing
+12. `tests/test_phase3_comprehensive.py` - All 9 ETL transformers
+13. `tests/test_phase3_e2e.py` - End-to-end CPE↔CVE integration
 
 #### Infrastructure Code
 - `src/config.py` (180 lines) - Configuration management

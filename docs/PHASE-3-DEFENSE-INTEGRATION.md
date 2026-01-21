@@ -31,17 +31,17 @@ DEFENSE SIDE:
 
 ## Test Scripts Created
 
-### 1. test_defense_layers_integration.py
+### 1. tests/test_defense_layers_integration.py
 - **Purpose:** Load all four defense frameworks and establish relationships to ATT&CK
 - **Size:** ~420 lines
 - **Classes:** `DefenseLayerIntegration`
-- **Execution:** `python test_defense_layers_integration.py`
+- **Execution:** `python tests/test_defense_layers_integration.py`
 - **Result:** ✅ SUCCESS - All defense layers loaded (12 nodes), relationships created (3 edges)
 
-### 2. test_extended_chain.py
+### 2. tests/test_extended_chain.py
 - **Purpose:** Comprehensive verification of complete extended chain with defenses
 - **Size:** ~250 lines
-- **Execution:** `python test_extended_chain.py`
+- **Execution:** `python tests/test_extended_chain.py`
 - **Result:** ✅ SUCCESS - Complete graph verified with statistics
 
 ## Defense Layers Loaded

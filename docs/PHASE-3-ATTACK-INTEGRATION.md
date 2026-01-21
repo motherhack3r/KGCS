@@ -28,24 +28,24 @@ Verified 3+ complete end-to-end paths:
 
 ## Test Scripts Created
 
-### 1. test_attack_integration.py
+### 1. tests/test_attack_integration.py
 - **Purpose:** Load MITRE ATT&CK STIX objects and create CAPEC→Technique relationships
 - **Size:** ~280 lines
 - **Key Classes:** `ATTACKtoNeo4j`
-- **Execution:** `python test_attack_integration.py`
+- **Execution:** `python tests/test_attack_integration.py`
 - **Result:** ✅ SUCCESS - 5 techniques loaded, 4 relationships created
 
-### 2. test_complete_chain.py
+### 2. tests/test_complete_chain.py
 - **Purpose:** Verify complete 5-layer causal chain
 - **Size:** ~200 lines
-- **Execution:** `python test_complete_chain.py`
+- **Execution:** `python tests/test_complete_chain.py`
 - **Result:** ✅ SUCCESS - All 5 layers verified operational
 
 ## Code Changes
 
 ### New Files
-- `test_attack_integration.py` - ATT&CK integration test
-- `test_complete_chain.py` - 5-layer verification
+- `tests/test_attack_integration.py` - ATT&CK integration test
+- `tests/test_complete_chain.py` - 5-layer verification
 
 ### Modified Files
 - None (all new functionality isolated in test scripts)

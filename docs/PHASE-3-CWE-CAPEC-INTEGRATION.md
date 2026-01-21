@@ -6,35 +6,30 @@
 
 Successfully integrated CWE (Common Weakness Enumeration) and CAPEC (Common Attack Pattern Expression and Enumeration) data into the Neo4j knowledge graph, extending the causal chain from:
 
-```
-CPE -> CVE -> CWE -> CAPEC
-```
-
 ## Architecture
 
-### Data Flow
 
+```bash
+python tests/test_cwe_integration.py
+```
 ```
 CWE JSON (sample_cwe.json)
-    |
-    v
-CWEtoRDFTransformer (src/etl/etl_cwe.py)
-    |
     v
 5 Weakness nodes in Neo4j
     |
-    v
 CVE->CWE relationships (CAUSED_BY)
+```bash
+python tests/test_capec_integration.py
+```
     |
     v
-CAPEC JSON (sample_capec.json)
+CAPECtoNeo4j (tests/test_capec_integration.py)
     |
     v
-CAPECtoNeo4j (test_capec_integration.py)
     |
-    v
-5 AttackPattern nodes in Neo4j
-    |
+```bash
+python tests/test_full_causal_chain.py
+```
     v
 CWE->CAPEC relationships (EXPLOITED_BY)
     |
@@ -46,7 +41,7 @@ Complete Causal Chain (5 end-to-end paths verified)
 
 ### 1. CWE Integration (Weaknesses)
 
-**File:** test_cwe_integration.py
+**File:** tests/test_cwe_integration.py
 
 **Process:**
 - Load CWE JSON from `data/cwe/samples/sample_cwe.json`
@@ -86,7 +81,7 @@ Weaknesses Loaded:
 
 ### 3. CAPEC Integration (Attack Patterns)
 
-**File:** test_capec_integration.py
+**File:** tests/test_capec_integration.py
 
 **Process:**
 - Load CAPEC JSON from `data/capec/samples/sample_capec.json`
@@ -161,7 +156,7 @@ Complete Chains: 5 paths verified
 
 ## Test Scripts
 
-### test_cwe_integration.py
+### tests/test_cwe_integration.py
 - Transform CWE JSON to RDF
 - Load weakness nodes
 - Create CVE->CWE relationships
@@ -169,10 +164,10 @@ Complete Chains: 5 paths verified
 
 **Run:**
 ```bash
-python test_cwe_integration.py
+python tests/test_cwe_integration.py
 ```
 
-### test_capec_integration.py
+### tests/test_capec_integration.py
 - Load CAPEC attack patterns
 - Create attack pattern nodes
 - Link to CWE weaknesses
@@ -180,17 +175,17 @@ python test_cwe_integration.py
 
 **Run:**
 ```bash
-python test_capec_integration.py
+python tests/test_capec_integration.py
 ```
 
-### test_full_causal_chain.py
+### tests/test_full_causal_chain.py
 - Verify all four layers (CPE, CVE, CWE, CAPEC)
 - Display sample paths
 - Generate statistics
 
 **Run:**
 ```bash
-python test_full_causal_chain.py
+python tests/test_full_causal_chain.py
 ```
 
 ## Database Schema
@@ -271,22 +266,22 @@ python test_full_causal_chain.py
 
 ## Files Created
 
-- `test_cwe_integration.py` - CWE integration pipeline
-- `test_capec_integration.py` - CAPEC integration pipeline
-- `test_full_causal_chain.py` - End-to-end verification
+- `tests/test_cwe_integration.py` - CWE integration pipeline
+- `tests/test_capec_integration.py` - CAPEC integration pipeline
+- `tests/test_full_causal_chain.py` - End-to-end verification
 
 ## Verification Commands
 
 ```bash
 # Test CWE integration
-python test_cwe_integration.py
+python tests/test_cwe_integration.py
 
 # Test CAPEC integration
-python test_capec_integration.py
+python tests/test_capec_integration.py
 
 # Verify complete causal chain
-python test_full_causal_chain.py
-
+python tests/test_full_causal_chain.py
+```
 # Query causal paths in Neo4j
 cypher-shell -u neo4j -p <password> \
   "MATCH (cve)-[r1:CAUSED_BY]->(cwe)-[r2:EXPLOITED_BY]->(ap) \

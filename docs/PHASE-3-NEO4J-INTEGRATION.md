@@ -92,7 +92,7 @@ Vulnerability {
      - Automatic index/constraint creation
      - Data quality reporting
 
-2. **[test_causal_chain.py](../test_causal_chain.py)**
+2. **[tests/test_causal_chain.py](../tests/test_causal_chain.py)**
    - Verification script for Neo4j data
    - Validates:
      - Node counts by type
@@ -256,7 +256,7 @@ CREATE CONSTRAINT vulnerability_uri_unique
 ### Connection Test
 
 ```bash
-python test_neo4j_connection.py
+python tests/test_neo4j_connection.py
 # Output: SUCCESS - Connected to Neo4j 2025.12.1
 ```
 
@@ -270,7 +270,7 @@ python -m src.etl.rdf_to_neo4j
 ### Causal Chain Verification
 
 ```bash
-python test_causal_chain.py
+python tests/test_causal_chain.py
 # Output: SUCCESS - All node types verified
 ```
 
@@ -419,7 +419,7 @@ neo4j status
 cat .env.devel | grep NEO4J
 
 # Test basic connectivity
-python test_neo4j_connection.py
+python tests/test_neo4j_connection.py
 ```
 
 ### Data Quality Issues

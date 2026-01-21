@@ -53,10 +53,10 @@ All 9 ETL transformers implemented in `src/etl/`:
 Created comprehensive test scripts:
 
 ```bash
-python test_etl_pipeline.py cpe      # Test CPE ETL
-python test_etl_pipeline.py cve      # Test CVE ETL
-python test_phase3_comprehensive.py  # Test all 9 ETL transformers
-python test_phase3_e2e.py            # End-to-end CPE + CVE integration
+python tests/test_etl_pipeline.py cpe      # Test CPE ETL
+python tests/test_etl_pipeline.py cve      # Test CVE ETL
+python tests/test_phase3_comprehensive.py  # Test all 9 ETL transformers
+python tests/test_phase3_e2e.py            # End-to-end CPE + CVE integration
 ```
 
 ### 4. Data Quality Assurance (✅ Complete)
@@ -176,7 +176,7 @@ Action: Production data from NVD API will have all required fields
 1. **Obtain JSON Sample Data**
    - [ ] Download CWE, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE as JSON
    - [ ] Convert TTL samples to JSON if source data available
-   - [ ] Update `test_phase3_comprehensive.py` to test all 9 transformers
+   - [ ] Update `tests/test_phase3_comprehensive.py` to test all 9 transformers
 
 2. **Neo4j Integration** 
    - [ ] Set up Neo4j container (Docker)
@@ -212,17 +212,18 @@ Action: Production data from NVD API will have all required fields
 ## Files Created/Modified
 
 ### New Test Scripts
-- `test_etl_pipeline.py` — Single ETL transformer test
-- `test_phase3_comprehensive.py` — All 9 ETL transformers
-- `test_phase3_e2e.py` — End-to-end CPE + CVE integration
 
-### Generated Outputs
+- `tests/test_etl_pipeline.py` — Single ETL transformer test
+- `tests/test_phase3_comprehensive.py` — All 9 ETL transformers
+- `tests/test_phase3_e2e.py` — End-to-end CPE + CVE integration
+
 - `tmp/phase3_cpe.ttl` — 12,441 RDF triples from CPE
 - `tmp/phase3_cve.ttl` — 537 RDF triples from CVE
 - `tmp/phase3_combined.ttl` — 12,978 RDF triples (combined)
 - `artifacts/shacl-report-phase3_combined.ttl.json` — Validation report
 
 ### Bug Fixes
+
 - **src/etl/etl_cpe.py** — Fixed JSON structure parsing (products[].cpe)
 
 ---
