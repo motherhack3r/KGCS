@@ -1,7 +1,7 @@
 # KGCS Project Status Summary
 
-**Date:** January 21, 2026  
-**Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟡 MVP-Ready | Phase 4 🔵 Designed | Phase 5 🔵 Planned
+**Date:** January 21, 2026 (Updated)  
+**Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟡 In Progress (MVP) | Phase 4 🔵 Designed | Phase 5 🔵 Planned
 
 ## Sources
 
@@ -19,8 +19,9 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 - **25+ SHACL Shapes** — validation rules ✅
 - **36 Test Cases** — positive/negative samples ✅
 - **31 Validation Reports** — artifacts generated ✅
-- **9 ETL Wrappers + 9 Transformers** — ready ✅
-- **3 Extension Ontologies** — designed (Incident, Risk, ThreatActor)
+- **9 ETL Wrappers + 9 Transformers** — all operational ✅
+- **3 Extension Ontologies** — designed (Incident, Risk, ThreatActor) ✅
+- **3 ETL Output Reports** — CPE + CVE (sample 1) + CVE (sample 2) all PASS ✅
 
 ## Phase 1 — Core Standards (✅ Complete)
 
@@ -48,22 +49,26 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 - [x] CI validation workflow active
 - [x] Governance document finalized
 
-## Phase 3 — Data Ingestion (🟡 MVP-Ready, In Progress)
+## Phase 3 — Data Ingestion (🟡 In Progress - MVP Core)
 
-**Status:** Pipeline and ETL scaffolding complete; Neo4j integration pending.
+**Status:** CPE/CVE ETL fully operational and SHACL-validated. Neo4j loader pending.
 
 ### Completed
 
 - [x] Pipeline orchestrator with SHACL validation hooks
-- [x] 9 ETL wrapper scripts (etl_*.py)
-- [x] 9 transformer implementations (scripts/etl/*.py)
+- [x] 9 ETL wrapper scripts (src/etl/etl_*.py)
+- [x] 9 transformer implementations (src/etl/*.py)
 - [x] Provenance tracking framework
+- [x] CPE ETL tested & validated with NVD samples
+- [x] CVE ETL tested & validated with NVD samples
+- [x] PlatformConfiguration mapping complete (includes excluding bounds, status, timestamps, match expansion)
+- [x] All three ETL test runs passing SHACL validation
 
 ### MVP Checklist (Remaining)
 
 - [ ] Bootstrap infra (requirements, Neo4j docker-compose, setup scripts)
-- [ ] Validate CPE/CVE ETL with NVD samples
-- [ ] Confirm `PlatformConfiguration` mapping
+- [x] Validate CPE/CVE ETL with NVD samples ✅ COMPLETE
+- [x] Confirm `PlatformConfiguration` mapping ✅ COMPLETE (full bounds + status + dates + match expansion)
 - [ ] Implement Neo4j loader (Turtle → Cypher)
 - [ ] Create graph constraints and indexes
 - [ ] End-to-end tests (ETL → SHACL → Neo4j)
@@ -96,4 +101,11 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 
 ## Critical Path
 
-Phase 3 MVP completion is the current blocker for Phase 4–5 execution. Focus should remain on Neo4j loading and end-to-end validation.
+Phase 3 MVP completion requires:
+
+1. Neo4j loader implementation (Turtle → Cypher) — 2-3 days
+2. Graph constraints & indexes — 1-2 days
+3. End-to-end integration tests — 2-3 days
+4. CI automation — 1-2 days
+
+**Estimated timeline:** 6-10 days to production-ready Neo4j load with full CPE/CVE coverage. Phase 4–5 can begin in parallel (extension ETL, RAG framework).
