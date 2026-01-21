@@ -137,8 +137,8 @@ FILES CREATED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Production Code:
-  ✓ create_cpe_cve_relationships.py     Creates 63 AFFECTS relationships
-  ✓ verify_phase4_complete.py           Comprehensive validation suite
+  ✓ scripts/db/create_cpe_cve_relationships.py     Creates 63 AFFECTS relationships
+  ✓ scripts/db/verify_phase4_complete.py           Comprehensive validation suite
 
 Documentation:
   ✓ PHASE-4-CPE-CVE-INTEGRATION.md      Complete technical report
@@ -150,14 +150,14 @@ Configuration:
 VALIDATION RESULTS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Test: create_cpe_cve_relationships.py
+Test: scripts/db/create_cpe_cve_relationships.py
   ✓ Loaded 1,371 platform URIs
   ✓ Loaded 21 vulnerability records
   ✓ Created 63 AFFECTS relationships
   ✓ Verified complete 6-layer chain (9 paths)
   Status: PASS
 
-Test: verify_phase4_complete.py
+Test: scripts/db/verify_phase4_complete.py
   ✓ Node inventory: 1,475 total (all expected types)
   ✓ CPE→CVE coverage: 63 relationships verified
   ✓ 6-layer chain: 9 complete paths confirmed
@@ -244,7 +244,7 @@ NEXT STEPS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Optional: Test the new queries
-  1. Run verify_phase4_complete.py to see 6-layer chains in action
+  1. Run scripts/db/verify_phase4_complete.py to see 6-layer chains in action
   2. Query specific vulnerabilities per platform
   3. Explore threat propagation paths
 

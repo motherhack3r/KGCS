@@ -134,7 +134,7 @@ CPE ETL BUG FIX - FINAL VERIFICATION
 
 ### Unit Tests - ✅ 8/8 PASS
 
-Created `verify_cpe_fix.py` with comprehensive test cases:
+Created `scripts/legacy/phase4/verify_cpe_fix.py` with comprehensive test cases:
 
 ```
 [Test 1] cpe:2.3:a:adobe:acrobat:2021.001:*:*:*:*:*:*:*
@@ -180,12 +180,13 @@ Created `verify_cpe_fix.py` with comprehensive test cases:
 - **[src/etl/etl_cpe.py](src/etl/etl_cpe.py)** - Fixed indices (lines 60-70)
 
 ### Created (for diagnosis and repair)
-- **verify_cpe_fix.py** - Unit test suite (8 tests, all passing)
-- **repair_cpe_properties.py** - Initial repair script
-- **complete_cpe_repair.py** - Final comprehensive repair
-- **diagnose_cpe_mismatch.py** - Diagnostic tool
-- **check_buggy_pattern.py** - Pattern detection
-- **final_cpe_verification.py** - Comprehensive verification
+
+- **scripts/legacy/phase4/verify_cpe_fix.py** - Unit test suite (8 tests, all passing)
+- **scripts/legacy/phase4/repair_cpe_properties.py** - Initial repair script
+- **scripts/legacy/phase4/complete_cpe_repair.py** - Final comprehensive repair
+- **scripts/legacy/phase4/diagnose_cpe_mismatch.py** - Diagnostic tool
+- **scripts/legacy/phase4/check_buggy_pattern.py** - Pattern detection
+- **scripts/legacy/phase4/final_cpe_verification.py** - Comprehensive verification
 - **CPE_ETL_BUG_FIX_REPORT.md** - This report
 
 ---

@@ -101,6 +101,12 @@ Each extension lives in its own OWL file and imports the core ontology.
 * Build a UI for visualizing traversal paths.  
 * Integrate with an LLM for explainable answers.
 
+## 🧰 Operational Scripts
+
+* `scripts/db/` holds the Phase 4 helpers (`create_cpe_cve_relationships.py`, `verify_phase4_complete.py`, the `check_*` utilities, etc.) that interact with Neo4j for reproduction or diagnostics.  
+* `scripts/legacy/phase4/` archives the one-off repair/verification scripts (`repair_cpe_properties.py`, `diagnose_cpe_mismatch.py`, `check_buggy_pattern.py`, etc.) that were needed during the CPE parsing fix but are no longer part of normal ingestion.
+* Regression and integration suites now live under `tests/` so the repository root stays focused on documentation, configuration, and operational scripts.
+
 ---
 
 ## 🤝 Contributing
@@ -115,9 +121,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## **Roadmap**
 
-* **Short-term (03 months):** Complete CI SHACL gating, add missing per-OWL positive/negative samples, and automate validator runs in `src/core/`.
-* **Mid-term (39 months):** Expand modular OWL coverage (additional standards), automate ingestion pipelines, add RAG enforcement hooks, and produce more example traversal templates.
-* **Long-term (918 months):** Build a web UI for traversal visualization, full CI enforcement for OWL/SHACL changes, and integrate explainable LLM-backed query interfaces.
+* **Short-term (0-3 months):** Complete CI SHACL gating, add missing per-OWL positive/negative samples, and automate validator runs in `src/core/`.
+* **Mid-term (3-9 months):** Expand modular OWL coverage (additional standards), automate ingestion pipelines, add RAG enforcement hooks, and produce more example traversal templates.
+* **Long-term (9-18 months):** Build a web UI for traversal visualization, full CI enforcement for OWL/SHACL changes, and integrate explainable LLM-backed query interfaces.
 
 ## **Current Status**
 

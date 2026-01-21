@@ -76,7 +76,7 @@ if len(parts) >= 6 and parts[5] != '*':  # ✅ Changed from >= 7 and parts[6]
 
 ### 2. Database Repair
 
-**Script:** `repair_cpe_properties.py`
+**Script:** `scripts/legacy/phase4/repair_cpe_properties.py`
 
 **Actions:**
 1. Queried all 1,371 Platform nodes with cpeUri set
@@ -127,11 +127,13 @@ Status:     ✅ PASS
 - `src/etl/etl_cpe.py` - Fixed CPE URI parsing indices (lines 60-70)
 
 ### Repair Scripts
-- `repair_cpe_properties.py` - Repaired all 1,371 Platform nodes in database
+
+- `scripts/legacy/phase4/repair_cpe_properties.py` - Repaired all 1,371 Platform nodes in database
 
 ### Verification Scripts
-- `verify_cpe_fix.py` - Tests correct CPE parsing logic
-- `test_cpe_parsing_fix.py` - Comprehensive parsing verification
+
+- `scripts/legacy/phase4/verify_cpe_fix.py` - Tests correct CPE parsing logic
+- `tests/test_cpe_parsing_fix.py` - Comprehensive parsing verification
 
 ---
 
