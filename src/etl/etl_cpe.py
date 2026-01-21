@@ -58,15 +58,16 @@ class CPEtoRDFTransformer:
             self.graph.add((platform_node, SEC.cpeUri, Literal(cpe_name, datatype=XSD.string)))
 
         # Parse CPE string components (format: cpe:2.3:part:vendor:product:version:update:edition:...)
+        # After split by ':', indices are: [0]="cpe" [1]="2.3" [2]=part [3]=vendor [4]=product [5]=version [6]=update...
         parts = cpe_name.split(':')
+        if len(parts) >= 3:
+            self.graph.add((platform_node, SEC.platformPart, Literal(parts[2], datatype=XSD.string)))
         if len(parts) >= 4:
-            self.graph.add((platform_node, SEC.platformPart, Literal(parts[3], datatype=XSD.string)))
+            self.graph.add((platform_node, SEC.vendor, Literal(parts[3], datatype=XSD.string)))
         if len(parts) >= 5:
-            self.graph.add((platform_node, SEC.vendor, Literal(parts[4], datatype=XSD.string)))
-        if len(parts) >= 6:
-            self.graph.add((platform_node, SEC.product, Literal(parts[5], datatype=XSD.string)))
-        if len(parts) >= 7 and parts[6] != '*':
-            self.graph.add((platform_node, SEC.version, Literal(parts[6], datatype=XSD.string)))
+            self.graph.add((platform_node, SEC.product, Literal(parts[4], datatype=XSD.string)))
+        if len(parts) >= 6 and parts[5] != '*':
+            self.graph.add((platform_node, SEC.version, Literal(parts[5], datatype=XSD.string)))
 
         # Deprecation status
         if cpe.get('deprecated') is not None:

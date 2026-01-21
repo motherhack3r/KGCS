@@ -6,34 +6,34 @@ This document explains how to configure KGCS for local development and productio
 
 1. **Copy the template:**
 
-```bash
-cp .env.example .env
-```
+    ```bash
+    cp .env.example .env
+    ```
 
 2. **Edit `.env` with your Neo4j credentials:**
 
-```bash
-# Linux/Mac
-nano .env
+    ```bash
+    # Linux/Mac
+    nano .env
 
-# Windows PowerShell
-notepad .env
-```
+    # Windows PowerShell
+    notepad .env
+    ```
 
 3. **Set your Neo4j connection details:**
 
-```env
-NEO4J_URI=bolt://localhost:7687
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=your-password-here
-NEO4J_DATABASE=neo4j
-```
+    ```env
+    NEO4J_URI=bolt://localhost:7687
+    NEO4J_USER=neo4j
+    NEO4J_PASSWORD=your-password-here
+    NEO4J_DATABASE=neo4j
+    ```
 
 4. **Test the configuration:**
 
-```bash
-python -m src.config
-```
+    ```bash
+    python -m src.config
+    ```
 
 ## Configuration Hierarchy
 
@@ -46,7 +46,9 @@ KGCS loads configuration in this order (highest priority last):
 ## Configuration File
 
 ### `.env` (Local Secrets - NOT COMMITTED)
+
 Contains actual credentials and sensitive settings:
+
 ```env
 NEO4J_PASSWORD=your-actual-password
 NEO4J_URI=bolt://your-server:7687
@@ -55,7 +57,9 @@ NEO4J_URI=bolt://your-server:7687
 **IMPORTANT:** `.env` is in `.gitignore` and should NEVER be committed to git.
 
 ### `.env.example` (Template - COMMITTED)
+
 Safe template for developers to copy and customize:
+
 ```env
 NEO4J_PASSWORD=your-secure-password-here
 NEO4J_URI=bolt://localhost:7687
@@ -66,6 +70,7 @@ This file IS committed so all developers know what keys are needed.
 ## Neo4j Configuration
 
 ### Required Settings
+
 ```env
 NEO4J_URI=bolt://localhost:7687          # Connection URI
 NEO4J_USER=neo4j                          # Username
@@ -74,6 +79,7 @@ NEO4J_DATABASE=neo4j                      # Database name
 ```
 
 ### Optional Settings
+
 ```env
 NEO4J_ENCRYPTED=false                     # Use encrypted connection
 NEO4J_TRUST=TRUST_ALL_CERTIFICATES        # Certificate trust mode
@@ -81,6 +87,7 @@ NEO4J_AUTH_ENABLED=true                   # Enable authentication
 ```
 
 ### Common URIs
+
 - **Local Development:** `bolt://localhost:7687`
 - **Docker Container:** `bolt://neo4j:7687`
 - **Remote Server:** `bolt://server.example.com:7687`
@@ -111,6 +118,7 @@ LOG_FILE=logs/kgcs.log           # Log file path (optional)
 ## Using Configuration in Code
 
 ### Simple Access
+
 ```python
 from src.config import neo4j_config, etl_config, validation_config
 
