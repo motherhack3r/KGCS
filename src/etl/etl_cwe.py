@@ -4,7 +4,7 @@ Transforms official MITRE CWE (Common Weakness Enumeration) JSON into RDF triple
 conforming to the Core Ontology Weakness class.
 
 Usage:
-    python -m kgcs.etl.etl_cwe --input data/cwe/raw/cwe.json \
+    python -m src.etl.etl_cwe --input data/cwe/raw/cwe.json \
                               --output data/cwe/samples/cwe-output.ttl \
                               --validate
 """
@@ -156,7 +156,7 @@ def main():
     if args.validate:
         print("\nRunning SHACL validation...")
         try:
-            from kgcs.core.validation import run_validator, load_graph
+            from core.validation import run_validator, load_graph
             shapes = load_graph(args.shapes)
             conforms, _, _ = run_validator(args.output, shapes)
             if conforms:

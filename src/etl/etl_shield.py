@@ -3,7 +3,7 @@
 Deception techniques that counter ATT&CK techniques.
 
 Usage:
-    python -m kgcs.etl.etl_shield --input data/shield/raw/shield.json \
+    python -m src.etl.etl_shield --input data/shield/raw/shield.json \
                               --output data/shield/samples/shield-output.ttl
 """
 

@@ -3,7 +3,7 @@
 Engagement concepts for adversary interaction and strategic disruption.
 
 Usage:
-    python -m kgcs.etl.etl_engage --input data/engage/raw/engage.json \
+    python -m src.etl.etl_engage --input data/engage/raw/engage.json \
                               --output data/engage/samples/engage-output.ttl
 """
 

@@ -4,7 +4,7 @@ Transforms official MITRE CAPEC (Common Attack Pattern Enumeration and Classific
 JSON into RDF triples conforming to the Core Ontology AttackPattern class.
 
 Usage:
-    python -m kgcs.etl.etl_capec --input data/capec/raw/capec.json \
+    python -m src.etl.etl_capec --input data/capec/raw/capec.json \
                               --output data/capec/samples/capec-output.ttl \
                               --validate
 """
@@ -160,7 +160,7 @@ def main():
     if args.validate:
         print("\nRunning SHACL validation...")
         try:
-            from kgcs.core.validation import run_validator, load_graph
+            from core.validation import run_validator, load_graph
             shapes = load_graph(args.shapes)
             conforms, _, _ = run_validator(args.output, shapes)
             if conforms:

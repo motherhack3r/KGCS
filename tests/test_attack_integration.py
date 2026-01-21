@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 from dotenv import load_dotenv
 load_dotenv('.env.devel')
 
-from config import neo4j_config
+from src.config import neo4j_config
 
 
 class ATTACKtoNeo4j:

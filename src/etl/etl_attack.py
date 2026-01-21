@@ -4,7 +4,7 @@ Transforms official MITRE ATT&CK (Adversarial Tactics, Techniques, and Common Kn
 STIX 2.1 JSON into RDF triples conforming to the Core Ontology Technique/Tactic classes.
 
 Usage:
-    python -m kgcs.etl.etl_attack --input data/attack/raw/attack-stix.json \
+    python -m src.etl.etl_attack --input data/attack/raw/attack-stix.json \
                               --output data/attack/samples/attack-output.ttl \
                               --validate
 """
@@ -152,7 +152,7 @@ def main():
     if args.validate:
         print("\nRunning SHACL validation...")
         try:
-            from kgcs.core.validation import run_validator, load_graph
+            from core.validation import run_validator, load_graph
             shapes = load_graph(args.shapes)
             conforms, _, _ = run_validator(args.output, shapes)
             if conforms:

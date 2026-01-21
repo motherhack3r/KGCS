@@ -4,7 +4,7 @@ Transforms official NVD CVE API JSON (2.0) into RDF triples conforming to the
 Core Ontology Vulnerability/VulnerabilityScore classes.
 
 Usage:
-    python -m kgcs.etl.etl_cve --input data/cve/raw/cve-api-response.json \
+    python -m src.etl.etl_cve --input data/cve/raw/cve-api-response.json \
                               --output data/cve/samples/cve-output.ttl \
                               --validate
 """
@@ -127,7 +127,7 @@ class CVEtoRDFTransformer:
         cpe_criteria = cpe_match.get('criteria')
         if cpe_criteria:
             self.graph.add((config_node, SEC.configurationCriteria, Literal(cpe_criteria, datatype=XSD.string)))
-            platform_id = urllib.parse.quote(cpe_criteria, safe='')
+            platform_id = cpe_match.get('cpeNameId') or urllib.parse.quote(cpe_criteria, safe='')
             platform_node = URIRef(f"{EX}platform/{platform_id}")
             self.graph.add((platform_node, RDF.type, SEC.Platform))
             self.graph.add((platform_node, SEC.CPEUri, Literal(cpe_criteria, datatype=XSD.string)))
@@ -137,6 +137,37 @@ class CVEtoRDFTransformer:
             self.graph.add((config_node, SEC.versionStartIncluding, Literal(cpe_match['versionStartIncluding'], datatype=XSD.string)))
         if cpe_match.get('versionEndIncluding'):
             self.graph.add((config_node, SEC.versionEndIncluding, Literal(cpe_match['versionEndIncluding'], datatype=XSD.string)))
+        if cpe_match.get('versionStartExcluding'):
+            self.graph.add((config_node, SEC.versionStartExcluding, Literal(cpe_match['versionStartExcluding'], datatype=XSD.string)))
+        if cpe_match.get('versionEndExcluding'):
+            self.graph.add((config_node, SEC.versionEndExcluding, Literal(cpe_match['versionEndExcluding'], datatype=XSD.string)))
+
+        if cpe_match.get('status'):
+            self.graph.add((config_node, SEC.configurationStatus, Literal(cpe_match['status'], datatype=XSD.string)))
+
+        if cpe_match.get('created'):
+            try:
+                created = datetime.fromisoformat(cpe_match['created'].replace('Z', '+00:00'))
+                self.graph.add((config_node, SEC.configCreatedDate, Literal(created, datatype=XSD.dateTime)))
+            except Exception:
+                pass
+
+        if cpe_match.get('lastModified'):
+            try:
+                modified = datetime.fromisoformat(cpe_match['lastModified'].replace('Z', '+00:00'))
+                self.graph.add((config_node, SEC.configLastModifiedDate, Literal(modified, datatype=XSD.dateTime)))
+            except Exception:
+                pass
+
+        for match in cpe_match.get('matches', []):
+            match_cpe = match.get('cpeName')
+            if not match_cpe:
+                continue
+            match_platform_id = match.get('cpeNameId') or urllib.parse.quote(match_cpe, safe='')
+            match_platform_node = URIRef(f"{EX}platform/{match_platform_id}")
+            self.graph.add((match_platform_node, RDF.type, SEC.Platform))
+            self.graph.add((match_platform_node, SEC.CPEUri, Literal(match_cpe, datatype=XSD.string)))
+            self.graph.add((config_node, SEC.matchesPlatform, match_platform_node))
 
         self.graph.add((config_node, SEC.affected_by, vuln_node))
 
@@ -184,7 +215,7 @@ def main():
     if args.validate:
         print("\nRunning SHACL validation...")
         try:
-            from kgcs.core.validation import run_validator, load_graph
+            from core.validation import run_validator, load_graph
             shapes = load_graph(args.shapes)
             conforms, _, _ = run_validator(args.output, shapes)
             if conforms:

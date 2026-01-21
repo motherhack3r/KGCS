@@ -4,7 +4,7 @@ Transforms official NVD CPE API JSON into RDF triples conforming to the
 Core Ontology Platform/PlatformConfiguration classes.
 
 Usage:
-    python -m kgcs.etl.etl_cpe --input data/cpe/raw/cpe-api-response.json \
+    python -m src.etl.etl_cpe --input data/cpe/raw/cpe-api-response.json \
                               --output data/cpe/samples/cpe-output.ttl \
                               --validate
 """
@@ -122,7 +122,7 @@ def main():
         print("\nRunning SHACL validation...")
         # Call validation module
         try:
-            from kgcs.core.validation import run_validator, load_graph
+            from core.validation import run_validator, load_graph
             shapes = load_graph(args.shapes)
             conforms, _, _ = run_validator(args.output, shapes)
             if conforms:

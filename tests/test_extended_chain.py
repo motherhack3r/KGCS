@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv('.env.devel')
 
 sys.path.insert(0, str(Path(__file__).parent / "src"))
-from config import neo4j_config
+from src.config import neo4j_config
 
 
 def verify_extended_chain():
