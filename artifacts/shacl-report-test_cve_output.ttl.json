@@ -1,0 +1,6 @@
+{
+  "data_file": "tmp/test_cve_output.ttl",
+  "conforms": true,
+  "results_text": "Validation Report\nConforms: True\n",
+  "violations": []
+}

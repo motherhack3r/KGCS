@@ -37,47 +37,60 @@ class CPEtoRDFTransformer:
         if 'products' not in cpe_json:
             raise ValueError("Expected 'products' key in CPE API response")
 
-        for cpe in cpe_json['products']:
+        for product in cpe_json['products']:
+            cpe = product.get('cpe', {})
             self._add_platform(cpe)
 
         return self.graph
 
     def _add_platform(self, cpe: dict):
         """Add a CPE entry as a sec:Platform node."""
-        cpe_uri = cpe.get('cpeName', '')
-        if not cpe_uri:
+        cpe_name = cpe.get('cpeName', '')
+        if not cpe_name:
             return
 
-        platform_node = URIRef(f"{EX}platform/{cpe.get('cpeNameId', 'unknown')}")
+        cpe_id = cpe.get('cpeNameId', 'unknown')
+        platform_node = URIRef(f"{EX}platform/{cpe_id}")
         self.graph.add((platform_node, RDF.type, SEC.Platform))
 
-        if cpe_uri:
-            self.graph.add((platform_node, SEC.CPEUri, Literal(cpe_uri, datatype=XSD.string)))
+        # CPE URI
+        if cpe_name:
+            self.graph.add((platform_node, SEC.cpeUri, Literal(cpe_name, datatype=XSD.string)))
 
-        parts = cpe_uri.split(':')
-        if len(parts) >= 5:
+        # Parse CPE string components (format: cpe:2.3:part:vendor:product:version:update:edition:...)
+        parts = cpe_name.split(':')
+        if len(parts) >= 4:
             self.graph.add((platform_node, SEC.platformPart, Literal(parts[3], datatype=XSD.string)))
-        if len(parts) >= 6:
+        if len(parts) >= 5:
             self.graph.add((platform_node, SEC.vendor, Literal(parts[4], datatype=XSD.string)))
-        if len(parts) >= 7:
+        if len(parts) >= 6:
             self.graph.add((platform_node, SEC.product, Literal(parts[5], datatype=XSD.string)))
-        if len(parts) >= 8:
+        if len(parts) >= 7 and parts[6] != '*':
             self.graph.add((platform_node, SEC.version, Literal(parts[6], datatype=XSD.string)))
 
+        # Deprecation status
         if cpe.get('deprecated') is not None:
             deprecated = 'true' if cpe['deprecated'] else 'false'
             self.graph.add((platform_node, SEC.platformDeprecated, Literal(deprecated, datatype=XSD.boolean)))
 
+        # CPE Name ID
         if cpe.get('cpeNameId'):
             self.graph.add((platform_node, SEC.cpeNameId, Literal(cpe['cpeNameId'], datatype=XSD.string)))
 
-        if cpe.get('createdDate'):
-            created = datetime.fromisoformat(cpe['createdDate'].replace('Z', '+00:00'))
-            self.graph.add((platform_node, SEC.cpeCreatedDate, Literal(created, datatype=XSD.dateTime)))
+        # Created and modified dates
+        if cpe.get('created'):
+            try:
+                created = datetime.fromisoformat(cpe['created'].replace('Z', '+00:00'))
+                self.graph.add((platform_node, SEC.cpeCreatedDate, Literal(created, datatype=XSD.dateTime)))
+            except:
+                pass
 
-        if cpe.get('lastModifiedDate'):
-            modified = datetime.fromisoformat(cpe['lastModifiedDate'].replace('Z', '+00:00'))
-            self.graph.add((platform_node, SEC.cpeLastModifiedDate, Literal(modified, datatype=XSD.dateTime)))
+        if cpe.get('lastModified'):
+            try:
+                modified = datetime.fromisoformat(cpe['lastModified'].replace('Z', '+00:00'))
+                self.graph.add((platform_node, SEC.cpeLastModifiedDate, Literal(modified, datatype=XSD.dateTime)))
+            except:
+                pass
 
 
 def main():
