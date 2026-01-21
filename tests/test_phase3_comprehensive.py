@@ -25,11 +25,36 @@ import os
 import json
 from pathlib import Path
 
+import pytest
+
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
 from src.core.validation import load_graph, run_validator
+from src.etl.etl_cpe import CPEtoRDFTransformer
+from src.etl.etl_cve import CVEtoRDFTransformer
+from src.etl.etl_cwe import CWEtoRDFTransformer
+from src.etl.etl_capec import CAPECtoRDFTransformer
+from src.etl.etl_attack import ATTACKtoRDFTransformer
+from src.etl.etl_d3fend import D3FENDtoRDFTransformer
+from src.etl.etl_car import CARtoRDFTransformer
+from src.etl.etl_shield import SHIELDtoRDFTransformer
+from src.etl.etl_engage import ENGAGEtoRDFTransformer
 
+TEST_CASES = [
+    ('CPE', 'data/cpe/samples/sample_cpe.json', CPEtoRDFTransformer, 'tmp/phase3_cpe.ttl'),
+    ('CVE', 'data/cve/samples/sample_cve.json', CVEtoRDFTransformer, 'tmp/phase3_cve.ttl'),
+    ('CWE', 'tmp/sample_cwe.ttl', CWEtoRDFTransformer, 'tmp/phase3_cwe.ttl'),
+    ('CAPEC', 'tmp/sample_capec.ttl', CAPECtoRDFTransformer, 'tmp/phase3_capec.ttl'),
+    ('ATT&CK', 'tmp/sample_attack.ttl', ATTACKtoRDFTransformer, 'tmp/phase3_attack.ttl'),
+    ('D3FEND', 'tmp/sample_d3fend.ttl', D3FENDtoRDFTransformer, 'tmp/phase3_d3fend.ttl'),
+    ('CAR', 'tmp/sample_car.ttl', CARtoRDFTransformer, 'tmp/phase3_car.ttl'),
+    ('SHIELD', 'tmp/sample_shield.ttl', SHIELDtoRDFTransformer, 'tmp/phase3_shield.ttl'),
+    ('ENGAGE', 'tmp/sample_engage.ttl', ENGAGEtoRDFTransformer, 'tmp/phase3_engage.ttl'),
+]
+
+
+@pytest.mark.parametrize("name,sample_file,transformer_class,output_file", TEST_CASES)
 def test_etl(name, sample_file, transformer_class, output_file):
     """Test a single ETL transformer."""
     
@@ -105,29 +130,7 @@ def main():
     print("=" * 100)
     print()
     
-    # Import all ETL transformers
-    from src.etl.etl_cpe import CPEtoRDFTransformer
-    from src.etl.etl_cve import CVEtoRDFTransformer
-    from src.etl.etl_cwe import CWEtoRDFTransformer
-    from src.etl.etl_capec import CAPECtoRDFTransformer
-    from src.etl.etl_attack import ATTACKtoRDFTransformer
-    from src.etl.etl_d3fend import D3FENDtoRDFTransformer
-    from src.etl.etl_car import CARtoRDFTransformer
-    from src.etl.etl_shield import SHIELDtoRDFTransformer
-    from src.etl.etl_engage import ENGAGEtoRDFTransformer
-    
-    # Define tests
-    tests = [
-        ('CPE', 'data/cpe/samples/sample_cpe.json', CPEtoRDFTransformer, 'tmp/phase3_cpe.ttl'),
-        ('CVE', 'data/cve/samples/sample_cve.json', CVEtoRDFTransformer, 'tmp/phase3_cve.ttl'),
-        ('CWE', 'tmp/sample_cwe.ttl', CWEtoRDFTransformer, 'tmp/phase3_cwe.ttl'),  # May not exist yet
-        ('CAPEC', 'tmp/sample_capec.ttl', CAPECtoRDFTransformer, 'tmp/phase3_capec.ttl'),
-        ('ATT&CK', 'tmp/sample_attack.ttl', ATTACKtoRDFTransformer, 'tmp/phase3_attack.ttl'),
-        ('D3FEND', 'tmp/sample_d3fend.ttl', D3FENDtoRDFTransformer, 'tmp/phase3_d3fend.ttl'),
-        ('CAR', 'tmp/sample_car.ttl', CARtoRDFTransformer, 'tmp/phase3_car.ttl'),
-        ('SHIELD', 'tmp/sample_shield.ttl', SHIELDtoRDFTransformer, 'tmp/phase3_shield.ttl'),
-        ('ENGAGE', 'tmp/sample_engage.ttl', ENGAGEtoRDFTransformer, 'tmp/phase3_engage.ttl'),
-    ]
+    tests = TEST_CASES
     
     results = {}
     total_records = 0
