@@ -65,6 +65,7 @@ class RDFtoNeo4jTransformer:
         self.relationships: List[RelationshipData] = []
         self.stats = {
             'platforms': 0,
+            'platform_configurations': 0,
             'vulnerabilities': 0,
             'scores': 0,
             'references': 0,
@@ -88,6 +89,9 @@ class RDFtoNeo4jTransformer:
             # Platform nodes
             if (subject, RDF.type, self.sec_ns.Platform) in g:
                 self._extract_platform_node(subject, g)
+            # PlatformConfiguration nodes
+            elif (subject, RDF.type, self.sec_ns.PlatformConfiguration) in g:
+                self._extract_platform_configuration_node(subject, g)
             # Vulnerability nodes
             elif (subject, RDF.type, self.sec_ns.Vulnerability) in g:
                 self._extract_vulnerability_node(subject, g)
@@ -122,6 +126,7 @@ class RDFtoNeo4jTransformer:
             self.stats['relationships'] += 1
         
         print(f"   * Platforms: {self.stats['platforms']}")
+        print(f"   * Platform Configurations: {self.stats['platform_configurations']}")
         print(f"   * Vulnerabilities: {self.stats['vulnerabilities']}")
         print(f"   * Scores: {self.stats['scores']}")
         print(f"   * References: {self.stats['references']}")
@@ -141,6 +146,22 @@ class RDFtoNeo4jTransformer:
         
         self.nodes[uri] = NodeData(label='Platform', uri=uri, properties=properties)
         self.stats['platforms'] += 1
+    
+    def _extract_platform_configuration_node(self, subject, g: Graph) -> None:
+        """Extract PlatformConfiguration node properties."""
+        uri = str(subject)
+        properties = {}
+        
+        for predicate, obj in g.predicate_objects(subject):
+            prop_name = str(predicate).split('#')[-1]
+            # Skip object properties (those will be relationships)
+            if prop_name != 'type' and prop_name not in ['matchesPlatform', 'affected_by']:
+                value = self._parse_literal(obj)
+                if value is not None:
+                    properties[prop_name] = value
+        
+        self.nodes[uri] = NodeData(label='PlatformConfiguration', uri=uri, properties=properties)
+        self.stats['platform_configurations'] += 1
     
     def _extract_vulnerability_node(self, subject, g: Graph) -> None:
         """Extract Vulnerability node properties."""
