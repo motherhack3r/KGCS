@@ -1,6 +1,0 @@
-@prefix sec: <https://example.org/sec/core#> .
-@prefix d3: <https://example.org/sec/d3fend#> .
-
-# D3FEND bad sample: missing d3fendId
-d3:deftech-002 a d3:DefensiveTechnique ;
-  d3:label "Missing identifier - should fail." .

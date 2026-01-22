@@ -1,8 +1,0 @@
-@prefix sec: <https://example.org/sec/core#> .
-
-sec:vuln-t2-bad a sec:Vulnerability ;
-  sec:cveId "CVE-TEST-T2-BAD" ;
-  sec:scored_by sec:cvss-t2-bad .
-
-sec:cvss-t2-bad a sec:VulnerabilityScore ;
-  sec:baseScore "5.0" .

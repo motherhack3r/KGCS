@@ -1,6 +1,0 @@
-@prefix sec: <https://example.org/sec/core#> .
-@prefix car: <https://example.org/sec/car#> .
-
-# CAR bad sample: missing carId (should violate identifier shape)
-car:analytic-0002 a car:DetectionAnalytic ;
-  car:description "Missing carId field - should fail identifier constraint." .
