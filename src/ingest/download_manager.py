@@ -101,11 +101,13 @@ class StandardDownloader(ABC):
                         # Extract all files
                         zip_ref.extractall(self.raw_dir)
                     
-                    # Find the extracted JSON file
+                    # Find the extracted JSON or XML file
                     json_files = list(self.raw_dir.glob("*.json"))
-                    if json_files:
-                        # Use the first JSON file found
-                        extracted_file = json_files[0]
+                    xml_files = list(self.raw_dir.glob("*.xml"))
+                    all_files = json_files + xml_files
+                    if all_files:
+                        # Use the first extracted file found
+                        extracted_file = all_files[0]
                         # Only rename if it doesn't match expected filename
                         if extracted_file.name != filename and extracted_file.name.replace('.json', '') in filename:
                             try:
@@ -127,7 +129,7 @@ class StandardDownloader(ABC):
                 size_bytes = file_path.stat().st_size
                 sha256 = self.calculate_sha256(file_path)
                 
-                logger.info(f"✓ Downloaded {filename}: {size_bytes} bytes")
+                logger.info(f"[OK] Downloaded {filename}: {size_bytes} bytes")
                 
                 return {
                     'filename': filename,
@@ -168,7 +170,7 @@ class StandardDownloader(ABC):
 
     def save_manifest(self, manifest: Dict) -> None:
         """Save manifest with metadata."""
-        manifest['last_updated'] = datetime.utcnow().isoformat()
+        manifest['last_updated'] = datetime.now().isoformat()
         with open(self.manifest_file, 'w') as f:
             json.dump(manifest, f, indent=2)
         logger.info(f"Manifest saved: {self.manifest_file}")
@@ -396,36 +398,37 @@ class MITRECARDownloader(StandardDownloader):
         manifest = self.load_manifest()
         files_metadata = []
         
-        # CAR data model files - try various URL formats
-        base_urls = [
-            'https://raw.githubusercontent.com/mitre-attack/car/master/data_model',
-            'https://raw.githubusercontent.com/mitre-attack/car/main/data_model'
-        ]
+        # Use GitHub API to list available YAML files
+        api_url = 'https://api.github.com/repos/mitre-attack/car/contents/data_model'
+        base_download_url = 'https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model'
         
-        # Common CAR JSON files
-        files = [
-            'CAR_analytic_objects.json',
-            'CAR_analytic_rules.json'
-        ]
-        
-        for base_url in base_urls:
-            for filename in files:
-                url = f"{base_url}/{filename}"
-                try:
-                    file_meta = self.download_file(url, filename, extract_zip=False)
-                    if file_meta:
-                        files_metadata.append(file_meta)
-                        break  # File found, stop trying other base URLs for this file
-                except Exception as e:
-                    logger.debug(f"Failed to download {filename}: {e}")
-                    continue
+        try:
+            # Fetch directory listing from GitHub API
+            req = Request(api_url, headers={'User-Agent': 'KGCS-DownloadManager/1.0'})
+            with urlopen(req, timeout=30) as response:
+                files_list = json.loads(response.read().decode('utf-8'))
+            
+            # Filter for .yaml files and download them
+            for item in files_list:
+                if item.get('type') == 'file' and item.get('name', '').endswith('.yaml'):
+                    filename = item['name']
+                    url = f"{base_download_url}/{filename}"
+                    try:
+                        file_meta = self.download_file(url, filename, extract_zip=False)
+                        if file_meta:
+                            files_metadata.append(file_meta)
+                    except Exception as e:
+                        logger.debug(f"Could not download {filename}: {e}")
+                        continue
+        except Exception as e:
+            logger.warning(f"Could not fetch CAR file listing from GitHub API: {e}")
         
         if files_metadata:
             manifest['files'] = files_metadata
-            manifest['source'] = 'https://github.com/mitre-attack/car'
+            manifest['source'] = 'https://github.com/mitre-attack/car/tree/master/data_model'
             self.save_manifest(manifest)
         else:
-            logger.warning("Could not download CAR files from any source")
+            logger.warning("Could not download any CAR files")
         
         return {'standard': 'car', 'files': files_metadata}
         

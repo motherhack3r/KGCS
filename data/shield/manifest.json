@@ -1,0 +1,12 @@
+{
+  "files": [
+    {
+      "filename": "shield-deception-techniques.json",
+      "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/shield-deception-techniques.json",
+      "status": "failed",
+      "error": "HTTP Error 404: Not Found"
+    }
+  ],
+  "last_updated": "2026-01-22T17:08:26.977486",
+  "source": "https://github.com/MITRECND/mitrecnd.github.io"
+}

@@ -1,0 +1,194 @@
+{
+  "start_time": "2026-01-22T17:08:21.150996",
+  "end_time": "2026-01-22T17:08:27.396109",
+  "duration_seconds": 6.245113,
+  "results": [
+    {
+      "standard": "cwe",
+      "files": [
+        {
+          "filename": "cwec_latest.xml",
+          "size_bytes": 16095784,
+          "sha256": "f7d6fae581116795aa3545ce2ab801f81cbb655410d65db703f1343df10ff7b9",
+          "url": "https://cwe.mitre.org/data/xml/cwec_latest.xml.zip",
+          "status": "success"
+        }
+      ]
+    },
+    {
+      "standard": "capec",
+      "files": [
+        {
+          "filename": "capec_latest.xml",
+          "size_bytes": 3849998,
+          "sha256": "70279a2dff0cb0ad79e546adb07828335a704ad5210e047e09e986172fc9e34d",
+          "url": "https://capec.mitre.org/data/xml/capec_latest.xml",
+          "status": "cached"
+        }
+      ]
+    },
+    {
+      "standard": "attack",
+      "files": [
+        {
+          "filename": "enterprise-attack.json",
+          "size_bytes": 45126961,
+          "sha256": "628c4fc3c01b9ef37e1cd84ca3c421e1d43950a43464a14aabd1a7089601dc45",
+          "url": "https://github.com/mitre/cti/raw/refs/heads/master/enterprise-attack/enterprise-attack.json",
+          "status": "cached"
+        },
+        {
+          "filename": "ics-attack.json",
+          "size_bytes": 3077395,
+          "sha256": "76655cd7c363ca9a7474a95e9d60522a0c3211eaf2efad5b5e9cd7f9e0365b51",
+          "url": "https://github.com/mitre/cti/raw/refs/heads/master/ics-attack/ics-attack.json",
+          "status": "cached"
+        },
+        {
+          "filename": "mobile-attack.json",
+          "size_bytes": 4352625,
+          "sha256": "62ecc7e3cabacc2430de0d65078a3726b6d8f7b0eff9493fd6403b514f66518d",
+          "url": "https://github.com/mitre/cti/raw/refs/heads/master/mobile-attack/mobile-attack.json",
+          "status": "cached"
+        },
+        {
+          "filename": "pre-attack.json",
+          "size_bytes": 589866,
+          "sha256": "696f4f33f01eb9f06df83bd2b623b77e7d52e1a810a024e54574aec5e86afd3a",
+          "url": "https://github.com/mitre/cti/raw/refs/heads/master/pre-attack/pre-attack.json",
+          "status": "cached"
+        }
+      ]
+    },
+    {
+      "standard": "d3fend",
+      "files": [
+        {
+          "filename": "d3fend.owl",
+          "size_bytes": 6073206,
+          "sha256": "501934ed1630f0fcf55df4c2ce0977b489f4db6864db50df6357cae45f806180",
+          "url": "https://d3fend.mitre.org/ontologies/d3fend.owl",
+          "status": "cached"
+        }
+      ]
+    },
+    {
+      "standard": "car",
+      "files": [
+        {
+          "filename": "authentication.yaml",
+          "size_bytes": 3569,
+          "sha256": "6d24f56ddf86498a252258440853aac8c659ca2f824d96890bdae45fd026dbfb",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model/authentication.yaml",
+          "status": "success"
+        },
+        {
+          "filename": "driver.yaml",
+          "size_bytes": 2266,
+          "sha256": "957705a9d2b7d5ec1950a98bee55ad326107717c2c450df9e7150e4d4799c5f7",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model/driver.yaml",
+          "status": "success"
+        },
+        {
+          "filename": "email.yaml",
+          "size_bytes": 3230,
+          "sha256": "fa0e66a29ce4c0838c82c1f74ae8694fe4f5842cece3c59446251a3430363202",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model/email.yaml",
+          "status": "success"
+        },
+        {
+          "filename": "file.yaml",
+          "size_bytes": 5396,
+          "sha256": "ecbd72806716dc6a78ed1cea5d8437f6f7a8aeae153794ec8e8968919aaf2a19",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model/file.yaml",
+          "status": "success"
+        },
+        {
+          "filename": "flow.yaml",
+          "size_bytes": 4776,
+          "sha256": "76fa69a6bbca302f24170878fd1e92021625e4a8fadd1b18e4f043d22eb795e7",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model/flow.yaml",
+          "status": "success"
+        },
+        {
+          "filename": "http.yaml",
+          "size_bytes": 2645,
+          "sha256": "613a622131781a2db799cddb23f33e68a75a10f7b33036026c8806de0f570ed2",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model/http.yaml",
+          "status": "success"
+        },
+        {
+          "filename": "module.yaml",
+          "size_bytes": 2935,
+          "sha256": "fd9481ad99f442118f3fdf1c650acd9817647a140b1fd02228a393259f89d4c6",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model/module.yaml",
+          "status": "success"
+        },
+        {
+          "filename": "process.yaml",
+          "size_bytes": 5745,
+          "sha256": "7060d32477dd920ba09050108adf3106db76f99721738df65e4252d46d62b52a",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model/process.yaml",
+          "status": "success"
+        },
+        {
+          "filename": "registry.yaml",
+          "size_bytes": 3613,
+          "sha256": "77c83cd70f5328bd1625e5dd555d11832c7e1a22b77b632991a49de58790b9cb",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model/registry.yaml",
+          "status": "success"
+        },
+        {
+          "filename": "service.yaml",
+          "size_bytes": 2396,
+          "sha256": "0284d899de1949e9209dae027f74a51d18e249a1df544d06ce1efbbe43b8db77",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model/service.yaml",
+          "status": "success"
+        },
+        {
+          "filename": "socket.yaml",
+          "size_bytes": 2815,
+          "sha256": "770530565df212255becebdc8e58465e6c4d04d5ef7e440dc05f7abd118e1b80",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model/socket.yaml",
+          "status": "success"
+        },
+        {
+          "filename": "thread.yaml",
+          "size_bytes": 3278,
+          "sha256": "692b393634dc6c122754b52d68b3713648d79efa915bee929c363d5d08374603",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model/thread.yaml",
+          "status": "success"
+        },
+        {
+          "filename": "user_session.yaml",
+          "size_bytes": 2237,
+          "sha256": "838fcab87cfa53651a79c182e3ff90ad41d5226655de3351f8775a89afab6be2",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model/user_session.yaml",
+          "status": "success"
+        }
+      ]
+    },
+    {
+      "standard": "shield",
+      "files": [
+        {
+          "filename": "shield-deception-techniques.json",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/shield-deception-techniques.json",
+          "status": "failed",
+          "error": "HTTP Error 404: Not Found"
+        }
+      ]
+    },
+    {
+      "standard": "engage",
+      "files": [
+        {
+          "filename": "engage-objects.json",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/engage-objects.json",
+          "status": "failed",
+          "error": "HTTP Error 404: Not Found"
+        }
+      ]
+    }
+  ]
+}

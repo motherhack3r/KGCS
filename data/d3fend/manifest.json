@@ -1,0 +1,13 @@
+{
+  "files": [
+    {
+      "filename": "d3fend.owl",
+      "size_bytes": 6073206,
+      "sha256": "501934ed1630f0fcf55df4c2ce0977b489f4db6864db50df6357cae45f806180",
+      "url": "https://d3fend.mitre.org/ontologies/d3fend.owl",
+      "status": "cached"
+    }
+  ],
+  "last_updated": "2026-01-22T17:08:23.145424",
+  "source": "https://d3fend.mitre.org/"
+}
