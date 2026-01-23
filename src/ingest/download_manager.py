@@ -453,42 +453,59 @@ class MITRESHIELDDownloader(StandardDownloader):
         
         manifest = self.load_manifest()
         files_metadata = []
-        
-        # SHIELD data from GitHub - try various URL formats
-        base_urls = [
-            'https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data',
-            'https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/main/_data',
-            'https://raw.githubusercontent.com/mitre-shield/mitre-shield.github.io/master/data'
+        # Prefer using the GitHub API to list files and download the canonical
+        # raw URLs. This is more resilient than hard-coding raw paths.
+        api_candidates = [
+            ('https://api.github.com/repos/MITRECND/mitrecnd.github.io/contents/_data', 'https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/refs/heads/master/_data/'),
+            ('https://api.github.com/repos/MITRECND/mitrecnd.github.io/contents/_data?ref=main', 'https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/refs/heads/main/_data/'),
+            ('https://api.github.com/repos/mitre-shield/mitre-shield.github.io/contents/data', 'https://raw.githubusercontent.com/mitre-shield/mitre-shield.github.io/refs/heads/master/data/'),
         ]
-        
-        # Common SHIELD JSON files
-        files = [
-            'shield-deception-techniques.json',
-            'shield-techniques.json',
-            'shield.json'
-        ]
-        
-        for base_url in base_urls:
-            for filename in files:
-                url = f"{base_url}/{filename}"
-                try:
-                    file_meta = self.download_file(url, filename, extract_zip=False)
-                    if file_meta:
-                        files_metadata.append(file_meta)
-                        break
-                except Exception as e:
-                    logger.debug(f"Failed to download {filename} from {base_url}: {e}")
+
+        token = os.environ.get('GITHUB_TOKEN')
+        headers = {'User-Agent': 'KGCS-DownloadManager/1.0'}
+        if token:
+            headers['Authorization'] = f'token {token}'
+
+        tried_any = False
+        for api_url, raw_base in api_candidates:
+            try:
+                req = Request(api_url, headers=headers)
+                with urlopen(req, timeout=30) as resp:
+                    files_list = json.loads(resp.read().decode('utf-8'))
+
+                # Filter for .json files
+                json_files = [f for f in files_list if f.get('type') == 'file' and f.get('name', '').endswith('.json')]
+                if not json_files:
+                    logger.debug(f'No JSON files listed at {api_url}')
                     continue
-            if files_metadata:
-                break
-        
-        if files_metadata:
-            manifest['files'] = files_metadata
-            manifest['source'] = 'https://github.com/MITRECND/mitrecnd.github.io'
-            self.save_manifest(manifest)
+
+                tried_any = True
+                for item in json_files:
+                    filename = item.get('name')
+                    # Use the API-provided download_url when present, otherwise construct raw URL
+                    download_url = item.get('download_url') or f"{raw_base}{filename}"
+                    try:
+                        file_meta = self.download_file(download_url, filename, extract_zip=False)
+                        if file_meta:
+                            files_metadata.append(file_meta)
+                    except Exception as e:
+                        logger.debug(f'Failed to download {filename} from {download_url}: {e}')
+                        continue
+
+                if files_metadata:
+                    manifest['files'] = files_metadata
+                    manifest['source'] = api_url.split('/contents')[0]
+                    self.save_manifest(manifest)
+                    return {'standard': 'shield', 'files': files_metadata}
+            except Exception as e:
+                logger.debug(f'Failed to fetch SHIELD listing from {api_url}: {e}')
+                continue
+
+        if not tried_any:
+            logger.warning('No SHIELD GitHub API endpoints available to try')
         else:
-            logger.warning("Could not download SHIELD files from any source")
-        
+            logger.warning('Could not download any SHIELD files from GitHub API candidates')
+
         return {'standard': 'shield', 'files': files_metadata}
 
 
@@ -501,45 +518,48 @@ class MITREENGAGEDownloader(StandardDownloader):
     def download(self) -> Dict:
         """Download ENGAGE from GitHub."""
         logger.info("Starting MITRE ENGAGE download...")
-        
         manifest = self.load_manifest()
         files_metadata = []
-        
-        # ENGAGE data from GitHub - try various URL formats and paths
-        base_urls = [
-            'https://raw.githubusercontent.com/mitre/engage/main/Data/json',
-            'https://raw.githubusercontent.com/mitre/engage/master/Data/json'
-        ]
-        
-        # Common ENGAGE files
-        files = [
-            'engage-objects.json',
-            'engage-objects-detailed.json',
-            'engage-datasets.json',
-            'engage.json'
-        ]
-        
-        for base_url in base_urls:
-            for filename in files:
-                url = f"{base_url}/{filename}"
+
+        api_url = 'https://api.github.com/repos/mitre/engage/contents/Data/json'
+        raw_base = 'https://raw.githubusercontent.com/mitre/engage/refs/heads/master/Data/json/'
+
+        token = os.environ.get('GITHUB_TOKEN')
+        headers = {'User-Agent': 'KGCS-DownloadManager/1.0'}
+        if token:
+            headers['Authorization'] = f'token {token}'
+
+        try:
+            req = Request(api_url, headers=headers)
+            with urlopen(req, timeout=30) as resp:
+                files_list = json.loads(resp.read().decode('utf-8'))
+
+            json_files = [f for f in files_list if f.get('type') == 'file' and f.get('name', '').endswith('.json')]
+            if not json_files:
+                logger.warning('No ENGAGE JSON files found via GitHub API')
+                return {'standard': 'engage', 'files': files_metadata}
+
+            for item in json_files:
+                filename = item.get('name')
+                download_url = item.get('download_url') or f"{raw_base}{filename}"
                 try:
-                    file_meta = self.download_file(url, filename, extract_zip=False)
+                    file_meta = self.download_file(download_url, filename, extract_zip=False)
                     if file_meta:
                         files_metadata.append(file_meta)
-                        break
                 except Exception as e:
-                    logger.debug(f"Failed to download {filename} from {base_url}: {e}")
+                    logger.debug(f'Failed to download {filename} from {download_url}: {e}')
                     continue
+
             if files_metadata:
-                break
-        
-        if files_metadata:
-            manifest['files'] = files_metadata
-            manifest['source'] = 'https://github.com/mitre/engage'
-            self.save_manifest(manifest)
-        else:
-            logger.warning("Could not download ENGAGE files from any source")
-        
+                manifest['files'] = files_metadata
+                manifest['source'] = 'https://github.com/mitre/engage'
+                self.save_manifest(manifest)
+            else:
+                logger.warning('Could not download ENGAGE files from GitHub API')
+
+        except Exception as e:
+            logger.warning(f'Failed to fetch ENGAGE listing from GitHub API: {e}')
+
         return {'standard': 'engage', 'files': files_metadata}
 
 
@@ -572,9 +592,41 @@ class DownloadPipeline:
         logger.info("=" * 70)
         
         start_time = datetime.now()
+        # (No pre-filtering here.) We'll attempt to run the async downloader
+        # explicitly and only filter sync downloaders if the async runner
+        # successfully completes (or is imported and executed in-process).
         # Attempt to run the async downloader from the `data-raw` pipeline if available.
         try:
             AsyncStandardsDownloader = None
+            # First try to run the data-raw downloader as a subprocess. This
+            # avoids importing async dependencies into the current process
+            # while still allowing the async pipeline to own files. If the
+            # subprocess runs successfully, we will skip the sync downloaders.
+            downloader_path = Path('data-raw') / 'src' / 'downloader.py'
+            ran_async_subprocess = False
+            if downloader_path.exists():
+                try:
+                    import subprocess
+                    args = [sys.executable, str(downloader_path), '--output', str(self.base_dir)]
+                    # Run synchronously so downstream sync downloaders are skipped
+                    logger.info(f'Running async downloader subprocess: {args}')
+                    proc = subprocess.run(args, capture_output=True, text=True)
+                    logger.info(f'Async subprocess exit {proc.returncode}')
+                    if proc.stdout:
+                        logger.info(proc.stdout)
+                    if proc.stderr:
+                        logger.warning(proc.stderr)
+                    if proc.returncode == 0:
+                        ran_async_subprocess = True
+                        owned_by_async = {'shield', 'engage', 'car', 'attack', 'capec', 'd3fend', 'cwe', 'cpe', 'cpematch', 'cve'}
+                        try:
+                            self.downloaders = [d for d in self.downloaders if getattr(d, 'standard_name', None) not in owned_by_async]
+                            logger.info(f'Async subprocess succeeded; filtered sync downloaders: {[d.standard_name for d in self.downloaders]}')
+                        except Exception:
+                            logger.debug('Failed to filter sync downloaders after subprocess run')
+                except Exception as e:
+                    logger.debug(f'Async subprocess attempt failed: {e}')
+
             # First try a clean import that might exist in some layouts
             try:
                 from data_raw.src.downloader import StandardsDownloader as AsyncStandardsDownloader  # type: ignore
@@ -607,6 +659,15 @@ class DownloadPipeline:
                             loop.run_until_complete(_run_async())
                 except Exception as e:
                     logger.warning(f'Async downloader integration failed: {e}')
+                # If we successfully ran the async downloader in-process, filter
+                # sync downloaders as well.
+                try:
+                    if not ran_async_subprocess:
+                        owned_by_async = {'shield', 'engage', 'car', 'attack', 'capec', 'd3fend', 'cwe', 'cpe', 'cpematch', 'cve'}
+                        self.downloaders = [d for d in self.downloaders if getattr(d, 'standard_name', None) not in owned_by_async]
+                        logger.info(f'Async import run succeeded; filtered sync downloaders: {[d.standard_name for d in self.downloaders]}')
+                except Exception:
+                    logger.debug('Failed to filter sync downloaders after in-process async run')
         except Exception as e:
             logger.debug(f'Could not attempt async downloader integration: {e}')
         

@@ -1,7 +1,7 @@
 {
-  "start_time": "2026-01-23T19:01:09.408824",
-  "end_time": "2026-01-23T19:01:13.420914",
-  "duration_seconds": 4.01209,
+  "start_time": "2026-01-23T19:26:23.781688",
+  "end_time": "2026-01-23T19:26:42.619865",
+  "duration_seconds": 18.838177,
   "results": [
     {
       "standard": "cwe",
@@ -172,10 +172,88 @@
       "standard": "shield",
       "files": [
         {
-          "filename": "shield-deception-techniques.json",
-          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/shield-deception-techniques.json",
-          "status": "failed",
-          "error": "HTTP Error 404: Not Found"
+          "filename": "attack_groups.json",
+          "size_bytes": 319621,
+          "sha256": "c7a296ca1f35bb2b30851f56dc43f59a0feb795b6dcfb71cdf64d2bcd473ecdf",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/attack_groups.json",
+          "status": "success"
+        },
+        {
+          "filename": "attack_mapping.json",
+          "size_bytes": 641795,
+          "sha256": "fe56bdd3c61cf00f557cff44d699dc64706237723b4378ea191c93c85c607702",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/attack_mapping.json",
+          "status": "success"
+        },
+        {
+          "filename": "mapping.json",
+          "size_bytes": 99194,
+          "sha256": "222f912469ee4b860728a75fd861d6527616a1514fb1d0d0c62d5849055a28ef",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/mapping.json",
+          "status": "success"
+        },
+        {
+          "filename": "navigation.json",
+          "size_bytes": 11023,
+          "sha256": "2ee34af15a91f55c1e3d887c28ad66a149ffeb2c9f653864400fbfced7aee02f",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/navigation.json",
+          "status": "success"
+        },
+        {
+          "filename": "opportunities.json",
+          "size_bytes": 13731,
+          "sha256": "c775036f672a7513e9c1a962d4e8cb6d41cdd8780722870c7a89b4dd3d5a87e2",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/opportunities.json",
+          "status": "success"
+        },
+        {
+          "filename": "procedures.json",
+          "size_bytes": 12029,
+          "sha256": "bd98955e70676529d0618b548af34ed5d2dbfe55a6930e703dd204850b5b82ce",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/procedures.json",
+          "status": "success"
+        },
+        {
+          "filename": "tactic_details.json",
+          "size_bytes": 67774,
+          "sha256": "ec7b76847d48727fda6d62736921393c18c8c9d10d1d6e5ebf2ff0414d05dadb",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/tactic_details.json",
+          "status": "success"
+        },
+        {
+          "filename": "tactic_matrix.json",
+          "size_bytes": 64433,
+          "sha256": "e249cd250848df0dbe82a52fa92d9c7c0ddc3f3e84a6317a78fb3869ceca91c5",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/tactic_matrix.json",
+          "status": "success"
+        },
+        {
+          "filename": "tactics.json",
+          "size_bytes": 3797,
+          "sha256": "8226428e70f542b51a4b47511ea0456e1ff4fe911721d8ce7905b00e8f79dc52",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/tactics.json",
+          "status": "success"
+        },
+        {
+          "filename": "technique_details.json",
+          "size_bytes": 181237,
+          "sha256": "f698a8b97fa6ac78462fe29681cdd6f936aa3c130ea622cdeb0ec675d965c398",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/technique_details.json",
+          "status": "success"
+        },
+        {
+          "filename": "techniques.json",
+          "size_bytes": 15863,
+          "sha256": "09150fad97afe50b33acbd4145cc5abe7f841e92fcdbd3856c7a20de283efd36",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/techniques.json",
+          "status": "success"
+        },
+        {
+          "filename": "use_cases.json",
+          "size_bytes": 36683,
+          "sha256": "dac36dcb9cd9d5ee1c70652a230f7640113f8d023a454e9fa159349a28089c46",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/use_cases.json",
+          "status": "success"
         }
       ]
     },
@@ -183,10 +261,88 @@
       "standard": "engage",
       "files": [
         {
-          "filename": "engage-objects.json",
-          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/engage-objects.json",
-          "status": "failed",
-          "error": "HTTP Error 404: Not Found"
+          "filename": "activities.json",
+          "size_bytes": 37415,
+          "sha256": "19c8788bdd8615a0d5dddf8046c902c00b453c1b0247e35c9ca610a99ad98e07",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/activities.json",
+          "status": "success"
+        },
+        {
+          "filename": "activity_details.json",
+          "size_bytes": 153319,
+          "sha256": "4e47d11af0428ad1d3b1782c367a3e4a0abf850e6809fd838e350d31886a1abf",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/activity_details.json",
+          "status": "success"
+        },
+        {
+          "filename": "approach_activity_mappings.json",
+          "size_bytes": 2754,
+          "sha256": "604f9e9e38431ec83a0fdcaa0c7d2f88c4b5d20a4f2ff4c94e497a78c6ccbe06",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/approach_activity_mappings.json",
+          "status": "success"
+        },
+        {
+          "filename": "approach_details.json",
+          "size_bytes": 9000,
+          "sha256": "cff1b915f0fbba99373bb2322a1b1c4abccb300bada6cd8eefb482caec97d5db",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/approach_details.json",
+          "status": "success"
+        },
+        {
+          "filename": "approach_matrix.json",
+          "size_bytes": 61875,
+          "sha256": "9f52e275f4125b19bf70b1544632e4b7f516c2463a20b7c7a7989536588f367c",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/approach_matrix.json",
+          "status": "success"
+        },
+        {
+          "filename": "approaches.json",
+          "size_bytes": 7955,
+          "sha256": "da2e09ad8c93f4aa463afaa9c5b1ef27eae91b444b580c4af432ae4ba05dadb7",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/approaches.json",
+          "status": "success"
+        },
+        {
+          "filename": "attack_mapping.json",
+          "size_bytes": 282159,
+          "sha256": "8004901aa219813a4b7105665aa5e9cd2128beeccc818b2c3e42324f1ad609bf",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/attack_mapping.json",
+          "status": "success"
+        },
+        {
+          "filename": "attack_tactics_techniques.json",
+          "size_bytes": 36411,
+          "sha256": "6ea21f2dbab322ab093b79ae140d4e55445995bca81ed9a4634563d25ab8a270",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/attack_tactics_techniques.json",
+          "status": "success"
+        },
+        {
+          "filename": "goal_approach_mappings.json",
+          "size_bytes": 450,
+          "sha256": "150d4384e9d2f242a5a6301202a6d560a46ecb265566382f94e35900ae02af3d",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/goal_approach_mappings.json",
+          "status": "success"
+        },
+        {
+          "filename": "goal_details.json",
+          "size_bytes": 10105,
+          "sha256": "c82463eb407eb4f8e74ebdf59afad1f7b0cde8ef42c2a96356fc69ff85436402",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/goal_details.json",
+          "status": "success"
+        },
+        {
+          "filename": "goals.json",
+          "size_bytes": 9848,
+          "sha256": "7056089a8f1c76304feab9d0ba3695e9410c5e6636487b907cf676c7f2e22d72",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/goals.json",
+          "status": "success"
+        },
+        {
+          "filename": "references.json",
+          "size_bytes": 13543,
+          "sha256": "6598c1c3cad875b33586b88732ac1c27faa9d376529db8730e56889ccd1e316a",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/references.json",
+          "status": "success"
         }
       ]
     }
