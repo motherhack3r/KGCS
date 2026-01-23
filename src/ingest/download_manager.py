@@ -601,93 +601,47 @@ class DownloadPipeline:
         self.downloaders = [d for d in self.downloaders if d is not None]
         self.results = []
 
-    def run(self) -> Dict:
-        """Execute all downloads."""
+    async def run(self) -> Dict:
+        """Execute all downloads: async MITRE standards first, then sync downloaders for others."""
         logger.info("=" * 70)
         logger.info("KGCS Daily Download Pipeline Starting")
         logger.info("=" * 70)
         
         start_time = datetime.now()
-        # (No pre-filtering here.) We'll attempt to run the async downloader
-        # explicitly and only filter sync downloaders if the async runner
-        # successfully completes (or is imported and executed in-process).
-        # Attempt to run the async downloader from the `data-raw` pipeline if available.
+        
+        # 1. Run async downloader for MITRE standards (ATT&CK, CAPEC, D3FEND)
         try:
-            AsyncStandardsDownloader = None
-            # First try to run the data-raw downloader as a subprocess. This
-            # avoids importing async dependencies into the current process
-            # while still allowing the async pipeline to own files. If the
-            # subprocess runs successfully, we will skip the sync downloaders.
-            downloader_path = Path('data-raw') / 'src' / 'downloader.py'
-            ran_async_subprocess = False
-            if downloader_path.exists():
-                try:
-                    import subprocess
-                    args = [sys.executable, str(downloader_path), '--output', str(self.base_dir)]
-                    # Run synchronously so downstream sync downloaders are skipped
-                    logger.info(f'Running async downloader subprocess: {args}')
-                    proc = subprocess.run(args, capture_output=True, text=True)
-                    logger.info(f'Async subprocess exit {proc.returncode}')
-                    if proc.stdout:
-                        logger.info(proc.stdout)
-                    if proc.stderr:
-                        logger.warning(proc.stderr)
-                    if proc.returncode == 0:
-                        ran_async_subprocess = True
-                        # Only filter standards actually implemented in async downloader
-                        owned_by_async = {'attack', 'capec', 'd3fend'}
-                        try:
-                            self.downloaders = [d for d in self.downloaders if getattr(d, 'standard_name', None) not in owned_by_async]
-                            logger.info(f'Async subprocess succeeded; filtered sync downloaders: {[d.standard_name for d in self.downloaders]}')
-                        except Exception:
-                            logger.debug('Failed to filter sync downloaders after subprocess run')
-                except Exception as e:
-                    logger.debug(f'Async subprocess attempt failed: {e}')
-
-            # First try a clean import that might exist in some layouts
-            try:
-                from data_raw.src.downloader import StandardsDownloader as AsyncStandardsDownloader  # type: ignore
-            except Exception:
-                # Fallback: load by path from the workspace data-raw directory
-                downloader_path = Path('data-raw') / 'src' / 'downloader.py'
-                if downloader_path.exists():
-                    spec = importlib.util.spec_from_file_location('data_raw_downloader', str(downloader_path))
-                    if spec and spec.loader:
-                        mod = importlib.util.module_from_spec(spec)
-                        spec.loader.exec_module(mod)  # type: ignore
-                        AsyncStandardsDownloader = getattr(mod, 'StandardsDownloader', None)
-
-            if AsyncStandardsDownloader:
-                logger.info('Integrating async StandardsDownloader from data-raw...')
-                try:
-                    async def _run_async():
-                        async with AsyncStandardsDownloader(output_dir=self.base_dir) as d:
-                            await d.run()
-
-                    # Use asyncio.run where possible; handle already-running event loops gracefully
-                    try:
-                        asyncio.run(_run_async())
-                    except RuntimeError:
-                        loop = asyncio.get_event_loop()
-                        if loop.is_running():
-                            logger.info('Event loop already running; scheduling async downloader task')
-                            loop.create_task(_run_async())
-                        else:
-                            loop.run_until_complete(_run_async())
-                except Exception as e:
-                    logger.warning(f'Async downloader integration failed: {e}')
-                # If we successfully ran the async downloader in-process, filter
-                # sync downloaders as well.
-                try:
-                    if not ran_async_subprocess:
-                        # Only filter standards actually implemented in async downloader
-                        owned_by_async = {'attack', 'capec', 'd3fend'}
-                        self.downloaders = [d for d in self.downloaders if getattr(d, 'standard_name', None) not in owned_by_async]
-                        logger.info(f'Async import run succeeded; filtered sync downloaders: {[d.standard_name for d in self.downloaders]}')
-                except Exception:
-                    logger.debug('Failed to filter sync downloaders after in-process async run')
+            # Add data-raw to path for import
+            data_raw_path = Path('data-raw') / 'src'
+            if data_raw_path.exists() and str(data_raw_path.parent) not in sys.path:
+                sys.path.insert(0, str(data_raw_path.parent))
+            
+            from downloader import StandardsDownloader as AsyncStandardsDownloader
+            logger.info("Running async downloader for MITRE standards...")
+            async with AsyncStandardsDownloader(output_dir=self.base_dir) as d:
+                await d.run()
+            
+            # Filter out standards that async downloaded
+            owned_by_async = {'attack', 'capec', 'd3fend'}
+            self.downloaders = [d for d in self.downloaders if getattr(d, 'standard_name', None) not in owned_by_async]
+            logger.info(f"Async downloader succeeded; remaining sync downloaders: {[d.standard_name for d in self.downloaders]}")
+        except ImportError as e:
+            logger.warning(f"Could not import async downloader: {e}; proceeding with sync-only")
         except Exception as e:
-            logger.debug(f'Could not attempt async downloader integration: {e}')
+            logger.warning(f"Async downloader failed: {e}; proceeding with sync downloaders")
+        
+        # 2. Run sync downloaders for remaining standards (CPE, CVE, CWE, CAR, SHIELD, ENGAGE)
+        for downloader in self.downloaders:
+            try:
+                result = downloader.download()
+                self.results.append(result)
+            except Exception as e:
+                logger.error(f"Error downloading {downloader.standard_name}: {e}")
+                self.results.append({
+                    'standard': downloader.standard_name,
+                    'status': 'error',
+                    'error': str(e)
+                })
         
         for downloader in self.downloaders:
             try:
@@ -736,10 +690,10 @@ def main():
         logger.info("Skipping large NVD files (CPE, CPEMatch, CVE)")
     
     pipeline = DownloadPipeline(skip_large_files=skip_large)
-    summary = pipeline.run()
+    asyncio.run(pipeline.run())
     
     # Exit with error if any download failed
-    failed = [r for r in summary['results'] if r.get('status') == 'error']
+    failed = [r for r in pipeline.results if r.get('status') == 'error']
     if failed:
         logger.error(f"Pipeline completed with {len(failed)} errors")
         return 1
