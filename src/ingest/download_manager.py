@@ -107,7 +107,16 @@ class StandardDownloader(ABC):
                     json_files = list(self.raw_dir.glob("*.json"))
                     xml_files = list(self.raw_dir.glob("*.xml"))
                     all_files = json_files + xml_files
-                    if all_files:
+                    
+                    # Check for chunked directories (e.g., nvdcpe-2.0-chunks/)
+                    chunk_dirs = list(self.raw_dir.glob("*-chunks"))
+                    
+                    if chunk_dirs:
+                        # Handle chunked archives (like NVD CPE)
+                        chunk_dir = chunk_dirs[0]
+                        logger.info(f"Found chunked data directory: {chunk_dir.name}")
+                        file_path = chunk_dir  # Use the chunk directory as the "file"
+                    elif all_files:
                         # Use the first extracted file found
                         extracted_file = all_files[0]
                         # Only rename if it doesn't match expected filename
@@ -121,6 +130,8 @@ class StandardDownloader(ABC):
                                 file_path = extracted_file
                         else:
                             file_path = extracted_file
+                    else:
+                        raise FileNotFoundError(f"No JSON/XML files found after extracting {temp_zip}")
                     
                     # Delete ZIP after extraction
                     try:
@@ -128,8 +139,13 @@ class StandardDownloader(ABC):
                     except Exception as e:
                         logger.warning(f"Could not delete {temp_zip}: {e}")
 
-                size_bytes = file_path.stat().st_size
-                sha256 = self.calculate_sha256(file_path)
+                # Handle both files and directories (for chunked archives)
+                if file_path.is_dir():
+                    size_bytes = sum(f.stat().st_size for f in file_path.rglob('*') if f.is_file())
+                    sha256 = 'chunked-archive'  # For directories, use a placeholder
+                else:
+                    size_bytes = file_path.stat().st_size
+                    sha256 = self.calculate_sha256(file_path)
                 
                 logger.info(f"[OK] Downloaded {filename}: {size_bytes} bytes")
                 
@@ -618,7 +634,8 @@ class DownloadPipeline:
                         logger.warning(proc.stderr)
                     if proc.returncode == 0:
                         ran_async_subprocess = True
-                        owned_by_async = {'shield', 'engage', 'car', 'attack', 'capec', 'd3fend', 'cwe', 'cpe', 'cpematch', 'cve'}
+                        # Only filter standards actually implemented in async downloader
+                        owned_by_async = {'attack', 'capec', 'd3fend'}
                         try:
                             self.downloaders = [d for d in self.downloaders if getattr(d, 'standard_name', None) not in owned_by_async]
                             logger.info(f'Async subprocess succeeded; filtered sync downloaders: {[d.standard_name for d in self.downloaders]}')
@@ -663,7 +680,8 @@ class DownloadPipeline:
                 # sync downloaders as well.
                 try:
                     if not ran_async_subprocess:
-                        owned_by_async = {'shield', 'engage', 'car', 'attack', 'capec', 'd3fend', 'cwe', 'cpe', 'cpematch', 'cve'}
+                        # Only filter standards actually implemented in async downloader
+                        owned_by_async = {'attack', 'capec', 'd3fend'}
                         self.downloaders = [d for d in self.downloaders if getattr(d, 'standard_name', None) not in owned_by_async]
                         logger.info(f'Async import run succeeded; filtered sync downloaders: {[d.standard_name for d in self.downloaders]}')
                 except Exception:

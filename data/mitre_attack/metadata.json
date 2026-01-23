@@ -1,0 +1,45 @@
+{
+  "files": {
+    "enterprise-attack.json": {
+      "content_type": "text/plain; charset=utf-8",
+      "etag": "W/\"595ba3b76f39039f70390ba31c50a0d4f2e5fe949e754e58e7c7e77f29a61e08\"",
+      "last_modified": null,
+      "saved_at": "2026-01-23T18:49:54Z",
+      "sha256": "628c4fc3c01b9ef37e1cd84ca3c421e1d43950a43464a14aabd1a7089601dc45",
+      "size_bytes": 45126961,
+      "source": "raw.githubusercontent.com",
+      "url": "https://raw.githubusercontent.com/mitre/cti/refs/heads/master/enterprise-attack/enterprise-attack.json"
+    },
+    "ics-attack.json": {
+      "content_type": "text/plain; charset=utf-8",
+      "etag": "W/\"cadefe3d58681af768bb5757ea86d3e8f629d345dcb99c2b220a321921e29cb6\"",
+      "last_modified": null,
+      "saved_at": "2026-01-23T18:49:52Z",
+      "sha256": "76655cd7c363ca9a7474a95e9d60522a0c3211eaf2efad5b5e9cd7f9e0365b51",
+      "size_bytes": 3077395,
+      "source": "raw.githubusercontent.com",
+      "url": "https://raw.githubusercontent.com/mitre/cti/refs/heads/master/ics-attack/ics-attack.json"
+    },
+    "mobile-attack.json": {
+      "content_type": "text/plain; charset=utf-8",
+      "etag": "W/\"a43c3c80cb73a26b54b8d4f8e85740a8d18f629b808420ffe80b28807b981364\"",
+      "last_modified": null,
+      "saved_at": "2026-01-23T18:49:53Z",
+      "sha256": "62ecc7e3cabacc2430de0d65078a3726b6d8f7b0eff9493fd6403b514f66518d",
+      "size_bytes": 4352625,
+      "source": "raw.githubusercontent.com",
+      "url": "https://raw.githubusercontent.com/mitre/cti/refs/heads/master/mobile-attack/mobile-attack.json"
+    },
+    "pre-attack.json": {
+      "content_type": "text/plain; charset=utf-8",
+      "etag": "W/\"526c491e1e69683da55214308fe5f4e5cbfcbd2c9d99d179b82c9a89c2435f75\"",
+      "last_modified": null,
+      "saved_at": "2026-01-23T18:49:52Z",
+      "sha256": "696f4f33f01eb9f06df83bd2b623b77e7d52e1a810a024e54574aec5e86afd3a",
+      "size_bytes": 589866,
+      "source": "raw.githubusercontent.com",
+      "url": "https://raw.githubusercontent.com/mitre/cti/refs/heads/master/pre-attack/pre-attack.json"
+    }
+  },
+  "generated_at": "2026-01-23T18:49:54Z"
+}

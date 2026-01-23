@@ -1,0 +1,13 @@
+{
+  "files": [
+    {
+      "filename": "nvdcpe-2.0.json",
+      "size_bytes": 747104931,
+      "sha256": "chunked-archive",
+      "url": "https://nvd.nist.gov/feeds/json/cpe/2.0/nvdcpe-2.0.zip",
+      "status": "success"
+    }
+  ],
+  "last_updated": "2026-01-23T19:50:03.206492",
+  "source": "https://nvd.nist.gov/feeds/json/cpe/2.0/"
+}

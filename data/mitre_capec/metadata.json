@@ -1,0 +1,15 @@
+{
+  "files": {
+    "capec_latest.xml": {
+      "content_type": "text/xml",
+      "etag": null,
+      "last_modified": "Tue, 24 Jan 2023 18:32:31 GMT",
+      "saved_at": "2026-01-23T18:49:54Z",
+      "sha256": "70279a2dff0cb0ad79e546adb07828335a704ad5210e047e09e986172fc9e34d",
+      "size_bytes": 3849998,
+      "source": "capec.mitre.org",
+      "url": "https://capec.mitre.org/data/xml/capec_latest.xml"
+    }
+  },
+  "generated_at": "2026-01-23T18:49:54Z"
+}
