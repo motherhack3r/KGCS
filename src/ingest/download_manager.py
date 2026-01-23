@@ -19,6 +19,8 @@ from typing import Dict, List, Optional
 from urllib.request import urlopen, Request
 from urllib.error import URLError, HTTPError
 import gzip
+import importlib.util
+import asyncio
 from abc import ABC, abstractmethod
 
 # Configure logging
@@ -570,6 +572,43 @@ class DownloadPipeline:
         logger.info("=" * 70)
         
         start_time = datetime.now()
+        # Attempt to run the async downloader from the `data-raw` pipeline if available.
+        try:
+            AsyncStandardsDownloader = None
+            # First try a clean import that might exist in some layouts
+            try:
+                from data_raw.src.downloader import StandardsDownloader as AsyncStandardsDownloader  # type: ignore
+            except Exception:
+                # Fallback: load by path from the workspace data-raw directory
+                downloader_path = Path('data-raw') / 'src' / 'downloader.py'
+                if downloader_path.exists():
+                    spec = importlib.util.spec_from_file_location('data_raw_downloader', str(downloader_path))
+                    if spec and spec.loader:
+                        mod = importlib.util.module_from_spec(spec)
+                        spec.loader.exec_module(mod)  # type: ignore
+                        AsyncStandardsDownloader = getattr(mod, 'StandardsDownloader', None)
+
+            if AsyncStandardsDownloader:
+                logger.info('Integrating async StandardsDownloader from data-raw...')
+                try:
+                    async def _run_async():
+                        async with AsyncStandardsDownloader(output_dir=self.base_dir) as d:
+                            await d.run()
+
+                    # Use asyncio.run where possible; handle already-running event loops gracefully
+                    try:
+                        asyncio.run(_run_async())
+                    except RuntimeError:
+                        loop = asyncio.get_event_loop()
+                        if loop.is_running():
+                            logger.info('Event loop already running; scheduling async downloader task')
+                            loop.create_task(_run_async())
+                        else:
+                            loop.run_until_complete(_run_async())
+                except Exception as e:
+                    logger.warning(f'Async downloader integration failed: {e}')
+        except Exception as e:
+            logger.debug(f'Could not attempt async downloader integration: {e}')
         
         for downloader in self.downloaders:
             try:
