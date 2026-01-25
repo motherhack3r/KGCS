@@ -78,6 +78,32 @@ python scripts/cleanup_workspace.py --full --execute
 
 ⚠️ **Warning:** This will delete downloaded raw data. Re-run the data ingestion pipeline to re-download.
 
+### Data Cleanup (Include Transformed Data)
+
+Include transformed sample data in `data/` folder:
+
+```bash
+python scripts/cleanup_workspace.py --data --execute
+```
+
+⚠️ **Warning:** This will delete transformed sample outputs. Re-run ETL transformers to recreate.
+
+### Complete Cleanup (Everything)
+
+Combine both flags to clean everything:
+
+```bash
+python scripts/cleanup_workspace.py --full --data --execute
+```
+
+⚠️ **This will delete:**
+- All temporary files and cache
+- All test artifacts and logs
+- All downloaded source data (data-raw/)
+- All transformed sample data (data/samples/)
+
+Manifest files are preserved for reference.
+
 ## Categories Cleaned
 
 ### Always Cleaned (unless excluded by code)
@@ -99,6 +125,22 @@ python scripts/cleanup_workspace.py --full --execute
 | Directory | Purpose | Size | Recoverable |
 |---|---|---|---|
 | `data-raw/` | Downloaded source data (CPE, CVE, etc.) | 1-5 GB+ | Yes - requires re-download |
+
+### Optional (with `--data` flag)
+
+| Directory | Purpose | Recoverable |
+|---|---|---|
+| `data/attack/samples/` | Transformed ATT&CK sample data | Yes - re-run ETL |
+| `data/capec/samples/` | Transformed CAPEC sample data | Yes - re-run ETL |
+| `data/car/samples/` | Transformed CAR sample data | Yes - re-run ETL |
+| `data/cpe/samples/` | Transformed CPE sample data | Yes - re-run ETL |
+| `data/cve/samples/` | Transformed CVE sample data | Yes - re-run ETL |
+| `data/cwe/samples/` | Transformed CWE sample data | Yes - re-run ETL |
+| `data/d3fend/samples/` | Transformed D3FEND sample data | Yes - re-run ETL |
+| `data/engage/samples/` | Transformed ENGAGE sample data | Yes - re-run ETL |
+| `data/shield/samples/` | Transformed SHIELD sample data | Yes - re-run ETL |
+
+**Note:** Manifest files in `data/*/` are preserved.
 
 ## When to Clean
 
@@ -190,7 +232,8 @@ python scripts/cleanup_workspace.py [OPTIONS]
 Options:
   --dry-run      Show what would be deleted without actually deleting
   --execute      Actually delete the files (default is to list only)
-  --full         Include optional patterns like data-raw/
+  --full         Include downloaded source data (data-raw/)
+  --data         Include transformed sample data (data/)
   --help         Show help message
 ```
 

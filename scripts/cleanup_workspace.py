@@ -51,13 +51,31 @@ GLOB_PATTERNS = [
 ]
 
 # Optional patterns (only with --full)
-OPTIONAL_PATTERNS = [
-    ("data-raw/", "Downloaded source data", False),
+OPTIONAL_PATTERNS_FULL = [
+    ("data-raw/", "Downloaded source data (NVD/MITRE)", False),
+]
+
+# Optional patterns (only with --data)
+OPTIONAL_PATTERNS_DATA = [
+    ("data/attack/samples/", "Transformed ATT&CK sample data", False),
+    ("data/capec/samples/", "Transformed CAPEC sample data", False),
+    ("data/car/samples/", "Transformed CAR sample data", False),
+    ("data/cpe/samples/", "Transformed CPE sample data", False),
+    ("data/cve/samples/", "Transformed CVE sample data", False),
+    ("data/cwe/samples/", "Transformed CWE sample data", False),
+    ("data/d3fend/samples/", "Transformed D3FEND sample data", False),
+    ("data/engage/samples/", "Transformed ENGAGE sample data", False),
+    ("data/shield/samples/", "Transformed SHIELD sample data", False),
 ]
 
 
-def find_cleanup_items() -> Tuple[List[Path], dict]:
-    """Find all items that should be cleaned."""
+def find_cleanup_items(include_full: bool = False, include_data: bool = False) -> Tuple[List[Path], dict]:
+    """Find all items that should be cleaned.
+    
+    Args:
+        include_full: Include downloaded source data (data-raw/)
+        include_data: Include transformed data samples (data/)
+    """
     items_to_remove = []
     stats = {
         "dirs": 0,
@@ -67,8 +85,15 @@ def find_cleanup_items() -> Tuple[List[Path], dict]:
 
     project_root = Path.cwd()
 
+    # Build patterns list
+    all_patterns = CLEANUP_PATTERNS + GLOB_PATTERNS
+    if include_full:
+        all_patterns.extend(OPTIONAL_PATTERNS_FULL)
+    if include_data:
+        all_patterns.extend(OPTIONAL_PATTERNS_DATA)
+
     # Check directory patterns
-    for pattern, desc, _ in CLEANUP_PATTERNS + OPTIONAL_PATTERNS:
+    for pattern, desc, _ in all_patterns:
         path = project_root / pattern.rstrip("/")
         if path.exists():
             items_to_remove.append((path, desc))
@@ -159,18 +184,18 @@ def main():
     parser.add_argument(
         "--full",
         action="store_true",
-        help="Include optional patterns like data-raw/ (downloaded data)",
+        help="Include downloaded source data (data-raw/)",
+    )
+    parser.add_argument(
+        "--data",
+        action="store_true",
+        help="Include transformed sample data (data/)",
     )
 
     args = parser.parse_args()
 
-    # Filter patterns based on --full flag
-    patterns = CLEANUP_PATTERNS + GLOB_PATTERNS
-    if args.full:
-        patterns.extend(OPTIONAL_PATTERNS)
-
     # Find items
-    items, stats = find_cleanup_items()
+    items, stats = find_cleanup_items(include_full=args.full, include_data=args.data)
 
     if not items:
         print("✅ Workspace is clean! No items found to remove.")
