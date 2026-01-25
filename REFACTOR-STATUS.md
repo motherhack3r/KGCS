@@ -58,13 +58,23 @@ Successfully reorganized KGCS documentation and codebase structure:
 | Verification scripts | `src/scripts/` | `tests/` | Analysis/verification belongs with tests |
 | Ingest utilities | `data-raw/src/` | `src/ingest/` | Consolidate all ingestion code together |
 | Ingest config | `data-raw/src/config.py` | `src/ingest/ingest_config.py` | Clarity on purpose; avoid confusion with main config.py |
+| Dev/debug scripts | `scripts/` (10 files, 2 dirs) | `scripts/.archive/` | Keep only production scripts in root |
 | Empty directories | `src/scripts/`, `data-raw/src/`, `data-raw/` | Removed | No longer needed |
 
-**Files moved:**
+**Files consolidated:**
 - `verify_causal_chain.py` → `tests/verify_causal_chain.py`
 - `verify_defense_layers.py` → `tests/verify_defense_layers.py`
 - `downloader.py` → `src/ingest/downloader.py`
-- `config.py` → `src/ingest/ingest_config.py` (renamed for clarity)
+- `config.py` → `src/ingest/ingest_config.py` (renamed)
+
+**Scripts archived to `scripts/.archive/`:**
+- 10 development/debug scripts (merge_*, normalize_*, check_*, inspect_*, preview_*, etl_cve_stream.py)
+- 2 directories: `db/` (7 Neo4j debugging scripts), `legacy/phase4/` (8 phase 4 verification scripts)
+
+**Scripts retained in `scripts/` (production, documented, CI/CD):**
+- `validate_shacl_stream.py` - SHACL validation orchestrator
+- `validate_etl_pipeline_order.py` - ETL pipeline validator
+- `reload_neo4j.py` - Graph database operations
 
 ---
 
