@@ -9,7 +9,8 @@ Usage:
   python scripts/cleanup_workspace.py              # List items to clean
   python scripts/cleanup_workspace.py --dry-run    # Show what would be deleted
   python scripts/cleanup_workspace.py --execute    # Actually delete files
-  python scripts/cleanup_workspace.py --full       # Include downloaded data
+  python scripts/cleanup_workspace.py --sources    # Include downloaded source data
+  python scripts/cleanup_workspace.py --data       # Include transformed sample data
 
 Categories cleaned:
   • tmp/                 - Temporary working files
@@ -22,8 +23,11 @@ Categories cleaned:
   • .coverage            - Coverage reports
   • htmlcov/             - HTML coverage reports
 
-Optional (with --full):
-  • data-raw/           - Downloaded source data
+Optional (with --sources):
+  • data/*/raw/          - Downloaded source data (CPE, CVE, CWE, etc.)
+
+Optional (with --data):
+  • data/*/samples/      - Transformed sample data (CPE, CVE, CWE, etc.)
 """
 
 import os
@@ -50,9 +54,17 @@ GLOB_PATTERNS = [
     ("**/.coverage*", "Coverage files", True),
 ]
 
-# Optional patterns (only with --full)
-OPTIONAL_PATTERNS_FULL = [
-    ("data-raw/", "Downloaded source data (NVD/MITRE)", False),
+# Optional patterns (only with --sources)
+OPTIONAL_PATTERNS_SOURCES = [
+    ("data/attack/raw/", "Downloaded ATT&CK source data", False),
+    ("data/capec/raw/", "Downloaded CAPEC source data", False),
+    ("data/car/raw/", "Downloaded CAR source data", False),
+    ("data/cpe/raw/", "Downloaded CPE source data", False),
+    ("data/cve/raw/", "Downloaded CVE source data", False),
+    ("data/cwe/raw/", "Downloaded CWE source data", False),
+    ("data/d3fend/raw/", "Downloaded D3FEND source data", False),
+    ("data/engage/raw/", "Downloaded ENGAGE source data", False),
+    ("data/shield/raw/", "Downloaded SHIELD source data", False),
 ]
 
 # Optional patterns (only with --data)
@@ -69,12 +81,12 @@ OPTIONAL_PATTERNS_DATA = [
 ]
 
 
-def find_cleanup_items(include_full: bool = False, include_data: bool = False) -> Tuple[List[Path], dict]:
+def find_cleanup_items(include_sources: bool = False, include_data: bool = False) -> Tuple[List[Path], dict]:
     """Find all items that should be cleaned.
     
     Args:
-        include_full: Include downloaded source data (data-raw/)
-        include_data: Include transformed data samples (data/)
+        include_sources: Include downloaded source data (data/*/raw/)
+        include_data: Include transformed data samples (data/*/samples/)
     """
     items_to_remove = []
     stats = {
@@ -87,8 +99,8 @@ def find_cleanup_items(include_full: bool = False, include_data: bool = False) -
 
     # Build patterns list
     all_patterns = CLEANUP_PATTERNS + GLOB_PATTERNS
-    if include_full:
-        all_patterns.extend(OPTIONAL_PATTERNS_FULL)
+    if include_sources:
+        all_patterns.extend(OPTIONAL_PATTERNS_SOURCES)
     if include_data:
         all_patterns.extend(OPTIONAL_PATTERNS_DATA)
 
@@ -182,20 +194,20 @@ def main():
         help="Actually delete the files (default is to list only)",
     )
     parser.add_argument(
-        "--full",
+        "--sources",
         action="store_true",
-        help="Include downloaded source data (data-raw/)",
+        help="Include downloaded source data (data/*/raw/)",
     )
     parser.add_argument(
         "--data",
         action="store_true",
-        help="Include transformed sample data (data/)",
+        help="Include transformed sample data (data/*/samples/)",
     )
 
     args = parser.parse_args()
 
     # Find items
-    items, stats = find_cleanup_items(include_full=args.full, include_data=args.data)
+    items, stats = find_cleanup_items(include_sources=args.sources, include_data=args.data)
 
     if not items:
         print("✅ Workspace is clean! No items found to remove.")

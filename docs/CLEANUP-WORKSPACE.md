@@ -12,7 +12,8 @@ The cleanup script removes temporary files, cache, logs, and test artifacts that
 - **Python cache:** `__pycache__/`, `.pytest_cache/`, `*.pyc`, `*.pyo`
 - **RDFlib cache:** `.rdflib_default/` directory
 - **Coverage reports:** `htmlcov/`, `.coverage*` files
-- **Optional:** Downloaded data in `data-raw/` (with `--full` flag)
+- **Optional (sources):** Downloaded source data in `data/*/raw/` directories (with `--sources` flag)
+- **Optional (data):** Transformed sample data in `data/*/samples/` directories (with `--data` flag)
 
 ## Usage
 
@@ -68,15 +69,15 @@ Output:
 ✅ Cleaned 3 items
 ```
 
-### Full Cleanup (Include Downloaded Data)
+### Source Data Cleanup (Include Downloaded Source Data)
 
-Include optional patterns like `data-raw/` (downloaded source data):
+Include downloaded source data from `data/*/raw/` directories (CPE, CVE, CWE, etc.):
 
 ```bash
-python scripts/cleanup_workspace.py --full --execute
+python scripts/cleanup_workspace.py --sources --execute
 ```
 
-⚠️ **Warning:** This will delete downloaded raw data. Re-run the data ingestion pipeline to re-download.
+⚠️ **Warning:** This will delete downloaded source data. Re-run the data ingestion pipeline to re-download.
 
 ### Data Cleanup (Include Transformed Data)
 
@@ -93,14 +94,14 @@ python scripts/cleanup_workspace.py --data --execute
 Combine both flags to clean everything:
 
 ```bash
-python scripts/cleanup_workspace.py --full --data --execute
+python scripts/cleanup_workspace.py --sources --data --execute
 ```
 
 ⚠️ **This will delete:**
 - All temporary files and cache
 - All test artifacts and logs
-- All downloaded source data (data-raw/)
-- All transformed sample data (data/samples/)
+- All downloaded source data (data/*/raw/)
+- All transformed sample data (data/*/samples/)
 
 Manifest files are preserved for reference.
 
@@ -120,11 +121,19 @@ Manifest files are preserved for reference.
 | `htmlcov/` | HTML coverage reports | Yes - re-run coverage |
 | `.coverage*` | Coverage data files | Yes - re-run tests with coverage |
 
-### Optional (with `--full` flag)
+### Optional (with `--sources` flag)
 
 | Directory | Purpose | Size | Recoverable |
-|---|---|---|---|
-| `data-raw/` | Downloaded source data (CPE, CVE, etc.) | 1-5 GB+ | Yes - requires re-download |
+| --- | --- | --- | --- |
+| `data/attack/raw/` | Downloaded ATT&CK source data | 10-50 MB | Yes - requires re-download |
+| `data/capec/raw/` | Downloaded CAPEC source data | 10-50 MB | Yes - requires re-download |
+| `data/car/raw/` | Downloaded CAR source data | 1-10 MB | Yes - requires re-download |
+| `data/cpe/raw/` | Downloaded CPE source data | 800+ MB | Yes - requires re-download |
+| `data/cve/raw/` | Downloaded CVE source data | 5+ GB | Yes - requires re-download |
+| `data/cwe/raw/` | Downloaded CWE source data | 10-50 MB | Yes - requires re-download |
+| `data/d3fend/raw/` | Downloaded D3FEND source data | 10-50 MB | Yes - requires re-download |
+| `data/engage/raw/` | Downloaded ENGAGE source data | 1-10 MB | Yes - requires re-download |
+| `data/shield/raw/` | Downloaded SHIELD source data | 10-50 MB | Yes - requires re-download |
 
 ### Optional (with `--data` flag)
 
@@ -161,8 +170,8 @@ python scripts/cleanup_workspace.py --execute
 
 **Before deployment** (good practice):
 ```bash
-# Full clean including optional data
-python scripts/cleanup_workspace.py --full --execute
+# Full clean including optional source and sample data
+python scripts/cleanup_workspace.py --sources --data --execute
 ```
 
 **Troubleshooting** (when tests act weird):
@@ -196,7 +205,7 @@ Files: 103
 - Temporary working files (recreated as needed)
 
 ⚠️ **Be careful with:**
-- `data-raw/` - Contains downloaded source data (use `--full` only if needed)
+- `data/*/raw/` - Contains downloaded source data (use `--sources` only if needed)
 
 ✅ **Never deleted:**
 - Source code (`src/`, `tests/`, `scripts/`)
