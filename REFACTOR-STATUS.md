@@ -9,13 +9,14 @@
 
 ## Quick Summary
 
-Successfully reorganized KGCS documentation structure:
-- ✅ Archived 18 redundant files (preserved in git history)
+Successfully reorganized KGCS documentation and codebase structure:
+- ✅ Archived 18 redundant documentation files (preserved in git history)
+- ✅ Consolidated scripts: `src/scripts/` → `tests/` + `data-raw/` → `src/ingest/`
 - ✅ Created 4 comprehensive new guides
-- ✅ Zero functional code changes
+- ✅ Zero breaking changes to functional code
 - ✅ All files preserved and recoverable
 
-**Result:** Cleaner folder structure (-30% clutter), better organization, comprehensive documentation.
+**Result:** Cleaner structure (-30% doc clutter), better code organization, comprehensive documentation, removed confusing dual locations.
 
 ---
 
@@ -49,6 +50,21 @@ Successfully reorganized KGCS documentation structure:
 | Active docs | ~40 | ~40 | ✅ No loss of essential docs |
 | Guide coverage | Scattered | Comprehensive | ✅ Better organized |
 | Lines of docs | 2,500+ | 3,900+ | +1,400 (better structured) |
+
+### 🔧 Code Structure Changes
+
+| Item | Before | After | Why |
+| --- | --- | --- | --- |
+| Verification scripts | `src/scripts/` | `tests/` | Analysis/verification belongs with tests |
+| Ingest utilities | `data-raw/src/` | `src/ingest/` | Consolidate all ingestion code together |
+| Ingest config | `data-raw/src/config.py` | `src/ingest/ingest_config.py` | Clarity on purpose; avoid confusion with main config.py |
+| Empty directories | `src/scripts/`, `data-raw/src/`, `data-raw/` | Removed | No longer needed |
+
+**Files moved:**
+- `verify_causal_chain.py` → `tests/verify_causal_chain.py`
+- `verify_defense_layers.py` → `tests/verify_defense_layers.py`
+- `downloader.py` → `src/ingest/downloader.py`
+- `config.py` → `src/ingest/ingest_config.py` (renamed for clarity)
 
 ---
 
