@@ -86,17 +86,24 @@ def process_product(cpe: dict, out_f) -> int:
 
 def main():
     parser = argparse.ArgumentParser(description='Streaming ETL: NVD CPE JSON → Turtle')
-    parser.add_argument('--input', '-i', required=True, help='Input CPE API JSON file')
+    parser.add_argument('--input', '-i', required=True, help='Input CPE API JSON file(s), glob, or directory')
     parser.add_argument('--output', '-o', required=True, help='Output Turtle file')
     args = parser.parse_args()
 
-    if not os.path.exists(args.input):
+    import glob
+    input_files = []
+    if os.path.isdir(args.input):
+        for fn in sorted(os.listdir(args.input)):
+            if fn.lower().endswith('.json'):
+                input_files.append(os.path.join(args.input, fn))
+    else:
+        input_files = glob.glob(args.input)
+        if not input_files:
+            input_files = [args.input]
+
+    if not any(os.path.exists(p) for p in input_files):
         print(f"Error: Input file not found: {args.input}", file=sys.stderr)
         sys.exit(1)
-
-    print(f"Loading CPE JSON from {args.input}...")
-    with open(args.input, 'r', encoding='utf-8') as f:
-        cpe_json = json.load(f)
 
     header = (
         "@prefix sec: <https://example.org/sec/core#> .\n"
@@ -108,10 +115,18 @@ def main():
     total = 0
     with open(args.output, 'w', encoding='utf-8') as out_f:
         out_f.write(header)
+        print(f"Loading CPE JSON from {args.input}...")
         print("Transforming and writing streaming Turtle...")
-        for product in cpe_json.get('products', []):
-            cpe = product.get('cpe', {})
-            total += process_product(cpe, out_f)
+        for input_file in input_files:
+            if not os.path.exists(input_file):
+                print(f"Warning: {input_file} not found, skipping")
+                continue
+
+            with open(input_file, 'r', encoding='utf-8') as f:
+                cpe_json = json.load(f)
+                for product in cpe_json.get('products', []):
+                    cpe = product.get('cpe', {})
+                    total += process_product(cpe, out_f)
 
     print(f'Done — triples written: {total}', file=sys.stderr)
 

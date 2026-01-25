@@ -14,6 +14,7 @@ import json
 import os
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 from datetime import datetime
 from rdflib import Graph, Namespace, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD
@@ -129,6 +130,75 @@ class CWEtoRDFTransformer:
                     self.graph.add((weakness_node, SEC.parentOf, related_node))
 
 
+def _flatten_text(element: ET.Element | None) -> str:
+    if element is None:
+        return ""
+    text_parts = []
+    if element.text and element.text.strip():
+        text_parts.append(element.text.strip())
+    for child in element:
+        child_text = _flatten_text(child)
+        if child_text:
+            text_parts.append(child_text)
+        if child.tail and child.tail.strip():
+            text_parts.append(child.tail.strip())
+    return " ".join(text_parts).strip()
+
+
+def _extract_platforms(weakness: ET.Element, ns: dict) -> list:
+    platforms = []
+    for lang in weakness.findall('.//cwe:Applicable_Platforms/cwe:Language', ns):
+        value = lang.get('Name') or lang.get('Class')
+        if value:
+            platforms.append({'Language': value})
+    for os_elem in weakness.findall('.//cwe:Applicable_Platforms/cwe:Operating_System', ns):
+        value = os_elem.get('Name') or os_elem.get('Class')
+        if value:
+            platforms.append({'OperatingSystem': value})
+    return platforms
+
+
+def _cwe_xml_to_json(path: str) -> dict:
+    tree = ET.parse(path)
+    root = tree.getroot()
+    ns = {'cwe': 'http://cwe.mitre.org/cwe-7'}
+
+    weaknesses = []
+    for weakness in root.findall('.//cwe:Weaknesses/cwe:Weakness', ns):
+        cwe_id = weakness.get('ID')
+        name = weakness.get('Name')
+        abstraction = weakness.get('Abstraction')
+        status = weakness.get('Status')
+
+        description = _flatten_text(weakness.find('cwe:Description', ns))
+
+        related = []
+        for rel in weakness.findall('.//cwe:Related_Weaknesses/cwe:Related_Weakness', ns):
+            rel_id = rel.get('CWE_ID')
+            nature = rel.get('Nature')
+            if rel_id:
+                related.append({'ID': rel_id, 'Relationship': nature})
+
+        weaknesses.append({
+            'ID': cwe_id,
+            'Name': name,
+            'Description': description,
+            'WeaknessAbstraction': abstraction,
+            'Status': status,
+            'ApplicablePlatforms': _extract_platforms(weakness, ns),
+            'RelatedWeaknesses': related
+        })
+
+    return {'Weakness': weaknesses}
+
+
+def _load_cwe_data(path: str) -> dict:
+    if path.lower().endswith('.xml'):
+        return _cwe_xml_to_json(path)
+    with open(path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
 def main():
     parser = argparse.ArgumentParser(description="ETL: MITRE CWE JSON → RDF Turtle")
     parser.add_argument("--input", "-i", required=True, help="Input CWE JSON file")
@@ -141,9 +211,8 @@ def main():
         print(f"Error: Input file not found: {args.input}", file=sys.stderr)
         sys.exit(1)
 
-    print(f"Loading CWE JSON from {args.input}...")
-    with open(args.input, "r", encoding="utf-8") as f:
-        cwe_json = json.load(f)
+    print(f"Loading CWE data from {args.input}...")
+    cwe_json = _load_cwe_data(args.input)
 
     print("Transforming to RDF...")
     transformer = CWEtoRDFTransformer()

@@ -32,18 +32,75 @@ class D3FENDtoRDFTransformer:
 
     def transform(self, json_data: dict) -> Graph:
         """Transform D3FEND JSON to RDF graph."""
-        if "DefensiveTechniques" not in json_data:
-            raise ValueError("JSON must contain 'DefensiveTechniques' array")
-        
-        techniques = json_data["DefensiveTechniques"]
-        
-        for technique in techniques:
-            self._add_defensive_technique(technique)
-        
-        self._add_technique_relationships(techniques)
-        self._add_mitigation_relationships(techniques)
-        
-        return self.graph
+        if "DefensiveTechniques" in json_data:
+            techniques = json_data["DefensiveTechniques"]
+
+            for technique in techniques:
+                self._add_defensive_technique(technique)
+
+            self._add_technique_relationships(techniques)
+            self._add_mitigation_relationships(techniques)
+            return self.graph
+
+        if "@graph" in json_data:
+            self._transform_jsonld(json_data.get("@graph", []))
+            return self.graph
+
+        raise ValueError("Unsupported D3FEND JSON format")
+
+    def _transform_jsonld(self, graph_items: list) -> None:
+        """Transform D3FEND JSON-LD (@graph) into DefensiveTechnique nodes."""
+        for item in graph_items:
+            if not isinstance(item, dict):
+                continue
+            if not self._is_defensive_technique(item):
+                continue
+
+            d3fend_id = self._get_value(item.get("d3f:d3fend-id")) or self._get_value(item.get("d3f:d3fendId"))
+            label = self._get_value(item.get("rdfs:label"))
+            definition = self._get_value(item.get("d3f:definition"))
+
+            if not d3fend_id:
+                fallback_id = self._get_value(item.get("@id"))
+                if not fallback_id:
+                    continue
+                d3fend_id = fallback_id
+
+            d3fend_id_full = f"{d3fend_id}" if str(d3fend_id).startswith("D3") else f"D3FEND-{d3fend_id}"
+            technique_node = URIRef(f"{self.EX}deftech/{d3fend_id_full}")
+
+            self.graph.add((technique_node, RDF.type, self.SEC.DefensiveTechnique))
+            self.graph.add((technique_node, self.SEC.d3fendId, Literal(d3fend_id_full, datatype=XSD.string)))
+
+            if label:
+                self.graph.add((technique_node, RDFS.label, Literal(label, datatype=XSD.string)))
+
+            if definition:
+                self.graph.add((technique_node, self.SEC.description, Literal(definition, datatype=XSD.string)))
+
+    def _is_defensive_technique(self, item: dict) -> bool:
+        types = item.get("@type")
+        if isinstance(types, str):
+            types = [types]
+
+        if isinstance(types, list) and "d3f:DefensiveTechnique" in types:
+            return True
+
+        sub_classes = item.get("rdfs:subClassOf")
+        if isinstance(sub_classes, dict):
+            sub_classes = [sub_classes]
+
+        if isinstance(sub_classes, list):
+            for sub in sub_classes:
+                if isinstance(sub, dict) and sub.get("@id") == "d3f:DefensiveTechnique":
+                    return True
+
+        return False
+
+    def _get_value(self, value):
+        if isinstance(value, dict):
+            return value.get("@value") or value.get("@id") or value.get("value")
+        return value
 
     def _add_defensive_technique(self, technique: dict):
         """Add a D3FEND defensive technique node."""
@@ -122,10 +179,10 @@ def main():
     args = parser.parse_args()
     
     try:
-        with open(args.input, "r") as f:
+        with open(args.input, "r", encoding="utf-8", errors="replace") as f:
             json_data = json.load(f)
     except Exception as e:
-        print(f"❌ Error loading JSON: {e}")
+        print(f"Error loading JSON: {e}")
         return 1
     
     try:
@@ -140,11 +197,11 @@ def main():
         with open(args.output, "w") as f:
             f.write(ttl_content)
         
-        print(f"✓ Transformation complete: {args.output}")
+        print(f"Transformation complete: {args.output}")
         return 0
     
     except Exception as e:
-        print(f"❌ Transformation error: {e}")
+        print(f"Transformation error: {e}")
         return 1
 
 

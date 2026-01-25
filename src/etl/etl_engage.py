@@ -49,24 +49,24 @@ class ENGAGEtoRDFTransformer:
         engage_id = concept.get("ID", "")
         if not engage_id:
             return
-        
+
         engage_id_full = f"ENGAGE-{engage_id}" if not engage_id.startswith("ENGAGE-") else engage_id
         concept_node = URIRef(f"{self.EX}engagement/{engage_id_full}")
-        
+
         self.graph.add((concept_node, RDF.type, self.SEC.EngagementConcept))
         self.graph.add((concept_node, self.SEC.engageId, Literal(engage_id_full, datatype=XSD.string)))
-        
+
         if concept.get("Name"):
             self.graph.add((concept_node, RDFS.label, Literal(concept["Name"], datatype=XSD.string)))
-        
+
         if concept.get("Description"):
             desc_text = self._extract_description(concept["Description"])
             if desc_text:
                 self.graph.add((concept_node, self.SEC.description, Literal(desc_text, datatype=XSD.string)))
-        
+
         if concept.get("StrategicValue"):
             self.graph.add((concept_node, self.SEC.strategicValue, Literal(concept["StrategicValue"], datatype=XSD.string)))
-        
+
         if concept.get("Category"):
             self.graph.add((concept_node, self.SEC.category, Literal(concept["Category"], datatype=XSD.string)))
 
@@ -89,10 +89,10 @@ class ENGAGEtoRDFTransformer:
             engage_id = concept.get("ID", "")
             if not engage_id:
                 continue
-            
+
             engage_id_full = f"ENGAGE-{engage_id}" if not engage_id.startswith("ENGAGE-") else engage_id
             concept_node = URIRef(f"{self.EX}engagement/{engage_id_full}")
-            
+
             if concept.get("DisruptsTechniques"):
                 for att_technique in concept["DisruptsTechniques"]:
                     att_id = att_technique if isinstance(att_technique, str) else att_technique.get("ID", "")
@@ -100,6 +100,32 @@ class ENGAGEtoRDFTransformer:
                         att_id_full = f"{att_id}" if att_id.startswith("T") else f"T{att_id}"
                         att_node = URIRef(f"{self.EX}technique/{att_id_full}")
                         self.graph.add((concept_node, self.SEC.disrupts, att_node))
+
+
+def _load_engage_data(input_path: str) -> dict:
+    if os.path.isdir(input_path):
+        activities_path = os.path.join(input_path, "activities.json")
+        if not os.path.exists(activities_path):
+            raise FileNotFoundError(f"Missing activities.json in {input_path}")
+
+        with open(activities_path, "r", encoding="utf-8") as f:
+            activities = json.load(f)
+
+        normalized = []
+        for item in activities:
+            concept_id = item.get("id") or item.get("ID")
+            name = item.get("name") or item.get("Name")
+            description = item.get("description") or item.get("Description") or item.get("long_description")
+            normalized.append({
+                "ID": concept_id,
+                "Name": name,
+                "Description": description
+            })
+
+        return {"EngagementConcepts": normalized}
+
+    with open(input_path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 
 def main():
@@ -110,14 +136,13 @@ def main():
     args = parser.parse_args()
     
     try:
-        with open(args.input, "r") as f:
-            json_data = json.load(f)
+        json_data = _load_engage_data(args.input)
     except Exception as e:
-        print(f"❌ Error loading JSON: {e}")
+        print(f"Error loading ENGAGE data: {e}")
         return 1
     
     try:
-        print(f"Loading ENGAGE JSON from {args.input}...")
+        print(f"Loading ENGAGE data from {args.input}...")
         transformer = ENGAGEtoRDFTransformer()
         print("Transforming to RDF...")
         transformer.transform(json_data)
@@ -128,11 +153,11 @@ def main():
         with open(args.output, "w", encoding="utf-8") as f:
             f.write(ttl_content)
         
-        print(f"✓ Transformation complete: {args.output}")
+        print(f"Transformation complete: {args.output}")
         return 0
     
     except Exception as e:
-        print(f"❌ Transformation error: {e}")
+        print(f"Transformation error: {e}")
         return 1
 
 

@@ -49,24 +49,24 @@ class SHIELDtoRDFTransformer:
         shield_id = technique.get("ID", "")
         if not shield_id:
             return
-        
+
         shield_id_full = f"SHIELD-{shield_id}" if not shield_id.startswith("SHIELD-") else shield_id
         technique_node = URIRef(f"{self.EX}deception/{shield_id_full}")
-        
+
         self.graph.add((technique_node, RDF.type, self.SEC.DeceptionTechnique))
         self.graph.add((technique_node, self.SEC.shieldId, Literal(shield_id_full, datatype=XSD.string)))
-        
+
         if technique.get("Name"):
             self.graph.add((technique_node, RDFS.label, Literal(technique["Name"], datatype=XSD.string)))
-        
+
         if technique.get("Description"):
             desc_text = self._extract_description(technique["Description"])
             if desc_text:
                 self.graph.add((technique_node, self.SEC.description, Literal(desc_text, datatype=XSD.string)))
-        
+
         if technique.get("OperationalImpact"):
             self.graph.add((technique_node, self.SEC.operationalImpact, Literal(technique["OperationalImpact"], datatype=XSD.string)))
-        
+
         if technique.get("EaseOfEmployment"):
             self.graph.add((technique_node, self.SEC.easeOfEmployment, Literal(technique["EaseOfEmployment"], datatype=XSD.string)))
 
@@ -89,10 +89,10 @@ class SHIELDtoRDFTransformer:
             shield_id = technique.get("ID", "")
             if not shield_id:
                 continue
-            
+
             shield_id_full = f"SHIELD-{shield_id}" if not shield_id.startswith("SHIELD-") else shield_id
             technique_node = URIRef(f"{self.EX}deception/{shield_id_full}")
-            
+
             if technique.get("CountersTechniques"):
                 for att_technique in technique["CountersTechniques"]:
                     att_id = att_technique if isinstance(att_technique, str) else att_technique.get("ID", "")
@@ -100,6 +100,32 @@ class SHIELDtoRDFTransformer:
                         att_id_full = f"{att_id}" if att_id.startswith("T") else f"T{att_id}"
                         att_node = URIRef(f"{self.EX}technique/{att_id_full}")
                         self.graph.add((technique_node, self.SEC.counters, att_node))
+
+
+def _load_shield_data(input_path: str) -> dict:
+    if os.path.isdir(input_path):
+        techniques_path = os.path.join(input_path, "techniques.json")
+        if not os.path.exists(techniques_path):
+            raise FileNotFoundError(f"Missing techniques.json in {input_path}")
+
+        with open(techniques_path, "r", encoding="utf-8") as f:
+            techniques = json.load(f)
+
+        normalized = []
+        for item in techniques:
+            tech_id = item.get("id") or item.get("ID")
+            name = item.get("name") or item.get("Name")
+            description = item.get("description") or item.get("Description") or item.get("long_description")
+            normalized.append({
+                "ID": tech_id,
+                "Name": name,
+                "Description": description
+            })
+
+        return {"DeceptionTechniques": normalized}
+
+    with open(input_path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 
 def main():
@@ -110,14 +136,13 @@ def main():
     args = parser.parse_args()
     
     try:
-        with open(args.input, "r") as f:
-            json_data = json.load(f)
+        json_data = _load_shield_data(args.input)
     except Exception as e:
-        print(f"❌ Error loading JSON: {e}")
+        print(f"Error loading SHIELD data: {e}")
         return 1
     
     try:
-        print(f"Loading SHIELD JSON from {args.input}...")
+        print(f"Loading SHIELD data from {args.input}...")
         transformer = SHIELDtoRDFTransformer()
         print("Transforming to RDF...")
         transformer.transform(json_data)
@@ -128,11 +153,11 @@ def main():
         with open(args.output, "w", encoding="utf-8") as f:
             f.write(ttl_content)
         
-        print(f"✓ Transformation complete: {args.output}")
+        print(f"Transformation complete: {args.output}")
         return 0
     
     except Exception as e:
-        print(f"❌ Transformation error: {e}")
+        print(f"Transformation error: {e}")
         return 1
 
 
