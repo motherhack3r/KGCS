@@ -13,14 +13,52 @@ The script will call the existing validation module (`src.core.validation`) as a
 for each chunk, writing per-chunk JSON reports to the output directory.
 """
 import argparse
+import json
 import os
 import subprocess
 import sys
 import tempfile
 import time
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 
-def chunk_and_validate(data_path, shapes, out_dir, chunk_size=1000, per_call_timeout=300):
+def _validate_chunk(tmp_path: str, shapes: str, out_dir: str, per_call_timeout: int, idx: int):
+    cmd = [sys.executable, '-m', 'src.core.validation', '--data', tmp_path, '--shapes', shapes, '--output', out_dir]
+    try:
+        start = time.time()
+        result = subprocess.run(
+            cmd,
+            check=False,
+            timeout=per_call_timeout,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        elapsed = time.time() - start
+        report_name = f"shacl-report-{os.path.basename(tmp_path)}.json"
+        report_path = os.path.join(out_dir, report_name)
+        report = None
+        if os.path.exists(report_path):
+            with open(report_path, 'r', encoding='utf-8') as fh:
+                report = json.load(fh)
+            try:
+                os.remove(report_path)
+            except Exception:
+                pass
+        error_text = None
+        if result.returncode not in (0, 1) and (result.stderr or result.stdout):
+            error_text = (result.stderr or result.stdout).strip()
+        return idx, elapsed, result.returncode, report, error_text
+    except subprocess.TimeoutExpired:
+        return idx, None, None, None, f"Chunk {idx}: validation timed out after {per_call_timeout}s"
+    finally:
+        try:
+            os.remove(tmp_path)
+        except Exception:
+            pass
+
+
+def chunk_and_validate(data_path, shapes, out_dir, chunk_size=1000, per_call_timeout=300, workers=1, summary_report=None, progress_newline=False):
     os.makedirs(out_dir, exist_ok=True)
     header_lines = []
 
@@ -47,23 +85,10 @@ def chunk_and_validate(data_path, shapes, out_dir, chunk_size=1000, per_call_tim
             tf.write('@prefix ex: <https://example.org/> .\n\n')
             for L in tmp_lines:
                 tf.write(L)
-        # call validator as subprocess to avoid importing packaging issues
-        cmd = [sys.executable, '-m', 'src.core.validation', '--data', tmp_path, '--shapes', shapes, '--output', out_dir]
-        try:
-            start = time.time()
-            subprocess.run(cmd, check=False, timeout=per_call_timeout)
-            elapsed = time.time() - start
-        except subprocess.TimeoutExpired:
-            print(f"Chunk {idx}: validation timed out after {per_call_timeout}s", file=sys.stderr)
-            elapsed = None
-        # remove tmp file to save space
-        try:
-            os.remove(tmp_path)
-        except Exception:
-            pass
-        return elapsed
+        return tmp_path
 
     idx = 0
+    chunk_files = []
     with open(data_path, 'r', encoding='utf-8') as fh:
         for line in fh:
             if not line.strip():
@@ -85,8 +110,9 @@ def chunk_and_validate(data_path, shapes, out_dir, chunk_size=1000, per_call_tim
                 # if chunk reached
                 if len(current_chunk_subjects) >= chunk_size:
                     idx += 1
-                    elapsed = flush_chunk(chunk_lines, idx)
-                    print(f"Validated chunk {idx}; elapsed={elapsed}")
+                    tmp_path = flush_chunk(chunk_lines, idx)
+                    if tmp_path:
+                        chunk_files.append((idx, tmp_path))
                     chunk_lines = []
                     current_chunk_subjects = set()
                     current_subject = subj
@@ -96,10 +122,77 @@ def chunk_and_validate(data_path, shapes, out_dir, chunk_size=1000, per_call_tim
     # flush remaining
     if chunk_lines:
         idx += 1
-        elapsed = flush_chunk(chunk_lines, idx)
-        print(f"Validated chunk {idx}; elapsed={elapsed}")
+        tmp_path = flush_chunk(chunk_lines, idx)
+        if tmp_path:
+            chunk_files.append((idx, tmp_path))
+
+    total = len(chunk_files)
+    completed = 0
+    chunk_reports = []
+    errors = []
+
+    def update_progress():
+        percent = (completed / total) * 100 if total else 100
+        bar_width = 20
+        filled = int(bar_width * (percent / 100)) if total else bar_width
+        bar = "█" * filled + "░" * (bar_width - filled)
+        message = f"Validated {completed}/{total} chunks ({percent:0.1f}%) {bar}"
+        if progress_newline:
+            print(message, flush=True)
+        else:
+            print(f"\r{message}", end='', flush=True)
+
+    if workers and workers > 1:
+        with ProcessPoolExecutor(max_workers=workers) as executor:
+            futures = [executor.submit(_validate_chunk, tmp_path, shapes, out_dir, per_call_timeout, chunk_idx)
+                       for chunk_idx, tmp_path in chunk_files]
+            for future in as_completed(futures):
+                chunk_idx, elapsed, returncode, report, error = future.result()
+                completed += 1
+                update_progress()
+                if error:
+                    errors.append(error)
+                if report:
+                    report['chunk'] = chunk_idx
+                    report['elapsed'] = elapsed
+                    report['return_code'] = returncode
+                    chunk_reports.append(report)
+    else:
+        for chunk_idx, tmp_path in chunk_files:
+            chunk_idx, elapsed, returncode, report, error = _validate_chunk(tmp_path, shapes, out_dir, per_call_timeout, chunk_idx)
+            completed += 1
+            update_progress()
+            if error:
+                errors.append(error)
+            if report:
+                report['chunk'] = chunk_idx
+                report['elapsed'] = elapsed
+                report['return_code'] = returncode
+                chunk_reports.append(report)
+
+    if total:
+        print()
+
+    conforms = all(r.get('conforms') for r in chunk_reports) if chunk_reports else False
+
+    if summary_report is None:
+        base = os.path.basename(data_path)
+        summary_report = os.path.join(out_dir, f"shacl-report-{base}-summary.json")
+
+    summary = {
+        'data_file': data_path,
+        'conforms': bool(conforms),
+        'chunks': idx,
+        'triples_scanned': total_triples,
+        'errors': errors,
+        'chunk_reports': chunk_reports
+    }
+
+    with open(summary_report, 'w', encoding='utf-8') as fh:
+        json.dump(summary, fh, indent=2)
 
     print(f"Finished: chunks={idx}, triples_scanned={total_triples}")
+    print(f"Summary report: {summary_report}")
 
 
 def main():
@@ -109,6 +202,9 @@ def main():
     p.add_argument('--output', '-o', default='artifacts')
     p.add_argument('--chunk-size', type=int, default=1000, help='Number of unique subjects per chunk')
     p.add_argument('--per-call-timeout', type=int, default=300, help='Seconds timeout per validation call')
+    p.add_argument('--workers', type=int, default=1, help='Parallel validation workers (default: 1)')
+    p.add_argument('--summary-report', help='Write a single summary report JSON to this path')
+    p.add_argument('--progress-newline', action='store_true', help='Print progress updates as new lines (useful when piping)')
     args = p.parse_args()
 
     if not os.path.exists(args.data):
@@ -118,7 +214,16 @@ def main():
         print('Shapes file not found:', args.shapes, file=sys.stderr)
         raise SystemExit(2)
 
-    chunk_and_validate(args.data, args.shapes, args.output, chunk_size=args.chunk_size, per_call_timeout=args.per_call_timeout)
+    chunk_and_validate(
+        args.data,
+        args.shapes,
+        args.output,
+        chunk_size=args.chunk_size,
+        per_call_timeout=args.per_call_timeout,
+        workers=args.workers,
+        summary_report=args.summary_report,
+        progress_newline=args.progress_newline
+    )
 
 
 if __name__ == '__main__':
