@@ -1,6 +1,0 @@
-{
-  "data_file": "E:\\DEVEL\\LAIA\\KGCS\\data\\shacl-samples\\t2_good.ttl",
-  "conforms": false,
-  "results_text": "Validation Report\nConforms: False\nResults (1):\nConstraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:decimal ; sh:message Literal(\"VulnerabilityScore must include a baseScore (0.0-10.0).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:baseScore ]\n\tFocus Node: sec:cvss-t2\n\tValue Node: Literal(\"7.5\")\n\tResult Path: ex:baseScore\n\tMessage: VulnerabilityScore must include a baseScore (0.0-10.0).\n",
-  "violations": []
-}

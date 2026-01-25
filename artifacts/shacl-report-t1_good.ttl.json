@@ -1,6 +1,0 @@
-{
-  "data_file": "E:\\DEVEL\\LAIA\\KGCS\\data\\shacl-samples\\t1_good.ttl",
-  "conforms": false,
-  "results_text": "Validation Report\nConforms: False\nResults (2):\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:string ; sh:message Literal(\"AttackPattern (CAPEC) must include a capecId.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:capecId ]\n\tFocus Node: capec:capec-t1\n\tResult Path: ex:capecId\n\tMessage: AttackPattern (CAPEC) must include a capecId.\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:string ; sh:message Literal(\"Weakness (CWE) must include a cweId.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:cweId ]\n\tFocus Node: sec:weak-t1\n\tResult Path: ex:cweId\n\tMessage: Weakness (CWE) must include a cweId.\n",
-  "violations": []
-}

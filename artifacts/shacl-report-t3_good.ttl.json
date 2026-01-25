@@ -1,6 +1,0 @@
-{
-  "data_file": "E:\\DEVEL\\LAIA\\KGCS\\data\\shacl-samples\\t3_good.ttl",
-  "conforms": false,
-  "results_text": "Validation Report\nConforms: False\nResults (2):\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:class ex:Tactic ; sh:message Literal(\"Technique must belong to at least one Tactic (belongs_to).\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:belongs_to ]\n\tFocus Node: sec:tech-t3\n\tResult Path: ex:belongs_to\n\tMessage: Technique must belong to at least one Tactic (belongs_to).\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:datatype xsd:string ; sh:message Literal(\"DetectionAnalytic (CAR) must include a carId.\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:path ex:carId ]\n\tFocus Node: sec:car-t3\n\tResult Path: ex:carId\n\tMessage: DetectionAnalytic (CAR) must include a carId.\n",
-  "violations": []
-}

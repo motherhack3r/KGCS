@@ -1,6 +1,0 @@
-{
-  "data_file": "E:\\DEVEL\\LAIA\\KGCS\\data\\shacl-samples\\t6_good.ttl",
-  "conforms": true,
-  "results_text": "Validation Report\nConforms: True\n",
-  "violations": []
-}
