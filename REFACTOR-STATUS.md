@@ -72,9 +72,27 @@ Successfully reorganized KGCS documentation and codebase structure:
 - 2 directories: `db/` (7 Neo4j debugging scripts), `legacy/phase4/` (8 phase 4 verification scripts)
 
 **Scripts retained in `scripts/` (production, documented, CI/CD):**
+**Scripts retained in `scripts/` (production, documented, CI/CD):**
 - `validate_shacl_stream.py` - SHACL validation orchestrator
 - `validate_etl_pipeline_order.py` - ETL pipeline validator
 - `reload_neo4j.py` - Graph database operations
+
+**Tests archived to `tests/.archive/`:**
+- 12 redundant/exploratory test files:
+  - Individual standard integration tests (test_cpe_cve, test_attack, test_capec, test_cwe, test_defense_layers_integration)
+  - Causal chain verification duplicates (test_causal_chain, test_complete_chain, test_full_causal_chain, test_extended_chain)
+  - E2E/phase-specific tests (test_phase3_e2e, test_phase4_complete)
+  - Bug fix verification (test_cpe_parsing_fix)
+
+**Tests retained in `tests/` (core suite, documented):**
+- `test_phase3_comprehensive.py` - All 9 ETL transformers (primary test)
+- `test_etl_pipeline.py` - Single standard E2E validation
+- `test_standards_downloader.py` - Downloader integration
+- `test_neo4j_connection.py` - Database connectivity
+- `test_neo4j_data_load.py` - Data loading
+- `test_download_integration.py` - Integration test
+- `verify_causal_chain.py` - Standalone verification utility
+- `verify_defense_layers.py` - Standalone verification utility
 
 ---
 
@@ -84,7 +102,7 @@ Successfully reorganized KGCS documentation and codebase structure:
 
 ```
 src/             ← All ETL, config, extensions unchanged
-tests/           ← All test suites functional
+tests/           ← Core test suite functional (6 tests + 2 utilities)
 scripts/         ← All utility scripts ready
 docs/ontology/
   ├── owl/       ← 11 frozen OWL modules unchanged
