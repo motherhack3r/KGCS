@@ -3,7 +3,7 @@
 Detection analytics that detect ATT&CK techniques.
 
 Usage:
-    python -m kgcs.etl.etl_car --input data/car/raw/car.json \
+    python -m src.etl.etl_car --input data/car/raw/car.json \
                               --output data/car/samples/car-output.ttl
 """
 

@@ -3,7 +3,7 @@
 Engagement concepts for adversary interaction and strategic disruption.
 
 Usage:
-    python -m kgcs.etl.etl_engage --input data/engage/raw/engage.json \
+    python -m src.etl.etl_engage --input data/engage/raw/engage.json \
                               --output data/engage/samples/engage-output.ttl
 """
 
@@ -125,7 +125,7 @@ def main():
         
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)
         print(f"Writing RDF to {args.output}...")
-        with open(args.output, "w") as f:
+        with open(args.output, "w", encoding="utf-8") as f:
             f.write(ttl_content)
         
         print(f"✓ Transformation complete: {args.output}")

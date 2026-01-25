@@ -3,7 +3,7 @@
 Deception techniques that counter ATT&CK techniques.
 
 Usage:
-    python -m kgcs.etl.etl_shield --input data/shield/raw/shield.json \
+    python -m src.etl.etl_shield --input data/shield/raw/shield.json \
                               --output data/shield/samples/shield-output.ttl
 """
 
@@ -125,7 +125,7 @@ def main():
         
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)
         print(f"Writing RDF to {args.output}...")
-        with open(args.output, "w") as f:
+        with open(args.output, "w", encoding="utf-8") as f:
             f.write(ttl_content)
         
         print(f"✓ Transformation complete: {args.output}")

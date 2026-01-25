@@ -1,6 +1,0 @@
-@prefix sec: <https://example.org/sec/core#> .
-
-# Missing causal chain: vulnerability without caused_by
-sec:vuln-t1-bad a sec:Vulnerability ;
-  sec:cveId "CVE-TEST-T1-BAD" ;
-  sec:description "No caused_by link" .

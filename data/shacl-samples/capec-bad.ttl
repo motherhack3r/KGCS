@@ -1,6 +1,0 @@
-@prefix sec: <https://example.org/sec/core#> .
-@prefix capec: <https://example.org/sec/capec#> .
-
-# CAPEC bad sample: missing capecId
-capec:ap-unknown a capec:AttackPattern ;
-  capec:title "Missing capecId - should fail." .

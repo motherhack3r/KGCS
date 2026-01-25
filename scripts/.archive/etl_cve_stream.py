@@ -1,72 +1,11 @@
-"""ETL Pipeline: NVD CVE JSON → RDF Turtle with SHACL validation.
-
-Transforms official NVD CVE API JSON (2.0) into RDF triples conforming to the
-Core Ontology Vulnerability/VulnerabilityScore classes.
-
-**IMPORTANT: This transformer assumes PlatformConfiguration entities have been created
-by etl_cpematch.py. CVE records reference existing PlatformConfiguration nodes by
-matchCriteriaId (foreign key relationship).**
-
-Recommended ingestion order:
-  1. etl_cpe.py       → Create Platform nodes from CPE definitions
-  2. etl_cpematch.py  → Create PlatformConfiguration nodes from match criteria
-  3. etl_cve.py       → Create Vulnerability nodes (references existing configs)
-
-Usage:
-    python -m src.etl.etl_cve --input data/cve/raw/cve-api-response.json \
-                              --output data/cve/samples/cve-output.ttl \
-                              --validate
-"""
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #!/usr/bin/env python3
-"""Streaming CVE ETL: write Turtle incrementally to avoid large in-memory graphs.
+"""Streaming, lightweight CVE -> N-Triples writer.
 
 Usage:
-  python src/etl/etl_cve.py --input data/cve/raw --output data/cve/samples/cve-output.ttl
+  python scripts/etl_cve_stream.py --input data/cve/raw/nvdcve-all.json --output data/cve/samples/cve-output.nt
 
-This script accepts either a single NVD JSON file or a directory of per-year JSON files.
-It writes Turtle triples incrementally, emitting a small header with prefixes and then
-one triple-per-line Turtle statements for each CVE found.
+Accepts either a single JSON file or a directory containing NVD JSON year files.
+This is intentionally simple and writes N-Triples incrementally to avoid building a huge rdflib.Graph.
 """
 import argparse
 import json
@@ -75,7 +14,7 @@ import sys
 from datetime import datetime
 
 
-def turtle_escape(s: str) -> str:
+def nt_escape(s: str) -> str:
     s = s.replace('\\', '\\\\')
     s = s.replace('"', '\\"')
     s = s.replace('\n', '\\n')
@@ -83,11 +22,17 @@ def turtle_escape(s: str) -> str:
     return '"%s"' % s
 
 
+def as_iri(url: str) -> str:
+    return '<%s>' % url
+
+
 def subject_for_cve(cve_id: str) -> str:
+    # Use MITRE CVE name resolver as stable IRI
     return '<https://cve.mitre.org/cgi-bin/cvename.cgi?name=%s>' % cve_id
 
 
 def process_vulnerability(item, out_f):
+    # Try to be robust to different NVD JSON shapes
     cve_id = None
     if isinstance(item, dict):
         if 'cve' in item and isinstance(item['cve'], dict):
@@ -98,17 +43,18 @@ def process_vulnerability(item, out_f):
         return 0
 
     subj = subject_for_cve(cve_id)
-    triples = 0
+    triples_written = 0
 
-    # rdfs:label
-    out_f.write(f"{subj} <http://www.w3.org/2000/01/rdf-schema#label> {turtle_escape(cve_id)} .\n")
-    triples += 1
+    # label triple
+    out_f.write(f"{subj} <http://www.w3.org/2000/01/rdf-schema#label> {nt_escape(cve_id)} .\n")
+    triples_written += 1
 
     # description
     desc = None
     try:
         if 'cve' in item and isinstance(item['cve'], dict):
             c = item['cve']
+            # common shapes: descriptions: list of {lang,value}
             descs = c.get('descriptions') or c.get('description') or c.get('descriptions', [])
             if isinstance(descs, list):
                 for d in descs:
@@ -117,28 +63,31 @@ def process_vulnerability(item, out_f):
                         break
             elif isinstance(descs, str):
                 desc = descs
+        # fallback top-level
         if not desc:
             desc = item.get('description') or item.get('summary')
     except Exception:
         desc = None
 
     if desc:
-        out_f.write(f"{subj} <http://purl.org/dc/terms/description> {turtle_escape(desc)} .\n")
-        triples += 1
+        out_f.write(f"{subj} <http://purl.org/dc/terms/description> {nt_escape(desc)} .\n")
+        triples_written += 1
 
-    # published date
+    # dates
     pub = None
     for k in ('published', 'publishedDate', 'published_date', 'publishedTimestamp'):
         pub = item.get(k) or pub
+    # sometimes nested
     if not pub and 'cve' in item and isinstance(item['cve'], dict):
         pub = item['cve'].get('published') or item['cve'].get('publishedDate')
 
     if pub:
+        # try to normalize to date
         try:
             dt = datetime.fromisoformat(pub.replace('Z', '+00:00'))
-            ds = dt.date().isoformat()
-            out_f.write(f"{subj} <http://purl.org/dc/terms/issued> \"{ds}\"^^<http://www.w3.org/2001/XMLSchema#date> .\n")
-            triples += 1
+            date_str = dt.date().isoformat()
+            out_f.write(f"{subj} <http://purl.org/dc/terms/issued> \"{date_str}\"^^<http://www.w3.org/2001/XMLSchema#date> .\n")
+            triples_written += 1
         except Exception:
             pass
 
@@ -156,6 +105,7 @@ def process_vulnerability(item, out_f):
                             refs.append(url)
                     elif isinstance(ref, str):
                         refs.append(ref)
+        # fallback top-level
         if not refs:
             for key in ('references', 'refs'):
                 r = item.get(key)
@@ -173,16 +123,18 @@ def process_vulnerability(item, out_f):
             continue
         if url.startswith('http'):
             out_f.write(f"{subj} <http://purl.org/dc/terms/references> <{url}> .\n")
-            triples += 1
+            triples_written += 1
 
-    return triples
+    return triples_written
 
 
 def iter_vulnerabilities_from_file(path):
     with open(path, 'r', encoding='utf-8') as fh:
         data = json.load(fh)
+    # common NVD shapes: top-level 'vulnerabilities' or top-level list
     if isinstance(data, dict) and 'vulnerabilities' in data and isinstance(data['vulnerabilities'], list):
         for v in data['vulnerabilities']:
+            # some wrappers place the actual record under 'cve' key
             yield v
     elif isinstance(data, list):
         for v in data:
@@ -191,6 +143,7 @@ def iter_vulnerabilities_from_file(path):
         for v in data['CVE_Items']:
             yield v
     else:
+        # fallback: try to find list values
         for v in data.values():
             if isinstance(v, list):
                 for item in v:
@@ -200,35 +153,27 @@ def iter_vulnerabilities_from_file(path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', '-i', required=True, help='Input JSON file or directory')
-    parser.add_argument('--output', '-o', required=True, help='Output Turtle file (.ttl)')
+    parser.add_argument('--output', '-o', required=True, help='Output N-Triples file (.nt)')
     args = parser.parse_args()
 
     paths = []
     if os.path.isdir(args.input):
+        # take all .json files sorted
         for fn in sorted(os.listdir(args.input)):
             if fn.lower().endswith('.json'):
                 paths.append(os.path.join(args.input, fn))
     else:
         paths.append(args.input)
 
-    os.makedirs(os.path.dirname(args.output), exist_ok=True)
     total = 0
-    header = (
-        "@prefix dcterms: <http://purl.org/dc/terms/> .\n"
-        "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n"
-        "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\n"
-    )
-
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
     with open(args.output, 'w', encoding='utf-8') as out_f:
-        out_f.write(header)
         for p in paths:
             print('Processing', p, file=sys.stderr)
             for item in iter_vulnerabilities_from_file(p):
                 total += process_vulnerability(item, out_f)
-
     print(f'Done — triples written: {total}', file=sys.stderr)
 
 
 if __name__ == '__main__':
     main()
-

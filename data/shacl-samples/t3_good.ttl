@@ -1,9 +1,0 @@
-@prefix sec: <https://example.org/sec/core#> .
-@prefix attck: <https://example.org/sec/attck#> .
-
-sec:tech-t3 a sec:Technique ;
-  attck:technique_id "T-T3" ;
-  sec:detected_by sec:car-t3 .
-
-sec:car-t3 a sec:DetectionAnalytic ;
-  sec:car_id "CAR-T3" .

@@ -3,7 +3,7 @@
 Defensive techniques that mitigate ATT&CK techniques.
 
 Usage:
-    python -m kgcs.etl.etl_d3fend --input data/d3fend/raw/d3fend.json \
+    python -m src.etl.etl_d3fend --input data/d3fend/raw/d3fend.json \
                               --output data/d3fend/samples/d3fend-output.ttl
 """
 
