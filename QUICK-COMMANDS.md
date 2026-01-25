@@ -1,31 +1,27 @@
-# Quick Commands: Branch refactor/clean-structure
+# Quick Commands: Repository Utilities
 
-**Branch is ready!** Here are the essential commands:
+**Status:** The `refactor/clean-structure` branch has been merged into `devel` (January 25, 2026).
 
-## Checkout & Review
-
-```bash
-# Switch to the refactor branch
-git checkout refactor/clean-structure
-
-# See what changed
-git diff roadmap/phase3..HEAD
-
-# View specific files
-git show refactor/clean-structure:docs/ARCHITECTURE.md
-git show refactor/clean-structure:docs/GLOSSARY.md
-```
-
-## Review Documentation
+## Cleanup Workspace
 
 ```bash
-# View the new guides
-cat docs/ARCHITECTURE.md      # 5-phase roadmap
-cat docs/GLOSSARY.md          # Standards reference
-cat docs/EXTENDING.md         # How to add new standards
-cat docs/DEPLOYMENT.md        # Setup guide
-cat REFACTOR-STATUS.md        # Refactor summary
-cat BRANCH-SUMMARY.md         # Branch details
+# Show items that would be cleaned (always safe)
+python scripts/cleanup_workspace.py
+
+# Clean temporary files and cache
+python scripts/cleanup_workspace.py --execute
+
+# Preview without deleting
+python scripts/cleanup_workspace.py --dry-run
+
+# Include downloaded source data
+python scripts/cleanup_workspace.py --sources --execute
+
+# Include transformed sample data  
+python scripts/cleanup_workspace.py --data --execute
+
+# Everything at once
+python scripts/cleanup_workspace.py --sources --data --execute
 ```
 
 ## Merge to Main

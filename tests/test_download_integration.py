@@ -13,7 +13,7 @@ from src.ingest.download_manager import DownloadPipeline
 
 
 def test_async_downloader_invoked(monkeypatch, tmp_path):
-    """Smoke test: ensure the async `StandardsDownloader` from data-raw is invoked.
+    """Smoke test: ensure the async `StandardsDownloader` from data source directories is invoked.
 
     This test patches `importlib.util.spec_from_file_location` to provide a
     fake module with a `StandardsDownloader` that records when its `run`

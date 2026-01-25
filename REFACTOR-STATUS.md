@@ -11,7 +11,7 @@
 
 Successfully reorganized KGCS documentation and codebase structure:
 - ✅ Archived 18 redundant documentation files (preserved in git history)
-- ✅ Consolidated scripts: `src/scripts/` → `tests/` + `data-raw/` → `src/ingest/`
+- ✅ Consolidated scripts: `src/scripts/` → `tests/` + ingestion code → `src/ingest/`
 - ✅ Created 4 comprehensive new guides
 - ✅ Zero breaking changes to functional code
 - ✅ All files preserved and recoverable
@@ -56,10 +56,10 @@ Successfully reorganized KGCS documentation and codebase structure:
 | Item | Before | After | Why |
 | --- | --- | --- | --- |
 | Verification scripts | `src/scripts/` | `tests/` | Analysis/verification belongs with tests |
-| Ingest utilities | `data-raw/src/` | `src/ingest/` | Consolidate all ingestion code together |
-| Ingest config | `data-raw/src/config.py` | `src/ingest/ingest_config.py` | Clarity on purpose; avoid confusion with main config.py |
+| Ingest utilities | Scattered ingestion code | `src/ingest/` | Consolidate all ingestion code together |
+| Ingest config | Multiple config files | `src/ingest/ingest_config.py` | Clarity on purpose; avoid confusion with main config.py |
 | Dev/debug scripts | `scripts/` (10 files, 2 dirs) | `scripts/.archive/` | Keep only production scripts in root |
-| Empty directories | `src/scripts/`, `data-raw/src/`, `data-raw/` | Removed | No longer needed |
+| Empty directories | `src/scripts/`, scattered modules | Removed | No longer needed |
 
 **Files consolidated:**
 - `verify_causal_chain.py` → `tests/verify_causal_chain.py`

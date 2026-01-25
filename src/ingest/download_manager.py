@@ -611,7 +611,7 @@ class DownloadPipeline:
         
         # 1. Run async downloader for MITRE standards (ATT&CK, CAPEC, D3FEND)
         try:
-            # Add data-raw to path for import
+            # Add data source directories to path for import
             # StandardsDownloader is now in src/ingest/
             from src.ingest.downloader import StandardsDownloader as AsyncStandardsDownloader
             logger.info("Running async downloader for MITRE standards...")

@@ -241,8 +241,8 @@ python scripts/cleanup_workspace.py [OPTIONS]
 Options:
   --dry-run      Show what would be deleted without actually deleting
   --execute      Actually delete the files (default is to list only)
-  --full         Include downloaded source data (data-raw/)
-  --data         Include transformed sample data (data/)
+  --sources      Include downloaded source data (data/*/raw/)
+  --data         Include transformed sample data (data/*/samples/)
   --help         Show help message
 ```
 
@@ -283,7 +283,7 @@ python scripts/cleanup_workspace.py
 python scripts/cleanup_workspace.py --execute
 
 # If you have raw data downloads, also clean those
-python scripts/cleanup_workspace.py --full --execute
+python scripts/cleanup_workspace.py --sources --execute
 ```
 
 ## Troubleshooting
@@ -319,8 +319,8 @@ python scripts/cleanup_workspace.py --dry-run
 # Clean everything
 python scripts/cleanup_workspace.py --execute
 
-# Clean including downloaded data
-python scripts/cleanup_workspace.py --full --execute
+# Clean including downloaded source and sample data
+python scripts/cleanup_workspace.py --sources --data --execute
 
 # Git garbage collection (additional cleanup)
 git gc --aggressive
