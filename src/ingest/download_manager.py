@@ -612,11 +612,8 @@ class DownloadPipeline:
         # 1. Run async downloader for MITRE standards (ATT&CK, CAPEC, D3FEND)
         try:
             # Add data-raw to path for import
-            data_raw_path = Path('data-raw') / 'src'
-            if data_raw_path.exists() and str(data_raw_path.parent) not in sys.path:
-                sys.path.insert(0, str(data_raw_path.parent))
-            
-            from downloader import StandardsDownloader as AsyncStandardsDownloader
+            # StandardsDownloader is now in src/ingest/
+            from src.ingest.downloader import StandardsDownloader as AsyncStandardsDownloader
             logger.info("Running async downloader for MITRE standards...")
             async with AsyncStandardsDownloader(output_dir=self.base_dir) as d:
                 await d.run()

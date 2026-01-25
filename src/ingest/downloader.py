@@ -19,7 +19,7 @@ import hashlib
 import zipfile
 from urllib.parse import urlparse
 
-from config import APIEndpoints, ETLConfig
+from src.ingest.ingest_config import APIEndpoints, ETLConfig
 
 # On Windows avoid Proactor shutdown issues by using the SelectorEventLoopPolicy
 if sys.platform == "win32":
