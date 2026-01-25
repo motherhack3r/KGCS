@@ -31,7 +31,8 @@ KGCS (Cybersecurity Knowledge Graph) is a **frozen, standards-backed ontology** 
 **Key invariant:** Causal chain maintained: `CPE → CVE → CWE → CAPEC → ATT&CK → {D3FEND, CAR, SHIELD, ENGAGE}`
 
 **Files:**
-```
+
+```text
 docs/ontology/owl/
 ├── core-ontology-v1.0.owl           (Core + bridge)
 ├── cpe-ontology.owl
@@ -63,6 +64,7 @@ docs/ontology/owl/
 **Testing:** 36+ test cases covering all standards
 
 **Key workflow:**
+
 ```bash
 # Single file validation
 python scripts/validate_shacl_stream.py \
@@ -74,7 +76,8 @@ pytest tests/test_phase3_comprehensive.py -v
 ```
 
 **Files:**
-```
+
+```text
 docs/ontology/shacl/
 ├── consolidated-shapes.ttl          (Master bundle)
 ├── cpe-shapes.ttl ... engage-shapes.ttl
@@ -117,6 +120,7 @@ docs/ontology/GOVERNANCE.md           (Policies + procedures)
    - ETL pipeline orchestration
 
 **Key workflow:**
+
 ```bash
 # Transform CPE JSON to RDF
 python -m src.etl.etl_cpe \
@@ -131,7 +135,8 @@ python src/etl/rdf_to_neo4j.py \
 ```
 
 **Files:**
-```
+
+```text
 src/etl/
 ├── etl_cpe.py, etl_cve.py, etl_cwe.py, ...
 ├── etl_cpematch.py                  (Matches expansion)
@@ -174,7 +179,8 @@ tests/
 **Key principle:** Extensions import core only (one-way flow); core never modified to support extensions.
 
 **Files:**
-```
+
+```text
 docs/ontology/extensions/
 ├── incident-extension.owl
 ├── risk-extension.owl
@@ -214,7 +220,8 @@ src/extensions/
 **Key principle:** LLM reasoning is **templated, not freeform**.
 
 **Files:**
-```
+
+```text
 docs/ontology/rag/
 ├── RAG-traversal-templates.md
 ├── RAG-traversal-templates-extension.md
@@ -230,26 +237,31 @@ src/rag/
 ## Critical Design Principles
 
 ### 1. Authoritativeness
+
 - Every ontology class maps 1:1 to a stable ID in NVD or MITRE
 - If a standard doesn't define it, we don't model it
 - Extensions are for subjective/contextual data only
 
 ### 2. Immutability of Core
+
 - Phase 1 OWL modules are **frozen** (no modifications post-release)
 - Changes require versioning + deprecation period
 - Extensions add layers; never override core
 
 ### 3. Explicit Provenance
+
 - Every edge is traceable to source data or extension rule
 - Never fabricate relationships to "complete the graph"
 - All statements must include source field (cveId, techniqueId, etc.)
 
 ### 4. No Hallucination
+
 - RAG queries follow pre-approved templates only
 - LLM responses include evidence + source IDs
 - Query validation prevents shortcuts in causal chain
 
 ### 5. One-Way Import Flow
+
 - Core imports external standards only
 - Extensions import core only
 - No circular dependencies (DAG structure)
@@ -304,22 +316,26 @@ KGCS/
 ## Next Steps
 
 ### Immediate (Phase 3 MVP, Weeks 5–7)
+
 - [ ] Implement Neo4j loader (Turtle → Cypher)
 - [ ] Create graph constraints + indexes
 - [ ] End-to-end tests (ETL → SHACL → Neo4j)
 - [ ] Update CI pipeline for ingestion
 
 ### Short-term (Phase 3 Full, Weeks 8–10)
+
 - [ ] Complete all 9 ETL transformers
 - [ ] Test production-scale data (222 MB CPE + CVE)
 - [ ] Finalize data quality metrics
 
 ### Medium-term (Phase 4, Weeks 11–12)
+
 - [ ] Implement extensions (Incident, Risk, ThreatActor)
 - [ ] Extension-to-core loading
 - [ ] Cross-layer traversals
 
 ### Long-term (Phase 5, Weeks 13–14)
+
 - [ ] RAG traversal validator
 - [ ] Query API
 - [ ] LLM integration + safety enforcement
@@ -334,3 +350,4 @@ KGCS/
 - [ZERO-START-ARCHITECTURE.md](ZERO-START-ARCHITECTURE.md) — Detailed structure review
 - [CLEANUP-CHECKLIST.md](CLEANUP-CHECKLIST.md) — File-by-file decisions
 
+---

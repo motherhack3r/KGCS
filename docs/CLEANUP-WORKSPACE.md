@@ -319,8 +319,8 @@ python scripts/cleanup_workspace.py --dry-run
 # Clean everything
 python scripts/cleanup_workspace.py --execute
 
-# Clean including downloaded source and sample data
-python scripts/cleanup_workspace.py --sources --data --execute
+# Clean including downloaded data
+python scripts/cleanup_workspace.py --full --execute
 
 # Git garbage collection (additional cleanup)
 git gc --aggressive
