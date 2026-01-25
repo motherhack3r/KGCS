@@ -224,7 +224,7 @@ class StandardsDownloader:
                         except Exception:
                             logger.exception("Failed to extract ZIP %s", output_path)
 
-                        logger.info(f"✓ Saved: {output_path}")
+                        logger.info(f"Saved: {output_path}")
                         return True
                     else:
                         # Treat some response codes as transient
@@ -250,8 +250,8 @@ class StandardsDownloader:
     async def download_mitre_attack(self):
         """Download MITRE ATT&CK files"""
         logger.info("Processing MITRE ATT&CK")
-        attack_dir = self.output_dir / "mitre_attack"
-        attack_dir.mkdir(exist_ok=True)
+        attack_dir = self.output_dir / "attack" / "raw"
+        attack_dir.mkdir(parents=True, exist_ok=True)
         
         domains = {
             0: "enterprise-attack.json",
@@ -272,8 +272,8 @@ class StandardsDownloader:
     async def download_mitre_capec(self):
         """Download MITRE CAPEC file"""
         logger.info("Processing MITRE CAPEC")
-        capec_dir = self.output_dir / "mitre_capec"
-        capec_dir.mkdir(exist_ok=True)
+        capec_dir = self.output_dir / "capec" / "raw"
+        capec_dir.mkdir(parents=True, exist_ok=True)
         
         output_file = capec_dir / "capec_latest.xml"
         await self.download_file(APIEndpoints.MITRE_CAPEC, output_file, "MITRE CAPEC")
@@ -282,8 +282,8 @@ class StandardsDownloader:
     async def download_mitre_d3fend(self):
         """Download MITRE D3FEND ontology files (json/owl/ttl)"""
         logger.info("Processing MITRE D3FEND")
-        d3_dir = self.output_dir / "mitre_d3fend"
-        d3_dir.mkdir(exist_ok=True)
+        d3_dir = self.output_dir / "d3fend" / "raw"
+        d3_dir.mkdir(parents=True, exist_ok=True)
 
         base = APIEndpoints.MITRE_D3FEND_BASE
         files = getattr(APIEndpoints, 'MITRE_D3FEND_FILES', [])

@@ -611,9 +611,12 @@ class DownloadPipeline:
         
         # 1. Run async downloader for MITRE standards (ATT&CK, CAPEC, D3FEND)
         try:
-            # Add data source directories to path for import
-            # StandardsDownloader is now in src/ingest/
-            from src.ingest.downloader import StandardsDownloader as AsyncStandardsDownloader
+            # StandardsDownloader is in src/ingest/downloader.py
+            try:
+                from src.ingest.downloader import StandardsDownloader as AsyncStandardsDownloader
+            except Exception:
+                from .downloader import StandardsDownloader as AsyncStandardsDownloader
+
             logger.info("Running async downloader for MITRE standards...")
             async with AsyncStandardsDownloader(output_dir=self.base_dir) as d:
                 await d.run()
@@ -628,18 +631,6 @@ class DownloadPipeline:
             logger.warning(f"Async downloader failed: {e}; proceeding with sync downloaders")
         
         # 2. Run sync downloaders for remaining standards (CPE, CVE, CWE, CAR, SHIELD, ENGAGE)
-        for downloader in self.downloaders:
-            try:
-                result = downloader.download()
-                self.results.append(result)
-            except Exception as e:
-                logger.error(f"Error downloading {downloader.standard_name}: {e}")
-                self.results.append({
-                    'standard': downloader.standard_name,
-                    'status': 'error',
-                    'error': str(e)
-                })
-        
         for downloader in self.downloaders:
             try:
                 result = downloader.download()
