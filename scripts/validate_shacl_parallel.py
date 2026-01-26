@@ -78,8 +78,10 @@ def run_job(job, workers, chunk_size, timeout):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Parallel SHACL validation runner")
-    parser.add_argument("--workers-per-standard", type=int, default=4, help="Workers per standard")
-    parser.add_argument("--chunk-size", type=int, default=2000, help="Subjects per chunk")
+    parser.add_argument("--workers-per-standard", type=int, default=2, help="Base workers per standard")
+    parser.add_argument("--boost-workers-per-standard", type=int, default=4, help="Boost workers per standard when no standards are pending")
+    parser.add_argument("--max-parallel-standards", type=int, default=3, help="Max standards to run concurrently")
+    parser.add_argument("--chunk-size", type=int, default=20000, help="Subjects per chunk")
     parser.add_argument("--per-call-timeout", type=int, default=600, help="Timeout per validation call")
     return parser.parse_args()
 
@@ -88,21 +90,61 @@ def main():
     args = parse_args()
     Path("artifacts").mkdir(parents=True, exist_ok=True)
 
-    processes = []
+    runnable_jobs = [job for job in STANDARD_JOBS if os.path.exists(job[1]) and os.path.exists(job[2])]
+    skipped_jobs = [job for job in STANDARD_JOBS if job not in runnable_jobs]
+
+    for job in skipped_jobs:
+        name, data_path, shapes_path, _ = job
+        if not os.path.exists(data_path):
+            print(f"[{name}] SKIP: data file not found: {data_path}")
+        elif not os.path.exists(shapes_path):
+            print(f"[{name}] SKIP: shapes file not found: {shapes_path}")
+
+    if not runnable_jobs:
+        print("No standards to validate.")
+        return 1
+
+    if len(runnable_jobs) <= args.max_parallel_standards:
+        effective_workers = args.boost_workers_per_standard
+    else:
+        effective_workers = args.workers_per_standard
+
     results = []
+    active_threads = []
 
-    for job in STANDARD_JOBS:
-        thread = threading.Thread(
-            target=lambda j=job: results.append(
-                (j[0], run_job(j, args.workers_per_standard, args.chunk_size, args.per_call_timeout))
-            ),
-            daemon=True
-        )
-        processes.append(thread)
-        thread.start()
+    def start_job(job):
+        name = job[0]
+        code = run_job(job, effective_workers, args.chunk_size, args.per_call_timeout)
+        results.append((name, code))
 
-    for thread in processes:
-        thread.join()
+    job_iter = iter(runnable_jobs)
+
+    while True:
+        while len(active_threads) < args.max_parallel_standards:
+            try:
+                job = next(job_iter)
+            except StopIteration:
+                break
+            thread = threading.Thread(target=start_job, args=(job,), daemon=True)
+            active_threads.append(thread)
+            thread.start()
+
+        if not active_threads:
+            break
+
+        finished = []
+        for thread in active_threads:
+            thread.join(timeout=0.1)
+            if not thread.is_alive():
+                finished.append(thread)
+
+        for thread in finished:
+            active_threads.remove(thread)
+
+        if not finished and len(active_threads) >= args.max_parallel_standards:
+            for thread in active_threads:
+                thread.join()
+            active_threads = []
 
     failures = [name for name, code in results if code != 0]
     if failures:

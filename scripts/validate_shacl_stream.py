@@ -131,12 +131,14 @@ def chunk_and_validate(data_path, shapes, out_dir, chunk_size=1000, per_call_tim
     chunk_reports = []
     errors = []
 
-    def update_progress():
+    def update_progress(worker_id: int | None = None):
         percent = (completed / total) * 100 if total else 100
         bar_width = 20
         filled = int(bar_width * (percent / 100)) if total else bar_width
-        bar = "█" * filled + "░" * (bar_width - filled)
-        message = f"Validated {completed}/{total} chunks ({percent:0.1f}%) {bar}"
+        bar = "=" * filled + "." * (bar_width - filled)
+        message = f"Validated {completed}/{total} chunks ({percent:0.1f}%) [{bar}]"
+        if worker_id is not None:
+            message = f"{message} (worker {worker_id})"
         if progress_newline:
             print(message, flush=True)
         else:
@@ -149,7 +151,8 @@ def chunk_and_validate(data_path, shapes, out_dir, chunk_size=1000, per_call_tim
             for future in as_completed(futures):
                 chunk_idx, elapsed, returncode, report, error = future.result()
                 completed += 1
-                update_progress()
+                worker_id = ((chunk_idx - 1) % max(workers, 1)) + 1
+                update_progress(worker_id)
                 if error:
                     errors.append(error)
                 if report:
@@ -161,7 +164,8 @@ def chunk_and_validate(data_path, shapes, out_dir, chunk_size=1000, per_call_tim
         for chunk_idx, tmp_path in chunk_files:
             chunk_idx, elapsed, returncode, report, error = _validate_chunk(tmp_path, shapes, out_dir, per_call_timeout, chunk_idx)
             completed += 1
-            update_progress()
+            worker_id = ((chunk_idx - 1) % max(workers, 1)) + 1
+            update_progress(worker_id)
             if error:
                 errors.append(error)
             if report:
