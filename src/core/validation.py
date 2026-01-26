@@ -70,7 +70,13 @@ def run_validator(data_file: str, shapes_graph: Graph, output: str = 'artifacts'
     data.parse(data_file, format='turtle')
 
     # Run validation
-    conforms, results_graph, results_text = validate(data_graph=data, shacl_graph=shapes_graph, inference='rdfs', abort_on_first=False, serialize_report_graph=True)
+    conforms, results_graph, results_text = validate(
+        data_graph=data,
+        shacl_graph=shapes_graph,
+        inference='rdfs',
+        abort_on_first=False,
+        serialize_report_graph=False
+    )
     os.makedirs(output, exist_ok=True)
     report_path = os.path.join(output, f'shacl-report-{os.path.basename(data_file)}.json')
     # Load rule catalog if available
@@ -94,8 +100,13 @@ def run_validator(data_file: str, shapes_graph: Graph, output: str = 'artifacts'
             result_path = results_graph.value(r, SH.resultPath)
             shape_key = None
             rule_id = None
-            if source_shape is not None:
-                s_str = str(source_shape)
+            shape_node = source_shape
+            if isinstance(source_shape, BNode):
+                parent_shape = shapes_graph.value(predicate=SH.property, object=source_shape)
+                if parent_shape is not None:
+                    shape_node = parent_shape
+            if shape_node is not None:
+                s_str = str(shape_node)
                 # local name fallback
                 if '#' in s_str:
                     local = s_str.split('#')[-1]

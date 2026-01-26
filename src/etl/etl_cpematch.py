@@ -83,9 +83,10 @@ def process_match_string(ms: dict, out_f, platform_cache: set) -> int:
 
         if match_platform_id not in platform_cache:
             out_f.write(f"{platform_subj} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://example.org/sec/core#Platform> .\n")
-            out_f.write(f"{platform_subj} <https://example.org/sec/core#CPEUri> {turtle_escape(match_cpe)} .\n")
+            out_f.write(f"{platform_subj} <https://example.org/sec/core#cpeUri> {turtle_escape(match_cpe)} .\n")
+            out_f.write(f"{platform_subj} <https://example.org/sec/core#cpeNameId> {turtle_escape(match_platform_id)} .\n")
             platform_cache.add(match_platform_id)
-            written += 2
+            written += 3
 
         out_f.write(f"{subj} <https://example.org/sec/core#matchesPlatform> {platform_subj} .\n")
         written += 1
