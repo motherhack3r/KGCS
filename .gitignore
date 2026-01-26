@@ -66,3 +66,6 @@ tmp/
 
 # Logs
 *.log
+
+# Large generated reports
+artifacts/shacl-report-cpematch-summary.json
