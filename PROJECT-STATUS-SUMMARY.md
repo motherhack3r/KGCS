@@ -135,6 +135,8 @@ Phase 3 MVP completion requires:
 
 - **Raw-to-Turtle ETL:** All standards except CAR now transform from raw feeds to Turtle outputs.  
 - **SHACL Validation:** Parallel streaming validation completed with per-standard summary reports.  
+- **CPEMatch Fix:** `Platform` nodes now emit `cpeNameId` and correct `cpeUri`, and CPEMatch validation conforms (0 violations).  
+- **Repo Hygiene:** Removed oversized CPEMatch summary report from history; added ignore rule to prevent reintroduction.  
 - **Download Pipeline:** Daily downloader runs cleanly with fixed raw-path handling and no duplicate downloads.  
 
 ### Next Steps
