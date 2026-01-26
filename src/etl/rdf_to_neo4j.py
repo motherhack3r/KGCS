@@ -6,9 +6,10 @@ Transforms RDF triples to Neo4j nodes and relationships, implementing
 the causal chain: CPE -> CVE -> CWE -> CAPEC -> ATT&CK -> {D3FEND, CAR, SHIELD, ENGAGE}
 """
 
+import argparse
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
 from dotenv import load_dotenv
 from collections import defaultdict
@@ -18,7 +19,7 @@ env_devel_path = Path(__file__).parent.parent.parent / ".env.devel"
 load_dotenv(env_devel_path)
 
 from src.config import neo4j_config
-from rdflib import Graph, Namespace, RDF, Literal
+from rdflib import Graph, Namespace, RDF, Literal, URIRef
 from neo4j import GraphDatabase
 from datetime import datetime
 
@@ -44,12 +45,7 @@ class RDFtoNeo4jTransformer:
     """
     Transforms RDF data to Neo4j nodes and relationships.
     
-    Handles:
-    - Platform (CPE) nodes
-    - Vulnerability (CVE) nodes
-    - Score (CVSS) nodes
-    - Reference nodes
-    - Relationships (affects_by, scored_by, references, etc.)
+    Handles core KGCS classes and relationships in the sec/core namespace.
     """
     
     def __init__(self, ttl_file: str, batch_size: int = 1000):
@@ -59,16 +55,13 @@ class RDFtoNeo4jTransformer:
         
         # RDF namespaces
         self.sec_ns = Namespace("https://example.org/sec/core#")
+        self.sec_ns_str = str(self.sec_ns)
         
         # Tracking
         self.nodes: Dict[str, NodeData] = {}
         self.relationships: List[RelationshipData] = []
         self.stats = {
-            'platforms': 0,
-            'platform_configurations': 0,
-            'vulnerabilities': 0,
-            'scores': 0,
-            'references': 0,
+            'labels': defaultdict(int),
             'relationships': 0,
         }
         
@@ -83,130 +76,70 @@ class RDFtoNeo4jTransformer:
     def extract_nodes_and_relationships(self, g: Graph) -> None:
         """Extract nodes and relationships from RDF graph."""
         print(f"\nExtracting nodes and relationships...")
-        
-        # Extract nodes by type
+        core_types_by_subject: Dict[URIRef, List[str]] = {}
+        for subject in g.subjects(RDF.type, None):
+            type_labels = []
+            for obj in g.objects(subject, RDF.type):
+                if isinstance(obj, URIRef) and str(obj).startswith(self.sec_ns_str):
+                    type_labels.append(self._local_name(obj))
+
+            if type_labels:
+                core_types_by_subject[subject] = sorted(set(type_labels))
+
+        for subject, labels in core_types_by_subject.items():
+            self._extract_node(subject, g, labels)
+
         for subject, predicate, obj in g:
-            # Platform nodes
-            if (subject, RDF.type, self.sec_ns.Platform) in g:
-                self._extract_platform_node(subject, g)
-            # PlatformConfiguration nodes
-            elif (subject, RDF.type, self.sec_ns.PlatformConfiguration) in g:
-                self._extract_platform_configuration_node(subject, g)
-            # Vulnerability nodes
-            elif (subject, RDF.type, self.sec_ns.Vulnerability) in g:
-                self._extract_vulnerability_node(subject, g)
-            # Score nodes
-            elif (subject, RDF.type, self.sec_ns.Score) in g:
-                self._extract_score_node(subject, g)
-            # Reference nodes
-            elif (subject, RDF.type, self.sec_ns.Reference) in g:
-                self._extract_reference_node(subject, g)
-        
-        # Extract relationships
-        for subject, predicate, obj in g:
-            # Skip if target is not a URI reference (literals only)
             if isinstance(obj, Literal):
                 continue
-            
-            predicate_name = str(predicate).split('#')[-1]
-            
-            # Convert predicate to relationship type (UPPER_SNAKE_CASE)
+            if predicate == RDF.type:
+                continue
+            if not self._is_core_uri(predicate):
+                continue
+
+            subject_uri = str(subject)
+            target_uri = str(obj)
+            if subject_uri not in self.nodes or target_uri not in self.nodes:
+                continue
+
+            predicate_name = self._local_name(predicate)
             rel_type = self._predicate_to_relationship(predicate_name)
-            
-            # Skip internal RDF predicates
+
             if rel_type in ['TYPE', 'VALUE', 'LABEL']:
                 continue
-            
+
             self.relationships.append(RelationshipData(
-                source_uri=str(subject),
-                target_uri=str(obj),
+                source_uri=subject_uri,
+                target_uri=target_uri,
                 relationship_type=rel_type,
                 properties={}
             ))
             self.stats['relationships'] += 1
-        
-        print(f"   * Platforms: {self.stats['platforms']}")
-        print(f"   * Platform Configurations: {self.stats['platform_configurations']}")
-        print(f"   * Vulnerabilities: {self.stats['vulnerabilities']}")
-        print(f"   * Scores: {self.stats['scores']}")
-        print(f"   * References: {self.stats['references']}")
+
+        for label, count in sorted(self.stats['labels'].items()):
+            print(f"   * {label}: {count}")
         print(f"   * Relationships: {self.stats['relationships']}")
     
-    def _extract_platform_node(self, subject, g: Graph) -> None:
-        """Extract Platform node properties."""
+    def _extract_node(self, subject, g: Graph, labels: List[str]) -> None:
+        """Extract node properties for any core class."""
         uri = str(subject)
         properties = {}
-        
+
         for predicate, obj in g.predicate_objects(subject):
-            prop_name = str(predicate).split('#')[-1]
-            if prop_name != 'type':
+            if predicate == RDF.type:
+                continue
+            if isinstance(obj, Literal):
+                prop_name = self._local_name(predicate)
                 value = self._parse_literal(obj)
                 if value is not None:
                     properties[prop_name] = value
-        
-        self.nodes[uri] = NodeData(label='Platform', uri=uri, properties=properties)
-        self.stats['platforms'] += 1
-    
-    def _extract_platform_configuration_node(self, subject, g: Graph) -> None:
-        """Extract PlatformConfiguration node properties."""
-        uri = str(subject)
-        properties = {}
-        
-        for predicate, obj in g.predicate_objects(subject):
-            prop_name = str(predicate).split('#')[-1]
-            # Skip object properties (those will be relationships)
-            if prop_name != 'type' and prop_name not in ['matchesPlatform', 'affected_by']:
-                value = self._parse_literal(obj)
-                if value is not None:
-                    properties[prop_name] = value
-        
-        self.nodes[uri] = NodeData(label='PlatformConfiguration', uri=uri, properties=properties)
-        self.stats['platform_configurations'] += 1
-    
-    def _extract_vulnerability_node(self, subject, g: Graph) -> None:
-        """Extract Vulnerability node properties."""
-        uri = str(subject)
-        properties = {}
-        
-        for predicate, obj in g.predicate_objects(subject):
-            prop_name = str(predicate).split('#')[-1]
-            if prop_name != 'type' and prop_name not in ['references', 'scored_by']:
-                value = self._parse_literal(obj)
-                if value is not None:
-                    properties[prop_name] = value
-        
-        self.nodes[uri] = NodeData(label='Vulnerability', uri=uri, properties=properties)
-        self.stats['vulnerabilities'] += 1
-    
-    def _extract_score_node(self, subject, g: Graph) -> None:
-        """Extract Score (CVSS) node properties."""
-        uri = str(subject)
-        properties = {}
-        
-        for predicate, obj in g.predicate_objects(subject):
-            prop_name = str(predicate).split('#')[-1]
-            if prop_name != 'type':
-                value = self._parse_literal(obj)
-                if value is not None:
-                    properties[prop_name] = value
-        
-        self.nodes[uri] = NodeData(label='Score', uri=uri, properties=properties)
-        self.stats['scores'] += 1
-    
-    def _extract_reference_node(self, subject, g: Graph) -> None:
-        """Extract Reference node properties."""
-        uri = str(subject)
-        properties = {}
-        
-        for predicate, obj in g.predicate_objects(subject):
-            prop_name = str(predicate).split('#')[-1]
-            if prop_name != 'type':
-                value = self._parse_literal(obj)
-                if value is not None:
-                    properties[prop_name] = value
-        
-        self.nodes[uri] = NodeData(label='Reference', uri=uri, properties=properties)
-        self.stats['references'] += 1
+
+        primary_label = labels[0]
+        if len(labels) > 1:
+            properties['rdfTypes'] = labels
+
+        self.nodes[uri] = NodeData(label=primary_label, uri=uri, properties=properties)
+        self.stats['labels'][primary_label] += 1
     
     def _parse_literal(self, obj):
         """Parse RDF literal to Python value with proper type conversion."""
@@ -258,6 +191,14 @@ class RDFtoNeo4jTransformer:
         s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', predicate_name)
         # Insert underscore before uppercase in sequences
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).upper()
+
+    def _local_name(self, uri: URIRef) -> str:
+        """Return the local name for a URIRef."""
+        return str(uri).split('#')[-1]
+
+    def _is_core_uri(self, uri: URIRef) -> bool:
+        """Check if a URIRef is in the core namespace."""
+        return str(uri).startswith(self.sec_ns_str)
     
     def load_to_neo4j(self, driver) -> bool:
         """Load nodes and relationships into Neo4j."""
@@ -357,7 +298,7 @@ class RDFtoNeo4jTransformer:
             })
         
         for rel_type, rel_list in by_type.items():
-            cypher = f"UNWIND $rels as rel MATCH (source {{uri: rel.sourceUri}}) MATCH (target {{uri: rel.targetUri}}) MERGE (source)-[r:`{rel_type}`]-(target) SET r += rel.properties"
+            cypher = f"UNWIND $rels as rel MATCH (source {{uri: rel.sourceUri}}) MATCH (target {{uri: rel.targetUri}}) MERGE (source)-[r:`{rel_type}`]->(target) SET r += rel.properties"
             try:
                 session.run(cypher, rels=rel_list)
             except Exception:
@@ -391,12 +332,17 @@ class RDFtoNeo4jTransformer:
 
 def main():
     """Main entry point."""
+    parser = argparse.ArgumentParser(description="RDF-to-Neo4j loader")
+    parser.add_argument("--ttl", required=False, default="tmp/phase3_combined.ttl", help="Input Turtle file")
+    parser.add_argument("--batch-size", type=int, default=1000, help="Neo4j batch size")
+    args = parser.parse_args()
+
     print("=" * 100)
     print("RDF-TO-NEO4J TRANSFORMATION")
     print("=" * 100)
     
     try:
-        transformer = RDFtoNeo4jTransformer("tmp/phase3_combined.ttl")
+        transformer = RDFtoNeo4jTransformer(args.ttl, batch_size=args.batch_size)
         g = transformer.load_rdf()
         transformer.extract_nodes_and_relationships(g)
         
