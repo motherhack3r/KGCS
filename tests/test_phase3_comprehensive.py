@@ -23,6 +23,7 @@ Each test:
 import sys
 import os
 import json
+import yaml
 from pathlib import Path
 
 import pytest
@@ -48,7 +49,7 @@ TEST_CASES = [
     ('CAPEC', 'tmp/sample_capec.ttl', CAPECtoRDFTransformer, 'tmp/phase3_capec.ttl'),
     ('ATT&CK', 'tmp/sample_attack.ttl', ATTACKtoRDFTransformer, 'tmp/phase3_attack.ttl'),
     ('D3FEND', 'tmp/sample_d3fend.ttl', D3FENDtoRDFTransformer, 'tmp/phase3_d3fend.ttl'),
-    ('CAR', 'tmp/sample_car.ttl', CARtoRDFTransformer, 'tmp/phase3_car.ttl'),
+    ('CAR', 'data/car/samples/sample_car.yaml', CARtoRDFTransformer, 'tmp/phase3_car.ttl'),
     ('SHIELD', 'tmp/sample_shield.ttl', SHIELDtoRDFTransformer, 'tmp/phase3_shield.ttl'),
     ('ENGAGE', 'tmp/sample_engage.ttl', ENGAGEtoRDFTransformer, 'tmp/phase3_engage.ttl'),
 ]
@@ -67,7 +68,10 @@ def test_etl(name, sample_file, transformer_class, output_file):
     try:
         # Load data
         with open(sample_file, 'r', encoding='utf-8') as f:
-            data = json.load(f)
+            if sample_file.lower().endswith(('.yaml', '.yml')):
+                data = yaml.safe_load(f)
+            else:
+                data = json.load(f)
         record_count = 0
         
         # Count records based on structure
@@ -85,6 +89,12 @@ def test_etl(name, sample_file, transformer_class, output_file):
             record_count = len(data) if isinstance(data, list) else 1
         
         # Transform
+        if name == 'CAR':
+            if isinstance(data, dict):
+                if 'DetectionAnalytics' in data:
+                    data = data['DetectionAnalytics']
+                else:
+                    data = [data]
         transformer = transformer_class()
         graph = transformer.transform(data)
         triple_count = len(graph)

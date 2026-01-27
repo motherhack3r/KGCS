@@ -5,86 +5,86 @@
       "size_bytes": 37415,
       "sha256": "19c8788bdd8615a0d5dddf8046c902c00b453c1b0247e35c9ca610a99ad98e07",
       "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/activities.json",
-      "status": "success"
+      "status": "cached"
     },
     {
       "filename": "activity_details.json",
       "size_bytes": 153319,
       "sha256": "4e47d11af0428ad1d3b1782c367a3e4a0abf850e6809fd838e350d31886a1abf",
       "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/activity_details.json",
-      "status": "success"
+      "status": "cached"
     },
     {
       "filename": "approach_activity_mappings.json",
       "size_bytes": 2754,
       "sha256": "604f9e9e38431ec83a0fdcaa0c7d2f88c4b5d20a4f2ff4c94e497a78c6ccbe06",
       "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/approach_activity_mappings.json",
-      "status": "success"
+      "status": "cached"
     },
     {
       "filename": "approach_details.json",
       "size_bytes": 9000,
       "sha256": "cff1b915f0fbba99373bb2322a1b1c4abccb300bada6cd8eefb482caec97d5db",
       "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/approach_details.json",
-      "status": "success"
+      "status": "cached"
     },
     {
       "filename": "approach_matrix.json",
       "size_bytes": 61875,
       "sha256": "9f52e275f4125b19bf70b1544632e4b7f516c2463a20b7c7a7989536588f367c",
       "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/approach_matrix.json",
-      "status": "success"
+      "status": "cached"
     },
     {
       "filename": "approaches.json",
       "size_bytes": 7955,
       "sha256": "da2e09ad8c93f4aa463afaa9c5b1ef27eae91b444b580c4af432ae4ba05dadb7",
       "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/approaches.json",
-      "status": "success"
+      "status": "cached"
     },
     {
       "filename": "attack_mapping.json",
       "size_bytes": 282159,
       "sha256": "8004901aa219813a4b7105665aa5e9cd2128beeccc818b2c3e42324f1ad609bf",
       "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/attack_mapping.json",
-      "status": "success"
+      "status": "cached"
     },
     {
       "filename": "attack_tactics_techniques.json",
       "size_bytes": 36411,
       "sha256": "6ea21f2dbab322ab093b79ae140d4e55445995bca81ed9a4634563d25ab8a270",
       "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/attack_tactics_techniques.json",
-      "status": "success"
+      "status": "cached"
     },
     {
       "filename": "goal_approach_mappings.json",
       "size_bytes": 450,
       "sha256": "150d4384e9d2f242a5a6301202a6d560a46ecb265566382f94e35900ae02af3d",
       "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/goal_approach_mappings.json",
-      "status": "success"
+      "status": "cached"
     },
     {
       "filename": "goal_details.json",
       "size_bytes": 10105,
       "sha256": "c82463eb407eb4f8e74ebdf59afad1f7b0cde8ef42c2a96356fc69ff85436402",
       "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/goal_details.json",
-      "status": "success"
+      "status": "cached"
     },
     {
       "filename": "goals.json",
       "size_bytes": 9848,
       "sha256": "7056089a8f1c76304feab9d0ba3695e9410c5e6636487b907cf676c7f2e22d72",
       "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/goals.json",
-      "status": "success"
+      "status": "cached"
     },
     {
       "filename": "references.json",
       "size_bytes": 13543,
       "sha256": "6598c1c3cad875b33586b88732ac1c27faa9d376529db8730e56889ccd1e316a",
       "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/references.json",
-      "status": "success"
+      "status": "cached"
     }
   ],
-  "last_updated": "2026-01-25T04:09:53.718296",
+  "last_updated": "2026-01-27T02:21:35.858164",
   "source": "https://github.com/mitre/engage"
 }

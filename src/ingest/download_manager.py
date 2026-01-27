@@ -410,49 +410,45 @@ class MITRECARDownloader(StandardDownloader):
         super().__init__('car')
 
     def download(self) -> Dict:
-        """Download CAR data model from MITRE GitHub."""
+        """Download CAR data model, analytics, and sensors from MITRE GitHub."""
         logger.info("Starting MITRE CAR download...")
         
         manifest = self.load_manifest()
         files_metadata = []
-        
-        # Use GitHub API to list available YAML files
-        api_url = 'https://api.github.com/repos/mitre-attack/car/contents/data_model'
-        base_download_url = 'https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master/data_model'
-        
-        try:
-            # Fetch directory listing from GitHub API
-            req = Request(api_url, headers={'User-Agent': 'KGCS-DownloadManager/1.0'})
-            with urlopen(req, timeout=30) as response:
-                files_list = json.loads(response.read().decode('utf-8'))
-            
-            # Filter for .yaml files and download them
-            for item in files_list:
-                if item.get('type') == 'file' and item.get('name', '').endswith('.yaml'):
-                    filename = item['name']
-                    url = f"{base_download_url}/{filename}"
-                    try:
-                        file_meta = self.download_file(url, filename, extract_zip=False)
-                        if file_meta:
-                            files_metadata.append(file_meta)
-                    except Exception as e:
-                        logger.debug(f"Could not download {filename}: {e}")
-                        continue
-        except Exception as e:
-            logger.warning(f"Could not fetch CAR file listing from GitHub API: {e}")
+
+        car_dirs = ["data_model", "analytics", "sensors"]
+        base_api = "https://api.github.com/repos/mitre-attack/car/contents"
+        base_raw = "https://raw.githubusercontent.com/mitre-attack/car/refs/heads/master"
+
+        for car_dir in car_dirs:
+            api_url = f"{base_api}/{car_dir}"
+            raw_base = f"{base_raw}/{car_dir}"
+            try:
+                req = Request(api_url, headers={'User-Agent': 'KGCS-DownloadManager/1.0'})
+                with urlopen(req, timeout=30) as response:
+                    files_list = json.loads(response.read().decode('utf-8'))
+
+                for item in files_list:
+                    if item.get('type') == 'file' and item.get('name', '').endswith(('.yaml', '.yml')):
+                        filename = f"{car_dir}_{item['name']}"
+                        url = item.get('download_url') or f"{raw_base}/{item['name']}"
+                        try:
+                            file_meta = self.download_file(url, filename, extract_zip=False)
+                            if file_meta:
+                                file_meta['source_dir'] = car_dir
+                                files_metadata.append(file_meta)
+                        except Exception as e:
+                            logger.debug(f"Could not download {item.get('name')} from {car_dir}: {e}")
+                            continue
+            except Exception as e:
+                logger.warning(f"Could not fetch CAR file listing from GitHub API ({car_dir}): {e}")
         
         if files_metadata:
             manifest['files'] = files_metadata
-            manifest['source'] = 'https://github.com/mitre-attack/car/tree/master/data_model'
+            manifest['source'] = 'https://github.com/mitre-attack/car'
             self.save_manifest(manifest)
         else:
             logger.warning("Could not download any CAR files")
-        
-        return {'standard': 'car', 'files': files_metadata}
-        
-        manifest['files'] = files_metadata
-        manifest['source'] = 'https://github.com/mitre-attack/car/tree/master/data_model'
-        self.save_manifest(manifest)
         
         return {'standard': 'car', 'files': files_metadata}
 

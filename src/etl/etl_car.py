@@ -1,137 +1,250 @@
-"""ETL Pipeline: MITRE CAR JSON → RDF Turtle.
+"""ETL Pipeline: MITRE CAR YAML → RDF Turtle.
 
 Detection analytics that detect ATT&CK techniques.
 
 Usage:
-    python -m src.etl.etl_car --input data/car/raw/car.json \
-                              --output data/car/samples/car-output.ttl
+    python -m src.etl.etl_car --input data/car/raw \
+                              --output data/car/samples/car-output.ttl \
+                              --validate
 """
 
-import json
 import argparse
-from pathlib import Path
-import sys
+import glob
 import os
+import sys
+from pathlib import Path
+from typing import Any, Dict, Iterable, List
 
-from rdflib import Graph, Namespace, URIRef, Literal
+import yaml
+from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF, RDFS, XSD
 
 
 class CARtoRDFTransformer:
-    """Transform CAR JSON to RDF."""
+    """Transform CAR analytics to RDF."""
 
     def __init__(self):
         self.graph = Graph()
         self.SEC = Namespace("https://example.org/sec/core#")
         self.EX = Namespace("https://example.org/")
-        
+
         self.graph.bind("sec", self.SEC)
         self.graph.bind("rdf", RDF)
         self.graph.bind("rdfs", RDFS)
         self.graph.bind("xsd", XSD)
 
-    def transform(self, json_data: dict) -> Graph:
-        """Transform CAR JSON to RDF graph."""
-        if "DetectionAnalytics" not in json_data:
-            raise ValueError("JSON must contain 'DetectionAnalytics' array")
-        
-        analytics = json_data["DetectionAnalytics"]
-        
+    def transform(self, analytics: List[Dict[str, Any]]) -> Graph:
+        """Transform CAR analytics into RDF graph."""
         for analytic in analytics:
             self._add_detection_analytic(analytic)
-        
+
         self._add_detection_relationships(analytics)
-        
+
         return self.graph
 
-    def _add_detection_analytic(self, analytic: dict):
+    def _add_detection_analytic(self, analytic: Dict[str, Any]) -> None:
         """Add a CAR detection analytic node."""
-        car_id = analytic.get("ID", "")
+        car_id = _get_first_value(analytic, ["id", "ID", "carId", "car_id", "analytic_id", "analyticId"])
         if not car_id:
             return
-        
-        car_id_full = f"CAR-{car_id}" if not car_id.startswith("CAR-") else car_id
+
+        car_id_full = _normalize_car_id(str(car_id))
         analytic_node = URIRef(f"{self.EX}analytic/{car_id_full}")
-        
+
         self.graph.add((analytic_node, RDF.type, self.SEC.DetectionAnalytic))
         self.graph.add((analytic_node, self.SEC.carId, Literal(car_id_full, datatype=XSD.string)))
-        
-        if analytic.get("Name"):
-            self.graph.add((analytic_node, RDFS.label, Literal(analytic["Name"], datatype=XSD.string)))
-        
-        if analytic.get("Description"):
-            desc_text = self._extract_description(analytic["Description"])
+
+        name = _get_first_value(analytic, ["name", "Name", "title", "Title"])
+        if name:
+            self.graph.add((analytic_node, RDFS.label, Literal(str(name), datatype=XSD.string)))
+
+        desc_value = _get_first_value(analytic, ["description", "Description", "summary", "Summary"])
+        if desc_value:
+            desc_text = _extract_description(desc_value)
             if desc_text:
                 self.graph.add((analytic_node, self.SEC.description, Literal(desc_text, datatype=XSD.string)))
-        
-        if analytic.get("LogicExpression"):
-            self.graph.add((analytic_node, self.SEC.logicExpression, Literal(analytic["LogicExpression"], datatype=XSD.string)))
-        
-        if analytic.get("DataSources"):
-            for source in analytic["DataSources"]:
-                self.graph.add((analytic_node, self.SEC.dataSource, Literal(source, datatype=XSD.string)))
 
-    def _extract_description(self, description_obj) -> str:
-        """Extract description text from potentially nested structure."""
-        if isinstance(description_obj, str):
-            return description_obj
-        if isinstance(description_obj, dict):
-            if "Description" in description_obj:
-                return self._extract_description(description_obj["Description"])
-            if "Text" in description_obj:
-                return description_obj["Text"]
-        if isinstance(description_obj, list) and len(description_obj) > 0:
-            return self._extract_description(description_obj[0])
-        return ""
-
-    def _add_detection_relationships(self, analytics: list):
+    def _add_detection_relationships(self, analytics: List[Dict[str, Any]]) -> None:
         """Add detects relationships to ATT&CK techniques."""
         for analytic in analytics:
-            car_id = analytic.get("ID", "")
+            car_id = _get_first_value(analytic, ["id", "ID", "carId", "car_id", "analytic_id", "analyticId"])
             if not car_id:
                 continue
-            
-            car_id_full = f"CAR-{car_id}" if not car_id.startswith("CAR-") else car_id
+
+            car_id_full = _normalize_car_id(str(car_id))
             analytic_node = URIRef(f"{self.EX}analytic/{car_id_full}")
-            
-            if analytic.get("DetectsTechniques"):
-                for att_technique in analytic["DetectsTechniques"]:
-                    att_id = att_technique if isinstance(att_technique, str) else att_technique.get("ID", "")
-                    if att_id:
-                        att_id_full = f"{att_id}" if att_id.startswith("T") else f"T{att_id}"
-                        att_node = URIRef(f"{self.EX}technique/{att_id_full}")
-                        self.graph.add((analytic_node, self.SEC.detects, att_node))
+
+            for att_id in _extract_technique_ids(analytic):
+                att_id_full = att_id if att_id.startswith("T") else f"T{att_id}"
+                att_node = URIRef(f"{self.EX}technique/{att_id_full}")
+                self.graph.add((analytic_node, self.SEC.detects, att_node))
 
 
-def main():
-    parser = argparse.ArgumentParser(description="ETL: MITRE CAR JSON → RDF Turtle")
-    parser.add_argument("--input", "-i", required=True, help="Input CAR JSON file")
+def _get_first_value(obj: Dict[str, Any], keys: List[str]) -> Any:
+    for key in keys:
+        if key in obj and obj[key] not in (None, ""):
+            return obj[key]
+    return None
+
+
+def _normalize_car_id(value: str) -> str:
+    value = value.strip()
+    if not value:
+        return value
+    return value if value.startswith("CAR-") else f"CAR-{value}"
+
+
+def _extract_technique_ids(analytic: Dict[str, Any]) -> Iterable[str]:
+    keys = [
+        "DetectsTechniques",
+        "detects_techniques",
+        "detectsTechniques",
+        "techniques",
+        "technique",
+        "attack_techniques",
+        "attck_techniques",
+        "attackTechniques",
+        "attack_technique_ids",
+    ]
+    seen = set()
+    for key in keys:
+        if key not in analytic:
+            continue
+        value = analytic.get(key)
+        for item in _normalize_technique_items(value):
+            if item and item not in seen:
+                seen.add(item)
+                yield item
+
+
+def _normalize_technique_items(value: Any) -> Iterable[str]:
+    if not value:
+        return []
+    if isinstance(value, list):
+        for entry in value:
+            item = _extract_technique_id(entry)
+            if item:
+                yield item
+    else:
+        item = _extract_technique_id(value)
+        if item:
+            yield item
+
+
+def _extract_technique_id(entry: Any) -> str | None:
+    if isinstance(entry, str):
+        return entry.strip()
+    if isinstance(entry, dict):
+        for key in ("id", "ID", "technique_id", "techniqueId", "attack_id", "attackId"):
+            if entry.get(key):
+                return str(entry.get(key)).strip()
+    return None
+
+
+def _extract_description(description_obj: Any) -> str:
+    if isinstance(description_obj, str):
+        return description_obj
+    if isinstance(description_obj, dict):
+        if "Description" in description_obj:
+            return _extract_description(description_obj["Description"])
+        if "Text" in description_obj:
+            return description_obj["Text"]
+    if isinstance(description_obj, list) and description_obj:
+        return _extract_description(description_obj[0])
+    return ""
+
+
+def _iter_analytics_from_yaml(path: str) -> List[Dict[str, Any]]:
+    with open(path, "r", encoding="utf-8", errors="replace") as fh:
+        docs = list(yaml.safe_load_all(fh))
+
+    analytics: List[Dict[str, Any]] = []
+    for doc in docs:
+        analytics.extend(_collect_analytics(doc))
+    return analytics
+
+
+def _collect_analytics(doc: Any) -> List[Dict[str, Any]]:
+    if doc is None:
+        return []
+    if isinstance(doc, list):
+        items: List[Dict[str, Any]] = []
+        for entry in doc:
+            items.extend(_collect_analytics(entry))
+        return items
+    if isinstance(doc, dict):
+        for key in ("DetectionAnalytics", "analytics"):
+            if isinstance(doc.get(key), list):
+                return [item for item in doc[key] if isinstance(item, dict)]
+        if _get_first_value(doc, ["id", "ID", "carId", "car_id", "analytic_id", "analyticId"]):
+            return [doc]
+    return []
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="ETL: MITRE CAR YAML → RDF Turtle")
+    parser.add_argument("--input", "-i", required=True, help="Input CAR YAML file, glob, or directory")
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
-    
+    parser.add_argument("--validate", action="store_true", help="Run SHACL validation on output")
+    parser.add_argument("--shapes", default="docs/ontology/shacl/car-shapes.ttl", help="SHACL shapes file")
     args = parser.parse_args()
-    
-    try:
-        with open(args.input, "r") as f:
-            json_data = json.load(f)
-    except Exception as e:
-        print(f"❌ Error loading JSON: {e}")
+
+    input_files: List[str] = []
+    if os.path.isdir(args.input):
+        input_files = sorted(glob.glob(os.path.join(args.input, "*.yml")))
+        input_files += sorted(glob.glob(os.path.join(args.input, "*.yaml")))
+    else:
+        input_files = sorted(glob.glob(args.input)) or [args.input]
+
+    if not any(os.path.exists(p) for p in input_files):
+        print(f"❌ Error: Input not found: {args.input}")
         return 1
-    
+
+    analytics: List[Dict[str, Any]] = []
+    for input_file in input_files:
+        if not os.path.exists(input_file):
+            print(f"Warning: {input_file} not found, skipping")
+            continue
+        try:
+            analytics.extend(_iter_analytics_from_yaml(input_file))
+        except Exception as e:
+            print(f"Warning: Could not parse {input_file}: {e}")
+
+    if not analytics:
+        print("Warning: No CAR analytics with IDs found in input; output will be empty.")
+
     try:
-        print(f"Loading CAR JSON from {args.input}...")
+        print(f"Loading CAR YAML from {args.input}...")
         transformer = CARtoRDFTransformer()
         print("Transforming to RDF...")
-        transformer.transform(json_data)
+        transformer.transform(analytics)
         ttl_content = transformer.graph.serialize(format="turtle")
-        
+
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)
         print(f"Writing RDF to {args.output}...")
-        with open(args.output, "w") as f:
+        with open(args.output, "w", encoding="utf-8") as f:
             f.write(ttl_content)
-        
+
+        if args.validate:
+            print("\nRunning SHACL validation...")
+            try:
+                try:
+                    from src.core.validation import run_validator, load_graph
+                except Exception:
+                    from core.validation import run_validator, load_graph
+                shapes = load_graph(args.shapes)
+                conforms, _, _ = run_validator(args.output, shapes)
+                if conforms:
+                    print("✓ Validation passed!")
+                else:
+                    print("✗ Validation failed!")
+                    return 1
+            except Exception as e:
+                print(f"Warning: Could not run validation: {e}")
+
         print(f"✓ Transformation complete: {args.output}")
         return 0
-    
+
     except Exception as e:
         print(f"❌ Transformation error: {e}")
         return 1

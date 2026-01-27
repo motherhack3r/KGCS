@@ -137,7 +137,12 @@ def main():
     print("\n[STAGE 8] Transform CAR → DetectionAnalytic nodes")
     print("-" * 70)
     if has_any_input('data/car/raw/*.yaml'):
-        skip_stage("CAR", "raw is CAR data model YAML; analytics JSON not available for etl_car")
+        if not run_etl('etl_car',
+                       'data/car/raw',
+                       'tmp/pipeline-stage8-car.ttl'):
+            print("CAR ETL failed")
+            return 1
+        print("CAR ETL completed")
     else:
         skip_stage("CAR", "raw files not found")
 
@@ -178,6 +183,7 @@ Generated outputs:
   Stage 5: tmp/pipeline-stage5-d3fend.ttl      (DefensiveTechnique nodes)
     Stage 6: tmp/pipeline-stage6-capec.ttl       (AttackPattern nodes)
     Stage 7: tmp/pipeline-stage7-cwe.ttl         (Weakness nodes)
+        Stage 8: tmp/pipeline-stage8-car.ttl         (DetectionAnalytic nodes)
     Stage 9: tmp/pipeline-stage9-shield.ttl      (DeceptionTechnique nodes)
     Stage 10: tmp/pipeline-stage10-engage.ttl    (EngagementConcept nodes)
 
