@@ -1,0 +1,34 @@
+{
+  "Weakness": [
+    {
+      "ID": "287",
+      "Name": "Improper Authentication",
+      "Description": "When an actor claims to have a given identity, the product does not prove or insufficiently proves that the claim is correct.",
+      "WeaknessAbstraction": "Class",
+      "Status": "Draft",
+      "RelatedWeaknesses": [
+        {
+          "ID": "284",
+          "Relationship": "ChildOf"
+        },
+        {
+          "ID": "284",
+          "Relationship": "ChildOf"
+        }
+      ]
+    },
+    {
+      "ID": "553",
+      "Name": "Command Shell in Externally Accessible Directory",
+      "Description": "A possible shell file exists in /cgi-bin/ or other accessible directories. This is extremely dangerous and can be used by an attacker to execute commands on the web server.",
+      "WeaknessAbstraction": "Variant",
+      "Status": "Incomplete",
+      "RelatedWeaknesses": [
+        {
+          "ID": "552",
+          "Relationship": "ChildOf"
+        }
+      ]
+    }
+  ]
+}

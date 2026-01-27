@@ -8,6 +8,10 @@ where source data allows it:
     CPEMatch → CPE → CVE → CWE → CAPEC
     ATT&CK techniques → {D3FEND, CAR, SHIELD, ENGAGE}
 
+Modes:
+    --cve-first    (default) derive downstream from CVEs
+    --attack-first derive downstream from ATT&CK techniques
+
 Usage:
     python scripts/create_phase3_samples.py --count 200
 """
@@ -158,7 +162,7 @@ def _normalize_config_nodes(configs: object) -> List[dict]:
         nodes = []
         for entry in configs:
             if isinstance(entry, dict) and isinstance(entry.get("nodes"), list):
-                nodes.extend(entry.get("nodes"))
+                nodes.extend(entry.get("nodes") or [])
             else:
                 nodes.append(entry)
     else:
@@ -189,8 +193,11 @@ def _cve_has_configs(configs: object) -> bool:
 
 def _extract_cwe_ids_from_cve_item(item: dict) -> Set[str]:
     cwe_ids: Set[str] = set()
-    cve = item.get("cve") if isinstance(item.get("cve"), dict) else {}
-    weaknesses = cve.get("weaknesses") or item.get("weaknesses") or []
+    cve_obj = item.get("cve")
+    if isinstance(cve_obj, dict):
+        weaknesses = cve_obj.get("weaknesses") or item.get("weaknesses") or []
+    else:
+        weaknesses = item.get("weaknesses") or []
     for weakness in weaknesses:
         if not isinstance(weakness, dict):
             continue
@@ -267,7 +274,7 @@ def _cve_has_match(configs: object, match_ids: Set[str], criteria_values: Set[st
         nodes = []
         for entry in configs:
             if isinstance(entry, dict) and isinstance(entry.get("nodes"), list):
-                nodes.extend(entry.get("nodes"))
+                nodes.extend(entry.get("nodes") or [])
             else:
                 nodes.append(entry)
         return _nodes_have_match(nodes, match_ids, criteria_values)
@@ -414,6 +421,59 @@ def _build_capec_sample(capec_path: str, cwe_ids: Set[str]) -> dict:
     return {"AttackPatterns": patterns}
 
 
+def _build_capec_sample_by_ids(capec_path: str, capec_ids: Set[str]) -> dict:
+    tree = ET.parse(capec_path)
+    root = tree.getroot()
+    ns = {"capec": "http://capec.mitre.org/capec-3"}
+    wanted = {capec_id.replace("CAPEC-", "") for capec_id in capec_ids}
+
+    patterns: List[dict] = []
+    for ap in root.findall(".//capec:Attack_Patterns/capec:Attack_Pattern", ns):
+        capec_id = ap.get("ID")
+        if not capec_id or capec_id not in wanted:
+            continue
+
+        name = ap.get("Name")
+        description = _flatten_text(ap.find("capec:Description", ns))
+
+        prereqs = []
+        for prereq in ap.findall(".//capec:Prerequisites/capec:Prerequisite", ns):
+            prereq_text = _flatten_text(prereq)
+            if prereq_text:
+                prereqs.append({"Description": prereq_text})
+
+        consequences = []
+        for cons in ap.findall(".//capec:Consequences/capec:Consequence", ns):
+            cons_text = _flatten_text(cons)
+            if cons_text:
+                consequences.append({"Description": cons_text})
+
+        related_weaknesses = []
+        for rel in ap.findall(".//capec:Related_Weaknesses/capec:Related_Weakness", ns):
+            cwe_id = rel.get("CWE_ID")
+            if cwe_id:
+                related_weaknesses.append({"ID": cwe_id})
+
+        related_attack_patterns = []
+        for rel in ap.findall(".//capec:Related_Attack_Patterns/capec:Related_Attack_Pattern", ns):
+            rel_id = rel.get("CAPEC_ID")
+            nature = rel.get("Nature")
+            if rel_id:
+                related_attack_patterns.append({"ID": rel_id, "Relationship": nature})
+
+        patterns.append({
+            "ID": capec_id,
+            "Name": name,
+            "Description": description,
+            "Prerequisites": prereqs,
+            "Consequences": consequences,
+            "RelatedWeaknesses": related_weaknesses,
+            "RelatedAttackPatterns": related_attack_patterns,
+        })
+
+    return {"AttackPatterns": patterns}
+
+
 def _extract_attack_ids_from_json(payload: Any, attack_ids: Set[str]) -> None:
     if payload is None:
         return
@@ -493,6 +553,77 @@ def _extract_attack_id_from_refs(external_refs: List[dict]) -> Optional[str]:
     return None
 
 
+def _extract_capec_ids_from_attack(attack_dir: str, attack_ids: Set[str]) -> Set[str]:
+    capec_ids: Set[str] = set()
+    if not attack_ids or not os.path.isdir(attack_dir):
+        return capec_ids
+
+    for attack_file in sorted(Path(attack_dir).glob("*.json")):
+        try:
+            attack_json = json.load(open(attack_file, "r", encoding="utf-8", errors="ignore"))
+        except Exception:
+            continue
+        objects = attack_json.get("objects", []) if isinstance(attack_json, dict) else []
+        for obj in objects:
+            if not isinstance(obj, dict):
+                continue
+            if obj.get("type") != "attack-pattern":
+                continue
+            external_refs = obj.get("external_references", []) or []
+            attack_id = _extract_attack_id_from_refs(external_refs)
+            if attack_id not in attack_ids:
+                continue
+            for ref in external_refs:
+                if not isinstance(ref, dict):
+                    continue
+                if ref.get("source_name") == "capec":
+                    capec_id = ref.get("external_id")
+                    if capec_id:
+                        capec_ids.add(capec_id)
+    return capec_ids
+
+
+def _extract_cwe_ids_from_capec_payload(capec_payload: dict) -> Set[str]:
+    cwe_ids: Set[str] = set()
+    for pattern in capec_payload.get("AttackPatterns", []) if isinstance(capec_payload, dict) else []:
+        if not isinstance(pattern, dict):
+            continue
+        for rel in pattern.get("RelatedWeaknesses", []) or []:
+            cwe_id = rel.get("ID") if isinstance(rel, dict) else None
+            if isinstance(cwe_id, str) and cwe_id:
+                cwe_ids.add(f"CWE-{cwe_id}" if not cwe_id.startswith("CWE-") else cwe_id)
+    return cwe_ids
+
+
+def _collect_cves_by_cwe(paths: List[str], cwe_ids: Set[str], max_items: int, rng: random.Random) -> List[dict]:
+    if not cwe_ids:
+        return []
+    samples: List[dict] = []
+    idx = 0
+    for path in paths:
+        with open(path, "r", encoding="utf-8") as fh:
+            for item in ijson.items(fh, "vulnerabilities.item"):
+                if not isinstance(item, dict):
+                    continue
+                if not _extract_cwe_ids_from_cve_item(item) & cwe_ids:
+                    continue
+                configs = item.get("configurations")
+                if not configs:
+                    cve = item.get("cve") if isinstance(item.get("cve"), dict) else None
+                    configs = cve.get("configurations") if cve else None
+                if not configs or not _cve_has_configs(configs):
+                    continue
+
+                idx += 1
+                if len(samples) < max_items:
+                    samples.append(item)
+                    continue
+                j = rng.randint(1, idx)
+                if j <= max_items:
+                    samples[j - 1] = item
+    return samples
+
+
 def _extract_attack_ids_from_capec(attack_dir: str, capec_ids: Set[str]) -> Set[str]:
     attack_ids: Set[str] = set()
     if not capec_ids or not os.path.isdir(attack_dir):
@@ -527,8 +658,8 @@ def _extract_attack_ids_from_capec(attack_dir: str, capec_ids: Set[str]) -> Set[
     return attack_ids
 
 
-def _build_attack_samples(attack_files: List[Path], technique_ids: Set[str], output_root: str) -> int:
-    count_written = 0
+def _build_attack_samples(attack_files: List[Path], technique_ids: Set[str], output_root: str) -> List[dict]:
+    results: List[dict] = []
     for attack_file in attack_files:
         try:
             attack_json = json.load(open(attack_file, "r", encoding="utf-8", errors="ignore"))
@@ -537,6 +668,7 @@ def _build_attack_samples(attack_files: List[Path], technique_ids: Set[str], out
         objects = attack_json.get("objects", []) if isinstance(attack_json, dict) else []
 
         selected_objects = []
+        technique_count = 0
         tactic_shortnames: Set[str] = set()
         for obj in objects:
             if not isinstance(obj, dict):
@@ -546,11 +678,13 @@ def _build_attack_samples(attack_files: List[Path], technique_ids: Set[str], out
             attack_id = _extract_attack_id_from_refs(obj.get("external_references", []) or [])
             if attack_id and attack_id in technique_ids:
                 selected_objects.append(obj)
+                technique_count += 1
                 for phase in obj.get("kill_chain_phases", []) or []:
                     phase_name = phase.get("phase_name")
                     if phase_name:
                         tactic_shortnames.add(phase_name)
 
+        tactic_count = 0
         for obj in objects:
             if not isinstance(obj, dict):
                 continue
@@ -559,6 +693,7 @@ def _build_attack_samples(attack_files: List[Path], technique_ids: Set[str], out
             shortname = obj.get("x_mitre_shortname")
             if shortname and shortname in tactic_shortnames:
                 selected_objects.append(obj)
+                tactic_count += 1
 
         if not selected_objects:
             continue
@@ -566,9 +701,15 @@ def _build_attack_samples(attack_files: List[Path], technique_ids: Set[str], out
         sample_payload = {"type": attack_json.get("type", "bundle"), "objects": selected_objects}
         out_path = os.path.join(output_root, "attack", "samples", f"sample-{attack_file.name}")
         _write_json(out_path, sample_payload)
-        count_written += 1
+        results.append({
+            "file": attack_file.name,
+            "techniques": technique_count,
+            "tactics": tactic_count,
+            "objects": len(selected_objects),
+            "path": out_path,
+        })
 
-    return count_written
+    return results
 
 
 def _resolve_attack_files(attack_dir: str) -> List[Path]:
@@ -576,8 +717,8 @@ def _resolve_attack_files(attack_dir: str) -> List[Path]:
         return []
     preferred = [
         "enterprise-attack.json",
-        "ics-attack.json",
         "mobile-attack.json",
+        "ics-attack.json",
         "pre-attack.json",
     ]
     preferred_paths = [Path(attack_dir) / name for name in preferred if (Path(attack_dir) / name).exists()]
@@ -586,18 +727,37 @@ def _resolve_attack_files(attack_dir: str) -> List[Path]:
     return sorted(Path(attack_dir).glob("*.json"))
 
 
+def _collect_attack_ids(attack_files: List[Path]) -> Set[str]:
+    attack_ids: Set[str] = set()
+    for attack_file in attack_files:
+        try:
+            attack_json = json.load(open(attack_file, "r", encoding="utf-8", errors="ignore"))
+        except Exception:
+            continue
+        objects = attack_json.get("objects", []) if isinstance(attack_json, dict) else []
+        for obj in objects:
+            if not isinstance(obj, dict):
+                continue
+            if obj.get("type") != "attack-pattern":
+                continue
+            attack_id = _extract_attack_id_from_refs(obj.get("external_references", []) or [])
+            if isinstance(attack_id, str):
+                attack_ids.add(attack_id)
+    return attack_ids
+
+
 def _build_d3fend_sample(mapping_path: str, technique_ids: Set[str]) -> dict:
     techniques: Dict[str, dict] = {}
     if not os.path.exists(mapping_path):
         return {"DefensiveTechniques": []}
     data = json.load(open(mapping_path, "r", encoding="utf-8", errors="ignore"))
-    results = []
+    results: List[dict] = []
     if isinstance(data, dict):
         raw_results = data.get("results")
         if isinstance(raw_results, dict) and isinstance(raw_results.get("bindings"), list):
-            results = raw_results.get("bindings")
+            results = [r for r in raw_results.get("bindings") or [] if isinstance(r, dict)]
         elif isinstance(raw_results, list):
-            results = raw_results
+            results = [r for r in raw_results if isinstance(r, dict)]
     for entry in results:
         off_id = entry.get("off_tech_id", {})
         off_value = off_id.get("value") if isinstance(off_id, dict) else None
@@ -793,9 +953,20 @@ def _build_engage_sample(mapping_path: str, technique_ids: Set[str]) -> dict:
     return {"EngagementConcepts": list(concepts.values())}
 
 
+def _format_attack_file_names(attack_files: List[Path]) -> str:
+    if not attack_files:
+        return "(none)"
+    labels = []
+    for path in attack_files:
+        name = path.name.replace(".json", "")
+        name = name.replace("-attack", "")
+        labels.append(name)
+    return ", ".join(labels)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Create small Phase 3 sample JSON files")
-    parser.add_argument("--count", type=int, default=200, help="Number of CPEMatch entries to sample")
+    parser.add_argument("--count", type=int, default=None, help="Deprecated (use --cve-max and --cpematch-max)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for sampling")
     parser.add_argument("--cpe-input", default="data/cpe/raw/nvdcpe-2.0-chunks", help="CPE input file or directory")
     parser.add_argument("--cpematch-input", default="data/cpe/raw/nvdcpematch-2.0-chunks", help="CPEMatch input file or directory")
@@ -808,11 +979,12 @@ def main() -> int:
     parser.add_argument("--shield-input", default="data/shield/raw", help="SHIELD mapping input file or directory")
     parser.add_argument("--engage-input", default="data/engage/raw", help="ENGAGE mapping input file or directory")
     parser.add_argument("--output-root", default="data", help="Root output directory")
-    parser.add_argument("--cve-max", type=int, default=None, help="Max CVE records to include (default: same as --count)")
+    parser.add_argument("--cve-max", type=int, default=200, help="Max CVE records to include")
     parser.add_argument("--cve-fallback-random", action=argparse.BooleanOptionalAction, default=True, help="When no linked CVEs found, fall back to random CVE sampling")
     parser.add_argument("--attack-max", type=int, default=1000, help="Max ATT&CK techniques to include (default: 1000)")
     parser.add_argument("--cve-first", action=argparse.BooleanOptionalAction, default=True, help="Sample CVEs with configs+CWE first, then derive CPEMatch/CPE")
-    parser.add_argument("--cpematch-max", type=int, default=None, help="Max CPEMatch entries to include (default: same as --count)")
+    parser.add_argument("--attack-first", action=argparse.BooleanOptionalAction, default=False, help="Sample ATT&CK techniques first, then derive CAPEC/CWE/CVE")
+    parser.add_argument("--cpematch-max", type=int, default=200, help="Max CPEMatch entries to include")
     args = parser.parse_args()
 
     cpe_files: List[str] = []
@@ -851,12 +1023,68 @@ def main() -> int:
     print(f"Using CPE files: {len(cpe_files)}")
     print(f"Using CPEMatch files: {len(cpematch_files)}")
     print(f"Using CVE files: {len(cve_files)}")
+    attack_files = _resolve_attack_files(args.attack_input)
+    print(f"Using ATT&CK files: {_format_attack_file_names(attack_files)}")
 
     rng = random.Random(args.seed)
-    cve_max = args.cve_max if args.cve_max is not None else args.count
-    cpematch_max = args.cpematch_max if args.cpematch_max is not None else args.count
+    if args.count is not None:
+        print("Warning: --count is deprecated; use --cve-max and --cpematch-max")
+        if args.cve_max == 200:
+            args.cve_max = args.count
+        if args.cpematch_max == 200:
+            args.cpematch_max = args.count
 
-    if args.cve_first:
+    cve_max = args.cve_max
+    cpematch_max = args.cpematch_max
+
+    attack_ids: Set[str] = set()
+    capec_payload = None
+
+    if args.attack_first:
+        if not attack_files:
+            print("ATT&CK input not found")
+            return 1
+
+        attack_target = args.attack_max if args.attack_max is not None else args.count
+        attack_candidates = _collect_attack_ids(attack_files)
+        attack_ids = _sample_set(attack_candidates, attack_target, rng)
+        if not attack_ids:
+            print("Skipping ATT&CK-first sampling (no technique IDs found)")
+            return 1
+
+        capec_ids = _extract_capec_ids_from_attack(args.attack_input, attack_ids)
+        if capec_ids and os.path.exists(args.capec_input):
+            capec_payload = _build_capec_sample_by_ids(args.capec_input, capec_ids)
+        else:
+            capec_payload = {"AttackPatterns": []}
+
+        cwe_ids = _extract_cwe_ids_from_capec_payload(capec_payload)
+        cve_items = _collect_cves_by_cwe(cve_files, cwe_ids, cve_max, rng)
+        if not cve_items and args.cve_fallback_random and cve_max:
+            print("No CWE-linked CVEs found; falling back to random CVE sampling")
+            cve_items = _reservoir_sample_multi(cve_files, "vulnerabilities.item", cve_max, rng)
+
+        criteria_values: Set[str] = set()
+        match_ids: Set[str] = set()
+        for item in cve_items:
+            configs = item.get("configurations")
+            if not configs:
+                cve = item.get("cve") if isinstance(item.get("cve"), dict) else None
+                configs = cve.get("configurations") if cve else None
+            for match_id, criteria in _iter_cve_match_fields(configs):
+                if match_id:
+                    match_ids.add(match_id)
+                if isinstance(criteria, str):
+                    criteria_values.add(criteria)
+
+        cpematch_items = _collect_cpematch_by_criteria(cpematch_files, criteria_values, cpematch_max, rng)
+        if not cpematch_items:
+            print("No CPEMatch entries matched CVE criteria; falling back to random CPEMatch sampling")
+            cpematch_items = _reservoir_sample_multi(cpematch_files, "matchStrings.item", cpematch_max, rng)
+
+        match_ids, cpe_ids, criteria_values = _collect_related_ids(cpematch_items)
+        cpe_items = _collect_cpes(cpe_files, cpe_ids)
+    elif args.cve_first:
         cve_items = _collect_cves_with_cwe_and_configs(cve_files, cve_max, rng)
         if not cve_items:
             print("No CVEs with configs+CWE found; falling back to random CVE sampling")
@@ -904,7 +1132,7 @@ def main() -> int:
     print(f"Wrote {len(cpematch_items)} CPEMatch entries to {cpematch_out}")
     print(f"Wrote {len(cve_items)} CVE entries to {cve_out}")
 
-    cwe_ids = _extract_cwe_ids_from_cves(cve_items)
+    cwe_ids = _extract_cwe_ids_from_cves(cve_items) if not args.attack_first else _extract_cwe_ids_from_capec_payload(capec_payload or {})
     cwe_input = args.cwe_input
     if not os.path.exists(cwe_input):
         if os.path.isdir(cwe_input):
@@ -921,36 +1149,51 @@ def main() -> int:
     else:
         print("Skipping CWE sample (no CWE IDs or input missing)")
 
-    capec_payload = None
-    if cwe_ids and os.path.exists(args.capec_input):
+    if capec_payload is None and cwe_ids and os.path.exists(args.capec_input):
         capec_payload = _build_capec_sample(args.capec_input, cwe_ids)
+        capec_out = os.path.join(args.output_root, "capec", "samples", "sample_capec.json")
+        _write_json(capec_out, capec_payload)
+        print(f"Wrote {len(capec_payload.get('AttackPatterns', []))} CAPEC entries to {capec_out}")
+    elif capec_payload is not None:
         capec_out = os.path.join(args.output_root, "capec", "samples", "sample_capec.json")
         _write_json(capec_out, capec_payload)
         print(f"Wrote {len(capec_payload.get('AttackPatterns', []))} CAPEC entries to {capec_out}")
     else:
         print("Skipping CAPEC sample (no CWE IDs or input missing)")
 
-    attack_candidates = _extract_attack_ids_from_defense(
-        args.d3fend_input,
-        args.car_input,
-        args.shield_input,
-        args.engage_input,
-    )
-    if capec_payload and os.path.isdir(args.attack_input):
-        capec_ids = {f"CAPEC-{p.get('ID')}" if isinstance(p.get('ID'), str) and not p.get('ID').startswith('CAPEC-') else p.get('ID')
-                     for p in capec_payload.get('AttackPatterns', []) if isinstance(p, dict) and p.get('ID')}
-        capec_ids = {c for c in capec_ids if isinstance(c, str)}
-        attack_candidates.update(_extract_attack_ids_from_capec(args.attack_input, capec_ids))
-    attack_max = args.attack_max
-    attack_ids = _sample_set(attack_candidates, attack_max, rng)
+    if not attack_ids:
+        attack_candidates = _extract_attack_ids_from_defense(
+            args.d3fend_input,
+            args.car_input,
+            args.shield_input,
+            args.engage_input,
+        )
+        if capec_payload and os.path.isdir(args.attack_input):
+            capec_ids: Set[str] = set()
+            for pattern in capec_payload.get("AttackPatterns", []) if isinstance(capec_payload, dict) else []:
+                if not isinstance(pattern, dict):
+                    continue
+                capec_id = pattern.get("ID")
+                if isinstance(capec_id, str) and capec_id:
+                    capec_ids.add(f"CAPEC-{capec_id}" if not capec_id.startswith("CAPEC-") else capec_id)
+            attack_candidates.update(_extract_attack_ids_from_capec(args.attack_input, capec_ids))
+        attack_max = args.attack_max
+        attack_ids = _sample_set(attack_candidates, attack_max, rng)
     if not attack_ids:
         print("Skipping ATT&CK/defense samples (no technique IDs found)")
         return 0
 
-    attack_files = _resolve_attack_files(args.attack_input)
+    print(f"Selected ATT&CK techniques: {len(attack_ids)}")
     if attack_files:
-        count_written = _build_attack_samples(attack_files, attack_ids, args.output_root)
-        print(f"Wrote {count_written} ATT&CK sample file(s) to {os.path.join(args.output_root, 'attack', 'samples')}")
+        attack_results = _build_attack_samples(attack_files, attack_ids, args.output_root)
+        print(f"Wrote {len(attack_results)} ATT&CK sample file(s) to {os.path.join(args.output_root, 'attack', 'samples')}")
+        for result in attack_results:
+            file_label = result.get("file")
+            techniques = result.get("techniques", 0)
+            tactics = result.get("tactics", 0)
+            objects = result.get("objects", 0)
+            if file_label:
+                print(f"  - {file_label}: {techniques} techniques, {tactics} tactics ({objects} objects)")
     else:
         print("Skipping ATT&CK sample (input missing)")
 

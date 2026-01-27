@@ -1,0 +1,139 @@
+{
+  "EngagementConcepts": [
+    {
+      "ID": "EAC0005",
+      "Name": "Lures",
+      "Description": "When adversaries interact with the environment or personas, they are vulnerable when they collect, observe, or manipulate system artifacts or information. Manipulated data may cause them to reveal behaviors, use additional or more advanced capabilities against the target, and/or impact their dwell time.",
+      "DisruptsTechniques": [
+        "T1003",
+        "T1039",
+        "T1049",
+        "T1199",
+        "T1590",
+        "T1592"
+      ]
+    },
+    {
+      "ID": "EAC0011",
+      "Name": "Pocket Litter",
+      "Description": "When adversaries interact with the environment or personas, they are vulnerable to collecting, or in some way interacting with, manipulated or decoy data. In those cases the data may increase their tolerance for imperfections in the environment and improve the overall believability of the ruse.",
+      "DisruptsTechniques": [
+        "T1003",
+        "T1039",
+        "T1049",
+        "T1082",
+        "T1590",
+        "T1592"
+      ]
+    },
+    {
+      "ID": "EAC0003",
+      "Name": "System Activity Monitoring",
+      "Description": "When adversaries interact with network or system resources, they are vulnerable to triggering tripwires or engaging in easily detectable, anomalous behavior.",
+      "DisruptsTechniques": [
+        "T1003",
+        "T1207"
+      ]
+    },
+    {
+      "ID": "EAC0015",
+      "Name": "Information Manipulation",
+      "Description": "When adversaries interact with the environment or personas, they are vulnerable when they collect, observe, or manipulate system artifacts or information. Manipulated data may cause them to reveal behaviors, use additional or more advanced capabilities against the target, and/or impact their dwell time.",
+      "DisruptsTechniques": [
+        "T1039",
+        "T1049",
+        "T1082"
+      ]
+    },
+    {
+      "ID": "EAC0018",
+      "Name": "Security Controls",
+      "Description": "When adversaries discover enabled, accessible, or intentionally weakened/overly permissive resources in the environment, they are vulnerable to revealing additional or more advanced capabilities when exploiting or using said resource.",
+      "DisruptsTechniques": [
+        "T1039",
+        "T1199",
+        "T1207",
+        "T1543",
+        "T1546"
+      ]
+    },
+    {
+      "ID": "EAC0016",
+      "Name": "Network Manipulation",
+      "Description": "When adversaries move data across the network or interact with remote resources, they are vulnerable to network manipulations such as impacts to network availability, traffic filtering, degraded speeds, etc.",
+      "DisruptsTechniques": [
+        "T1039",
+        "T1105"
+      ]
+    },
+    {
+      "ID": "EAC0008",
+      "Name": "Burn-In",
+      "Description": "When adversaries interact with the environment or personas, they are vulnerable to collecting, or in some way interacting with, manipulated or decoy data. In those cases the data may increase their tolerance for imperfections in the environment and improve the overall believability of the ruse.",
+      "DisruptsTechniques": [
+        "T1049",
+        "T1082",
+        "T1592"
+      ]
+    },
+    {
+      "ID": "EAC0001",
+      "Name": "API Monitoring",
+      "Description": "When adversaries utilize or abuse system features, software, or other resources, they may be vulnerable to monitoring or Man-in-the-Middle manipulation.",
+      "DisruptsTechniques": [
+        "T1049",
+        "T1082"
+      ]
+    },
+    {
+      "ID": "EAC0014",
+      "Name": "Software Manipulation",
+      "Description": "When adversaries utilize or abuse system features, software, or other resources, they may be vulnerable to monitoring or Man-in-the-Middle manipulation.",
+      "DisruptsTechniques": [
+        "T1049",
+        "T1082"
+      ]
+    },
+    {
+      "ID": "EAC0002",
+      "Name": "Network Monitoring",
+      "Description": "When adversaries interact with network or system resources, they are vulnerable to triggering tripwires or engaging in easily detectable, anomalous behavior.",
+      "DisruptsTechniques": [
+        "T1105"
+      ]
+    },
+    {
+      "ID": "EAC0020",
+      "Name": "Isolation",
+      "Description": "When adversaries rely on specific resources to be enabled, accessible, and/or vulnerable, they are vulnerable to their operations being disrupted if the resources are disabled, removed, or otherwise made invulnerable.",
+      "DisruptsTechniques": [
+        "T1105"
+      ]
+    },
+    {
+      "ID": "EAC0012",
+      "Name": "Personas",
+      "Description": "When adversaries interact directly with victims, they are vulnerable to being socially engineered or otherwise manipulated by an aware user.",
+      "DisruptsTechniques": [
+        "T1199"
+      ]
+    },
+    {
+      "ID": "EAC0019",
+      "Name": "Baseline",
+      "Description": "When adversaries rely on specific resources to be enabled, accessible, and/or vulnerable, they are vulnerable to their operations being disrupted if the resources are disabled, removed, or otherwise made invulnerable.",
+      "DisruptsTechniques": [
+        "T1543",
+        "T1546"
+      ]
+    },
+    {
+      "ID": "EAC0022",
+      "Name": "Artifact Diversity",
+      "Description": "When adversaries discover a diverse set of accessible resources and decoy artifacts on the target, they are vulnerable to revealing their targeting preferences and capabilities.",
+      "DisruptsTechniques": [
+        "T1592"
+      ]
+    }
+  ]
+}

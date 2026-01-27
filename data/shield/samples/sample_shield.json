@@ -1,0 +1,110 @@
+{
+  "DeceptionTechniques": [
+    {
+      "ID": "DTE0012",
+      "Name": "Decoy Credentials",
+      "Description": "Create user credentials that are used for active defense purposes.",
+      "CountersTechniques": [
+        "T1003"
+      ]
+    },
+    {
+      "ID": "DTE0030",
+      "Name": "Pocket Litter",
+      "Description": "Place data on a system to reinforce the legitimacy of the system or user.",
+      "CountersTechniques": [
+        "T1039"
+      ]
+    },
+    {
+      "ID": "DTE0036",
+      "Name": "Software Manipulation",
+      "Description": "Make changes to a system's software properties and functions to achieve a desired effect.",
+      "CountersTechniques": [
+        "T1049"
+      ]
+    },
+    {
+      "ID": "DTE0011",
+      "Name": "Decoy Content ",
+      "Description": "Seed content that can be used to lead an adversary in a specific direction, entice a behavior, etc.",
+      "CountersTechniques": [
+        "T1082",
+        "T1590",
+        "T1592"
+      ]
+    },
+    {
+      "ID": "DTE0028",
+      "Name": "PCAP Collection",
+      "Description": "Collect full network traffic for future research and analysis.",
+      "CountersTechniques": [
+        "T1105"
+      ]
+    },
+    {
+      "ID": "DTE0034",
+      "Name": "System Activity Monitoring",
+      "Description": "Collect system activity logs which can reveal adversary activity.",
+      "CountersTechniques": [
+        "T1199"
+      ]
+    },
+    {
+      "ID": "DTE0007",
+      "Name": "Behavioral Analytics",
+      "Description": "Deploy tools that detect unusual system or user behavior.\n",
+      "CountersTechniques": [
+        "T1207"
+      ]
+    },
+    {
+      "ID": "DTE0032",
+      "Name": "Security Controls",
+      "Description": "Alter security controls to make the system more or less vulnerable to attack.",
+      "CountersTechniques": [
+        "T1543"
+      ]
+    },
+    {
+      "ID": "DTE0006",
+      "Name": "Baseline",
+      "Description": "Identify key system elements to establish a baseline and be prepared to reset a system to that baseline when necessary.",
+      "CountersTechniques": [
+        "T1546"
+      ]
+    },
+    {
+      "ID": "DTE0001",
+      "Name": "Admin Access",
+      "Description": "Modify a user's administrative privileges.\n",
+      "CountersTechniques": [
+        "T1546"
+      ]
+    },
+    {
+      "ID": "DTE0014",
+      "Name": "Decoy Network",
+      "Description": "Create a target network with a set of target systems, for the purpose of active defense.\n",
+      "CountersTechniques": [
+        "T1590"
+      ]
+    },
+    {
+      "ID": "DTE0027",
+      "Name": "Network Monitoring",
+      "Description": "Monitor network traffic in order to detect adversary activity.",
+      "CountersTechniques": [
+        "T1590"
+      ]
+    },
+    {
+      "ID": "DTE0017",
+      "Name": "Decoy System",
+      "Description": "Configure a computing system to serve as an attack target or experimental environment.  ",
+      "CountersTechniques": [
+        "T1592"
+      ]
+    }
+  ]
+}

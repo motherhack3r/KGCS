@@ -1,6 +1,2733 @@
-id: CAR-2024-01-001
-name: Sample Analytic - Suspicious Process
-description: Detects suspicious process execution based on command-line patterns.
-techniques:
-  - T1059
-  - T1059.001
+- title: Autorun Differences
+  submission_date: 2013/01/25
+  information_domain: Analytic, Host
+  platforms:
+  - Windows
+  subtypes:
+  - Registry
+  analytic_types:
+  - Situational Awareness
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2013-01-002
+  description: 'The Sysinternals tool [Autoruns](../sensors/autoruns) checks the registry
+    and file system for known identify persistence mechanisms. It will output any
+    tools identified, including built-in or added-on Microsoft functionality and third
+    party software. Many of these locations are known by adversaries and used to obtain
+    [Persistence](https://attack.mitre.org/tactics/TA0003). Running Autoruns periodically
+    in an environment makes it possible to collect and monitor its output for differences,
+    which may include the removal or addition of persistent tools. Depending on the
+    persistence mechanism and location, legitimate software may be more likely to
+    make changes than an adversary tool. Thus, this analytic may result in significant
+    noise in a highly dynamic environment. While Autoruns is a convenient method to
+    scan for programs using persistence mechanisms its scanning nature does not conform
+    well to streaming based analytics. This analytic could be replaced with one that
+    draws from sensors that collect registry and file information if streaming analytics
+    are desired.
+
+
+    Utilizes the Sysinternals autoruns tool (ignoring validated Microsoft entries).
+    Primarily not a detection analytic by itself but through analysis of results by
+    an analyst can be used for such. Building another analytic on top of this one
+    identifying unusual entries would likely be a beneficial alternative.
+
+    '
+  coverage:
+  - technique: T1543
+    tactics:
+    - TA0003
+    subtechniques:
+    - T1543.003
+    coverage: Moderate
+  - technique: T1053
+    tactics:
+    - TA0003
+    subtechniques:
+    - T1053.005
+    coverage: Moderate
+  - technique: T1547
+    tactics:
+    - TA0003
+    subtechniques:
+    - T1547.001
+    - T1547.010
+    - T1547.004
+    coverage: Moderate
+  - technique: T1574
+    tactics:
+    - TA0003
+    - TA0004
+    subtechniques:
+    - T1574.007
+    - T1574.008
+    - T1574.009
+    - T1574.010
+    - T1574.011
+    coverage: Moderate
+  - technique: T1546
+    tactics:
+    - TA0004
+    - TA0003
+    subtechniques:
+    - T1546.001
+    - T1546.003
+    - T1546.008
+    - T1546.010
+    coverage: Moderate
+  - technique: T1112
+    tactics:
+    - TA0003
+    - TA0002
+    coverage: Moderate
+  - technique: T1037
+    tactics:
+    - TA0003
+    subtechniques:
+    - T1037.001
+    coverage: Moderate
+  d3fend_mappings:
+  - iri: d3f:SystemInitConfigAnalysis
+    id: D3-SICA
+    label: System Init Config Analysis
+- title: SMB Events Monitoring
+  submission_date: 2013/01/25
+  information_domain: Network
+  platforms:
+  - N/A
+  subtypes:
+  - PCAP
+  analytic_types:
+  - Situational Awareness
+  contributors:
+  - MITRE
+  id: CAR-2013-01-003
+  description: '[Server Message Block](https://en.wikipedia.org/wiki/Server_Message
+    Block) (SMB) is used by Windows to allow for file, pipe, and printer sharing over
+    port 445/tcp. It allows for enumerating, and reading from and writing to file
+    shares for a remote computer. Although it is heavily used by Windows servers for
+    legitimate purposes and by users for file and printer sharing, many adversaries
+    also use SMB to achieve [Lateral Movement](https://attack.mitre.org/tactics/TA0008).
+    Looking at this activity more closely to obtain an adequate sense of situational
+    awareness may make it possible to detect adversaries moving between hosts in a
+    way that deviates from normal activity. Because SMB traffic is heavy in many environments,
+    this analytic may be difficult to turn into something that can be used to quickly
+    detect an APT. In some cases, it may make more sense to run this analytic in a
+    forensic fashion. Looking through and filtering its output after an intrusion
+    has been discovered may be helpful in identifying the scope of compromise.
+
+
+    ### Output Description
+
+
+    The source, destination, content, and time of each event.
+
+    '
+  coverage:
+  - technique: T1039
+    tactics:
+    - TA0009
+    coverage: Moderate
+  - technique: T1021
+    tactics:
+    - TA0008
+    subtechniques:
+    - T1021.002
+    coverage: Moderate
+  implementations:
+  - description: Although there may be more native ways to detect detailed SMB events
+      on the host, they can be extracted out of network traffic. With the right protocol
+      decoders, port 445 traffic can be filtered and even the file path (relative
+      to the share) can be retrieved.
+    code: 'flow = search Flow:Message
+
+      smb_events = filter flow where (dest_port == "445" and protocol == "smb")
+
+      smb_events.file_name = smb_events.proto_info.file_name
+
+      output smb_write
+
+      '
+    type: pseudocode
+  data_model_references:
+  - flow/message/dest_port
+  - flow/message/proto_info
+  d3fend_mappings:
+  - iri: d3f:IPCTrafficAnalysis
+    id: D3-IPCTA
+    label: IPC Traffic Analysis
+- title: Processes Spawning cmd.exe
+  submission_date: 2013/02/05
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - Situational Awareness
+  contributors:
+  - MITRE
+  id: CAR-2013-02-003
+  description: The Windows [Command Prompt](https://en.wikipedia.org/wiki/cmd.exe)
+    (`cmd.exe`) is a utility that provides a command line interface to Windows operating
+    systems. It provides the ability to run additional programs and also has several
+    built-in commands such as `dir`, `copy`, `mkdir`, and `type`, as well as batch
+    scripts (`.bat`). Typically, when a user runs a command prompt, the parent process
+    is `explorer.exe` or another instance of the prompt. There may be automated programs,
+    logon scripts, or administrative tools that launch instances of the command prompt
+    in order to run scripts or other built-in commands. Spawning the process `cmd.exe`
+    from certain parents may be more indicative of malice. For example, if Adobe Reader
+    or Outlook launches a command shell, this may suggest that a malicious document
+    has been loaded and should be investigated. Thus, by looking for abnormal parent
+    processes of `cmd.exe`, it may be possible to detect adversaries.
+  coverage:
+  - technique: T1059
+    tactics:
+    - TA0002
+    subtechniques:
+    - T1059.003
+    coverage: Moderate
+  implementations:
+  - code: 'process = search Process:Create
+
+      cmd = filter process where (exe == "cmd.exe")
+
+      output cmd'
+    type: pseudocode
+  - description: DNIF version of the above pseudocode.
+    code: _fetch * from event where $LogName=WINDOWS-SYSMON AND $EventID=1 AND $Process=regex(.*cmd\.exe.*)i
+      limit 100
+    type: DNIF
+    data_model: Sysmon native
+  - description: LogPoint version of the above pseudocode.
+    code: norm_id=WindowsSysmon event_id=1 image="*\cmd.exe"
+    type: LogPoint
+    data_model: LogPoint native
+  data_model_references:
+  - process/create/exe
+  - process/create/parent_exe
+  unit_tests:
+  - configurations:
+    - Windows 7
+    description: Within a command prompt or powershell, run cmd.exe
+  d3fend_mappings:
+  - iri: d3f:ProcessLineageAnalysis
+    id: D3-PLA
+    label: Process Lineage Analysis
+- title: Quick execution of a series of suspicious commands
+  submission_date: 2013/04/11
+  information_domain: Analytic, Host
+  platforms:
+  - Windows
+  - Linux
+  - macOS
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2013-04-002
+  description: "Certain commands are frequently used by malicious actors and infrequently\
+    \ used by normal users. By looking for execution of these commands in short periods\
+    \ of time, we can not only see when a malicious user was on the system but also\
+    \ get an idea of what they were doing.\n\n  Commands of interest:\n\n-   arp.exe\n\
+    -   at.exe\n-   attrib.exe\n-   cscript.exe\n-   dsquery.exe\n-   hostname.exe\n\
+    -   ipconfig.exe\n-   mimikatz.exe\n-   nbstat.exe\n-   net.exe\n-   netsh.exe\n\
+    -   nslookup.exe\n-   ping.exe\n-   quser.exe\n-   qwinsta.exe\n-   reg.exe\n\
+    -   runas.exe\n-   sc.exe\n-   schtasks.exe\n-   ssh.exe\n-   systeminfo.exe\n\
+    -   taskkill.exe\n-   telnet.exe\n-   tracert.exe\n-   wscript.exe\n-   xcopy.exe\n\
+    \n### Output Description\n\nThe host on which the commands were executed, the\
+    \ time of execution, and what commands were executed"
+  coverage:
+  - technique: T1087
+    tactics:
+    - TA0007
+    subtechniques:
+    - T1087.001
+    - T1087.002
+    coverage: Low
+  - technique: T1003
+    tactics:
+    - TA0006
+    subtechniques:
+    - T1003.002
+    coverage: Low
+  - technique: T1069
+    tactics:
+    - TA0007
+    subtechniques:
+    - T1069.001
+    - T1069.002
+    coverage: Low
+  - technique: T1057
+    tactics:
+    - TA0007
+    coverage: Low
+  - technique: T1021
+    tactics:
+    - TA0008
+    subtechniques:
+    - T1021.002
+    coverage: Low
+  - technique: T1543
+    tactics:
+    - TA0003
+    - TA0004
+    subtechniques:
+    - T1543.003
+    coverage: Low
+  - technique: T1112
+    tactics:
+    - TA0005
+    coverage: Low
+  - technique: T1574
+    tactics:
+    - TA0003
+    - TA0004
+    subtechniques:
+    - T1574.011
+    coverage: Low
+  - technique: T1018
+    tactics:
+    - TA0007
+    coverage: Low
+  - technique: T1569
+    tactics:
+    - TA0002
+    subtechniques:
+    - T1569.002
+    coverage: Low
+  - technique: T1053
+    tactics:
+    - TA0003
+    - TA0004
+    - TA0002
+    subtechniques:
+    - T1053.002
+    - T1053.005
+    coverage: Low
+  - technique: T1029
+    tactics:
+    - TA0010
+    coverage: Low
+  - technique: T1033
+    tactics:
+    - TA0007
+    coverage: Low
+  - technique: T1007
+    tactics:
+    - TA0007
+    coverage: Low
+  - technique: T1082
+    tactics:
+    - TA0007
+    coverage: Low
+  - technique: T1049
+    tactics:
+    - TA0007
+    coverage: Low
+  - technique: T1016
+    tactics:
+    - TA0007
+    coverage: Low
+  - technique: T1010
+    tactics:
+    - TA0007
+    coverage: Low
+  - technique: T1518
+    tactics:
+    - TA0007
+    subtechniques:
+    - T1518.001
+    coverage: Low
+  - technique: T1046
+    tactics:
+    - TA0007
+    coverage: Low
+  - technique: T1562
+    tactics:
+    - TA0005
+    subtechniques:
+    - T1562.001
+    - T1562.006
+    coverage: Low
+  - technique: T1098
+    tactics:
+    - TA0006
+    coverage: Low
+  - technique: T1059
+    tactics:
+    - TA0002
+    subtechniques:
+    - T1059.005
+    coverage: Moderate
+  - technique: T1012
+    tactics:
+    - TA0007
+    coverage: Low
+  implementations:
+  - code: "processes = search Process:Create\nreg_processes = filter processes where\
+      \ (exe == \"arp.exe\" or exe == \"at.exe\" or exe == \"attrib.exe\"\n or exe\
+      \ == \"cscript.exe\" or exe == \"dsquery.exe\" or exe == \"hostname.exe\"\n\
+      \ or exe == \"ipconfig.exe\" or exe == \"mimikatz.exe\" or exe == \"nbstat.exe\"\
+      \n or exe == \"net.exe\" or exe == \"netsh.exe\" or exe == \"nslookup.exe\"\n\
+      \ or exe == \"ping.exe\" or exe == \"quser.exe\" or exe == \"qwinsta.exe\"\n\
+      \ or exe == \"reg.exe\" or exe == \"runas.exe\" or exe == \"sc.exe\"\n or exe\
+      \ == \"schtasks.exe\" or exe == \"ssh.exe\" or exe == \"systeminfo.exe\"\n or\
+      \ exe == \"taskkill.exe\" or exe == \"telnet.exe\" or exe == \"tracert.exe\"\
+      \n or exe == \"wscript.exe\" or exe == \"xcopy.exe\")\nreg_grouped = group reg\
+      \ by hostname, ppid where(max time between two events is 30 minutes)\noutput\
+      \ reg_grouped"
+    type: pseudocode
+  - description: '[Sigma version](https://github.com/Neo23x0/sigma/blob/master/rules/windows/process_creation/win_multiple_suspicious_cli.yml)
+      of the above pseudocode, with some modifications.'
+    type: Sigma
+  - description: DNIF version of the above pseudocode.
+    code: '_fetch * from event where $LogName=WINDOWS-SYSMON AND $EventID=1 AND $App=regex(arp\.exe|at\.exe|attrib\.exe|cscript\.exe|dsquery\.exe|hostname\.exe|ipconfig\.exe|mimikatz.exe|nbstat\.exe|net\.exe|netsh\.exe|nslookup\.exe|ping\.exe|quser\.exe|qwinsta\.exe|reg\.exe|runas\.exe|sc\.exe|schtasks\.exe|ssh\.exe|systeminfo\.exe|taskkill\.exe|telnet\.exe|tracert\.exe|wscript\.exe|xcopy\.exe)i
+      group count_unique $App limit 100
+
+      >>_agg count
+
+      >>_checkif int_compare Count > 1 include'
+    type: DNIF
+    data_model: Sysmon native
+  - description: LogPoint version of the above pseudocode.
+    code: 'norm_id=WindowsSysmon event_id=1 image IN ["*\arp.exe", "*\at.exe", "*\attrib.exe",
+      "*\cscript.exe", "*\dsquery.exe", "*\hostname.exe", "*\ipconfig.exe", "*\mimikatz.exe",
+      "*\nbstat.exe", "*\net.exe", "*\netsh.exe", "*\nslookup.exe", "*\ping.exe",
+      "*\quser.exe", "*\qwinsta.exe", "*\reg.exe", "*\runas.exe", "*\sc.exe", "*\schtasks.exe",
+      "*\ssh.exe", "*\systeminfo.exe", "*\taskkill.exe", "*\telnet.exe", "*\tracert.exe",
+      "*\wscript.exe", "*\xcopy.exe"]
+
+      | chart count() as cnt by host
+
+      | search cnt > 1'
+    type: LogPoint
+    data_model: LogPoint native
+  data_model_references:
+  - process/create/hostname
+  - process/create/ppid
+  - process/create/exe
+  unit_tests:
+  - configurations:
+    - Windows 7
+    description: Within a command window, execute several of the commands in quick
+      succession.
+    commands:
+    - ipconfig /all
+    - hostname
+    - systeminfo
+    - reg.exe Query HKLM\Software\Microsoft
+  d3fend_mappings:
+  - iri: d3f:ProcessLineageAnalysis
+    id: D3-PLA
+    label: Process Lineage Analysis
+- title: Execution with AT
+  submission_date: 2013/05/13
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2013-05-004
+  description: 'In order to gain [persistence](https://attack.mitre.org/tactics/TA0003/),
+    [privilege escalation](https://attack.mitre.org/tactics/TA0004/), or [remote execution](https://attack.mitre.org/tactics/TA0002/),
+    an adversary may use the Windows built-in command AT (at.exe) to [schedule a command](https://attack.mitre.org/techniques/T1053/002)
+    to be run at a specified time, date, and even host. This method has been used
+    by adversaries and administrators alike. Its use may lead to detection of compromised
+    hosts and compromised users if it is used to move laterally.
+
+    The built-in Windows tool schtasks.exe ([CAR-2013-08-001](../CAR-2013-08-001))
+    offers greater flexibility when creating, modifying, and enumerating tasks. For
+    these reasons, schtasks.exe is more commonly used by administrators, tools/scripts,
+    and power users.'
+  coverage:
+  - technique: T1053
+    tactics:
+    - TA0002
+    - TA0003
+    - TA0004
+    subtechniques:
+    - T1053.002
+    coverage: Moderate
+  implementations:
+  - description: Instances of the process `at.exe` running imply the querying or creation
+      of tasks. Although the command_line is not essential for the analytic to run,
+      it is critical when identifying the command that was scheduled.
+    code: 'process = search Process:Create
+
+      at = filter process where (exe == "at.exe")
+
+      output at'
+    type: pseudocode
+  - description: Splunk version of the above pseudocode.
+    code: index=__your_sysmon_index__ Image="C:\\Windows\\*\\at.exe"|stats values(CommandLine)
+      as "Command Lines" by ComputerName
+    type: Splunk
+    data_model: Sysmon native
+  - description: EQL version of the above pseudocode.
+    code: process where subtype.create and process_name == "at.exe"
+    type: EQL
+    data_model: EQL native
+  - description: DNIF version of the above pseudocode.
+    code: _fetch * from event where $LogName=WINDOWS-SYSMON AND $EventID=1 AND $App=at.exe
+      limit 100
+    type: DNIF
+    data_model: Sysmon native
+  - description: LogPoint version of the above pseudocode.
+    code: norm_id=WindowsSysmon event_id=1 image="*\at.exe"
+    type: LogPoint
+    data_model: LogPoint native
+  data_model_references:
+  - process/create/command_line
+  - process/create/exe
+  unit_tests:
+  - configurations:
+    - Windows 7
+    description: '-   From an admin account, open Windows command prompt (right click,
+      run as administrator).
+
+      -   Execute "at 10:00 calc.exe," substituting a time in the near future for
+      10:00.
+
+      -   The program should respond with “Added a new job with job ID = 1” where
+      the job ID is dependent on what tasks are scheduled.
+
+      -   The program should execute at the time specified. This is what the analytic
+      should fire on.
+
+      -   To remove the scheduled task, execute "at 1 /delete" where you replace "1"
+      with the job ID output in step 2a above.'
+    commands:
+    - at 10:00 calc.exe // returns a job number X
+    - at X /delete
+  d3fend_mappings:
+  - iri: d3f:ScheduledJobAnalysis
+    id: D3-SJA
+    label: Scheduled Job Analysis
+- title: Running executables with same hash and different names
+  submission_date: 2013/05/23
+  information_domain: Host
+  platforms:
+  - Windows
+  - Linux
+  - macOS
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2013-05-009
+  description: 'Executables are generally not renamed, thus a given hash of an executable
+    should only have ever one name. Identifying instances where multiple process names
+    share the same hash may find cases where tools are copied by attackers to different
+    folders or hosts to [avoid detection](https://attack.mitre.org/tactics/TA0005).
+
+
+    Although this analytic was initially based on MD5 hashes, it is equally applicable
+    to any hashing convention.
+
+
+    ### Output Description
+
+
+    A list of hashes and the different executables associated with each one'
+  coverage:
+  - technique: T1036
+    tactics:
+    - TA0005
+    subtechniques:
+    - T1036.003
+    coverage: Moderate
+  implementations:
+  - name: Basic Query
+    description: This is a basic Splunk search that will output all of the sysmon-reported
+      process images and their respective hashes, for cases where an image has more
+      than one set of hashes. Thus, this will output a large amount of data and should
+      be filtered by the analyst in order to make the results more useful.
+    code: index=__your_sysmon_index__ EventCode=1|stats dc(Hashes) as Num_Hashes values(Hashes)
+      as "Hashes" by Image|where Num_Hashes > 1
+    type: splunk
+    data_model: Sysmon native
+  - name: Sigma/Sysmon
+    description: '[Sigma includes](https://github.com/Neo23x0/sigma/blob/master/rules/windows/process_creation/win_renamed_binary.yml)
+      a Sysmon-specific rule for detecting this, using the OriginalFilename field.'
+    type: Sigma
+  - name: Sigma (renamed powershell)
+    description: '[Sigma includes](https://github.com/Neo23x0/sigma/blob/master/rules/windows/process_creation/win_powershell_renamed_ps.yml)
+      a rule specifically for detecting instances of Powershell being renamed.'
+    type: Sigma
+  - name: Sigma (renamed paexec)
+    description: '[Sigma includes](https://github.com/Neo23x0/sigma/blob/master/rules/windows/process_creation/win_renamed_paexec.yml)
+      a rule specifically for detecting instances of paexec being renamed.'
+    type: Sigma
+  - description: DNIF version of the above pseudocode.
+    code: '_fetch * from event where $LogName=WINDOWS-SYSMON AND $EventID=1 group
+      count_unique $App, $HashMD5 limit 100
+
+      >>_agg count_unique $HashMD5
+
+      >>_checkif int_compare count_unique > 1 include'
+    type: DNIF
+    data_model: Sysmon native
+  - description: LogPoint version of the above pseudocode.
+    code: 'norm_id=WindowsSysmon event_id=1
+
+      | chart distinct_count(hash) as cnt by image
+
+      | search cnt > 1'
+    type: LogPoint
+    data_model: LogPoint native
+  data_model_references:
+  - process/create/exe
+  - process/create/md5_hash
+  d3fend_mappings:
+  - iri: d3f:ServiceBinaryVerification
+    id: D3-SBV
+    label: Service Binary Verification
+  - iri: d3f:SystemFileAnalysis
+    id: D3-SFA
+    label: System File Analysis
+- title: Suspicious Arguments
+  submission_date: 2013/07/05
+  information_domain: Host
+  platforms:
+  - Windows
+  - Linux
+  - macOS
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2013-07-001
+  description: "Malicious actors may rename built-in commands or external tools, such\
+    \ as those provided by SysInternals, to better [blend in](https://attack.mitre.org/tactics/TA0005)\
+    \ with the environment. In those cases, the file path name is arbitrary and may\
+    \ blend in well with the background. If the arguments are closely inspected, it\
+    \ may be possible to infer what tools are running and understand what an adversary\
+    \ is doing. When any legitimate software shares the same command lines, it must\
+    \ be whitelisted according to the expected parameters.\n\nAny tool of interest\
+    \ with commonly known command line usage can be detecting by command line analysis.\
+    \ Known substrings of command lines include\n\n-   PuTTY\n-   port forwarding\
+    \ `-R * -pw`\n-   secure copy (scp) `-pw * * *@*`\n-   mimikatz `sekurlsa::`\n\
+    -   RAR `* -hp *`\n-   Archive`* a *`\n    Additionally, it may be useful to find\
+    \ IP addresses in the command line\n-   `\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}`\n\
+    \    Logically this analytic makes use of [CAR-2014-03-005](../CAR-2014-03-005)."
+  coverage:
+  - technique: T1003
+    tactics:
+    - TA0006
+    subtechniques:
+    - T1003.001
+    coverage: Low
+  - technique: T1021
+    tactics:
+    - TA0008
+    coverage: Moderate
+  - technique: T1105
+    tactics:
+    - TA0011
+    - TA0008
+    coverage: Moderate
+  implementations:
+  - description: 'Identify process launches that contain substrings that belong to
+      known tools and do not match the expected process names. These will help to
+      indicate instances of tools that have been renamed. '
+    code: 'process = search Process:Create
+
+      port_fwd = filter process where (command_line match "-R .* -pw")
+
+      scp = filter process where (command_line match "-pw .* .* .*@.*"
+
+      mimikatz = filter process where (command_line match "sekurlsa")
+
+      rar = filter process where (command_line match " -hp ")
+
+      archive = filter process where (command_line match ".* a .*")
+
+      ip_addr = filter process where (command_line match \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})
+
+
+      output port_fwd, scp, mimikatz, rar, archive, ip_addr'
+    type: pseudocode
+  - description: Splunk version of the above pseudocode, excluding the IP address
+      search.
+    code: index=__your_sysmon_index__ EventCode=1 (CommandLine="* -R * -pw*" OR CommandLine="*
+      -pw * *@*" OR CommandLine="*sekurlsa*" OR CommandLine="* -hp *" OR CommandLine="*
+      a *")
+    type: splunk
+    data_model: Sysmon native
+  - description: EQL version of the above pseudocode, excluding the IP address search.
+    code: "process where subtype.create and\n  (command_line == \"* -R * -pw*\" or\
+      \ command_line == \"* -pw * *@*\" or command_line == \"*sekurlsa*\" or command_line\
+      \ == \"* -hp *\" or command_line == \"* a *\")"
+    type: EQL
+    data_model: EQL native
+  - description: Splunk version of the above pseudocode, solely for the IP address
+      search. Note that this will likely result in many false positives, since things
+      like software version numbers can also be valid IPv4 addresses.
+    code: index=__your_sysmon_index__ EventCode=1 |regex CommandLine=".*\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}\b.*"
+    type: splunk
+    data_model: Sysmon native
+  - description: DNIF version of the above pseudocode.
+    code: _fetch * from event where $LogName=WINDOWS-SYSMON AND $EventID=1 AND $Process=regex(.*(\-r.*\-pw|\-pw.*\@|sekurlsa|\-hp|
+      a |\\d\{1\,3\}\\\.\\d\{1\,3\}\\\.\\d\{1\,3\}).*)i limit 100
+    type: DNIF
+    data_model: Sysmon native
+  - description: LogPoint version of the above pseudocode.
+    code: norm_id=WindowsSysmon event_id=1 (command="* -R * -pw*" OR command="* -pw
+      * *@*" OR command="*sekurlsa*" OR command="* -hp *" OR command="* a *")
+    type: LogPoint
+    data_model: LogPoint native
+  data_model_references:
+  - process/create/command_line
+  - process/create/exe
+  unit_tests:
+  - configurations:
+    - Windows 7
+    description: Download and run Putty from the command line to connect to an SSH
+      server using remote port forwarding. Note that this requires specifying your
+      remote system password on the command line, where it will be logged and visible.
+      It is highly recommended that you specify an incorrect password and not complete
+      the login, or use a temporary password.
+    commands:
+    - putty.exe -pw <password> -R <port>:<host> <user>@<host>
+  - configurations:
+    - Windows 7
+    description: Download 7zip or other archiving software you plan to monitor. Create
+      an innocuous text file for testing, or substitute an existing file.
+    commands:
+    - 7z.exe a test.zip test.txt
+  d3fend_mappings:
+  - iri: d3f:ProcessSpawnAnalysis
+    id: D3-PSA
+    label: Process Spawn Analysis
+- title: Service Outlier Executables
+  submission_date: 2013/09/23
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - Detection
+  contributors:
+  - MITRE
+  id: CAR-2013-09-005
+  description: New executables that are started as a service are suspicious. This
+    analytic looks for anomalous service executables.
+  coverage:
+  - technique: T1543
+    tactics:
+    - TA0003
+    subtechniques:
+    - T1543.003
+    coverage: Moderate
+  implementations:
+  - description: Create a baseline of services seen over the last 30 days and a list
+      of services seen today. Remove services in the baseline from services seen today,
+      leaving a list of new services.
+    code: 'processes = search Process:Create
+
+      services = filter processes where (parent_image_path == "C:\Windows\System32\services.exe")
+
+      historic_services = filter services (where timestamp < now - 1 day AND timestamp
+      > now - 1 day)
+
+      current_services = filter services (where timestamp >= now - 1 day)
+
+      new_services = historic_services - current_services
+
+      output new_services'
+    type: pseudocode
+  - name: Sigma (Windows Event Log)
+    description: '[Sigma/Windows Event Log](https://github.com/Neo23x0/sigma/blob/master/rules/windows/builtin/win_rare_service_installs.yml)
+      rule with similar logic to the above pseudocode'
+    type: Sigma
+  - description: LogPoint version of the above sigma rule.
+    code: 'norm_id=WinServer event_id=7045
+
+      | chart count() as cnt by file
+
+      | search cnt < 5'
+    type: LogPoint
+    data_model: LogPoint native
+  data_model_references:
+  - process/create/parent_image_path
+  d3fend_mappings:
+  - iri: d3f:ProcessLineageAnalysis
+    id: D3-PLA
+    label: Process Lineage Analysis
+- title: DLL Injection via Load Library
+  submission_date: 2013/10/07
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process DLL
+  analytic_types:
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2013-10-002
+  description: 'Microsoft Windows allows for processes to remotely create threads
+    within other processes of the same privilege level. This functionality is provided
+    via the Windows API [CreateRemoteThread](https://msdn.microsoft.com/en-us/library/windows/desktop/ms682437.aspx).
+    Both Windows and third-party software use this ability for legitimate purposes.
+    For example, the Windows process [csrss.exe](https://en.wikipedia.org/wiki/Client/Server_Runtime_Subsystem)
+    creates threads in programs to send signals to registered callback routines. Both
+    adversaries and host-based security software use this functionality to [inject
+    DLLs](https://attack.mitre.org/techniques/T1055), but for very different purposes.
+    An adversary is likely to inject into a program to [evade defenses](https://attack.mitre.org/tactics/TA0005)
+    or [bypass User Account Control](https://attack.mitre.org/techniques/T1548/002),
+    but a security program might do this to gain increased monitoring of API calls.
+    One of the most common methods of [DLL Injection](https://attack.mitre.org/techniques/T1055)
+    is through the Windows API [LoadLibrary](https://msdn.microsoft.com/en-us/library/windows/desktop/ms684175.aspx).
+
+
+    -   Allocate memory in the target program with [VirtualAllocEx](https://msdn.microsoft.com/en-us/library/windows/desktop/aa366890.aspx)
+
+    -   Write the name of the DLL to inject into this program with [WriteProcessMemory](https://msdn.microsoft.com/en-us/library/windows/desktop/ms681674.aspx)
+
+    -   Create a new thread and set its entry point to [LoadLibrary](https://msdn.microsoft.com/en-us/library/windows/desktop/ms684175.aspx)
+    using the API [CreateRemoteThread](https://msdn.microsoft.com/en-us/library/windows/desktop/ms682437.aspx).
+
+
+    This behavior can be detected by looking for thread creations across processes,
+    and resolving the entry point to determine the function name. If the function
+    is `LoadLibraryA` or `LoadLibraryW`, then the intent of the remote thread is clearly
+    to inject a DLL. When this is the case, the source process must be examined so
+    that it can be ignored when it is both expected and a trusted process.
+
+    '
+  coverage:
+  - technique: T1055
+    tactics:
+    - TA0005
+    subtechniques:
+    - T1055.001
+    coverage: Moderate
+  - technique: T1548
+    tactics:
+    - TA0004
+    subtechniques:
+    - T1548.002
+    coverage: Moderate
+  implementations:
+  - description: 'Search for remote thread creations that start at LoadLibraryA or
+      LoadLibraryW. Depending on the tool, it may provide additional information about
+      the DLL string that is an argument to the function. If there is any security
+      software that legitimately injects DLLs, it must be carefully whitelisted. '
+    code: 'remote_thread = search Thread:RemoteCreate
+
+      remote_thread = filter (start_function == "LoadLibraryA" or start_function ==
+      "LoadLibraryW")
+
+      remote_thread = filter (src_image_path != "C:\Path\To\TrustedProgram.exe")
+
+
+      output remote_thread
+
+      '
+    type: pseudocode
+  - description: LogPoint version of the above pseudocode.
+    code: 'norm_id=WindowsSysmon event_id=8 start_function IN ["LoadLibraryA", "LoadLibraryW"]
+      -source_image="C:\Path\To\TrustedProgram.exe"
+
+      '
+    type: LogPoint
+    data_model: LogPoint native
+  data_model_references:
+  - thread/remote_create/src_pid
+  - thread/remote_create/start_function
+  true_positives:
+  - source: Mordor (Sysmon)
+    description: Sysmon event from the Mordor [Empire DLL Injection dataset](https://github.com/hunters-forge/mordor/blob/master/small_datasets/windows/defense_evasion/process_injection_T1055/empire_dll_injection.md).
+    event_snippet: CAR-2013-10-002-mordor-01-snippet.json
+    full_event: CAR-2013-10-002-mordor-01.json
+  d3fend_mappings:
+  - iri: d3f:SystemCallAnalysis
+    id: D3-SCA
+    label: System Call Analysis
+- title: Service Binary Modifications
+  submission_date: 2014/02/14
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Registry File Process
+  analytic_types:
+  - Situational Awareness
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2014-02-001
+  description: 'Adversaries may modify the binary file for an existing service to
+    achieve [Persistence](https://attack.mitre.org/tactics/TA0003) while potentially
+    [evading defenses](https://attack.mitre.org/tactics/TA0005). If a newly created
+    or modified runs as a service, it may indicate APT activity. However, services
+    are frequently installed by legitimate software. A well-tuned baseline is essential
+    to differentiating between benign and malicious service modifications.
+
+
+    ### Output Description
+
+
+    The Service Name and approximate time in which changes occurred on each host
+
+    '
+  coverage:
+  - technique: T1543
+    tactics:
+    - TA0003
+    - TA0004
+    subtechniques:
+    - T1543.003
+    coverage: Moderate
+  - technique: T1574
+    tactics:
+    - TA0003
+    - TA0004
+    subtechniques:
+    - T1574.010
+    coverage: Moderate
+  - technique: T1569
+    tactics:
+    - TA0002
+    subtechniques:
+    - T1569.002
+    coverage: Moderate
+  implementations:
+  - description: Look for events where a file was created and then later run as a
+      service. In these cases, a new service has been created or the binary has been
+      modified. Many programs, such as `msiexec.exe`, do these behaviors legitimately
+      and can be used to help validate legitimate service creations/modifications.
+    code: "legitimate_installers = [\"C:\\windows\\system32\\msiexec.exe\", \"C:\\\
+      windows\\syswow64\\msiexec.exe\", ...]\n\nfile_change = search File:Create,Modify\n\
+      process = search Process:Create\nservice_process = filter processes where (parent_exe\
+      \ == \"services.exe\")\nmodified_service = join (search, filter) where (\n file_change.time\
+      \ < service_process.time and\n file_change.file_path == service_process.image_path\n\
+      )\n\nmodified_service = filter modified_service where (modified_service.file_change.image_path\
+      \ not in legitimate_installers)\noutput modified_service\n"
+    type: pseudocode
+  data_model_references:
+  - file/create/file_path
+  - file/create/image_path
+  - process/create/image_path
+  - process/create/parent_exe
+  d3fend_mappings:
+  - iri: d3f:ServiceBinaryVerification
+    id: D3-SBV
+    label: Service Binary Verification
+- title: Remotely Launched Executables via Services
+  submission_date: 2014/03/18
+  information_domain: Host, Network
+  platforms:
+  - Windows
+  subtypes:
+  - Network Process
+  - Hostflow
+  analytic_types:
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2014-03-005
+  description: 'There are several ways to cause code to [execute](https://attack.mitre.org/tactics/TA0002)
+    on a remote host. One of the most common methods is via the Windows [Service Control
+    Manager](https://en.wikipedia.org/wiki/Service_Control_Manager) (SCM), which allows
+    authorized users to remotely create and modify services. Several tools, such as
+    [PsExec](https://attack.mitre.org/software/S0029), use this functionality.
+
+
+    When a client remotely communicates with the Service Control Manager, there are
+    two observable behaviors. First, the client connects to the [RPC Endpoint Mapper](../CAR-2014-05-001)
+    over 135/tcp. This handles authentication, and tells the client what port the
+    endpoint—in this case the SCM—is listening on. Then, the client connects directly
+    to the listening port on `services.exe`. If the request is to start an existing
+    service with a known command line, the the SCM process will run the corresponding
+    command.
+
+
+    This compound behavior can be detected by looking for `services.exe` receiving
+    a network connection and immediately spawning a child process.
+
+    '
+  coverage:
+  - technique: T1543
+    tactics:
+    - TA0003
+    subtechniques:
+    - T1543.003
+    coverage: Moderate
+  - technique: T1569
+    tactics:
+    - TA0002
+    subtechniques:
+    - T1569.002
+    coverage: Moderate
+  implementations:
+  - description: Look for processes launched from `services.exe` within 1 second of
+      services.exe receiving a network connection.
+    code: "process = search Process:Create\nflow = search Flow:Start\nservice = filter\
+      \ process where (parent_exe == \"services.exe\")\nremote_start = join (flow,\
+      \ service ) where (\n flow.hostname == service.hostname and\n flow.pid == service.pid\
+      \ and\n (flow.time < service.time < flow.time + 1 second)\n)\noutput remote_start\n"
+    type: pseudocode
+  data_model_references:
+  - flow/start/pid
+  - process/create/parent_exe
+  - process/create/pid
+  d3fend_mappings:
+  - iri: d3f:RPCTrafficAnalysis
+    id: D3-RTA
+    label: RPC Traffic Analysis
+- title: Services launching Cmd
+  submission_date: 2014/05/05
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2014-05-002
+  description: 'Windows runs the [Service Control Manager](https://en.wikipedia.org/wiki/Service_Control_Manager)
+    (SCM) within the process `services.exe`. Windows launches services as independent
+    processes or DLL loads within a [svchost.exe](https://en.wikipedia.org/wiki/svchost.exe)
+    group. To be a legitimate service, a process (or DLL) must have the appropriate
+    service entry point [SvcMain](https://msdn.microsoft.com/en-us/library/windows/desktop/ms687414.aspx).
+    If an application does not have the entry point, then it will timeout (default
+    is 30 seconds) and the process will be killed.
+
+
+    To survive the timeout, [adversaries and red teams](https://www.operationblockbuster.com/wp-content/uploads/2016/02/Operation-Blockbuster-RAT-and-Staging-Report.pdf)
+    can create services that direct to `cmd.exe` with the flag `/c`, followed by the
+    desired command. The `/c` flag causes the command shell to run a command and immediately
+    exit. As a result, the desired program will remain running and it will report
+    an error starting the service. This analytic will catch that command prompt instance
+    that is used to launch the actual malicious executable. Additionally, the children
+    and descendants of services.exe will run as a SYSTEM user by default. Thus, services
+    are a convenient way for an adversary to gain [Persistence](https://attack.mitre.org/tactics/TA0003)
+    and [Privilege Escalation](https://attack.mitre.org/tactics/TA0004).'
+  coverage:
+  - technique: T1543
+    tactics:
+    - TA0003
+    - TA0004
+    subtechniques:
+    - T1543.003
+    coverage: Moderate
+  implementations:
+  - description: Returns all processes named `cmd.exe` that have `services.exe` as
+      a parent process. Because this should never happen, the `/c` flag is redundant
+      in the search.
+    code: 'process = search Process:Create
+
+      cmd = filter process where (exe == "cmd.exe" and parent_exe == "services.exe")
+
+      output cmd'
+    type: pseudocode
+  - description: The Splunk version of the above pseudocode.
+    code: index=__your_sysmon_index__ EventCode=1 Image="C:\\Windows\\*\\cmd.exe"
+      ParentImage="C:\\Windows\\*\\services.exe"
+    type: Splunk
+    data_model: Sysmon native
+  - description: EQL version of the above pseudocode.
+    code: "process where subtype.create and\n  (process_name == \"cmd.exe\" and parent_process_name\
+      \ == \"services.exe\")"
+    type: EQL
+    data_model: EQL native
+  - description: DNIF version of the above pseudocode.
+    code: _fetch * from event where $LogName=WINDOWS-SYSMON AND $EventID=1 AND $App=cmd.exe
+      AND $ParentProcess=regex(.*services.exe.*)i limit 30
+    type: DNIF
+    data_model: Sysmon native
+  - description: LogPoint version of the above pseudocode.
+    code: norm_id=WindowsSysmon event_id=1 image="C:\Windows\System32\cmd.exe" parent_image="C:\Windows\System32\services.exe"
+    type: LogPoint
+    data_model: LogPoint native
+  data_model_references:
+  - process/create/exe
+  - process/create/parent_exe
+  d3fend_mappings:
+  - iri: d3f:ProcessLineageAnalysis
+    id: D3-PLA
+    label: Process Lineage Analysis
+- title: Outlier Parents of Cmd
+  submission_date: 2014/11/06
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - Anomaly
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2014-11-002
+  description: 'Many programs create command prompts as part of their normal operation
+    including malware used by attackers. This analytic attempts to identify suspicious
+    programs spawning `cmd.exe` by looking for programs that do not normally create
+    `cmd.exe`.
+
+
+    While this analytic does not take the user into account, doing so could generate
+    further interesting results.
+
+    It is very common for some programs to spawn cmd.exe as a subprocess, for example
+    to run batch files or windows commands. However many process don’t routinely launch
+    a command prompt – for example Microsoft Outlook. A command prompt being launched
+    from a process that normally doesn’t launch command prompts could be the result
+    of malicious code being injected into that process, or of an attacker replacing
+    a legitimate program with a malicious one.
+
+
+
+    ### Output Description
+
+
+    The time and host the new process was started as well as its parent
+
+    '
+  coverage:
+  - technique: T1059
+    tactics:
+    - TA0002
+    subtechniques:
+    - T1059.003
+    coverage: Moderate
+  implementations:
+  - description: Create a baseline of parents of `cmd.exe` seen over the last 30 days
+      and a list of parents of `cmd.exe` seen today. Remove parents in the baseline
+      from parents seen today, leaving a list of new parents.
+    code: 'processes = search Process:Create
+
+      cmd = filter processes where (exe == "cmd.exe")
+
+      cmd = from cmd select parent_exe
+
+      historic_cmd = filter cmd (where timestamp < now - 1 day AND timestamp > now
+      - 1 day)
+
+      current_cmd = filter cmd (where timestamp >= now - 1 day)
+
+      new_cmd = historic_cmd - current_cmd
+
+      output new_cmd
+
+      '
+    type: pseudocode
+  data_model_references:
+  - process/create/exe
+  - process/create/parent_exe
+  d3fend_mappings:
+  - iri: d3f:ProcessLineageAnalysis
+    id: D3-PLA
+    label: Process Lineage Analysis
+- title: Debuggers for Accessibility Applications
+  submission_date: 2014/11/21
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2014-11-003
+  description: 'The Windows Registry location `HKLM\Software\Microsoft\Windows NT\CurrentVersion\Image
+    File Execution Options` allows for parameters to be set for applications during
+    execution. One feature used by malicious actors is the "Debugger" option. When
+    a key has this value enabled, a Debugging command line can be specified. Windows
+    will launch the Debugging command line, and pass the original command line in
+    as an argument. Adversaries can set a Debugger for [Accessibility Applications](https://attack.mitre.org/techniques/T1546/008).
+    The analytic looks for the original command line as an argument to the Debugger.
+    When the strings "sethc.exe", "utilman.exe", "osk.exe", "narrator.exe", and "Magnify.exe"
+    are detected in the arguments, but not as the main executable, it is very likely
+    that a Debugger is set.
+
+
+    This analytic could depend on the possibility of the known strings used as arguments
+    for other applications used in the day-to-day environment. Although the chance
+    of the string "sethc.exe" being used as an argument for another application is
+    unlikely, it still is a possibility.
+
+    '
+  coverage:
+  - technique: T1546
+    tactics:
+    - TA0004
+    - TA0003
+    subtechniques:
+    - T1546.008
+    coverage: Moderate
+  implementations:
+  - description: One simple way to implement this technique is to note that in a default
+      Windows configuration there are no spaces in the path to the `system32` folder.
+      If the accessibility programs are ever run with a Debugger set, then Windows
+      will launch the Debugger process and append the command line to the accessibility
+      program. As a result, a space is inserted in the command line before the path.
+      Looking for any instances of a space in the command line before the name of
+      an accessibility program will help identify when Debuggers are set.
+    code: 'process = search Process:Create
+
+      debuggers = filter process where (command_line match "$.* .*(sethc{{pipe}}utilman{{pipe}}osk{{pipe}}narrator{{pipe}}magnify)\.exe")
+
+      output debuggers
+
+      '
+    type: pseudocode
+  - description: LogPoint version of the above pseudocode.
+    code: 'norm_id=WindowsSysmon event_id=1 command IN ["$* *sethc.exe", "$* *utilman.exe",
+      "$* *osk.exe", "$* *narrator.exe", "$* *magnify.exe"]
+
+      '
+    type: LogPoint
+    data_model: LogPoint native
+  data_model_references:
+  - process/create/command_line
+  - process/create/exe
+  unit_tests:
+  - configurations:
+    - Windows 7
+    description: Although it does not actually utilize the Debugging command line,
+      an easy way to test this analytic to run cmd.exe from a command window, supplying
+      one of the strings as arguments.
+    commands:
+    - cmd.exe Magnify.exe
+  d3fend_mappings:
+  - iri: d3f:ProcessLineageAnalysis
+    id: D3-PLA
+    label: Process Lineage Analysis
+- title: Command Launched from WinLogon
+  submission_date: 2014/11/19
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2014-11-008
+  description: 'An adversary can use [accessibility features](https://attack.mitre.org/techniques/T1546/008)
+    (Ease of Access), such as StickyKeys or Utilman, to launch a command shell from
+    the logon screen and gain SYSTEM access. Since an adversary does not have physical
+    access to the machine, this technique must be run within [Remote Desktop](https://attack.mitre.org/techniques/T1021/001).
+    To prevent an adversary from getting to the login screen without first authenticating,
+    Network-Level Authentication (NLA) must be enabled. If a debugger is set up for
+    one of the accessibility features, then it will intercept the process launch of
+    the feature and instead execute a new command line. This analytic looks for instances
+    of `cmd.exe` or `powershell.exe` launched directly from the logon process, `winlogon.exe`.
+    It should be used in tandem with [CAR-2014-11-003](../CAR-2014-11-003), which
+    detects the accessibility programs in the command line.
+
+
+    Several accessibility programs can be run using the Ease of Access center
+
+
+    -   `sethc.exe` handles StickyKeys
+
+    -   `utilman.exe` is the Ease of Access menu
+
+    -   `osk.exe` runs the On-Screen Keyboard
+
+    -   `narrator.exe` reads screen text over audio
+
+    -   `magnify.exe` magnifies the view of the screen near the cursor'
+  coverage:
+  - technique: T1546
+    tactics:
+    - TA0004
+    - TA0003
+    subtechniques:
+    - T1546.008
+    coverage: Moderate
+  implementations:
+  - description: 'Look for instances of processes where the parent executable is winlogon.exe
+      and the child is an instance of a command prompt. '
+    code: 'processes = search Process:Create
+
+      winlogon_cmd = filter processes where (parent_exe == "winlogon.exe" and exe
+      == "cmd.exe")
+
+      output winlogon_cmd'
+    type: pseudocode
+  - description: Splunk version of the above pseudocode.
+    code: index=__your_sysmon_index__ EventCode=1 ParentImage="C:\\Windows\\*\\winlogon.exe"
+      Image="C:\\Windows\\*\\cmd.exe"
+    type: Splunk
+    data_model: Sysmon native
+  - description: EQL version of the above pseudocode.
+    code: "process where subtype.create and\n  (process_name == \"cmd.exe\" and parent_process_name\
+      \ == \"winlogon.exe\")"
+    type: EQL
+    data_model: EQL native
+  - description: LogPoint version of the above pseudocode.
+    code: norm_id=WindowsSysmon event_id=1 parent_image="C:\Windows\System32\winlogon.exe"
+      parent_image="C:\Windows\System32\cmd.exe"
+    type: LogPoint
+    data_model: LogPoint native
+  data_model_references:
+  - process/create/exe
+  - process/create/parent_exe
+  d3fend_mappings:
+  - iri: d3f:ProcessLineageAnalysis
+    id: D3-PLA
+    label: Process Lineage Analysis
+- title: Remotely Scheduled Tasks via AT
+  submission_date: 2015/04/29
+  information_domain: Host, Network
+  platforms:
+  - Windows
+  subtypes:
+  - File API
+  - PCAP
+  analytic_types:
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2015-04-001
+  description: 'When AT.exe is used to remotely [schedule tasks](https://attack.mitre.org/techniques/T1053),
+    Windows uses named pipes over [SMB](https://en.wikipedia.org/wiki/Server_Message_Block)
+    to communicate with the API on the remote machine. After authentication over SMB,
+    the Named Pipe "ATSVC" is opened, over which the JobAdd function is called. On
+    the remote host, the job files are created by the Task Scheduler and follow the
+    convention `C:\Windows\System32\AT<job\_id>`. Unlike [CAR-2013-05-004](../CAR-2013-05-004),
+    this analytic specifically focuses on uses of AT that can be detected between
+    hosts, indicating remotely gained [execution](https://attack.mitre.org/tactics/TA0002).
+
+
+    This pipe activity could be discovered with a network decoder, such as that in
+    wireshark, that can inspect SMB traffic to identify the use of pipes. It could
+    also be detected by looking for raw packet capture streams or from a custom sensor
+    on the host that hooks the appropriate API functions. If no network or API level
+    of visibility is possible, this traffic may inferred by looking at SMB connections
+    over 445/tcp followed by the creation of files matching the pattern `C:\Windows\System32\AT\<job_id\>`.'
+  coverage:
+  - technique: T1053
+    tactics:
+    - TA0002
+    subtechniques:
+    - T1053.002
+    coverage: Moderate
+  implementations:
+  - description: To detect AT via network traffic, a sensor is needed that has the
+      ability to extract and decode PCAP information. Specifically, it needs to properly
+      decode SMB and the functions that are implemented over it via NamedPipes. If
+      a sensor meets these criteria, then the PCAP data needs to search for instances
+      of the command `JobAdd` over the pipe `ATSVC`, which is all implemented over
+      Windows SMB 445/tcp.
+    code: 'flows = search Flow:Message
+
+      at_proto = filter flows where (dest_port == 445 and proto_info.pipe == "ATSVC")
+
+      at_create = filter flows where (proto_info.function == "JobAdd")
+
+
+      output at_create'
+    type: pseudocode
+  data_model_references:
+  - flow/message/proto_info
+  d3fend_mappings:
+  - iri: d3f:IPCTrafficAnalysis
+    id: D3-IPCTA
+    label: IPC Traffic Analysis
+- title: Host Discovery Commands
+  submission_date: 2016/03/24
+  information_domain: Host
+  platforms:
+  - Windows
+  - Linux
+  - macOS
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2016-03-001
+  description: 'When entering on a host for the first time, an adversary may try to
+    [discover](https://attack.mitre.org/tactics/TA0007) information about the host.
+    There are several built-in Windows commands that can be used to learn about the
+    software configurations, active users, administrators, and networking configuration.
+    These commands should be monitored to identify when an adversary is learning information
+    about the system and environment. The information returned may impact choices
+    an adversary can make when [establishing persistence](https://attack.mitre.org/tactics/TA0003),
+    [escalating privileges](https://attack.mitre.org/tactics/TA0004), or [moving laterally](https://attack.mitre.org/tactics/TA0008).
+
+
+    Because these commands are built in, they may be run frequently by power users
+    or even by normal users. Thus, an analytic looking at this information should
+    have well-defined white- or blacklists, and should consider looking at an anomaly
+    detection approach, so that this information can be learned dynamically.
+
+
+    Within the built-in Windows Commands:
+
+
+    -   `hostname`
+
+    -   `ipconfig`
+
+    -   `net`
+
+    -   `quser`
+
+    -   `qwinsta`
+
+    -   `sc` with flags `query`, `queryex`, `qc`
+
+    -   `systeminfo`
+
+    -   `tasklist`
+
+    -   `dsquery`
+
+    -   `whoami`
+
+
+    **Note** `dsquery` is only pre-existing on Windows servers.
+
+    '
+  coverage:
+  - technique: T1087
+    tactics:
+    - TA0007
+    subtechniques:
+    - T1087.001
+    - T1087.002
+    coverage: Moderate
+  - technique: T1069
+    tactics:
+    - TA0007
+    subtechniques:
+    - T1069.001
+    - T1069.002
+    coverage: Moderate
+  - technique: T1016
+    tactics:
+    - TA0007
+    coverage: Moderate
+  - technique: T1082
+    tactics:
+    - TA0007
+    coverage: Moderate
+  - technique: T1033
+    tactics:
+    - TA0007
+    coverage: Moderate
+  - technique: T1057
+    tactics:
+    - TA0007
+    coverage: Moderate
+  - technique: T1007
+    tactics:
+    - TA0007
+    coverage: Moderate
+  implementations:
+  - description: To be effective in deciphering malicious and benign activity, the
+      full command line is essential. Similarly, having information about the parent
+      process can help with making decisions and tuning to an environment.
+    code: "process = search Process:Create\ninfo_command = filter process where (\n\
+      \ exe == \"hostname.exe\" or\n exe == \"ipconfig.exe\" or\n exe == \"net.exe\"\
+      \ or\n exe == \"quser.exe\" or\n exe == \"qwinsta.exe\" or\n exe == \"sc\" and\
+      \ (command_line match \" query\" or command_line match \" qc\")) or\n exe ==\
+      \ \"systeminfo.exe\" or\n exe == \"tasklist.exe\" or\n exe == \"whoami.exe\"\
+      \n)\noutput info_command\n"
+    type: pseudocode
+  - description: Splunk version of the above pseudocode search.
+    code: 'index=__your_sysmon_index__ EventCode=1 (Image="C:\\Windows\\*\\hostname.exe"
+      OR Image="C:\\Windows\\*\\ipconfig.exe" OR Image="C:\\Windows\\*\\net.exe" OR
+      Image="C:\\Windows\\*\\quser.exe" OR Image="C:\\Windows\\*\\qwinsta.exe" OR
+      (Image="C:\\Windows\\*\\sc.exe" AND (CommandLine="* query *" OR CommandLine="*
+      qc *")) OR Image="C:\\Windows\\*\\systeminfo.exe" OR Image="C:\\Windows\\*\\tasklist.exe"
+      OR Image="C:\\Windows\\*\\whoami.exe")|stats values(Image) as "Images" values(CommandLine)
+      as "Command Lines" by ComputerName
+
+      '
+    type: Splunk
+    data_model: Sysmon native
+  - description: EQL version of the above pseudocode search.
+    code: "process where subtype.create and\n  (process_name == \"hostname.exe\" or\
+      \ process_name == \"ipconfig.exe\" or process_name == \"net.exe\" or process_name\
+      \ == \"quser.exe\" process_name == \"qwinsta.exe\" or process_name == \"systeminfo.exe\"\
+      \ or process_name == \"tasklist.exe\" or process_name == \"whoami.exe\" or (process_name\
+      \ == \"sc.exe\" and (command_line == \"* query *\" or command_line == \"* qc\
+      \ *\")))\n"
+    type: EQL
+    data_model: EQL native
+  - description: LogPoint version of the above pseudocode.
+    code: 'norm_id=WindowsSysmon event_id=1 (image in ["*\hostname.exe", "*\ipconfig.exe",
+      "*\net.exe", "*\quser.exe", "*\qwinsta.exe", "*\systeminfo.exe", "*\tasklist.exe",
+      "*\whoami.exe"] OR (image="*\sc.exe" command IN ["* query *", "* qc *"))
+
+      '
+    type: LogPoint
+    data_model: LogPoint native
+  data_model_references:
+  - process/create/command_line
+  - process/create/exe
+  true_positives:
+  - source: Mordor (Sysmon) - net.exe
+    description: Sysmon net.exe event from the Mordor [Empire Net Start dataset](https://github.com/hunters-forge/mordor/blob/master/small_datasets/windows/discovery/system_service_discovery_T1007/empire_net_start.md).
+    event_snippet: CAR-2016-03-001-mordor-01-snippet.json
+    full_event: CAR-2016-03-001-mordor-01.json
+  - source: Mordor (Sysmon) - whoami.exe
+    description: Sysmon whoami.exe event from the Mordor [Empire Net Start dataset](https://github.com/hunters-forge/mordor/blob/master/small_datasets/windows/discovery/system_service_discovery_T1007/empire_net_start.md).
+    event_snippet: CAR-2016-03-001-mordor-02-snippet.json
+    full_event: CAR-2016-03-001-mordor-02.json
+  d3fend_mappings:
+  - iri: d3f:ProcessSpawnAnalysis
+    id: D3-PSA
+    label: Process Spawn Analysis
+- title: Successful Local Account Login
+  submission_date: 2016/04/18
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Login
+  analytic_types:
+  - Situational Awareness
+  contributors:
+  - MITRE/NSA
+  id: CAR-2016-04-004
+  description: The successful use of [Pass The Hash](https://attack.mitre.org/techniques/T1550/002/)
+    for lateral movement between workstations would trigger event ID 4624, with an
+    event level of Information, from the security log. This behavior would be a LogonType
+    of 3 using NTLM authentication where it is not a domain logon and not the ANONYMOUS
+    LOGON account.
+  coverage:
+  - technique: T1550
+    tactics:
+    - TA0008
+    subtechniques:
+    - T1550.002
+    coverage: Moderate
+  implementations:
+  - description: This analytic will look for remote logins, using a non domain login,
+      from one host to another, using NTL authentication where the account is not
+      "ANONYMOUS LOGON".
+    code: 'EventCode == 4624 and [target_user_name] != "ANONYMOUS LOGON" and
+
+      [authentication_package_name] == "NTLM"
+
+      '
+    type: pseudocode
+  unit_tests:
+  - configurations:
+    - Windows 7
+    description: As an adminstrator, create a new user. Then, logon to the host with
+      that new user. This is generate the event.
+    commands:
+    - net user 'test' 'test' /add
+  d3fend_mappings:
+  - iri: d3f:LocalAccountMonitoring
+    id: D3-LAM
+    label: Local Account Monitoring
+- title: Credential Dumping via Mimikatz
+  submission_date: 2019/04/29
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - MITRE
+  id: CAR-2019-04-004
+  description: 'Credential dumpers like Mimikatz can be loaded into memory and from
+    there read data from another processes. This analytic looks for instances where
+    processes are requesting specific permissions to read parts of the LSASS process
+    in order to detect when credential dumping is occurring. One weakness is that
+    all current implementations are “overtuned” to look for common access patterns
+    used by Mimikatz.
+
+
+    *This requires information about process access, e.g. Sysmon Event ID 10. That
+    currently doesn’t have a CAR data model mapping, since we currently lack any open/access
+    actions for Processes. If this changes, we will update the data model requirements.*
+
+    '
+  coverage:
+  - technique: T1003
+    tactics:
+    - TA0006
+    subtechniques:
+    - T1003.001
+    coverage: Low
+  implementations:
+  - name: Common Mimikatz GrantedAccess Patterns
+    description: This is specific to the way Mimikatz works currently, and thus is
+      fragile to both future updates and non-default configurations of Mimikatz.
+    code: 'index=__your_sysmon_data__ EventCode=10
+
+      TargetImage="C:\\WINDOWS\\system32\\lsass.exe"
+
+      (GrantedAccess=0x1410 OR GrantedAccess=0x1010 OR GrantedAccess=0x1438 OR GrantedAccess=0x143a
+      OR GrantedAccess=0x1418)
+
+      CallTrace="C:\\windows\\SYSTEM32\\ntdll.dll+*|C:\\windows\\System32\\KERNELBASE.dll+20edd|UNKNOWN(*)"
+
+      | table _time hostname user SourceImage GrantedAccess
+
+      '
+    type: splunk
+    data_model: Sysmon native
+  - name: Outliers
+    description: This is an outlier version of the above without including the specific
+      call trace. This should work in more (but not all) situations however runs more
+      slowly and will have more false positives - typically installers.
+    code: "earliest=-d@d latest=now() index=__your_sysmon_data__\n  EventCode=10\n\
+      \  TargetImage=\"C:\\\\WINDOWS\\\\system32\\\\lsass.exe\"\n  (GrantedAccess=0x1410\
+      \ OR GrantedAccess=0x1010 OR GrantedAccess=0x1438 OR GrantedAccess=0x143a OR\
+      \ GrantedAccess=0x1418)\n| search NOT [ search earliest=-7d@d latest=-2d@d index=__your_sysmon_data__\
+      \ EventCode=10 TargetImage=\"C:\\\\WINDOWS\\\\system32\\\\lsass.exe\" (GrantedAccess=0x1410\
+      \ OR GrantedAccess=0x1010 OR GrantedAccess=0x1438 OR GrantedAccess=0x143a OR\
+      \ GrantedAccess=0x1418)\n  | dedup SourceImage\n  | fields SourceImage ]\n|\
+      \ table  _time hostname user SourceImage GrantedAccess\n"
+    type: splunk
+    data_model: Sysmon native
+  - description: LogPoint version of the above pseudocode.
+    code: 'norm_id=WindowsSysmon event_id=10 image="C:\Windows\system32\lsass.exe"
+      (access="0x1410" OR access="0x1010" OR access="0x1438" OR access="0x143a" OR
+      access="0x1418") call_trace="C:\windows\SYSTEM32\ntdll.dll+*|C:\windows\System32\KERNELBASE.dll+20edd|UNKNOWN(*)"
+
+      | fields log_ts, host, user, source_image, access
+
+      '
+    type: LogPoint
+    data_model: LogPoint native
+  references:
+  - Credit to [Cyb3rWard0g](https://github.com/Cyb3rWard0g/ThreatHunter-Playbook/blob/master/playbooks/windows/06_credential_access/credential_dumping_T1003/credentials_from_memory/mimikatz_logonpasswords.md),
+    dim0x69 (blog.3or.de), and Mark Russinovich for providing much of the information
+    used to construct these analytics.
+  d3fend_mappings:
+  - iri: d3f:ProcessSpawnAnalysis
+    id: D3-PSA
+    label: Process Spawn Analysis
+- title: Lsass Process Dump via Procdump
+  submission_date: 2019/07/29
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - Kaushal Parikh/Cyware Labs
+  - Tony Lambert/Red Canary
+  - MITRE
+  id: CAR-2019-07-002
+  description: '[ProcDump](https://docs.microsoft.com/en-us/sysinternals/downloads/procdump)
+    is a sysinternal command-line utility whose primary purpose is monitoring an application
+    for CPU spikes and generating crash dumps during a spike that an administrator
+    or developer can use to determine the cause of the spike.
+
+
+    ProcDump may be used to dump the memory space of lsass.exe to disk for processing
+    with a credential access tool such as Mimikatz. This is performed by launching
+    procdump.exe as a privileged user with command line options indicating that lsass.exe
+    should be dumped to a file with an arbitrary name.
+
+
+    Note - the CAR data model currently does not support process access actions, so
+    the pseudocode implementation is based around process creates.
+
+    '
+  coverage:
+  - technique: T1003
+    tactics:
+    - TA0006
+    subtechniques:
+    - T1003.001
+    coverage: Low
+  implementations:
+  - name: Procdump - Process Create
+    description: This base pseudocode looks for process create events where an instance
+      of procdump is executed that references lsass in the command-line.
+    code: "processes = search Process:Create\nprocdump_lsass = filter processes where\
+      \ (\n  exe = \"procdump*.exe\"  and\n  command_line = \"*lsass*\")\noutput procdump_lsass\n"
+    type: Pseudocode
+  - name: Procdump - Process Create
+    description: A Splunk/Sysmon version of the above pseudocode.
+    code: 'index=__your_sysmon_index__ EventCode=1 Image="*\\procdump*.exe" CommandLine="*lsass*"
+
+      '
+    type: Splunk
+    data_model: Sysmon native
+  - name: Procdump - Process Create
+    description: An [EQL Version](https://eqllib.readthedocs.io/en/latest/analytics/1e1ef6be-12fc-11e9-8d76-4d6bb837cda4.html)
+      of the above pseudocode.
+    type: EQL
+  - name: Procdump - Process Access
+    description: A related Splunk search, which instead of looking for process create
+      events looks for process access events that target lsass.exe.
+    code: 'index=__your_sysmon_index__ EventCode=10 TargetImage="C:\\WINDOWS\\system32\\lsass.exe"
+      GrantedAccess="0x1FFFFF" ("procdump")
+
+      '
+    type: Splunk
+    data_model: Sysmon native
+  - name: Procdump - Process Access
+    description: A [Sigma Version](https://github.com/Neo23x0/sigma/blob/master/rules/windows/sysmon/sysmon_lsass_memdump.yml)
+      of the above Splunk search, with some more stringent criteria around calltrace.
+    type: Sigma
+  - description: LogPoint version of the above pseudocode.
+    code: 'norm_id=WindowsSysmon event_id=1 image="*\procdump*.exe" command="*lsass*"
+
+      '
+    type: LogPoint
+    data_model: LogPoint native
+  data_model_references:
+  - process/create/exe
+  - process/create/command_line
+  unit_tests:
+  - description: '1. Open a Windows Command Prompt or PowerShell instance.
+
+      2. Navigate to folder containing ProcDump.
+
+      3. Execute procdump.exe -ma lsass.exe lsass_dump
+
+      '
+  d3fend_mappings:
+  - iri: d3f:ProcessSpawnAnalysis
+    id: D3-PSA
+    label: Process Spawn Analysis
+- title: Credential Dumping via Windows Task Manager
+  submission_date: 2019/08/05
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - File
+  analytic_types:
+  - TTP
+  contributors:
+  - Tony Lambert/Red Canary
+  id: CAR-2019-08-001
+  description: 'The Windows Task Manager may be used to dump the memory space of `lsass.exe`
+    to disk for processing with a credential access tool such as Mimikatz. This is
+    performed by launching Task Manager as a privileged user, selecting `lsass.exe`,
+    and clicking "Create dump file". This saves a dump file to disk with a deterministic
+    name that includes the name of the process being dumped.
+
+
+    This requires filesystem data to determine whether files have been created.
+
+    '
+  coverage:
+  - technique: T1003
+    tactics:
+    - TA0006
+    subtechniques:
+    - T1003.001
+    coverage: Low
+  implementations:
+  - name: Procdump - File Create
+    description: This base pseudocode looks for file create events where a file with
+      a name similar to lsass.dmp is created by the Windows task manager process.
+    code: "files = search File:Create\nlsass_dump = filter files where (\n  file_name\
+      \ = \"lsass*.dmp\"  and\n  image_path = \"C:\\Windows\\*\\taskmgr.exe\")\noutput\
+      \ lsass_dump\n"
+    type: Pseudocode
+  - name: Procdump - File Create
+    description: A Splunk/Sysmon version of the above pseudocode.
+    code: 'index=__your_sysmon_index__ EventCode=11 TargetFilename="*lsass*.dmp" Image="C:\\Windows\\*\\taskmgr.exe"
+
+      '
+    type: Splunk
+    data_model: Sysmon native
+  - name: Procdump - File Create
+    description: An EQL version of the above pseudocode.
+    code: 'file where file_name == "lsass*.dmp" and process_name == "taskmgr.exe"
+
+      '
+    type: EQL
+    data_model: EQL native
+  - description: LogPoint version of the above pseudocode.
+    code: 'norm_id=WindowsSysmon event_id=11 file="*lsass*.dmp" source_image="C:\Windows\*\taskmgr.exe"
+
+      '
+    type: LogPoint
+    data_model: LogPoint native
+  data_model_references:
+  - file/create/file_name
+  - file/create/image_path
+  unit_tests:
+  - description: '1. Open Windows Task Manager as Administrator
+
+      2. Select lsass.exe
+
+      3. Right-click on lsass.exe and select "Create dump file".
+
+      '
+  true_positives:
+  - source: Mordor (Sysmon)
+    description: Sysmon event from the Mordor [Interactive Task Manager lsass dump
+      dataset](https://github.com/hunters-forge/mordor/blob/master/small_datasets/windows/credential_access/credential_dumping_T1003/interactive_taskmngr_lsass_dump.md).
+    event_snippet: CAR-2019-08-001-mordor-01-snippet.json
+    full_event: CAR-2019-08-001-mordor-01.json
+  d3fend_mappings:
+  - iri: d3f:FileCreationAnalysis
+    id: D3-FCA
+    label: File Creation Analysis
+- title: Active Directory Dumping via NTDSUtil
+  submission_date: 2019/08/13
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - File
+  analytic_types:
+  - TTP
+  contributors:
+  - Tony Lambert/Red Canary
+  id: CAR-2019-08-002
+  description: 'The NTDSUtil tool may be used to dump a Microsoft Active Directory
+    database to disk for processing with a credential access tool such as Mimikatz.
+    This is performed by launching `ntdsutil.exe` as a privileged user with command
+    line arguments indicating that media should be created for offline Active Directory
+    installation and specifying a folder path. This process will create a copy of
+    the Active Directory database, `ntds.dit`, to the specified folder path.
+
+
+    This requires filesystem data to determine whether files have been created.
+
+    '
+  coverage:
+  - technique: T1003
+    tactics:
+    - TA0006
+    subtechniques:
+    - T1003.003
+    coverage: Low
+  implementations:
+  - name: NTDSUtil - File Create
+    description: This base pseudocode looks for file create events where a file with
+      a name of ntds.dit is created by the ntdsutil process.
+    code: "files = search File:Create\nntds_dump = filter files where (\n  file_name\
+      \ = \"ntds.dit\"  and\n  image_path = \"*ntdsutil.exe\")\noutput ntds_dump\n"
+    type: Pseudocode
+  - name: NTDSUtil - File Create
+    description: A Splunk/Sysmon version of the above pseudocode.
+    code: 'index=__your_sysmon_index__ EventCode=11 TargetFilename="*ntds.dit" Image="*ntdsutil.exe"
+
+      '
+    type: Splunk
+    data_model: Sysmon native
+  - name: NTDSUtil - File Create
+    description: An EQL version of the above pseudocode.
+    code: 'file where file_name == "ntds.dit" and process_name == "ntdsutil.exe"
+
+      '
+    type: EQL
+    data_model: EQL native
+  - description: LogPoint version of the above pseudocode.
+    code: 'norm_id=WindowsSysmon event_id=11 file="*ntds.dit" source_image="*ntdsutil.exe"
+
+      '
+    type: LogPoint
+    data_model: LogPoint native
+  data_model_references:
+  - file/create/file_name
+  - file/create/image_path
+  unit_tests:
+  - description: '1. Open a Windows Command Prompt or PowerShell instance as Administrator
+
+      2. Execute `ntdsutil.exe “ac i ntds” “ifm” “create full c:\temp” q q`
+
+      '
+  d3fend_mappings:
+  - iri: d3f:ProcessSpawnAnalysis
+    id: D3-PSA
+    label: Process Spawn Analysis
+- title: MiniDump of LSASS
+  submission_date: 2020/05/04
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - Cyber National Mission Force (CNMF)
+  id: CAR-2020-05-001
+  description: 'This analytic detects the minidump variant of credential dumping where
+    a process opens lsass.exe in order to extract credentials using the Win32 API
+    call [MiniDumpWriteDump](https://docs.microsoft.com/en-us/windows/win32/api/minidumpapiset/nf-minidumpapiset-minidumpwritedump).
+    Tools like [SafetyKatz](https://github.com/GhostPack/SafetyKatz), [SafetyDump](https://github.com/m0rv4i/SafetyDump),
+    and [Outflank-Dumpert](https://github.com/outflanknl/Dumpert) default to this
+    variant and may be detected by this analytic, though keep in mind that not all
+    options for using those tools will result in this specific behavior.
+
+
+    The analytic is based on a [Sigma analytic](https://github.com/NVISO-BE/sigma-public/blob/master/rules/windows/sysmon/sysmon_lsass_memdump.yml)
+    contributed by Samir Bousseaden and written up in a [blog on MENASEC](https://blog.menasec.net/2019/02/threat-hunting-21-procdump-or-taskmgr.html).
+    It looks for a call trace that includes either dbghelp.dll or dbgcore.dll, which
+    export the relevant functions/permissions to perform the dump. It also detects
+    using the Windows Task Manager (taskmgr.exe) to dump lsass, which is described
+    in [CAR-2019-08-001](/analytics/CAR-2019-08-001/). In this iteration of the Sigma
+    analytic, the `GrantedAccess` filter isn''t included because it didn''t seem to
+    filter out any false positives and introduces the potential for evasion.
+
+
+    This analytic was tested both in a lab and in a production environment with a
+    very low false-positive rate. werfault.exe and tasklist.exe, both standard Windows
+    processes, showed up multiple times as false positives.
+
+
+    NOTE - this analytic has no corresponding pseudocode implementation because the
+    CAR data model doesn''t currently support process access events.
+
+    '
+  coverage:
+  - technique: T1003
+    tactics:
+    - TA0006
+    subtechniques:
+    - T1003.003
+    coverage: Low
+  implementations:
+  - name: Lsass Process Access
+    description: This Splunk query looks for process access events where lsass.exe
+      is accessed with a specific call trace that indicates the use of MiniDumpWriteDump.
+    code: index=__your_sysmon_index__ EventCode=10 TargetImage="C:\\windows\\system32\\lsass.exe"
+      (CallTrace="*dbghelp.dll*" OR CallTrace="*dbgcore.dll*")| table _time host SourceProcessId
+      SourceImage
+    type: Splunk
+    data_model: Sysmon native
+  - description: LogPoint version of the above pseudocodes.
+    code: 'norm_id=WindowsSysmon event_id=10 image="C:\Windows\system32\lsass.exe"
+      call_trace IN ["*dbghelp.dll*", "*dbgcore.dll*"]
+
+      | fields log_ts host source_process_id source_image'
+    type: LogPoint
+    data_model: LogPoint native
+  d3fend_mappings:
+  - iri: d3f:SystemCallAnalysis
+    id: D3-SCA
+    label: System Call Analysis
+- title: Component Object Model Hijacking
+  submission_date: 2020/09/10
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Registry
+  analytic_types:
+  - Situational Awareness
+  contributors:
+  - Olaf Hartong
+  id: CAR-2020-09-002
+  description: 'Adversaries may establish persistence or escalate privileges by executing
+    malicious content triggered by hijacked references to Component Object Model (COM)
+    objects. This is typically done by replacing COM object registry entries under
+    the HKEY_CURRENT_USER\Software\Classes\CLSID or HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID
+    keys. Accordingly, this analytic looks for any changes under these keys.
+
+    '
+  coverage:
+  - technique: T1546
+    coverage: Moderate
+    subtechniques:
+    - T1546.015
+    tactics:
+    - TA0003
+    - TA0004
+  implementations:
+  - name: Pseudocode - COM object registry entry modification
+    description: This is a pseudocode representation of the below splunk search.
+    code: "registry_keys = search (Registry:Create AND Registry:Remove AND Registry:Edit)\n\
+      clsid_keys = filter registry_keys where (\n  key = \"*\\Software\\Classes\\\
+      CLSID\\*\")\noutput clsid_keys\n"
+    data_model: CAR native
+    type: Pseudocode
+  - name: Splunk search - COM object registry entry modification
+    description: This Splunk search looks for any registry keys that were created,
+      deleted, or renamed, as well as any registry values that were set or renamed
+      under the Windows COM Object registry key.
+    code: 'index=__your_sysmon_index__ (EventCode=12 OR EventCode=13 OR EventCode=14)
+      TargetObject="*\\Software\\Classes\\CLSID\\*"
+
+      '
+    data_model: Sysmon native
+    type: Splunk
+  - name: LogPoint search - COM object registry entry modification
+    description: This LogPoint search looks for any registry keys that were created,
+      deleted, or renamed, as well as any registry values that were set or renamed
+      under the Windows COM Object registry key.
+    code: 'norm_id=WindowsSysmon event_id IN [12, 13, 14] target_object="*\Software\Classes\CLSID\*"
+
+      '
+    data_model: LogPoint native
+    type: LogPoint
+  data_model_references:
+  - registry/add/key
+  - registry/remove/key
+  - registry/edit/key
+  d3fend_mappings:
+  - iri: d3f:SystemInitConfigAnalysis
+    id: D3-SICA
+    label: System Init Config Analysis
+- title: AppInit DLLs
+  submission_date: 2020/09/10
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Registry
+  analytic_types:
+  - TTP
+  contributors:
+  - Olaf Hartong
+  id: CAR-2020-09-005
+  description: 'Adversaries may establish persistence and/or elevate privileges by
+    executing malicious content triggered by AppInit DLLs loaded into processes. Dynamic-link
+    libraries (DLLs) that are specified in the AppInit_DLLs value in the Registry
+    keys `HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Windows`
+    or `HKEY_LOCAL_MACHINE\Software\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Windows`
+    are loaded by user32.dll into every process that loads user32.dll. These values
+    can be abused to obtain elevated privileges by causing a malicious DLL to be loaded
+    and run in the context of separate processes. Accordingly, this analytic looks
+    for modifications to these registry keys that may be indicative of this type of
+    abuse.
+
+    '
+  coverage:
+  - technique: T1546
+    coverage: Moderate
+    subtechniques:
+    - T1546.010
+    tactics:
+    - TA0003
+    - TA0004
+  implementations:
+  - name: Pseudocode - AppInit DLL registry modification
+    description: This is a pseudocode representation of the below splunk search.
+    code: "registry_keys = search (Registry:Create AND Registry:Remove AND Registry:Edit)\n\
+      appinit_keys = filter registry_keys where (\n  key = \"*\\SOFTWARE\\Microsoft\\\
+      Windows NT\\CurrentVersion\\Windows\\Appinit_Dlls\\*\" OR\n  key = \"*\\SOFTWARE\\\
+      \\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\Appinit_Dlls\\\
+      *\"\"\n  )\noutput clsid_keys\n"
+    data_model: CAR native
+    type: Pseudocode
+  - name: Splunk search - AppInit DLL registry modification
+    description: This Splunk search looks for any registry keys that were created,
+      deleted, or renamed, as well as any registry values that were set or renamed
+      under the Windows AppInit DLL registry keys.
+    code: 'index=__your_sysmon_index__ (EventCode=12 OR EventCode=13 OR EventCode=14)
+      (TargetObject="*\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\Appinit_Dlls\\*"
+      OR TargetObject="*\\SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\Appinit_Dlls\\*")
+
+      '
+    data_model: Sysmon native
+    type: Splunk
+  - name: LogPoint search - AppInit DLL registry modification
+    description: This LogPoint search looks for any registry keys that were created,
+      deleted, or renamed, as well as any registry values that were set or renamed
+      under the Windows AppInit DLL registry keys.
+    code: 'norm_id=WindowsSysmon event_id IN [12, 13, 14] target_object IN ["*\SOFTWARE\Microsoft\Windows
+      NT\CurrentVersion\Windows\Appinit_Dlls\*", "*\SOFTWARE\Wow6432Node\Microsoft\Windows
+      NT\CurrentVersion\Windows\Appinit_Dlls\*"]
+
+      '
+    data_model: LogPoint native
+    type: LogPoint
+  data_model_references:
+  - registry/add/key
+  - registry/remove/key
+  - registry/edit/key
+  d3fend_mappings:
+  - iri: d3f:SystemInitConfigAnalysis
+    id: D3-SICA
+    label: System Init Config Analysis
+- title: DLL Injection with Mavinject
+  submission_date: 2020/11/30
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - Olaf Hartong
+  id: CAR-2020-11-003
+  description: 'Injecting a malicious DLL into a process is a common adversary TTP.
+    Although the ways of doing this are numerous, mavinject.exe is a commonly used
+    tool for doing so because it roles up many of the necessary steps into one, and
+    is available within Windows. Attackers may rename the executable, so we also use
+    the common argument "INJECTRUNNING" as a related signature here. Whitelisting
+    certain applications may be necessary to reduce noise for this analytic.
+
+    '
+  coverage:
+  - technique: T1055
+    tactics:
+    - TA0004
+    - TA0005
+    subtechniques:
+    - T1055.001
+    coverage: Low
+  implementations:
+  - name: Pseudocode - mavinject process and its common argument
+    description: This is a pseudocode representation of the below splunk search.
+    code: "processes = search Process:Create\nmavinject_processes = filter processes\
+      \ where (\n  exe = \"C:\\\\Windows\\\\SysWOW64\\\\mavinject.exe\" OR Image=\"\
+      C:\\\\Windows\\\\System32\\\\mavinject.exe\" OR command_line = \"*/INJECTRUNNING*\"\
+      \noutput mavinject_processes\n"
+    data_model: CAR native
+    type: Pseudocode
+  - name: Splunk Search - mavinject
+    description: Search for instances of mavinject.exe or mavinject32.exe
+    code: '(index=__your_sysmon_index__ EventCode=1) (Image="C:\\Windows\\SysWOW64\\mavinject.exe"
+      OR Image="C:\\Windows\\System32\\mavinject.exe" OR CommandLine="*\INJECTRUNNING*")
+
+      '
+    data_model: Sysmon native
+    type: Splunk
+  - name: LogPoint Search - mavinject
+    description: Search for instances of mavinject.exe or mavinject32.exe
+    code: 'norm_id=WindowsSysmon event_id=1 (image="C:\Windows\SysWOW64\mavinject.exe"
+      OR image="C:\Windows\System32\mavinject.exe" OR command="*\INJECTRUNNING*")
+
+      '
+    data_model: LogPoint native
+    type: LogPoint
+  data_model_references:
+  - process/create/exe
+  - process/create/command_line
+  d3fend_mappings:
+  - iri: d3f:ProcessSpawnAnalysis
+    id: D3-PSA
+    label: Process Spawn Analysis
+- title: Clear Powershell Console Command History
+  submission_date: 2020/11/30
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - Olaf Hartong
+  id: CAR-2020-11-005
+  description: 'Adversaries may attempt to conceal their tracks by deleting the history
+    of commands run within the Powershell console, or turning off history saving to
+    begin with. This analytic looks for several commands that would do this. This
+    does not capture the event if it is done within the console itself; only commandline-based
+    commands are detected. Note that the command to remove the history file directly
+    may very a bit if the history file is not saved in the default path on a particular
+    system.
+
+    '
+  coverage:
+  - technique: T1070
+    tactics:
+    - TA0005
+    subtechniques:
+    - T1070.003
+    coverage: Low
+  implementations:
+  - name: Pseudocode - clear or disable Powershell console history via commandline
+    description: This is a pseudocode representation of the below splunk search.
+    code: "processes = search Process:Create\nclear_commands = filter processes where\
+      \ (\n  command_line =\"*rm (Get-PSReadlineOption).HistorySavePath*\" OR command_line=\"\
+      *del (Get-PSReadlineOption).HistorySavePath*\" OR command_line=\"*Set-PSReadlineOption\
+      \ –HistorySaveStyle SaveNothing*\" OR command_line=\"*Remove-Item (Get-PSReadlineOption).HistorySavePath*\"\
+      )  OR command_linee=\"del*Microsoft\\Windows\\Powershell\\PSReadline\\ConsoleHost_history.txt\"\
+      )\noutput clear_commands\n"
+    data_model: CAR native
+    type: Pseudocode
+  - name: Splunk Search - clear command history via Powershell
+    description: Look for powershell commands that would clear command history
+    code: '(index=__your_sysmon_index__ EventCode=1) (CommandLine="*rm (Get-PSReadlineOption).HistorySavePath*"
+      OR CommandLine="*del (Get-PSReadlineOption).HistorySavePath*" OR CommandLine="*Set-PSReadlineOption
+      –HistorySaveStyle SaveNothing*" OR CommandLine="*Remove-Item (Get-PSReadlineOption).HistorySavePath*"
+      OR CommandLine="del*Microsoft\\Windows\\Powershell\\PSReadline\\ConsoleHost_history.txt")
+
+      '
+    data_model: Sysmon native
+    type: Splunk
+  - name: LogPoint Search - clear command history via Powershell
+    description: Look for powershell commands that would clear command history
+    code: 'norm_id=WindowsSysmon event_id=1 (command="*rm (Get-PSReadlineOption).HistorySavePath*"
+      OR command="*del (Get-PSReadlineOption).HistorySavePath*" OR command="*Set-PSReadlineOption
+      –HistorySaveStyle SaveNothing*" OR command="*Remove-Item (Get-PSReadlineOption).HistorySavePath*"
+      OR command="del*Microsoft\Windows\Powershell\PSReadline\ConsoleHost_history.txt")
+
+      '
+    data_model: LogPoint native
+    type: LogPoint
+  data_model_references:
+  - process/create/exe
+  - process/create/command_line
+  d3fend_mappings:
+  - iri: d3f:ProcessSpawnAnalysis
+    id: D3-PSA
+    label: Process Spawn Analysis
+- title: Registry Edit from Screensaver
+  submission_date: 2020/11/30
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - Olaf Hartong
+  id: CAR-2020-11-011
+  description: 'Adversaries may use screensaver files to run malicious code. This
+    analytic triggers on suspicious edits to the screensaver registry keys, which
+    dictate which .scr file the screensaver runs.
+
+    '
+  coverage:
+  - technique: T1546
+    tactics:
+    - TA0003
+    - TA0004
+    subtechniques:
+    - T1546.002
+    coverage: High
+  implementations:
+  - name: Pseudocode - Screensaver
+    description: This is a pseudocode representation of the below splunk search.
+    code: "reg_events = search Registry:add or Registry:edit\nscr_reg_events = filter\
+      \ processes where (\n  key=\"*\\\\Software\\\\Policies\\\\Microsoft\\\\Windows\\\
+      \\Control Panel\\\\Desktop\\\\SCRNSAVE.EXE\" AND\noutput scr_reg_events\n"
+    data_model: CAR native
+    type: Pseudocode
+  - name: Splunk Search - Screensaver
+    description: looks creations of edits of the SCRNSAVE.exe registry key
+    code: 'index=your_sysmon_index (EventCode=12 OR EventCode=13 OR EventCode=14)
+      TargetObject="*\\Software\\Policies\\Microsoft\\Windows\\Control Panel\\Desktop\\SCRNSAVE.EXE"
+
+      '
+    data_model: Sysmon native
+    type: Splunk
+  - name: LogPoint Search - Screensaver
+    description: looks creations of edits of the SCRNSAVE.exe registry key
+    code: 'norm_id=WindowsSysmon event_id IN [12, 13, 14] target_object="*\Software\Policies\Microsoft\Windows\Control
+      Panel\Desktop\SCRNSAVE.EXE"
+
+      '
+    data_model: LogPoint native
+    type: LogPoint
+  data_model_references:
+  - registry/edit/key
+  - registry/add/key
+  d3fend_mappings:
+  - iri: d3f:UserSessionInitConfigAnalysis
+    id: D3-USICA
+    label: User Session Init Config Analysis
+- title: Common Windows Process Masquerading
+  submission_date: 2021/02/12
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - Sebastien Damaye
+  id: CAR-2021-04-001
+  description: '[Masquerading (T1036)](https://attack.mitre.org/techniques/T1036/)
+    is defined by ATT&CK as follows:
+
+
+    "Masquerading occurs when the name or location of an object, legitimate or malicious,
+    is manipulated or abused for the sake of evading defenses and observation. This
+    may include manipulating file metadata, tricking users into misidentifying the
+    file type, and giving legitimate task or service names."
+
+
+    Malware authors often use this technique to hide malicious executables behind
+    legitimate Windows executable names (e.g. `lsass.exe`, `svchost.exe`, etc).
+
+
+    There are several sub-techniques, but this analytic focuses on [Match Legitimate
+    Name or Location](https://attack.mitre.org/techniques/T1036/005/) only.
+
+
+    **Analytic Methodology**
+
+
+    With process monitoring, hunt for processes matching these criteria:
+
+
+    * process name is `svchost.exe`, `smss.exe`, `wininit.exe`, `taskhost.exe`, etc.
+
+    * process path is not `C:\Windows\System32\` or `C:\Windows\SysWow64\`
+
+
+    Examples (true positive):
+
+
+    `C:\Users\administrator\svchost.exe`
+
+
+    To make sure the rule doesn''t miss cases where the executable would be started
+    from a sub-folder of these locations, the entire path is checked for the process
+    path. The below example should be considered as suspicious:
+
+
+    `C:\Windows\System32\srv\svchost.exe`
+
+    '
+  coverage:
+  - technique: T1036
+    tactics:
+    - TA0005
+    subtechniques:
+    - T1036.005
+    coverage: Moderate
+  implementations:
+  - name: Pseudocode - Common Windows Process Masquerading
+    description: Looks for mismatches between process names and their image paths.
+    code: "processes = search Process:*\nsuspicious_processes = filter processes where\
+      \ (\n  (exe=svchost.exe AND (image_path!=\"C:\\\\Windows\\\\System32\\\\svchost.exe\"\
+      \ OR process_path!=\"C:\\\\Windows\\\\SysWow64\\\\svchost.exe\"))\n  OR (exe=smss.exe\
+      \ AND image_path!=\"C:\\\\Windows\\\\System32\\\\smss.exe\")\n  OR (exe=wininit.exe\
+      \ AND image_path!=\"C:\\\\Windows\\\\System32\\\\wininit.exe\")\n  OR (exe=taskhost.exe\
+      \ AND image_path!=\"C:\\\\Windows\\\\System32\\\\taskhost.exe\")\n  OR (exe=lasass.exe\
+      \ AND image_path!=\"C:\\\\Windows\\\\System32\\\\lsass.exe\")\n  OR (exe=winlogon.exe\
+      \ AND image_path!=\"C:\\\\Windows\\\\System32\\\\winlogon.exe\")\n  OR (exe=csrss.exe\
+      \ AND image_path!=\"C:\\\\Windows\\\\System32\\\\csrss.exe\")\n  OR (exe=services.exe\
+      \ AND image_path!=\"C:\\\\Windows\\\\System32\\\\services.exe\")\n  OR (exe=lsm.exe\
+      \ AND image_path!=\"C:\\\\Windows\\\\System32\\\\lsm.exe\")\n  OR (exe=explorer.exe\
+      \ AND image_path!=\"C:\\\\Windows\\\\explorer.exe\")\n  )\noutput suspicious_processes\n"
+    data_model: CAR native
+    type: Pseudocode
+  - name: Splunk Search - Common Windows Process Masquerading
+    description: Splunk search version of the above pseudocode.
+    code: 'index=__your_sysmon_index__ source="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"
+      AND (
+
+      (process_name=svchost.exe AND NOT (process_path="C:\\Windows\\System32\\svchost.exe"
+      OR process_path="C:\\Windows\\SysWow64\\svchost.exe"))
+
+      OR (process_name=smss.exe AND NOT process_path="C:\\Windows\\System32\\smss.exe")
+
+      OR (process_name=wininit.exe AND NOT process_path="C:\\Windows\\System32\\wininit.exe")
+
+      OR (process_name=taskhost.exe AND NOT process_path="C:\\Windows\\System32\\taskhost.exe")
+
+      OR (process_name=lasass.exe AND NOT process_path="C:\\Windows\\System32\\lsass.exe")
+
+      OR (process_name=winlogon.exe AND NOT process_path="C:\\Windows\\System32\\winlogon.exe")
+
+      OR (process_name=csrss.exe AND NOT process_path="C:\\Windows\\System32\\csrss.exe")
+
+      OR (process_name=services.exe AND NOT process_path="C:\\Windows\\System32\\services.exe")
+
+      OR (process_name=lsm.exe AND NOT process_path="C:\\Windows\\System32\\lsm.exe")
+
+      OR (process_name=explorer.exe AND NOT process_path="C:\\Windows\\explorer.exe")
+
+      )
+
+      '
+    data_model: Sysmon native
+    type: Splunk
+  data_model_references:
+  - process/create/exe
+  - process/create/image_path
+  - process/access/exe
+  - process/access/image_path
+  - process/terminate/exe
+  - process/terminate/image_path
+  d3fend_mappings:
+  - iri: d3f:ProcessSpawnAnalysis
+    id: D3-PSA
+    label: Process Spawn Analysis
+- title: BITSAdmin Download File
+  submission_date: 2021/05/11
+  information_domain: Analytic
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - Splunk Threat Research <research@splunk.com>
+  id: CAR-2021-05-005
+  description: The following query identifies Microsoft Background Intelligent Transfer
+    Service utility `bitsadmin.exe` using the `transfer` parameter to download a remote
+    object. In addition, look for `download` or `upload` on the command-line, the
+    switches are not required to perform a transfer. Capture any files downloaded.
+    Review the reputation of the IP or domain used. Typically once executed, a follow
+    on command will be used to execute the dropped file. Note that the network connection
+    or file modification events related will not spawn or create from `bitsadmin.exe`,
+    but the artifacts will appear in a parallel process of `svchost.exe` with a command-line
+    similar to `svchost.exe -k netsvcs -s BITS`. It's important to review all parallel
+    and child processes to capture any behaviors and artifacts. In some suspicious
+    and malicious instances, BITS jobs will be created. You can use `bitsadmin /list
+    /verbose` to list out the jobs during investigation.
+  coverage:
+  - technique: T1197
+    tactics:
+    - TA0005
+    - TA0003
+    coverage: Moderate
+  - technique: T1105
+    tactics:
+    - TA0011
+    coverage: Moderate
+  implementations:
+  - name: Pseudocode – detect BITS transfer jobs
+    description: Pseudocode implementation of the Splunk search below
+    code: "processes = search Process:Create\nbitsadmin_commands = filter processes\
+      \ where (\n  exe =\"C:\\Windows\\System32\\bitsadmin.exe\" AND command_line\
+      \ = *transfer*)\noutput bitsadmin_commands\n"
+    data_model: CAR native
+    type: Pseudocode
+  - name: Splunk code
+    description: To successfully implement this search you need to be ingesting information
+      on process that include the name of the process responsible for the changes
+      from your endpoints into the `Endpoint` datamodel in the `Processes` node.
+    code: '| tstats count min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes
+      where Processes.process_name=bitsadmin.exe Processes.process=*transfer* by Processes.dest
+      Processes.user Processes.parent_process Processes.process_name Processes.process
+      Processes.process_id Processes.parent_process_id'
+    type: Splunk
+    data_model: Endpoint
+  unit_tests:
+  - configurations:
+    - Using Splunk [Attack Range](https://github.com/splunk/attack_range)
+    description: Replay the detection [dataset](https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1197/atomic_red_team/windows-sysmon.log)
+      using the Splunk attack range with the commands below
+    commands:
+    - python attack_range.py replay -dn data_dump [--dump NAME_OF_DUMP]
+  - configurations:
+    - Using [Invoke-AtomicRedTeam](https://github.com/redcanaryco/invoke-atomicredteam)
+    description: execute the atomic test [T1197](https://github.com/redcanaryco/atomic-red-team/tree/master/atomics/T1197)
+      against a Windows target.
+    commands:
+    - Invoke-AtomicTest T1197
+  data_model_references:
+  - process/create/exe
+  - process/create/command_line
+  d3fend_mappings:
+  - iri: d3f:ProcessSpawnAnalysis
+    id: D3-PSA
+    label: Process Spawn Analysis
+- title: CertUtil Download With URLCache and Split Arguments
+  submission_date: 2021/05/11
+  information_domain: Analytic
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - Splunk Threat Research <research@splunk.com>
+  id: CAR-2021-05-006
+  description: Certutil.exe may download a file from a remote destination using `-urlcache`.
+    This behavior does require a URL to be passed on the command-line. In addition,
+    `-f` (force) and `-split` (Split embedded ASN.1 elements, and save to files) will
+    be used. It is not entirely common for `certutil.exe` to contact public IP space.
+    However, it is uncommon for `certutil.exe` to write files to world writeable paths.\
+    During triage, capture any files on disk and review. Review the reputation of
+    the remote IP or domain in question.
+  coverage:
+  - technique: T1105
+    tactics:
+    - TA0011
+    coverage: Moderate
+  implementations:
+  - name: Pseudocode – CertUtil download
+    description: Pseudocode implementation of the Splunk search below
+    code: "processes = search Process:Create\ncertutil_downloads = filter processes\
+      \ where (\n  exe =\"C:\\Windows\\System32\\certutil.exe\" AND command_line =\
+      \ *urlcache* AND command_line = *split*)\noutput certutil_downloads\n"
+    data_model: CAR native
+    type: Pseudocode
+  - name: Splunk code
+    description: To successfully implement this search you need to be ingesting information
+      on process that include the name of the process responsible for the changes
+      from your endpoints into the `Endpoint` datamodel in the `Processes` node.
+    code: '| tstats count min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes
+      where Processes.process_name=certutil.exe Processes.process=*urlcache* Processes.process=*split*
+      by Processes.dest Processes.user Processes.parent_process Processes.process_name
+      Processes.process Processes.process_id Processes.parent_process_id'
+    type: Splunk
+    data_model: Endpoint
+  unit_tests:
+  - configurations:
+    - Using Splunk [Attack Range](https://github.com/splunk/attack_range)
+    description: Replay the detection [dataset](https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1105/atomic_red_team/windows-sysmon.log)  using
+      the Splunk attack range with the commands below
+    commands:
+    - python attack_range.py replay -dn data_dump [--dump NAME_OF_DUMP]
+  - configurations:
+    - Using [Invoke-AtomicRedTeam](https://github.com/redcanaryco/invoke-atomicredteam)
+    description: execute the atomic test [T1105](https://github.com/redcanaryco/atomic-red-team/tree/master/atomics/T1105)
+      against a Windows target.
+    commands:
+    - Invoke-AtomicTest T1105
+  data_model_references:
+  - process/create/exe
+  - process/create/command_line
+  d3fend_mappings:
+  - iri: d3f:ProcessSpawnAnalysis
+    id: D3-PSA
+    label: Process Spawn Analysis
+- title: CertUtil Download With VerifyCtl and Split Arguments
+  submission_date: 2021/05/11
+  information_domain: Analytic
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - Splunk Threat Research <research@splunk.com>
+  id: CAR-2021-05-007
+  description: 'Certutil.exe may download a file from a remote destination using `-VerifyCtl`.
+    This behavior does require a URL to be passed on the command-line. In addition,
+    `-f` (force) and `-split` (Split embedded ASN.1 elements, and save to files) will
+    be used. It is not entirely common for `certutil.exe` to contact public IP space.
+    \ During triage, capture any files on disk and review. Review the reputation of
+    the remote IP or domain in question. Using `-VerifyCtl`, the file will either
+    be written to the current working directory or `%APPDATA%\..\LocalLow\Microsoft\CryptnetUrlCache\Content\<hash>`. '
+  coverage:
+  - technique: T1105
+    tactics:
+    - TA0011
+    coverage: Moderate
+  implementations:
+  - name: Pseudocode – CertUtil download with VerifyCtl
+    description: Pseudocode implementation of the Splunk search below
+    code: "processes = search Process:Create\ncertutil_downloads = filter processes\
+      \ where (\n  exe = \"C:\\Windows\\System32\\certutil.exe\" AND command_line\
+      \ = *verifyctl* AND command_line = *split*)\noutput certutil_downloads\n"
+    data_model: CAR native
+    type: Pseudocode
+  - name: Splunk code
+    description: To successfully implement this search you need to be ingesting information
+      on process that include the name of the process responsible for the changes
+      from your endpoints into the `Endpoint` datamodel in the `Processes` node.
+    code: '| tstats count min(_time) as firstTime max(_time) as lastTime from datamodel=Endpoint.Processes
+      where Processes.process_name=certutil.exe Processes.process=*verifyctl* Processes.process=*split*
+      by Processes.dest Processes.user Processes.parent_process Processes.process_name
+      Processes.process Processes.process_id Processes.parent_process_id'
+    type: Splunk
+    data_model: Endpoint
+  unit_tests:
+  - configurations:
+    - Using Splunk [Attack Range](https://github.com/splunk/attack_range)
+    description: Replay the detection [dataset](https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1105/atomic_red_team/windows-sysmon.log)  using
+      the Splunk attack range with the commands below
+    commands:
+    - python attack_range.py replay -dn data_dump [--dump NAME_OF_DUMP]
+  - configurations:
+    - Using [Invoke-AtomicRedTeam](https://github.com/redcanaryco/invoke-atomicredteam)
+    description: execute the atomic test [T1105](https://github.com/redcanaryco/atomic-red-team/tree/master/atomics/T1105)
+      against a Windows target.
+    commands:
+    - Invoke-AtomicTest T1105
+  data_model_references:
+  - process/create/exe
+  - process/create/command_line
+  d3fend_mappings:
+  - iri: d3f:ProcessSpawnAnalysis
+    id: D3-PSA
+    label: Process Spawn Analysis
+- title: Create Remote Thread into LSASS
+  submission_date: 2021/05/11
+  information_domain: Analytic
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  analytic_types:
+  - TTP
+  contributors:
+  - Splunk Threat Research <research@splunk.com>
+  id: CAR-2021-05-011
+  description: Actors may create a remote thread into the LSASS service as part of
+    a workflow to dump credentials.
+  coverage:
+  - technique: T1003
+    subtechniques:
+    - T1003.001
+    tactics:
+    - TA0006
+    coverage: Moderate
+  implementations:
+  - name: Pseudocode – Remote thread creation into LSASS
+    description: Pseudocode implementation of the Splunk search below. The CAR data
+      model does not currently contain a Target Image field, for remote thread creation,
+      so this code Is somewhat inexact. See the Splunk implementation for a more precise
+      search for the lsass image target.
+    code: 'remote_threads = search Thread:remote_create
+
+      lsass_remote_create = filter remote_threads where "lsass" in raw event
+
+      output lsass_remote_create
+
+      '
+    data_model: CAR native
+    type: Pseudocode
+  - name: Splunk code
+    description: 'This search needs Sysmon Logs with a Sysmon configuration, which
+      includes EventCode 8 with lsass.exe. This search uses an input macro named `sysmon`.
+      We strongly recommend that you specify your environment-specific configurations
+      (index, source, sourcetype, etc.) for Windows Sysmon logs. Replace the macro
+      definition with configurations for your Splunk environment. The search also
+      uses a post-filter macro designed to filter out known false positives.
+
+      '
+    code: '`sysmon` EventID=8 TargetImage=*lsass.exe | stats count min(_time) as firstTime
+      max(_time) as lastTime by Computer, EventCode, TargetImage, TargetProcessId
+      | rename Computer as dest'
+    type: Splunk
+    data_model: ''
+  unit_tests:
+  - configurations:
+    - Using Splunk [Attack Range](https://github.com/splunk/attack_range)
+    description: 'Replay the detection [dataset](https://media.githubusercontent.com/media/splunk/attack_data/master/datasets/attack_techniques/T1003.001/atomic_red_team/windows-sysmon.log)
+      using the Splunk attack range with the commands below
+
+      '
+    commands:
+    - python attack_range.py replay -dn data_dump [--dump NAME_OF_DUMP]
+  - configurations:
+    - Using [Invoke-AtomicRedTeam](https://github.com/redcanaryco/invoke-atomicredteam)
+    description: execute the atomic test [T1003.001](https://github.com/redcanaryco/atomic-red-team/tree/master/atomics/T1003.001)
+      against a Windows target.
+    commands:
+    - Invoke-AtomicTest T1003.001
+  data_model_references:
+  - thread/remote_create
+  d3fend_mappings:
+  - iri: d3f:SystemCallAnalysis
+    id: D3-SCA
+    label: System Call Analysis
+- title: Registry Edit with Creation of SafeDllSearchMode Key Set to 0
+  submission_date: 2021/11/24
+  information_domain: Host
+  platforms:
+  - Windows
+  subtypes:
+  - Process
+  - Registry
+  analytic_types:
+  - TTP
+  contributors:
+  - Lucas Heiligenstein
+  id: CAR-2021-11-001
+  description: Detection of creation of registry key HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session
+    Manager\SafeDllSearchMode. The key SafeDllSearchMode, if set to 0, will block
+    the Windows mechanism for the search DLL order and adversaries may execute their
+    own malicious dll.
+  coverage:
+  - technique: T1574
+    tactics:
+    - TA0003
+    - TA0004
+    - TA0005
+    subtechniques:
+    - T1574.001
+    coverage: Medium
+  - technique: T1112
+    tactics:
+    - TA0005
+    coverage: Medium
+  implementations:
+  - name: Creation of SafeDllSearchMode
+    description: This detects SafeDllSearchMode creation, either via a new process
+      (command line) or direct registry manipulation.
+    code: 'processes = search Process:create
+
+      safe_dll_search_processes = filter processes where command_line CONTAINS("*SafeDllSearchMode*")
+      AND ((command_line CONTAINS("*reg*") AND command_line CONTAINS("*add*") AND
+      command_line CONTAINS("*/d*")) OR (command_line CONTAINS("*Set-ItemProperty*")
+      AND command_line CONTAINS(*-value*)) OR ((command_line CONTAINS("*00000000*")
+      AND command_line CONTAINS(*0*)))
+
+      reg_keys = search Registry:value_edit
+
+      safe_dll_reg_keys = filter reg_keys where value="SafeDllSearchMode" AND value_data="0"
+
+      output safe_dll_search_processes, safe_dll_reg_keys
+
+      '
+    data_model: CAR native
+    type: Pseudocode
+  - name: Splunk Search - Creation of SafeDllSearchMode
+    description: This is a Splunk representation of the above pseudocode.
+    code: '(source="WinEventLog:*" ((((EventCode="4688" OR EventCode="1") ((CommandLine="*reg*"
+      CommandLine="*add*" CommandLine="*/d*") OR (CommandLine="*Set-ItemProperty*"
+      CommandLine="*-value*")) (CommandLine="*00000000*" OR CommandLine="*0*") CommandLine="*SafeDllSearchMode*")
+      OR ((EventCode="4657") ObjectValueName="SafeDllSearchMode" value="0")) OR ((EventCode="13")
+      EventType="SetValue" TargetObject="*SafeDllSearchMode" Details="DWORD (0x00000000)")))
+
+      '
+    data_model: Win. Eventlog/Sysmon native
+    type: Splunk
+  - name: Elastic Search - Creation of SafeDllSearchMode
+    description: This is an Elastic representation of the above pseudocode.
+    code: '(((EventCode:("4688" OR "1") AND ((process.command_line:*reg* AND process.command_line:*add*
+      AND process.command_line:*\/d*) OR (process.command_line:*Set\-ItemProperty*
+      AND process.command_line:*\-value*)) AND process.command_line:(*00000000* OR
+      *0*) AND process.command_line:*SafeDllSearchMode*) OR (EventCode:"4657" AND
+      winlog.event_data.ObjectValueName:"SafeDllSearchMode" AND value:"0")) OR (EventCode:"13"
+      AND winlog.event_data.EventType:"SetValue" AND winlog.event_data.TargetObject:*SafeDllSearchMode
+      AND winlog.event_data.Details:"DWORD\ \(0x00000000\)"))
+
+      '
+    data_model: Win. Eventlog/Sysmon native
+    type: Elastic
+  - name: LogPoint Search - Creation of SafeDllSearchMode
+    description: This is a LogPoint representation of the above pseudocode.
+    code: '(((EventCode IN ["4688", "1"] ((CommandLine="*reg*" CommandLine="*add*"
+      CommandLine="*/d*") OR (CommandLine="*Set-ItemProperty*" CommandLine="*-value*"))
+      CommandLine IN ["*00000000*", "*0*"] CommandLine="*SafeDllSearchMode*") OR (EventCode
+      IN "4657" ObjectValueName="SafeDllSearchMode" value="0")) OR (EventCode IN "13"
+      EventType="SetValue" TargetObject="*SafeDllSearchMode" Details="DWORD (0x00000000)"))
+
+      '
+    data_model: Win. Eventlog/Sysmon native
+    type: LogPoint
+  unit_tests:
+  - description: Execute command with cmd
+    commands:
+    - reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager"
+      /v SafeDllSearchMode /d 0
+  - description: Execute command with powershell
+    commands:
+    - Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Session Manager"
+      -Name SafeDllSearchMode -Value 0
+  data_model_references:
+  - process/create/command_line
+  - registry/add/key
+  d3fend_mappings:
+  - iri: d3f:ProcessSpawnAnalysis
+    id: D3-PSA
+    label: Process Spawn Analysis
