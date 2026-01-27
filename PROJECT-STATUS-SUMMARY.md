@@ -1,6 +1,6 @@
 # KGCS Project Status Summary
 
-**Date:** January 26, 2026 (Updated)  
+**Date:** January 27, 2026 (Updated)  
 **Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟢 In Progress (MVP) | Phase 4 🔵 Designed | Phase 5 🔵 Planned
 
 ## Sources
@@ -53,7 +53,7 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 
 ## Phase 3 — Data Ingestion (🟢 In Progress - MVP Core)
 
-**Status:** ETL operational for all core standards except CAR; SHACL validation passing with parallel streaming. Neo4j loader pending.
+**Status:** ETL operational for all core standards except CAR; SHACL validation passing with parallel streaming. Neo4j loader and constraints are in-progress (branch work).
 
 ### Completed
 
@@ -83,8 +83,8 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 - [x] Raw data validation (production-scale testing) ✅ COMPLETE (CPE 217 MB + CVE 2026 5 MB, 0 violations)
 - [x] Parallel SHACL streaming validation ✅ COMPLETE (per-standard summaries)
 - [ ] CAR ETL from raw (YAML) and validation
-- [ ] Implement Neo4j loader (Turtle → Cypher)
-- [ ] Create graph constraints and indexes
+- [ ] Implement Neo4j loader (Turtle → Cypher) — in progress (streaming dry-run + chunked processing)
+- [ ] Create graph constraints and indexes — in progress (expanded core-ID constraints)
 - [ ] End-to-end tests (ETL → SHACL → Neo4j)
 - [ ] CI pipeline for ingestion and artifacts
 
@@ -128,7 +128,7 @@ Phase 3 MVP completion requires:
 
 ## Update Summary
 
-- **Date:** January 26, 2026  
+- **Date:** January 27, 2026  
 - **Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟢 In Progress (MVP) | Phase 4 🔵 Designed | Phase 5 🔵 Planned  
 
 ### Recent Developments
@@ -137,10 +137,14 @@ Phase 3 MVP completion requires:
 - **SHACL Validation:** Parallel streaming validation completed with per-standard summary reports.  
 - **CPEMatch Fix:** `Platform` nodes now emit `cpeNameId` and correct `cpeUri`, and CPEMatch validation conforms (0 violations).  
 - **Repo Hygiene:** Removed oversized CPEMatch summary report from history; added ignore rule to prevent reintroduction.  
+- **Neo4j Loader (WIP):** Streaming dry-run with chunking and progress added; large TTLs can be processed without full in-memory load.  
+- **Neo4j Constraints (WIP):** Core-ID uniqueness constraints expanded for all standards.  
 - **Download Pipeline:** Daily downloader runs cleanly with fixed raw-path handling and no duplicate downloads.  
 
-### Next Steps
+### Next Steps (Phase 3 Completion Order)
 
-- Continue Phase 3 MVP work: Neo4j loader, constraints, and end-to-end tests.  
-- Implement CAR raw YAML ETL + SHACL validation.  
-- Prepare for Phase 4 implementation based on current findings and feedback.
+1. Finish Neo4j loader PR (streaming load + CLI options) and merge.  
+2. Merge expanded Neo4j constraints/indexes.  
+3. Implement end-to-end test suite (ETL → SHACL → Neo4j) using pipeline outputs.  
+4. Add CAR raw YAML ETL + SHACL validation.  
+5. Add CI job for ingestion artifacts and end-to-end checks.
