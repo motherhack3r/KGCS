@@ -73,6 +73,9 @@ import json
 import os
 import sys
 from datetime import datetime
+from pathlib import Path
+
+import ijson
 
 
 def turtle_escape(s: str) -> str:
@@ -87,7 +90,69 @@ def subject_for_cve(cve_id: str) -> str:
     return '<https://cve.mitre.org/cgi-bin/cvename.cgi?name=%s>' % cve_id
 
 
-def process_vulnerability(item, out_f):
+def subject_for_config(match_id: str) -> str:
+    return f"<https://example.org/platformConfiguration/{match_id}>"
+
+
+def _extract_configs(item: dict):
+    if not isinstance(item, dict):
+        return None
+    cve = item.get('cve') if isinstance(item.get('cve'), dict) else None
+    if cve and isinstance(cve.get('configurations'), (list, dict)):
+        return cve.get('configurations')
+    return item.get('configurations')
+
+
+def _iter_match_criteria_ids(configs, criteria_to_match_id=None):
+    if not configs:
+        return
+    if isinstance(configs, dict):
+        nodes = configs.get('nodes') or configs.get('configurations') or []
+    elif isinstance(configs, list):
+        nodes = []
+        for entry in configs:
+            if isinstance(entry, dict) and isinstance(entry.get('nodes'), list):
+                nodes.extend(entry.get('nodes'))
+            else:
+                nodes.append(entry)
+    else:
+        return
+
+    stack = list(nodes)
+    while stack:
+        node = stack.pop()
+        if not isinstance(node, dict):
+            continue
+        for match in node.get('cpeMatch', []) or []:
+            if isinstance(match, dict):
+                match_id = match.get('matchCriteriaId')
+                if match_id:
+                    yield match_id
+                    continue
+                if criteria_to_match_id:
+                    criteria = match.get('criteria') or match.get('cpe23Uri')
+                    if criteria:
+                        mapped = criteria_to_match_id.get(criteria)
+                        if mapped:
+                            yield mapped
+        for match in node.get('cpe_match', []) or []:
+            if isinstance(match, dict):
+                match_id = match.get('matchCriteriaId')
+                if match_id:
+                    yield match_id
+                    continue
+                if criteria_to_match_id:
+                    criteria = match.get('criteria') or match.get('cpe23Uri')
+                    if criteria:
+                        mapped = criteria_to_match_id.get(criteria)
+                        if mapped:
+                            yield mapped
+        children = node.get('children') or []
+        if children:
+            stack.extend(children)
+
+
+def process_vulnerability(item, out_f, criteria_to_match_id=None):
     cve_id = None
     if isinstance(item, dict):
         if 'cve' in item and isinstance(item['cve'], dict):
@@ -175,6 +240,18 @@ def process_vulnerability(item, out_f):
             out_f.write(f"{subj} <http://purl.org/dc/terms/references> <{url}> .\n")
             triples += 1
 
+    # configurations: link PlatformConfiguration -> Vulnerability via matchCriteriaId
+    configs = _extract_configs(item)
+    if configs:
+        seen = set()
+        for match_id in _iter_match_criteria_ids(configs, criteria_to_match_id):
+            if match_id in seen:
+                continue
+            seen.add(match_id)
+            config_subj = subject_for_config(match_id)
+            out_f.write(f"{config_subj} <https://example.org/sec/core#affected_by> {subj} .\n")
+            triples += 1
+
     return triples
 
 
@@ -197,10 +274,38 @@ def iter_vulnerabilities_from_file(path):
                     yield item
 
 
+def _iter_cpematch_files(path: str):
+    if os.path.isdir(path):
+        for p in sorted(Path(path).rglob('*.json')):
+            yield str(p)
+    else:
+        yield path
+
+
+def build_cpematch_index(path: str) -> dict:
+    criteria_to_match_id = {}
+    for file_path in _iter_cpematch_files(path):
+        if not os.path.exists(file_path):
+            continue
+        with open(file_path, 'r', encoding='utf-8') as fh:
+            for item in ijson.items(fh, 'matchStrings.item'):
+                ms = item.get('matchString') if isinstance(item, dict) else None
+                if not isinstance(ms, dict):
+                    ms = item if isinstance(item, dict) else None
+                if not ms:
+                    continue
+                criteria = ms.get('criteria')
+                match_id = ms.get('matchCriteriaId')
+                if criteria and match_id and criteria not in criteria_to_match_id:
+                    criteria_to_match_id[criteria] = match_id
+    return criteria_to_match_id
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', '-i', required=True, help='Input JSON file or directory')
     parser.add_argument('--output', '-o', required=True, help='Output Turtle file (.ttl)')
+    parser.add_argument('--cpematch-input', help='Optional CPEMatch JSON file/dir to resolve criteria → matchCriteriaId')
     args = parser.parse_args()
 
     paths = []
@@ -214,17 +319,24 @@ def main():
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     total = 0
     header = (
+        "@prefix sec: <https://example.org/sec/core#> .\n"
         "@prefix dcterms: <http://purl.org/dc/terms/> .\n"
         "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n"
         "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\n"
     )
+
+    criteria_to_match_id = None
+    if args.cpematch_input:
+        print(f"Building CPEMatch criteria index from {args.cpematch_input}...", file=sys.stderr)
+        criteria_to_match_id = build_cpematch_index(args.cpematch_input)
+        print(f"CPEMatch criteria index size: {len(criteria_to_match_id)}", file=sys.stderr)
 
     with open(args.output, 'w', encoding='utf-8') as out_f:
         out_f.write(header)
         for p in paths:
             print('Processing', p, file=sys.stderr)
             for item in iter_vulnerabilities_from_file(p):
-                total += process_vulnerability(item, out_f)
+                total += process_vulnerability(item, out_f, criteria_to_match_id)
 
     print(f'Done — triples written: {total}', file=sys.stderr)
 
