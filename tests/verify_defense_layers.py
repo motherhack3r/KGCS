@@ -5,13 +5,13 @@ from rdflib import Graph, Namespace, RDF
 
 g = Graph()
 # Load all layers
-g.parse('tmp/pipeline-stage6-capec.ttl', format='turtle')
-g.parse('tmp/pipeline-stage7-cwe.ttl', format='turtle')
-g.parse('tmp/pipeline-stage4-attack.ttl', format='turtle')
-g.parse('tmp/pipeline-stage5-d3fend.ttl', format='turtle')
-g.parse('tmp/pipeline-stage11-car.ttl', format='turtle')
-g.parse('tmp/pipeline-stage9-shield.ttl', format='turtle')
-g.parse('tmp/pipeline-stage10-engage.ttl', format='turtle')
+g.parse('tmp/sample_capec_impl.ttl', format='turtle')
+g.parse('tmp/sample_cwe.ttl', format='turtle')
+g.parse('tmp/sample_attack.ttl', format='turtle')
+g.parse('tmp/sample_d3fend.ttl', format='turtle')
+g.parse('tmp/sample_car.ttl', format='turtle')
+g.parse('tmp/sample_shield.ttl', format='turtle')
+g.parse('tmp/sample_engage.ttl', format='turtle')
 
 SEC = Namespace('https://example.org/sec/core#')
 RDFS = Namespace('http://www.w3.org/2000/01/rdf-schema#')
