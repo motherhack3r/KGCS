@@ -355,6 +355,8 @@ def _write_chunk_file(lines: List[str], idx: int) -> str:
         tf.write('@prefix dcterms: <http://purl.org/dc/terms/> .\n')
         tf.write('@prefix sec: <https://example.org/sec/core#> .\n')
         tf.write('@prefix ex: <https://example.org/> .\n\n')
+        tf.write('@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n')
+        tf.write('@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\n')
         for line in lines:
             tf.write(line)
     return tmp_path

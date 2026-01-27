@@ -39,6 +39,7 @@ def test_phase3_etl_pipeline_order():
         TMP_DIR / "pipeline-stage5-d3fend.ttl",
         TMP_DIR / "pipeline-stage6-capec.ttl",
         TMP_DIR / "pipeline-stage7-cwe.ttl",
+        TMP_DIR / "pipeline-stage8-car.ttl",
         TMP_DIR / "pipeline-stage9-shield.ttl",
         TMP_DIR / "pipeline-stage10-engage.ttl",
     ]

@@ -124,9 +124,17 @@ def main():
 
     print("\n[STAGE 7] Transform CWE → Weakness nodes")
     print("-" * 70)
-    if has_any_input('data/cwe/raw/cwec_v4.19.1.xml'):
+    cwe_input = None
+    if has_any_input('data/cwe/raw/cwec_latest.xml'):
+        cwe_input = 'data/cwe/raw/cwec_latest.xml'
+    else:
+        candidates = glob.glob('data/cwe/raw/cwec*.xml')
+        if candidates:
+            cwe_input = sorted(candidates)[0]
+
+    if cwe_input:
         if not run_etl('etl_cwe',
-                       'data/cwe/raw/cwec_v4.19.1.xml',
+                       cwe_input,
                        'tmp/pipeline-stage7-cwe.ttl'):
             print("CWE ETL failed")
             return 1
