@@ -279,14 +279,25 @@ class RDFtoNeo4jTransformer:
         """Create indexes in Neo4j."""
         print(f"   Creating indexes...")
         
-        indexes = [
-            ("Platform", "cpeNameId", "platform_cpe_id_unique"),
+        constraints = [
+            ("Platform", "cpeNameId", "platform_cpe_name_id_unique"),
+            ("Platform", "cpeUri", "platform_cpe_uri_unique"),
+            ("PlatformConfiguration", "matchCriteriaId", "platform_config_match_id_unique"),
             ("Vulnerability", "cveId", "vulnerability_cve_id_unique"),
-            ("Platform", "uri", "platform_uri_unique"),
-            ("Vulnerability", "uri", "vulnerability_uri_unique"),
+            ("Weakness", "cweId", "weakness_cwe_id_unique"),
+            ("AttackPattern", "capecId", "attackpattern_capec_id_unique"),
+            ("Technique", "attackTechniqueId", "technique_attack_id_unique"),
+            ("SubTechnique", "attackTechniqueId", "subtechnique_attack_id_unique"),
+            ("Tactic", "tacticId", "tactic_id_unique"),
+            ("DefensiveTechnique", "d3fendId", "deftech_d3fend_id_unique"),
+            ("DetectionAnalytic", "carId", "car_id_unique"),
+            ("DeceptionTechnique", "shieldId", "deception_shield_id_unique"),
+            ("EngagementConcept", "engageId", "engage_id_unique"),
+            ("Reference", "referenceUrl", "reference_url_unique"),
+            ("Score", "uri", "score_uri_unique"),
         ]
         
-        for label, property_name, constraint_name in indexes:
+        for label, property_name, constraint_name in constraints:
             try:
                 session.run(f"""
                     CREATE CONSTRAINT {constraint_name} IF NOT EXISTS
