@@ -11,7 +11,7 @@
 
 ## Executive Summary
 
-KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validation framework). Phase 3 ETL transforms raw data for all core standards except CAR and validates via parallel SHACL streaming with summary reports. The Neo4j loader exists with chunked processing/dry-run support, but end-to-end load tests and CI ingestion remain pending. Phases 4–5 are designed but not implemented. Critical path remains Phase 3 MVP (Neo4j load + end-to-end validation).
+KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validation framework). Phase 3 ETL transforms raw data for all core standards except CAR and validates via parallel SHACL streaming with summary reports. The Neo4j loader exists with chunked processing/dry-run support, but production-grade load verification and ingestion CI are still pending. Phases 4–5 are designed but not implemented. Critical path remains Phase 3 MVP (CAR raw ETL + Neo4j load + end-to-end validation).
 
 ## Key Metrics
 
@@ -21,7 +21,7 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 - **31 Validation Reports** — artifacts generated ✅
 - **9 ETL Wrappers + 9 Transformers** — all operational ✅
 - **3 Extension Ontologies** — designed (Incident, Risk, ThreatActor) ✅
-- **9 ETL Outputs** — CPE, CPEMatch, CVE, ATT&CK, D3FEND, CAPEC, CWE, SHIELD, ENGAGE ✅
+- **9 ETL Outputs** — CPE, CPEMatch, CVE, ATT&CK, D3FEND, CAPEC, CWE, SHIELD, ENGAGE ✅ (CAR raw ETL pending)
 - **9 SHACL Summary Reports** — per-standard summaries generated ✅
 - **222 MB raw data validated** — CPE (217 MB) + CVE 2026 (5 MB) production-scale testing ✅
 
@@ -39,7 +39,7 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 
 ## Phase 2 — SHACL Validation (✅ Complete)
 
-**Status:** Full validation framework deployed with CI/CD integration.
+**Status:** Full validation framework deployed; CI workflow present (enforcement TBD).
 
 ### Phase 2 Checklist
 
@@ -53,7 +53,7 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 
 ## Phase 3 — Data Ingestion (🟢 In Progress - MVP Core)
 
-**Status:** ETL operational for all core standards except CAR; SHACL validation passing with parallel streaming. Neo4j loader exists with chunked processing; end-to-end load tests and CI ingestion remain pending.
+**Status:** ETL operational for all core standards except CAR; SHACL validation passing with parallel streaming. Neo4j loader exists with chunked processing; full load verification and CI ingestion remain pending.
 
 ### Completed
 
@@ -72,16 +72,11 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 - [x] ENGAGE ETL tested & validated (JSON)
 - [x] PlatformConfiguration mapping complete (includes excluding bounds, status, timestamps, match expansion)
 - [x] Match expansion feature tested with populated matches arrays (synthetic CVE data)
-- [x] All four ETL test runs passing SHACL validation
+- [x] Sample ETL suite available (tests/test_phase3_comprehensive.py)
 
 ### MVP Checklist (Remaining)
 
-- [ ] Bootstrap infra (requirements, Neo4j docker-compose, setup scripts)
-- [x] Validate CPE/CVE ETL with NVD samples ✅ COMPLETE
-- [x] Confirm `PlatformConfiguration` mapping ✅ COMPLETE (all 10 properties: 4 bounds + status + 2 dates + CPE expansion)
-- [x] Test match expansion feature ✅ COMPLETE (6 Platform nodes created from matches array, SHACL conforms)
-- [x] Raw data validation (production-scale testing) ✅ COMPLETE (CPE 217 MB + CVE 2026 5 MB, 0 violations)
-- [x] Parallel SHACL streaming validation ✅ COMPLETE (per-standard summaries)
+- [ ] Neo4j bootstrap scripts (docker-compose/setup) if required for team onboarding
 - [ ] CAR ETL from raw (YAML) and validation
 - [ ] End-to-end Neo4j load (loader exists; needs verification on real outputs)
 - [ ] Verify/apply graph constraints and indexes in Neo4j
@@ -117,10 +112,11 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 
 Phase 3 MVP completion requires:
 
-1. Neo4j loader implementation (Turtle → Cypher) — 2-3 days
-2. Graph constraints & indexes — 1-2 days
-3. End-to-end integration tests — 2-3 days
-4. CI automation — 1-2 days
+1. CAR raw ETL + SHACL validation
+2. Neo4j load verification on real pipeline outputs
+3. Graph constraints & indexes verification
+4. End-to-end integration tests
+5. CI ingestion automation
 
 **Estimated timeline:** 6-10 days to production-ready Neo4j load with full CPE/CVE coverage. Phase 4–5 can begin in parallel (extension ETL, RAG framework).
 
@@ -153,14 +149,16 @@ Phase 3 MVP completion requires:
 - **SHACL Validation:** Parallel streaming validation completed with per-standard summary reports.  
 - **CPEMatch Fix:** `Platform` nodes now emit `cpeNameId` and correct `cpeUri`, and CPEMatch validation conforms (0 violations).  
 - **Repo Hygiene:** Removed oversized CPEMatch summary report from history; added ignore rule to prevent reintroduction.  
-- **Neo4j Loader:** Chunked dry-run with progress exists in [src/etl/rdf_to_neo4j.py](../src/etl/rdf_to_neo4j.py); full end-to-end load still pending.  
+- **Neo4j Loader:** Chunked dry-run with progress exists in [src/etl/rdf_to_neo4j.py](src/etl/rdf_to_neo4j.py); full end-to-end load verification still pending.  
 - **Neo4j Constraints:** Core-ID uniqueness constraints defined in the loader; need verification in a live DB.  
 - **Download Pipeline:** Daily downloader runs cleanly with fixed raw-path handling and no duplicate downloads.  
+- **CI Ingestion Smoke:** Workflow added in [.github/workflows/phase3-ingest-smoke.yml](.github/workflows/phase3-ingest-smoke.yml) to run sample ETL + validate artifacts.  
 
 ### Next Steps (Phase 3 Completion Order)
 
-1. Finish Neo4j loader PR (streaming load + CLI options) and merge.  
-2. Merge expanded Neo4j constraints/indexes.  
-3. Implement end-to-end test suite (ETL → SHACL → Neo4j) using pipeline outputs.  
-4. Add CAR raw YAML ETL + SHACL validation.  
-5. Add CI job for ingestion artifacts and end-to-end checks.
+1. Add CAR raw YAML ETL + SHACL validation.  
+2. Verify Neo4j loader on pipeline TTLs (chunked load).  
+3. Verify Neo4j constraints/indexes in a live DB.  
+4. Implement end-to-end test suite (ETL → SHACL → Neo4j) using pipeline outputs.  
+5. Wire ingestion checks into CI (artifact upload + gating).
+
