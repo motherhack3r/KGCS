@@ -107,6 +107,13 @@ Each extension lives in its own OWL file and imports the core ontology.
 * `scripts/legacy/phase4/` archives the one-off repair/verification scripts (`repair_cpe_properties.py`, `diagnose_cpe_mismatch.py`, `check_buggy_pattern.py`, etc.) that were needed during the CPE parsing fix but are no longer part of normal ingestion.
 * Regression and integration suites now live under `tests/` so the repository root stays focused on documentation, configuration, and operational scripts.
 
+### Verification Utilities (RDF/Turtle)
+
+* [tests/verify_causal_chain.py](tests/verify_causal_chain.py) — offline sanity check of CWE→CAPEC→Technique→Tactic using the pipeline Turtle outputs in tmp.
+* [tests/verify_defense_layers.py](tests/verify_defense_layers.py) — offline sanity check of defense-layer links (D3FEND/CAR/SHIELD/ENGAGE) against ATT&CK using the pipeline Turtle outputs in tmp.
+
+These are manual verification utilities (not pytest tests) and expect the corresponding tmp/pipeline-stage*.ttl files to exist.
+
 ---
 
 ## 🤝 Contributing
