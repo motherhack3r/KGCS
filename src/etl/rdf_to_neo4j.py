@@ -7,12 +7,15 @@ the causal chain: CPE -> CVE -> CWE -> CAPEC -> ATT&CK -> {D3FEND, CAR, SHIELD, 
 """
 
 import argparse
+import os
 import sys
+import tempfile
 from pathlib import Path
-from typing import Dict, List
+from typing import Any, Dict, List, Tuple
 from dataclasses import dataclass
 from dotenv import load_dotenv
 from collections import defaultdict
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 # Load configuration
 env_devel_path = Path(__file__).parent.parent.parent / ".env.devel"
@@ -20,7 +23,7 @@ load_dotenv(env_devel_path)
 
 from src.config import neo4j_config
 from rdflib import Graph, Namespace, RDF, Literal, URIRef
-from neo4j import GraphDatabase
+from rdflib.term import Node
 from datetime import datetime
 
 
@@ -29,7 +32,7 @@ class NodeData:
     """Represents a node to be created in Neo4j."""
     label: str
     uri: str
-    properties: Dict[str, any]
+    properties: Dict[str, Any]
 
 
 @dataclass
@@ -38,7 +41,7 @@ class RelationshipData:
     source_uri: str
     target_uri: str
     relationship_type: str
-    properties: Dict[str, any]
+    properties: Dict[str, Any]
 
 
 class RDFtoNeo4jTransformer:
@@ -73,10 +76,11 @@ class RDFtoNeo4jTransformer:
         print(f"   * Loaded {len(g)} triples")
         return g
     
-    def extract_nodes_and_relationships(self, g: Graph) -> None:
+    def extract_nodes_and_relationships(self, g: Graph, verbose: bool = True) -> None:
         """Extract nodes and relationships from RDF graph."""
-        print(f"\nExtracting nodes and relationships...")
-        core_types_by_subject: Dict[URIRef, List[str]] = {}
+        if verbose:
+            print(f"\nExtracting nodes and relationships...")
+        core_types_by_subject: Dict[Node, List[str]] = {}
         for subject in g.subjects(RDF.type, None):
             type_labels = []
             for obj in g.objects(subject, RDF.type):
@@ -116,9 +120,10 @@ class RDFtoNeo4jTransformer:
             ))
             self.stats['relationships'] += 1
 
-        for label, count in sorted(self.stats['labels'].items()):
-            print(f"   * {label}: {count}")
-        print(f"   * Relationships: {self.stats['relationships']}")
+        if verbose:
+            for label, count in sorted(self.stats['labels'].items()):
+                print(f"   * {label}: {count}")
+            print(f"   * Relationships: {self.stats['relationships']}")
     
     def _extract_node(self, subject, g: Graph, labels: List[str]) -> None:
         """Extract node properties for any core class."""
@@ -192,24 +197,26 @@ class RDFtoNeo4jTransformer:
         # Insert underscore before uppercase in sequences
         return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).upper()
 
-    def _local_name(self, uri: URIRef) -> str:
+    def _local_name(self, uri: Node) -> str:
         """Return the local name for a URIRef."""
         return str(uri).split('#')[-1]
 
-    def _is_core_uri(self, uri: URIRef) -> bool:
+    def _is_core_uri(self, uri: Node) -> bool:
         """Check if a URIRef is in the core namespace."""
         return str(uri).startswith(self.sec_ns_str)
     
-    def load_to_neo4j(self, driver) -> bool:
+    def load_to_neo4j(self, driver, include_indexes: bool = True, include_stats: bool = True) -> bool:
         """Load nodes and relationships into Neo4j."""
         print(f"\nLoading to Neo4j...")
         
         try:
             with driver.session(database=neo4j_config.database) as session:
-                self._create_indexes(session)
+                if include_indexes:
+                    self._create_indexes(session)
                 self._load_nodes_batch(session)
                 self._load_relationships(session)
-                self._get_database_stats(session)
+                if include_stats:
+                    self._get_database_stats(session)
             return True
             
         except Exception as e:
@@ -330,11 +337,98 @@ class RDFtoNeo4jTransformer:
         print(f"\n   TOTAL: {total_nodes} nodes, {total_rels} relationships")
 
 
+def _write_chunk_file(lines: List[str], idx: int) -> str:
+    tmp_fd, tmp_path = tempfile.mkstemp(suffix=f'.chunk{idx}.ttl')
+    os.close(tmp_fd)
+    with open(tmp_path, 'w', encoding='utf-8') as tf:
+        tf.write('@prefix dcterms: <http://purl.org/dc/terms/> .\n')
+        tf.write('@prefix sec: <https://example.org/sec/core#> .\n')
+        tf.write('@prefix ex: <https://example.org/> .\n\n')
+        for line in lines:
+            tf.write(line)
+    return tmp_path
+
+
+def chunk_ttl_file(data_path: str, chunk_size: int) -> Tuple[List[Tuple[int, str]], int]:
+    total_triples = 0
+    idx = 0
+    chunk_files: List[Tuple[int, str]] = []
+    current_subject = None
+    current_chunk_subjects = set()
+    chunk_lines: List[str] = []
+
+    with open(data_path, 'r', encoding='utf-8') as fh:
+        for line in fh:
+            if not line.strip():
+                continue
+            if line.startswith('@prefix') or line.startswith('PREFIX') or line.startswith('#'):
+                continue
+            parts = line.split(None, 1)
+            if not parts:
+                continue
+            subj = parts[0]
+            if current_subject is None:
+                current_subject = subj
+            if subj != current_subject:
+                if subj not in current_chunk_subjects:
+                    current_chunk_subjects.add(subj)
+                if len(current_chunk_subjects) >= chunk_size:
+                    idx += 1
+                    tmp_path = _write_chunk_file(chunk_lines, idx)
+                    chunk_files.append((idx, tmp_path))
+                    chunk_lines = []
+                    current_chunk_subjects = set()
+                    current_subject = subj
+            chunk_lines.append(line)
+            total_triples += 1
+
+    if chunk_lines:
+        idx += 1
+        tmp_path = _write_chunk_file(chunk_lines, idx)
+        chunk_files.append((idx, tmp_path))
+
+    return chunk_files, total_triples
+
+
+def _dry_run_chunk(tmp_path: str) -> Dict[str, Any]:
+    g = Graph()
+    g.parse(tmp_path, format='turtle')
+    transformer = RDFtoNeo4jTransformer(tmp_path)
+    transformer.extract_nodes_and_relationships(g, verbose=False)
+    return {
+        'labels': dict(transformer.stats['labels']),
+        'relationships': transformer.stats['relationships'],
+    }
+
+
+def _merge_label_counts(target: Dict[str, int], delta: Dict[str, int]) -> None:
+    for key, value in delta.items():
+        target[key] = target.get(key, 0) + value
+
+
+def _update_progress(completed: int, total: int, worker_id: int | None = None, progress_newline: bool = False) -> None:
+    percent = (completed / total) * 100 if total else 100
+    bar_width = 20
+    filled = int(bar_width * (percent / 100)) if total else bar_width
+    bar = "=" * filled + "." * (bar_width - filled)
+    message = f"Processed {completed}/{total} chunks ({percent:0.1f}%) [{bar}]"
+    if worker_id is not None:
+        message = f"{message} (worker {worker_id})"
+    if progress_newline:
+        print(message, flush=True)
+    else:
+        print(f"\r{message}", end='', flush=True)
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="RDF-to-Neo4j loader")
     parser.add_argument("--ttl", required=False, default="tmp/phase3_combined.ttl", help="Input Turtle file")
     parser.add_argument("--batch-size", type=int, default=1000, help="Neo4j batch size")
+    parser.add_argument("--dry-run", action="store_true", help="Parse and extract without loading to Neo4j")
+    parser.add_argument("--chunk-size", type=int, default=0, help="Unique subjects per chunk (0 = load whole file)")
+    parser.add_argument("--workers", type=int, default=1, help="Parallel workers for dry-run only")
+    parser.add_argument("--progress-newline", action="store_true", help="Print progress updates as new lines")
     args = parser.parse_args()
 
     print("=" * 100)
@@ -342,20 +436,110 @@ def main():
     print("=" * 100)
     
     try:
+        if args.chunk_size and args.chunk_size > 0:
+            chunk_files, total_triples = chunk_ttl_file(args.ttl, args.chunk_size)
+            total_chunks = len(chunk_files)
+            completed = 0
+            aggregate_labels: Dict[str, int] = {}
+            aggregate_rels = 0
+
+            if args.dry_run:
+                workers = max(args.workers or 1, 1)
+                if workers > 1:
+                    with ProcessPoolExecutor(max_workers=workers) as executor:
+                        futures = [executor.submit(_dry_run_chunk, tmp_path) for _, tmp_path in chunk_files]
+                        for future in as_completed(futures):
+                            result = future.result()
+                            completed += 1
+                            worker_id = ((completed - 1) % workers) + 1
+                            _update_progress(completed, total_chunks, worker_id, args.progress_newline)
+                            _merge_label_counts(aggregate_labels, result.get('labels', {}))
+                            aggregate_rels += result.get('relationships', 0)
+                else:
+                    for chunk_idx, tmp_path in chunk_files:
+                        result = _dry_run_chunk(tmp_path)
+                        completed += 1
+                        _update_progress(completed, total_chunks, ((chunk_idx - 1) % workers) + 1, args.progress_newline)
+                        _merge_label_counts(aggregate_labels, result.get('labels', {}))
+                        aggregate_rels += result.get('relationships', 0)
+
+                if total_chunks:
+                    print()
+                print("\nDry run enabled — skipping Neo4j load.")
+            else:
+                if args.workers and args.workers > 1:
+                    print("\nNote: workers > 1 is ignored for Neo4j load to avoid write contention.")
+
+                from neo4j import GraphDatabase
+
+                print(f"\nConnecting to Neo4j at {neo4j_config.uri}...")
+                driver = GraphDatabase.driver(
+                    neo4j_config.uri,
+                    auth=(neo4j_config.user, neo4j_config.password),
+                    encrypted=neo4j_config.encrypted
+                )
+
+                with driver.session(database=neo4j_config.database) as session:
+                    transformer = RDFtoNeo4jTransformer(args.ttl, batch_size=args.batch_size)
+                    transformer._create_indexes(session)
+
+                for chunk_idx, tmp_path in chunk_files:
+                    transformer = RDFtoNeo4jTransformer(tmp_path, batch_size=args.batch_size)
+                    g = transformer.load_rdf()
+                    transformer.extract_nodes_and_relationships(g, verbose=False)
+                    success = transformer.load_to_neo4j(driver, include_indexes=False, include_stats=False)
+                    if not success:
+                        driver.close()
+                        return 1
+                    completed += 1
+                    _update_progress(completed, total_chunks, None, args.progress_newline)
+                    _merge_label_counts(aggregate_labels, dict(transformer.stats['labels']))
+                    aggregate_rels += transformer.stats['relationships']
+
+                driver.close()
+                if total_chunks:
+                    print()
+
+            for _, tmp_path in chunk_files:
+                try:
+                    os.remove(tmp_path)
+                except Exception:
+                    pass
+
+            print("\nSummary:")
+            for label, count in sorted(aggregate_labels.items()):
+                print(f"   * {label}: {count}")
+            print(f"   * Relationships: {aggregate_rels}")
+            print(f"   * Triples scanned: {total_triples}")
+
+            if args.dry_run:
+                return 0
+
+            print("\n" + "=" * 100)
+            print("SUCCESS: RDF-TO-NEO4J TRANSFORMATION COMPLETE")
+            print("=" * 100)
+            return 0
+
         transformer = RDFtoNeo4jTransformer(args.ttl, batch_size=args.batch_size)
         g = transformer.load_rdf()
         transformer.extract_nodes_and_relationships(g)
-        
+
+        if args.dry_run:
+            print("\nDry run enabled — skipping Neo4j load.")
+            return 0
+
+        from neo4j import GraphDatabase
+
         print(f"\nConnecting to Neo4j at {neo4j_config.uri}...")
         driver = GraphDatabase.driver(
             neo4j_config.uri,
             auth=(neo4j_config.user, neo4j_config.password),
             encrypted=neo4j_config.encrypted
         )
-        
+
         success = transformer.load_to_neo4j(driver)
         driver.close()
-        
+
         if success:
             print("\n" + "=" * 100)
             print("SUCCESS: RDF-TO-NEO4J TRANSFORMATION COMPLETE")
