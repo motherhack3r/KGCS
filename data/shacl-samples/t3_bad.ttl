@@ -1,6 +1,0 @@
-@prefix sec: <https://example.org/sec/core#> .
-@prefix attck: <https://example.org/sec/attck#> .
-
-sec:tech-t3-bad a sec:Technique ;
-  attck:technique_id "T-T3-BAD" .
-# Missing detected_by

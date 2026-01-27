@@ -1,5 +1,11 @@
 {
     "python-envs.defaultEnvManager": "ms-python.python:conda",
     "python-envs.defaultPackageManager": "ms-python.python:conda",
-    "python-envs.pythonProjects": []
+    "python-envs.pythonProjects": [],
+    "chat.tools.terminal.autoApprove": {
+        "/^python scripts\\\\merge_mitre_jsons\\.py --key DeceptionTechniques --input-dir data\\\\shield\\\\raw --output data\\\\shield\\\\raw\\\\shield\\.json$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
 }

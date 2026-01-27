@@ -14,7 +14,7 @@ It provides a single source of truth for AI systems to reason about vulnerabilit
 
 ## 🏗️ Architecture
 
-```
+```text
 ┌───────────────────────┐
 │  Extension Layer (L4)  │  (Incident, Risk, ThreatActor)
 ├───────────────────────┤
@@ -34,7 +34,7 @@ It provides a single source of truth for AI systems to reason about vulnerabilit
 ## 🔑 Core Invariants
 
 | Invariant | Description |
-|-----------|-------------|
+| ----------- | ------------- |
 | Authoritative alignment | Every class/property maps to a stable ID in NVD or MITRE. |
 | Explicit provenance | Every edge is traceable to a source field. |
 | No invented semantics | The ontology is a lens, not a replacement for the standards. |
@@ -45,6 +45,7 @@ It provides a single source of truth for AI systems to reason about vulnerabilit
 ## 🚀 Getting Started
 
 1. **Clone the repo**  
+
    ```bash
    git clone https://github.com/yourorg/kgcs.git
    cd kgcs
@@ -57,6 +58,7 @@ It provides a single source of truth for AI systems to reason about vulnerabilit
 3. **Query the graph**  
    * Use Neo4j Cypher or SPARQL.  
    * Example:  
+
      ```cypher
      MATCH (cve:Vulnerability {cveId:'CVE-2025-1234'})
      MATCH (cve)-[:caused_by]->(cwe:CWE)
@@ -72,7 +74,7 @@ It provides a single source of truth for AI systems to reason about vulnerabilit
 ## 📚 Documentation
 
 | File | Purpose |
-|------|---------|
+| ------ | --------- |
 | KGCS.md | Executive summary & architecture |
 | core-ontology-v1.0.md | Core class & edge definitions |
 | RAG-travesal-templates.md | Safe traversal contracts |
@@ -99,6 +101,19 @@ Each extension lives in its own OWL file and imports the core ontology.
 * Build a UI for visualizing traversal paths.  
 * Integrate with an LLM for explainable answers.
 
+## 🧰 Operational Scripts
+
+* `scripts/db/` holds the Phase 4 helpers (`create_cpe_cve_relationships.py`, `verify_phase4_complete.py`, the `check_*` utilities, etc.) that interact with Neo4j for reproduction or diagnostics.  
+* `scripts/legacy/phase4/` archives the one-off repair/verification scripts (`repair_cpe_properties.py`, `diagnose_cpe_mismatch.py`, `check_buggy_pattern.py`, etc.) that were needed during the CPE parsing fix but are no longer part of normal ingestion.
+* Regression and integration suites now live under `tests/` so the repository root stays focused on documentation, configuration, and operational scripts.
+
+### Verification Utilities (RDF/Turtle)
+
+* [tests/verify_causal_chain.py](tests/verify_causal_chain.py) — offline sanity check of CWE→CAPEC→Technique→Tactic using the pipeline Turtle outputs in tmp.
+* [tests/verify_defense_layers.py](tests/verify_defense_layers.py) — offline sanity check of defense-layer links (D3FEND/CAR/SHIELD/ENGAGE) against ATT&CK using the pipeline Turtle outputs in tmp.
+
+These are manual verification utilities (not pytest tests) and expect the corresponding tmp/pipeline-stage*.ttl files to exist.
+
 ---
 
 ## 🤝 Contributing
@@ -110,3 +125,20 @@ Pull requests are welcome. Please follow the style guidelines in ontology and ke
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
+
+## **Roadmap**
+
+* **Short-term (0-3 months):** Complete CI SHACL gating, add missing per-OWL positive/negative samples, and automate validator runs in `src/core/`.
+* **Mid-term (3-9 months):** Expand modular OWL coverage (additional standards), automate ingestion pipelines, add RAG enforcement hooks, and produce more example traversal templates.
+* **Long-term (9-18 months):** Build a web UI for traversal visualization, full CI enforcement for OWL/SHACL changes, and integrate explainable LLM-backed query interfaces.
+
+## **Current Status**
+
+* **Core Ontology:** Modular OWL files and core invariants are implemented under `docs/ontology/`.
+* **SHACL Validation:** Validation module at `src/core/validation.py` with CLI entry points; machine-readable reports stored in `artifacts/`; CI gating is scaffolded but not fully enforced.
+* **Ingestion:** ETL transformers for all 9 standards live in `src/etl/` (e.g., `etl_cve.py`, `etl_cpe.py`); pre-ingest pipeline in `src/ingest/pipeline.py` with validation gates; ready for Neo4j integration.
+* **RAG Safety:** Traversal templates and safety rules are documented; runtime enforcement and query-time validation remain to be completed.
+* **Integrations & UI:** Neo4j loader and sample data are present; a production UI is planned but not yet implemented.
+
+_For detailed technical documentation, please refer to the files in the `docs/` directory._
+_The document KGCS.md provides a comprehensive overview of the architecture and design principles._

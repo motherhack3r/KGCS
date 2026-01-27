@@ -20,7 +20,13 @@ Key invariants enforced (non-exhaustive):
 Run validator (example):
 
 ```bash
-python scripts/validate_shacl.py --shapes docs/ontology/shacl/kgcs-shapes.ttl --data data/samples/example.ttl
+python -m src.cli.validate --shapes docs/ontology/shacl/kgcs-shapes.ttl --data data/samples/example.ttl
+```
+
+Or using the CLI wrapper:
+
+```bash
+python scripts/validate_shacl_cli.py --shapes docs/ontology/shacl/kgcs-shapes.ttl --data data/samples/example.ttl
 ```
 
 See `rag-to-shacl.md` for how RAG templates map to shape groups.

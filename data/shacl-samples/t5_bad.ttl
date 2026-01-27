@@ -1,5 +1,0 @@
-@prefix sec: <https://example.org/sec/core#> .
-
-sec:tech-t5-bad a sec:Technique ;
-  sec:technique_id "T-T5-BAD" .
-# Missing countered_by

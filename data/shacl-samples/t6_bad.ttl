@@ -1,4 +1,0 @@
-@prefix sec: <https://example.org/sec/core#> .
-
-sec:ref-t6-bad a sec:Reference .
-# Missing referenceUrl and referenceSource

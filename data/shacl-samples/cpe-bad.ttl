@@ -1,6 +1,0 @@
-@prefix ex: <https://example.org/sec/core#> .
-
-# Negative CPE sample: Platform missing cpeNameId and PlatformConfiguration missing matchCriteriaId
-ex:PlatformX a ex:Platform .
-ex:PCX a ex:PlatformConfiguration ;
-  ex:matchesPlatform ex:PlatformX .

@@ -252,7 +252,7 @@ git checkout 1a2b3c -- data/cve/samples/cve-snapshot-2026-01-19.ttl
 python scripts/validate_shacl.py --data data/cve/samples/cve-snapshot-2026-01-19.ttl
 
 # Test RAG queries (T1-T7 templates)
-python scripts/test_rag_templates.py --data data/cve/samples/cve-snapshot-2026-01-19.ttl
+python tests/test_rag_templates.py --data data/cve/samples/cve-snapshot-2026-01-19.ttl
 ```
 
 ---
