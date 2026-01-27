@@ -165,6 +165,10 @@ def process_vulnerability(item, out_f, criteria_to_match_id=None):
     subj = subject_for_cve(cve_id)
     triples = 0
 
+    # rdf:type
+    out_f.write(f"{subj} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://example.org/sec/core#Vulnerability> .\n")
+    triples += 1
+
     # rdfs:label
     out_f.write(f"{subj} <http://www.w3.org/2000/01/rdf-schema#label> {turtle_escape(cve_id)} .\n")
     triples += 1
