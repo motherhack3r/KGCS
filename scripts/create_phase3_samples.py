@@ -414,6 +414,20 @@ def _build_capec_sample(capec_path: str, cwe_ids: Set[str]) -> dict:
     return {"AttackPatterns": patterns}
 
 
+def _extract_attack_ids_from_json(payload: Any, attack_ids: Set[str]) -> None:
+    if payload is None:
+        return
+    if isinstance(payload, dict):
+        for key, value in payload.items():
+            if isinstance(value, str) and value.startswith("T") and key in {"attack_id", "attack_technique", "attack_technique_id", "technique", "technique_id", "id"}:
+                attack_ids.add(value)
+            else:
+                _extract_attack_ids_from_json(value, attack_ids)
+    elif isinstance(payload, list):
+        for item in payload:
+            _extract_attack_ids_from_json(item, attack_ids)
+
+
 def _extract_attack_ids_from_defense(d3fend_mapping_path: str, car_path: str, shield_mapping_path: str, engage_mapping_path: str) -> Set[str]:
     attack_ids: Set[str] = set()
 
@@ -450,16 +464,18 @@ def _extract_attack_ids_from_defense(d3fend_mapping_path: str, car_path: str, sh
                 continue
 
     for mapping_path in (shield_mapping_path, engage_mapping_path):
-        if os.path.exists(mapping_path):
+        if not os.path.exists(mapping_path):
+            continue
+        if os.path.isdir(mapping_path):
+            json_files = sorted(Path(mapping_path).glob("*.json"))
+        else:
+            json_files = [Path(mapping_path)]
+        for file_path in json_files:
             try:
-                data = json.load(open(mapping_path, "r", encoding="utf-8", errors="ignore"))
-                if isinstance(data, list):
-                    for entry in data:
-                        attack_id = entry.get("attack_id")
-                        if isinstance(attack_id, str) and attack_id.startswith("T"):
-                            attack_ids.add(attack_id)
+                data = json.load(open(file_path, "r", encoding="utf-8", errors="ignore"))
+                _extract_attack_ids_from_json(data, attack_ids)
             except Exception:
-                pass
+                continue
 
     return attack_ids
 
@@ -477,9 +493,43 @@ def _extract_attack_id_from_refs(external_refs: List[dict]) -> Optional[str]:
     return None
 
 
-def _build_attack_samples(attack_dir: str, technique_ids: Set[str], output_root: str) -> int:
-    count_written = 0
+def _extract_attack_ids_from_capec(attack_dir: str, capec_ids: Set[str]) -> Set[str]:
+    attack_ids: Set[str] = set()
+    if not capec_ids or not os.path.isdir(attack_dir):
+        return attack_ids
+
     for attack_file in sorted(Path(attack_dir).glob("*.json")):
+        try:
+            attack_json = json.load(open(attack_file, "r", encoding="utf-8", errors="ignore"))
+        except Exception:
+            continue
+        objects = attack_json.get("objects", []) if isinstance(attack_json, dict) else []
+        for obj in objects:
+            if not isinstance(obj, dict):
+                continue
+            if obj.get("type") != "attack-pattern":
+                continue
+            external_refs = obj.get("external_references", []) or []
+            capec_match = False
+            for ref in external_refs:
+                if not isinstance(ref, dict):
+                    continue
+                if ref.get("source_name") == "capec":
+                    capec_id = ref.get("external_id")
+                    if capec_id in capec_ids:
+                        capec_match = True
+                        break
+            if not capec_match:
+                continue
+            attack_id = _extract_attack_id_from_refs(external_refs)
+            if attack_id:
+                attack_ids.add(attack_id)
+    return attack_ids
+
+
+def _build_attack_samples(attack_files: List[Path], technique_ids: Set[str], output_root: str) -> int:
+    count_written = 0
+    for attack_file in attack_files:
         try:
             attack_json = json.load(open(attack_file, "r", encoding="utf-8", errors="ignore"))
         except Exception:
@@ -519,6 +569,21 @@ def _build_attack_samples(attack_dir: str, technique_ids: Set[str], output_root:
         count_written += 1
 
     return count_written
+
+
+def _resolve_attack_files(attack_dir: str) -> List[Path]:
+    if not os.path.isdir(attack_dir):
+        return []
+    preferred = [
+        "enterprise-attack.json",
+        "ics-attack.json",
+        "mobile-attack.json",
+        "pre-attack.json",
+    ]
+    preferred_paths = [Path(attack_dir) / name for name in preferred if (Path(attack_dir) / name).exists()]
+    if preferred_paths:
+        return preferred_paths
+    return sorted(Path(attack_dir).glob("*.json"))
 
 
 def _build_d3fend_sample(mapping_path: str, technique_ids: Set[str]) -> dict:
@@ -562,6 +627,8 @@ def _build_d3fend_sample(mapping_path: str, technique_ids: Set[str]) -> dict:
 
 def _extract_car_technique_ids(analytic: dict) -> Set[str]:
     ids: Set[str] = set()
+    if not isinstance(analytic, dict):
+        return set()
     for key in (
         "DetectsTechniques",
         "detects_techniques",
@@ -584,6 +651,20 @@ def _extract_car_technique_ids(analytic: dict) -> Set[str]:
                         ids.add(tech_id)
         elif isinstance(value, str):
             ids.add(value)
+
+    coverage = analytic.get("coverage")
+    if isinstance(coverage, list):
+        for entry in coverage:
+            if not isinstance(entry, dict):
+                continue
+            technique = entry.get("technique")
+            if isinstance(technique, str):
+                ids.add(technique)
+            subtechniques = entry.get("subtechniques") or []
+            if isinstance(subtechniques, list):
+                for sub in subtechniques:
+                    if isinstance(sub, str):
+                        ids.add(sub)
 
     normalized: Set[str] = set()
     for tech_id in ids:
@@ -637,29 +718,39 @@ def _build_shield_sample(mapping_path: str, technique_ids: Set[str]) -> dict:
     techniques: Dict[str, dict] = {}
     if not os.path.exists(mapping_path):
         return {"DeceptionTechniques": []}
-    data = json.load(open(mapping_path, "r", encoding="utf-8", errors="ignore"))
-    if not isinstance(data, list):
-        return {"DeceptionTechniques": []}
-    for entry in data:
-        attack_id = entry.get("attack_id")
-        if attack_id not in technique_ids:
+    json_files = [Path(mapping_path)]
+    if os.path.isdir(mapping_path):
+        json_files = sorted(Path(mapping_path).glob("*.json"))
+
+    for file_path in json_files:
+        try:
+            data = json.load(open(file_path, "r", encoding="utf-8", errors="ignore"))
+        except Exception:
             continue
-        technique = entry.get("technique") or {}
-        tech_id = technique.get("id") or entry.get("technique_id")
-        if not tech_id:
+        if not isinstance(data, list):
             continue
-        name = technique.get("name") or technique.get("Name")
-        description = technique.get("description") or technique.get("Description") or technique.get("long_description")
-        if tech_id not in techniques:
-            techniques[tech_id] = {
-                "ID": tech_id,
-                "Name": name,
-                "Description": description,
-                "CountersTechniques": [],
-            }
-        counters = techniques[tech_id]["CountersTechniques"]
-        if attack_id not in counters:
-            counters.append(attack_id)
+        for entry in data:
+            if not isinstance(entry, dict):
+                continue
+            attack_id = entry.get("attack_id")
+            if attack_id not in technique_ids:
+                continue
+            technique = entry.get("technique") or {}
+            tech_id = technique.get("id") or entry.get("technique_id")
+            if not tech_id:
+                continue
+            name = technique.get("name") or technique.get("Name")
+            description = technique.get("description") or technique.get("Description") or technique.get("long_description")
+            if tech_id not in techniques:
+                techniques[tech_id] = {
+                    "ID": tech_id,
+                    "Name": name,
+                    "Description": description,
+                    "CountersTechniques": [],
+                }
+            counters = techniques[tech_id]["CountersTechniques"]
+            if attack_id not in counters:
+                counters.append(attack_id)
     return {"DeceptionTechniques": list(techniques.values())}
 
 
@@ -667,28 +758,38 @@ def _build_engage_sample(mapping_path: str, technique_ids: Set[str]) -> dict:
     concepts: Dict[str, dict] = {}
     if not os.path.exists(mapping_path):
         return {"EngagementConcepts": []}
-    data = json.load(open(mapping_path, "r", encoding="utf-8", errors="ignore"))
-    if not isinstance(data, list):
-        return {"EngagementConcepts": []}
-    for entry in data:
-        attack_id = entry.get("attack_id")
-        if attack_id not in technique_ids:
+    json_files = [Path(mapping_path)]
+    if os.path.isdir(mapping_path):
+        json_files = sorted(Path(mapping_path).glob("*.json"))
+
+    for file_path in json_files:
+        try:
+            data = json.load(open(file_path, "r", encoding="utf-8", errors="ignore"))
+        except Exception:
             continue
-        concept_id = entry.get("eac_id") or entry.get("eav_id")
-        concept_name = entry.get("eac") or entry.get("eav")
-        description = entry.get("eav")
-        if not concept_id:
+        if not isinstance(data, list):
             continue
-        if concept_id not in concepts:
-            concepts[concept_id] = {
-                "ID": concept_id,
-                "Name": concept_name,
-                "Description": description,
-                "DisruptsTechniques": [],
-            }
-        disrupts = concepts[concept_id]["DisruptsTechniques"]
-        if attack_id not in disrupts:
-            disrupts.append(attack_id)
+        for entry in data:
+            if not isinstance(entry, dict):
+                continue
+            attack_id = entry.get("attack_id")
+            if attack_id not in technique_ids:
+                continue
+            concept_id = entry.get("eac_id") or entry.get("eav_id")
+            concept_name = entry.get("eac") or entry.get("eav")
+            description = entry.get("eav")
+            if not concept_id:
+                continue
+            if concept_id not in concepts:
+                concepts[concept_id] = {
+                    "ID": concept_id,
+                    "Name": concept_name,
+                    "Description": description,
+                    "DisruptsTechniques": [],
+                }
+            disrupts = concepts[concept_id]["DisruptsTechniques"]
+            if attack_id not in disrupts:
+                disrupts.append(attack_id)
     return {"EngagementConcepts": list(concepts.values())}
 
 
@@ -704,12 +805,12 @@ def main() -> int:
     parser.add_argument("--attack-input", default="data/attack/raw", help="ATT&CK input directory")
     parser.add_argument("--d3fend-input", default="data/d3fend/raw/d3fend-full-mappings.json", help="D3FEND mappings input file")
     parser.add_argument("--car-input", default="data/car/raw", help="CAR input directory")
-    parser.add_argument("--shield-input", default="data/shield/raw/attack_mapping.json", help="SHIELD mapping input file")
-    parser.add_argument("--engage-input", default="data/engage/raw/attack_mapping.json", help="ENGAGE mapping input file")
+    parser.add_argument("--shield-input", default="data/shield/raw", help="SHIELD mapping input file or directory")
+    parser.add_argument("--engage-input", default="data/engage/raw", help="ENGAGE mapping input file or directory")
     parser.add_argument("--output-root", default="data", help="Root output directory")
     parser.add_argument("--cve-max", type=int, default=None, help="Max CVE records to include (default: same as --count)")
     parser.add_argument("--cve-fallback-random", action=argparse.BooleanOptionalAction, default=True, help="When no linked CVEs found, fall back to random CVE sampling")
-    parser.add_argument("--attack-max", type=int, default=None, help="Max ATT&CK techniques to include (default: same as --count)")
+    parser.add_argument("--attack-max", type=int, default=1000, help="Max ATT&CK techniques to include (default: 1000)")
     parser.add_argument("--cve-first", action=argparse.BooleanOptionalAction, default=True, help="Sample CVEs with configs+CWE first, then derive CPEMatch/CPE")
     parser.add_argument("--cpematch-max", type=int, default=None, help="Max CPEMatch entries to include (default: same as --count)")
     args = parser.parse_args()
@@ -820,6 +921,7 @@ def main() -> int:
     else:
         print("Skipping CWE sample (no CWE IDs or input missing)")
 
+    capec_payload = None
     if cwe_ids and os.path.exists(args.capec_input):
         capec_payload = _build_capec_sample(args.capec_input, cwe_ids)
         capec_out = os.path.join(args.output_root, "capec", "samples", "sample_capec.json")
@@ -834,14 +936,20 @@ def main() -> int:
         args.shield_input,
         args.engage_input,
     )
-    attack_max = args.attack_max if args.attack_max is not None else args.count
+    if capec_payload and os.path.isdir(args.attack_input):
+        capec_ids = {f"CAPEC-{p.get('ID')}" if isinstance(p.get('ID'), str) and not p.get('ID').startswith('CAPEC-') else p.get('ID')
+                     for p in capec_payload.get('AttackPatterns', []) if isinstance(p, dict) and p.get('ID')}
+        capec_ids = {c for c in capec_ids if isinstance(c, str)}
+        attack_candidates.update(_extract_attack_ids_from_capec(args.attack_input, capec_ids))
+    attack_max = args.attack_max
     attack_ids = _sample_set(attack_candidates, attack_max, rng)
     if not attack_ids:
         print("Skipping ATT&CK/defense samples (no technique IDs found)")
         return 0
 
-    if os.path.isdir(args.attack_input):
-        count_written = _build_attack_samples(args.attack_input, attack_ids, args.output_root)
+    attack_files = _resolve_attack_files(args.attack_input)
+    if attack_files:
+        count_written = _build_attack_samples(attack_files, attack_ids, args.output_root)
         print(f"Wrote {count_written} ATT&CK sample file(s) to {os.path.join(args.output_root, 'attack', 'samples')}")
     else:
         print("Skipping ATT&CK sample (input missing)")
