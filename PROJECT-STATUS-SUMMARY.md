@@ -11,7 +11,7 @@
 
 ## Executive Summary
 
-KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validation framework). Phase 3 ETL now transforms raw data for all core standards except CAR and validates via parallel SHACL streaming with summary reports. Neo4j integration remains pending. Phases 4–5 are designed but not implemented. Critical path remains Phase 3 MVP (Neo4j load + end-to-end validation).
+KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validation framework). Phase 3 ETL transforms raw data for all core standards except CAR and validates via parallel SHACL streaming with summary reports. The Neo4j loader exists with chunked processing/dry-run support, but end-to-end load tests and CI ingestion remain pending. Phases 4–5 are designed but not implemented. Critical path remains Phase 3 MVP (Neo4j load + end-to-end validation).
 
 ## Key Metrics
 
@@ -48,12 +48,12 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 - [x] Positive/negative SHACL samples
 - [x] Validation reports generated under artifacts/
 - [x] Rule catalog + failure payload schema
-- [x] CI validation workflow active
+- [~] CI validation workflow present (enforcement TBD)
 - [x] Governance document finalized
 
 ## Phase 3 — Data Ingestion (🟢 In Progress - MVP Core)
 
-**Status:** ETL operational for all core standards except CAR; SHACL validation passing with parallel streaming. Neo4j loader and constraints are in-progress (branch work).
+**Status:** ETL operational for all core standards except CAR; SHACL validation passing with parallel streaming. Neo4j loader exists with chunked processing; end-to-end load tests and CI ingestion remain pending.
 
 ### Completed
 
@@ -83,8 +83,8 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 - [x] Raw data validation (production-scale testing) ✅ COMPLETE (CPE 217 MB + CVE 2026 5 MB, 0 violations)
 - [x] Parallel SHACL streaming validation ✅ COMPLETE (per-standard summaries)
 - [ ] CAR ETL from raw (YAML) and validation
-- [ ] Implement Neo4j loader (Turtle → Cypher) — in progress (streaming dry-run + chunked processing)
-- [ ] Create graph constraints and indexes — in progress (expanded core-ID constraints)
+- [ ] End-to-end Neo4j load (loader exists; needs verification on real outputs)
+- [ ] Verify/apply graph constraints and indexes in Neo4j
 - [ ] End-to-end tests (ETL → SHACL → Neo4j)
 - [ ] CI pipeline for ingestion and artifacts
 
@@ -126,6 +126,22 @@ Phase 3 MVP completion requires:
 
 **Blocker Status:** ✅ **CLEARED** — CPE/CPEMatch/CVE and remaining core standards validated with 0 violations (CAR pending). Ready for Neo4j integration.
 
+## Phase 3 “Definition of Done” (Tight Checklist)
+
+- [ ] CAR raw YAML → Turtle ETL implemented and SHACL validation passes.
+- [ ] Single combined or per-standard pipeline outputs load into Neo4j using [src/etl/rdf_to_neo4j.py](src/etl/rdf_to_neo4j.py) without errors.
+- [ ] Neo4j constraints/indexes applied and verified (core IDs unique: cpeNameId, matchCriteriaId, cveId, cweId, capecId, attackTechniqueId, d3fendId, carId, shieldId, engageId).
+- [ ] End-to-end test: ETL → SHACL → Neo4j load executed and passes on pipeline TTLs in tmp/.
+- [ ] CI job added to run Phase 3 ingestion smoke checks and publish artifacts.
+
+### Acceptance Tests (Measurable)
+
+- CAR ETL: Running `python -m src.etl.etl_car --input data/car/raw --output tmp/pipeline-stage8-car.ttl --validate` produces a Turtle file and a SHACL report with `conforms: true`.
+- Neo4j load: Running `python src/etl/rdf_to_neo4j.py --ttl tmp/pipeline-stage1-cpe.ttl --batch-size 1000` completes with success banner and no exceptions.
+- Constraints: After load, `MATCH (n:Platform) RETURN count(n)` and `SHOW CONSTRAINTS` confirm uniqueness constraints exist for core IDs.
+- End-to-end: Running `python scripts/validate_etl_pipeline_order.py` then loading the resulting tmp/pipeline-stage*.ttl files results in a non-empty graph (nodes and relationships) with no load errors.
+- CI: A workflow run uploads artifacts for SHACL summaries and logs, and fails the job if any summary report has `conforms: false`.
+
 ## Update Summary
 
 - **Date:** January 27, 2026  
@@ -137,8 +153,8 @@ Phase 3 MVP completion requires:
 - **SHACL Validation:** Parallel streaming validation completed with per-standard summary reports.  
 - **CPEMatch Fix:** `Platform` nodes now emit `cpeNameId` and correct `cpeUri`, and CPEMatch validation conforms (0 violations).  
 - **Repo Hygiene:** Removed oversized CPEMatch summary report from history; added ignore rule to prevent reintroduction.  
-- **Neo4j Loader (WIP):** Streaming dry-run with chunking and progress added; large TTLs can be processed without full in-memory load.  
-- **Neo4j Constraints (WIP):** Core-ID uniqueness constraints expanded for all standards.  
+- **Neo4j Loader:** Chunked dry-run with progress exists in [src/etl/rdf_to_neo4j.py](../src/etl/rdf_to_neo4j.py); full end-to-end load still pending.  
+- **Neo4j Constraints:** Core-ID uniqueness constraints defined in the loader; need verification in a live DB.  
 - **Download Pipeline:** Daily downloader runs cleanly with fixed raw-path handling and no duplicate downloads.  
 
 ### Next Steps (Phase 3 Completion Order)

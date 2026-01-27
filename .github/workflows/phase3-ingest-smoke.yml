@@ -1,0 +1,75 @@
+name: Phase 3 Ingestion Smoke
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  ingest-smoke:
+    name: Phase 3 ETL smoke checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Phase 3 sample ETL suite
+        run: |
+          set -euo pipefail
+          python tests/test_phase3_comprehensive.py
+
+      - name: Validate combined TTL (if present)
+        run: |
+          set -euo pipefail
+          if ls tmp/phase3_*.ttl >/dev/null 2>&1; then
+            cat tmp/phase3_*.ttl > tmp/phase3_combined.ttl
+            python -m src.cli.validate --data tmp/phase3_combined.ttl
+          else
+            echo "No tmp/phase3_*.ttl found; skipping combined validation."
+          fi
+
+      - name: Fail on SHACL summary violations
+        run: |
+          set -euo pipefail
+          if ls artifacts/shacl-report-*-summary.json >/dev/null 2>&1; then
+            python - <<'PY'
+          import glob, json, sys
+          bad = []
+          for path in glob.glob('artifacts/shacl-report-*-summary.json'):
+              try:
+                  with open(path, 'r', encoding='utf-8') as f:
+                      data = json.load(f)
+                  if data.get('conforms') is False:
+                      bad.append(path)
+              except Exception as e:
+                  bad.append(f"{path} (read error: {e})")
+          if bad:
+              print("Non-conforming SHACL summaries:")
+              for b in bad:
+                  print(f" - {b}")
+              sys.exit(1)
+          print("SHACL summaries conform or not present.")
+          PY
+          else
+            echo "No SHACL summary reports found; skipping."
+          fi
+
+      - name: Upload Phase 3 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase3-artifacts
+          path: |
+            artifacts/
+            tmp/phase3_*.ttl
+            tmp/phase3_combined.ttl
