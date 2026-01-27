@@ -1,0 +1,6 @@
+id: CAR-2024-01-001
+name: Sample Analytic - Suspicious Process
+description: Detects suspicious process execution based on command-line patterns.
+techniques:
+  - T1059
+  - T1059.001
