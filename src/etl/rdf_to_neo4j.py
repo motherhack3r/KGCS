@@ -67,6 +67,22 @@ class RDFtoNeo4jTransformer:
             'labels': defaultdict(int),
             'relationships': 0,
         }
+        self.merge_keys = {
+            "Platform": "cpeNameId",
+            "PlatformConfiguration": "matchCriteriaId",
+            "Vulnerability": "cveId",
+            "Weakness": "cweId",
+            "AttackPattern": "capecId",
+            "Technique": "attackTechniqueId",
+            "SubTechnique": "attackTechniqueId",
+            "Tactic": "tacticId",
+            "DefensiveTechnique": "d3fendId",
+            "DetectionAnalytic": "carId",
+            "DeceptionTechnique": "shieldId",
+            "EngagementConcept": "engageId",
+            "Reference": "referenceUrl",
+            "Score": "uri",
+        }
         
     def load_rdf(self) -> Graph:
         """Load RDF graph from Turtle file."""
@@ -283,8 +299,24 @@ class RDFtoNeo4jTransformer:
             })
         
         for label, node_list in by_label.items():
-            cypher = f"UNWIND $nodes as node MERGE (n:`{label}` {{uri: node.uri}}) SET n += node.properties"
-            session.run(cypher, nodes=node_list)
+            key_prop = self.merge_keys.get(label)
+            if key_prop:
+                with_key = [n for n in node_list if n['properties'].get(key_prop) is not None]
+                without_key = [n for n in node_list if n['properties'].get(key_prop) is None]
+            else:
+                with_key = []
+                without_key = node_list
+
+            if with_key:
+                cypher = (
+                    f"UNWIND $nodes as node "
+                    f"MERGE (n:`{label}` {{{key_prop}: node.properties.{key_prop}}}) "
+                    f"SET n += node.properties, n.uri = node.uri"
+                )
+                session.run(cypher, nodes=with_key)
+            if without_key:
+                cypher = f"UNWIND $nodes as node MERGE (n:`{label}` {{uri: node.uri}}) SET n += node.properties"
+                session.run(cypher, nodes=without_key)
     
     def _load_relationships(self, session) -> None:
         """Load relationships to Neo4j."""
