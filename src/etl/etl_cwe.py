@@ -107,6 +107,18 @@ class CWEtoRDFTransformer:
         """Add parent/child relationships between weaknesses."""
         cwe_lookup = {w.get("ID", ""): w for w in weaknesses if w.get("ID")}
 
+        relationship_map = {
+            "ChildOf": SEC.childOf,
+            "ParentOf": SEC.parentOf,
+            "PeerOf": SEC.peerOf,
+            "CanPrecede": SEC.canPrecede,
+            "CanFollow": SEC.canFollow,
+            "Requires": SEC.requires,
+            "RequiredBy": SEC.requiredBy,
+            "CanAlsoBe": SEC.canAlsoBe,
+            "StartsWith": SEC.startsWith,
+        }
+
         for weakness in weaknesses:
             cwe_id = weakness.get("ID", "")
             if not cwe_id:
@@ -124,10 +136,9 @@ class CWEtoRDFTransformer:
                 related_node = URIRef(f"{EX}weakness/{related_id_full}")
                 relationship = related.get("Relationship", "")
 
-                if relationship == "ChildOf":
-                    self.graph.add((weakness_node, SEC.childOf, related_node))
-                elif relationship == "ParentOf":
-                    self.graph.add((weakness_node, SEC.parentOf, related_node))
+                predicate = relationship_map.get(relationship)
+                if predicate is not None:
+                    self.graph.add((weakness_node, predicate, related_node))
 
 
 def _flatten_text(element: ET.Element | None) -> str:

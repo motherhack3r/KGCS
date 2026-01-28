@@ -74,6 +74,7 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
+import re
 
 import ijson
 
@@ -92,6 +93,11 @@ def subject_for_cve(cve_id: str) -> str:
 
 def subject_for_config(match_id: str) -> str:
     return f"<https://example.org/platformConfiguration/{match_id}>"
+
+
+def subject_for_weakness(cwe_id: str) -> str:
+    cwe_id_full = cwe_id if cwe_id.startswith("CWE-") else f"CWE-{cwe_id}"
+    return f"<https://example.org/weakness/{cwe_id_full}>"
 
 
 def _extract_configs(item: dict):
@@ -192,7 +198,7 @@ def process_vulnerability(item, out_f, criteria_to_match_id=None):
         desc = None
 
     if desc:
-        out_f.write(f"{subj} <http://purl.org/dc/terms/description> {turtle_escape(desc)} .\n")
+        out_f.write(f"{subj} <https://example.org/sec/core#description> {turtle_escape(desc)} .\n")
         triples += 1
 
     # published date
@@ -241,8 +247,37 @@ def process_vulnerability(item, out_f, criteria_to_match_id=None):
         if not url:
             continue
         if url.startswith('http'):
-            out_f.write(f"{subj} <http://purl.org/dc/terms/references> <{url}> .\n")
+            out_f.write(f"{subj} <https://example.org/sec/core#referenceUrl> {turtle_escape(url)} .\n")
             triples += 1
+
+    # CWE relationships: CVE -> CWE (caused_by)
+    weaknesses = []
+    try:
+        if isinstance(item.get("cve"), dict):
+            weaknesses = item["cve"].get("weaknesses") or []
+        if not weaknesses:
+            weaknesses = item.get("weaknesses") or []
+    except Exception:
+        weaknesses = []
+
+    cwe_ids = set()
+    for weakness in weaknesses:
+        if not isinstance(weakness, dict):
+            continue
+        descriptions = weakness.get("description") or []
+        if isinstance(descriptions, dict):
+            descriptions = [descriptions]
+        for desc_entry in descriptions:
+            value = desc_entry.get("value") if isinstance(desc_entry, dict) else desc_entry
+            if not isinstance(value, str):
+                continue
+            for match in re.findall(r"CWE-\d+", value):
+                cwe_ids.add(match)
+
+    for cwe_id in sorted(cwe_ids):
+        weakness_subj = subject_for_weakness(cwe_id)
+        out_f.write(f"{subj} <https://example.org/sec/core#caused_by> {weakness_subj} .\n")
+        triples += 1
 
     # configurations: link PlatformConfiguration -> Vulnerability via matchCriteriaId
     configs = _extract_configs(item)

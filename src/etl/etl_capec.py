@@ -15,6 +15,7 @@ import os
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
+from pathlib import Path
 from datetime import datetime
 from rdflib import Graph, Namespace, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD
@@ -26,13 +27,14 @@ EX = Namespace("https://example.org/")
 class CAPECtoRDFTransformer:
     """Transform MITRE CAPEC JSON response to RDF/Turtle."""
 
-    def __init__(self):
+    def __init__(self, capec_to_attack: dict | None = None):
         self.graph = Graph()
         self.graph.bind("sec", SEC)
         self.graph.bind("ex", EX)
         self.graph.bind("xsd", XSD)
         self.graph.bind("rdf", RDF)
         self.graph.bind("rdfs", RDFS)
+        self.capec_to_attack = capec_to_attack or {}
 
     def transform(self, capec_json: dict) -> Graph:
         """Transform CAPEC API JSON response to RDF."""
@@ -83,6 +85,16 @@ class CAPECtoRDFTransformer:
         if pattern.get("RelatedWeaknesses"):
             self._add_weakness_relationships(pattern_node, pattern["RelatedWeaknesses"])
 
+        attack_ids = self.capec_to_attack.get(capec_id_full, [])
+        for attack_id in attack_ids:
+            if not isinstance(attack_id, str) or not attack_id:
+                continue
+            if "." in attack_id:
+                technique_node = URIRef(f"{EX}subtechnique/{attack_id}")
+            else:
+                technique_node = URIRef(f"{EX}technique/{attack_id}")
+            self.graph.add((pattern_node, SEC.implements, technique_node))
+
     def _extract_description(self, description_obj) -> str:
         """Extract description text from potentially nested structure."""
         if isinstance(description_obj, str):
@@ -111,6 +123,15 @@ class CAPECtoRDFTransformer:
         """Add relationships between attack patterns (parent/child/related)."""
         capec_lookup = {p.get("ID", ""): p for p in patterns if p.get("ID")}
 
+        relationship_map = {
+            "ParentOf": SEC.parentOf,
+            "ChildOf": SEC.childOf,
+            "PeerOf": SEC.peerOf,
+            "CanPrecede": SEC.canPrecede,
+            "CanFollow": SEC.canFollow,
+            "CanAlsoBe": SEC.canAlsoBe,
+        }
+
         for pattern in patterns:
             capec_id = pattern.get("ID", "")
             if not capec_id:
@@ -128,10 +149,9 @@ class CAPECtoRDFTransformer:
                 related_node = URIRef(f"{EX}attackPattern/{related_id_full}")
                 relationship = related.get("Relationship", "")
 
-                if relationship == "ParentOf":
-                    self.graph.add((pattern_node, SEC.parentOf, related_node))
-                elif relationship == "ChildOf":
-                    self.graph.add((pattern_node, SEC.childOf, related_node))
+                predicate = relationship_map.get(relationship)
+                if predicate is not None:
+                    self.graph.add((pattern_node, predicate, related_node))
 
 
 def _flatten_text(element: ET.Element | None) -> str:
@@ -206,10 +226,64 @@ def _load_capec_data(path: str) -> dict:
         return json.load(f)
 
 
+def _resolve_attack_files(attack_input: str) -> list[Path]:
+    if not attack_input:
+        return []
+    if os.path.isdir(attack_input):
+        preferred = [
+            "enterprise-attack.json",
+            "mobile-attack.json",
+            "ics-attack.json",
+            "pre-attack.json",
+        ]
+        preferred_paths = [Path(attack_input) / name for name in preferred if (Path(attack_input) / name).exists()]
+        if preferred_paths:
+            return preferred_paths
+        return sorted(Path(attack_input).glob("*.json"))
+    if os.path.exists(attack_input):
+        return [Path(attack_input)]
+    return []
+
+
+def _build_capec_to_attack_map(attack_input: str) -> dict:
+    capec_to_attack: dict[str, set[str]] = {}
+    for attack_file in _resolve_attack_files(attack_input):
+        try:
+            attack_json = json.load(open(attack_file, "r", encoding="utf-8", errors="ignore"))
+        except Exception:
+            continue
+        objects = attack_json.get("objects", []) if isinstance(attack_json, dict) else []
+        for obj in objects:
+            if not isinstance(obj, dict):
+                continue
+            if obj.get("type") != "attack-pattern":
+                continue
+            external_refs = obj.get("external_references", []) or []
+            attack_id = None
+            capec_ids = []
+            for ref in external_refs:
+                if not isinstance(ref, dict):
+                    continue
+                if ref.get("source_name") == "mitre-attack":
+                    attack_id = ref.get("external_id")
+                if ref.get("source_name") == "capec":
+                    capec_ids.append(ref.get("external_id"))
+            if not attack_id:
+                continue
+            for capec_id in capec_ids:
+                if not isinstance(capec_id, str) or not capec_id:
+                    continue
+                capec_full = capec_id if capec_id.startswith("CAPEC-") else f"CAPEC-{capec_id}"
+                capec_to_attack.setdefault(capec_full, set()).add(attack_id)
+
+    return {k: sorted(v) for k, v in capec_to_attack.items()}
+
+
 def main():
     parser = argparse.ArgumentParser(description="ETL: MITRE CAPEC JSON → RDF Turtle")
     parser.add_argument("--input", "-i", required=True, help="Input CAPEC JSON file")
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
+    parser.add_argument("--attack-input", default="data/attack/raw", help="ATT&CK STIX JSON file or directory for CAPEC→ATT&CK mappings")
     parser.add_argument("--validate", action="store_true", help="Run SHACL validation on output")
     parser.add_argument("--shapes", default="docs/ontology/shacl/capec-shapes.ttl", help="SHACL shapes file")
     args = parser.parse_args()
@@ -221,8 +295,14 @@ def main():
     print(f"Loading CAPEC data from {args.input}...")
     capec_json = _load_capec_data(args.input)
 
+    capec_to_attack = _build_capec_to_attack_map(args.attack_input)
+    if capec_to_attack:
+        print(f"Loaded {len(capec_to_attack)} CAPEC→ATT&CK mappings from {args.attack_input}")
+    else:
+        print("No CAPEC→ATT&CK mappings found (ATT&CK input missing or unmapped)")
+
     print("Transforming to RDF...")
-    transformer = CAPECtoRDFTransformer()
+    transformer = CAPECtoRDFTransformer(capec_to_attack=capec_to_attack)
     graph = transformer.transform(capec_json)
 
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)

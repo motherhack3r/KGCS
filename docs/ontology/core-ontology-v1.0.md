@@ -1,16 +1,16 @@
-Below is a **normalized, frozen, implementation-agnostic *Core Ontology v1.0*** derived from your drafts.
-This is **not a redesign**: it is a **canonical consolidation** with explicit scope boundaries, invariants, and guarantees.
-
-You can treat this as the **constitution** of the cybersecurity knowledge graph. Everything else (risk, incidents, threat actors, predictions, SOC logic, business impact) must sit **on top of this**, never inside it.
-
----
-
 # 🔐 Cybersecurity Core Ontology v1.0
 
 **Status:** Stable
 **Scope:** Authoritative security knowledge only
 **Design Goal:** Lossless integration of security standards with zero invented semantics
 **Primary Use:** Knowledge graphs, RAG, reasoning, explainability
+
+## Breafing
+
+Below is a **normalized, frozen, implementation-agnostic *Core Ontology v1.0*** derived from your drafts.
+This is **not a redesign**: it is a **canonical consolidation** with explicit scope boundaries, invariants, and guarantees.
+
+You can treat this as the **constitution** of the cybersecurity knowledge graph. Everything else (risk, incidents, threat actors, predictions, SOC logic, business impact) must sit **on top of this**, never inside it.
 
 ---
 
@@ -38,7 +38,7 @@ You can treat this as the **constitution** of the cybersecurity knowledge graph.
 
 ## 2. Core Ontology Layers
 
-```
+```text
 ┌─────────────────────────────┐
 │ Engagement & Strategy       │  (ENGAGE)
 ├─────────────────────────────┤
@@ -70,7 +70,7 @@ No inheritance or leakage of semantics across layers.
 | `Platform`              | Atomic software / hardware identity | CPE     |
 | `PlatformConfiguration` | Logical exposure expression         | NVD CVE |
 
-**Invariant**
+#### 3.1.1 Invariant
 
 * Vulnerabilities affect **configurations**, not platforms directly.
 
@@ -84,7 +84,7 @@ No inheritance or leakage of semantics across layers.
 | `VulnerabilityScore` | Severity scoring instance | CVSS        |
 | `Reference`          | Supporting evidence       | NVD / MITRE |
 
-**Invariant**
+#### 3.2.1 Invariant
 
 * Each CVSS version = separate `VulnerabilityScore`
 * Scores never overwrite each other
@@ -98,7 +98,7 @@ No inheritance or leakage of semantics across layers.
 | `Weakness`      | Root cause category           | CWE    |
 | `AttackPattern` | Abstract exploitation pattern | CAPEC  |
 
-**Invariant**
+#### 3.3.1 Invariant
 
 * Weakness ≠ Vulnerability
 * AttackPattern ≠ Technique
@@ -113,7 +113,7 @@ No inheritance or leakage of semantics across layers.
 | `SubTechnique` | Specialized technique       | ATT&CK |
 | `Tactic`       | Operational objective       | ATT&CK |
 
-**Invariant**
+#### 3.4.1 Invariant
 
 * Tactics classify intent, not execution
 * SubTechniques always belong to exactly one Technique
@@ -128,7 +128,7 @@ No inheritance or leakage of semantics across layers.
 | `DetectionAnalytic`  | Detection logic        | CAR    |
 | `DeceptionTechnique` | Adversary manipulation | SHIELD |
 
-**Invariant**
+#### 3.5.1 Invariant
 
 * Defense ≠ Detection ≠ Deception
 * Each mapped independently to ATT&CK
@@ -141,7 +141,7 @@ No inheritance or leakage of semantics across layers.
 | ------------------- | ------------------------------- | ------ |
 | `EngagementConcept` | Strategic adversary interaction | ENGAGE |
 
-**Invariant**
+#### 3.6.1 Invariant
 
 * Engagement operates on **techniques**, not vulnerabilities
 
@@ -151,7 +151,7 @@ No inheritance or leakage of semantics across layers.
 
 ### 4.1 Exposure & Vulnerability
 
-```
+```text
 PlatformConfiguration ── affected_by ──▶ Vulnerability
 Vulnerability ── scored_by ──▶ VulnerabilityScore
 Vulnerability ── references ──▶ Reference
@@ -161,7 +161,7 @@ Vulnerability ── references ──▶ Reference
 
 ### 4.2 Causality Chain (Non-negotiable)
 
-```
+```text
 Vulnerability ── caused_by ──▶ Weakness
 Weakness ── exploited_by ──▶ AttackPattern
 AttackPattern ── implemented_as ──▶ Technique
@@ -173,7 +173,7 @@ AttackPattern ── implemented_as ──▶ Technique
 
 ### 4.3 Adversary Structure
 
-```
+```text
 Technique ── belongs_to ──▶ Tactic
 SubTechnique ── subtechnique_of ──▶ Technique
 ```
@@ -182,7 +182,7 @@ SubTechnique ── subtechnique_of ──▶ Technique
 
 ### 4.4 Defense & Response
 
-```
+```text
 Technique ── mitigated_by ──▶ DefensiveTechnique
 Technique ── detected_by ──▶ DetectionAnalytic
 Technique ── countered_by ──▶ DeceptionTechnique
@@ -192,7 +192,7 @@ Technique ── countered_by ──▶ DeceptionTechnique
 
 ### 4.5 Engagement
 
-```
+```text
 EngagementConcept ── disrupts ──▶ Technique
 EngagementConcept ── targets ──▶ Group   (external)
 ```
@@ -248,7 +248,7 @@ You can add:
 
 **Guaranteed traversal path:**
 
-```
+```text
 Asset
  → PlatformConfiguration
  → Vulnerability
@@ -279,4 +279,3 @@ From here, the **correct next moves** are:
 3. 🧠 Define RAG traversal templates
 4. 🦉 Formalize OWL DL constraints
 5. 🗺️ Generate Neo4j / RDF schemas
-

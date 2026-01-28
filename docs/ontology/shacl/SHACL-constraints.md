@@ -1,4 +1,5 @@
-Perfect choice.
+# 🛡️ SHACL Validation Profiles
+
 Below are **production-grade SHACL validation profiles** that **enforce ontology purity, extension boundaries, and RAG-safe traversals**.
 
 These shapes are **not descriptive** — they are **guardrails**.
@@ -6,9 +7,7 @@ If data passes SHACL, it is *safe to reason over*.
 
 ---
 
-# 🛡️ SHACL Validation Profiles
-
-**(Cybersecurity Ontology Governance Layer)**
+## Overview **(Cybersecurity Ontology Governance Layer)**
 
 **Applies to:**
 
@@ -324,4 +323,3 @@ inc:ObservationEvidenceShape
 2. 🧠 **Auto-generate SHACL from traversal templates**
 3. 🔍 **SHACL-aware RAG validator**
 4. 📦 **SHACL profiles per trust level (SOC / Exec / AI)**
-
