@@ -130,6 +130,9 @@ python src/etl/rdf_to_neo4j.py \
 ```bash
 # Orchestrator (validates each ETL + SHACL)
 python scripts/validate_etl_pipeline_order.py
+
+# Orchestrator + Neo4j load (local config)
+python scripts/validate_etl_pipeline_order.py --load-neo4j --batch-size 1000
 ```
 
 ---
@@ -178,8 +181,7 @@ services:
       - ./artifacts:/app/artifacts
     command: |
       sh -c "
-        python scripts/validate_etl_pipeline_order.py &&
-        python src/etl/rdf_to_neo4j.py --ttl tmp/cpe-output.ttl
+        python scripts/validate_etl_pipeline_order.py --load-neo4j --batch-size 1000
       "
 
 volumes:
@@ -199,7 +201,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["python", "scripts/validate_etl_pipeline_order.py"]
+CMD ["python", "scripts/validate_etl_pipeline_order.py", "--load-neo4j", "--batch-size", "1000"]
 ```
 
 Start the stack:
@@ -214,7 +216,7 @@ docker-compose up -d
 
 ### Architecture
 
-```
+```text
 Data Ingestion Pipeline
   ├─ Download NVD + MITRE data
   ├─ ETL Transform (JSON → RDF)
@@ -269,7 +271,7 @@ neo4j-admin database restore neo4j-backup-20260125.db
 
 Use Neo4j's built-in monitoring:
 
-```
+```text
 http://localhost:7474/browser/
   → DBMS Monitor → Databases → neo4j
 ```
@@ -309,7 +311,7 @@ jobs:
           python-version: '3.10'
       - run: pip install -r requirements.txt
       - run: pytest tests/ -v
-      - run: python scripts/validate_etl_pipeline_order.py
+      - run: python scripts/validate_etl_pipeline_order.py --load-neo4j --batch-size 1000
 
   validate-shacl:
     runs-on: ubuntu-latest
@@ -355,7 +357,7 @@ cd /opt/kgcs
 curl -O https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-recent.json
 
 # Transform + Validate + Load
-python scripts/validate_etl_pipeline_order.py
+python scripts/validate_etl_pipeline_order.py --load-neo4j --batch-size 1000
 
 # Backup
 docker exec kgcs-neo4j neo4j-admin database backup neo4j /backups/neo4j-$(date +%Y%m%d).db
@@ -449,6 +451,7 @@ python scripts/validate_shacl_stream.py \
 ## Performance Benchmarks
 
 Tested on:
+
 - 4 CPU cores, 16 GB RAM
 - CPE: 217 MB (~400K entries)
 - CVE: 5 MB (~10K entries)
@@ -466,7 +469,7 @@ Tested on:
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — Phases and roadmap
 - [GOVERNANCE.md](ontology/GOVERNANCE.md) — Data policies
-- Neo4j Docs: https://neo4j.com/docs/
-- Docker Docs: https://docs.docker.com/
-- GitHub Actions: https://docs.github.com/en/actions
+- [Neo4j Docs](https://neo4j.com/docs/)
+- [Docker Docs](https://docs.docker.com/)
+- [GitHub Actions](https://docs.github.com/en/actions)
 

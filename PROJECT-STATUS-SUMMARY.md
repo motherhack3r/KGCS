@@ -82,12 +82,11 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 
 ### MVP Checklist (Remaining)
 
-- [ ] Neo4j bootstrap scripts (docker-compose/setup) if required for team onboarding
 - [x] CAR raw YAML ETL implemented and validated on downloaded analytics/sensors
 - [x] End-to-end Neo4j load (combined TTL) verified on full outputs
 - [x] Graph constraints and indexes applied by loader (local verification complete)
-- [ ] End-to-end tests (ETL → SHACL → Neo4j)
-- [ ] CI pipeline for ingestion and artifacts
+- [x] End-to-end tests (ETL → SHACL → Neo4j)
+- [x] CI pipeline for ingestion and artifacts
 
 ## Phase 4 — Extension Layers (🔵 Designed)
 
@@ -118,8 +117,7 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 
 Phase 3 MVP completion requires:
 
-1. End-to-end integration tests (ETL → SHACL → Neo4j)
-2. CI ingestion automation
+1. Relationship breakdown reporting in loader final stats
 
 **Estimated timeline:** 6-10 days to production-ready Neo4j load with full CPE/CVE coverage. Phase 4–5 can begin in parallel (extension ETL, RAG framework).
 
@@ -128,22 +126,22 @@ Phase 3 MVP completion requires:
 ## Phase 3 “Definition of Done” (Tight Checklist)
 
 - [x] CAR raw YAML → Turtle ETL implemented and SHACL validation passes (downloaded analytics/sensors).
-- [ ] Single combined or per-standard pipeline outputs load into Neo4j using [src/etl/rdf_to_neo4j.py](src/etl/rdf_to_neo4j.py) without errors.
-- [ ] Neo4j constraints/indexes applied and verified (core IDs unique: cpeNameId, matchCriteriaId, cveId, cweId, capecId, attackTechniqueId, d3fendId, carId, shieldId, engageId).
-- [ ] End-to-end test: ETL → SHACL → Neo4j load executed and passes on pipeline TTLs in tmp/.
-- [ ] CI job added to run Phase 3 ingestion smoke checks and publish artifacts.
+- [x] Single combined or per-standard pipeline outputs load into Neo4j using [src/etl/rdf_to_neo4j.py](src/etl/rdf_to_neo4j.py) without errors.
+- [x] Neo4j constraints/indexes applied and verified (core IDs unique: cpeNameId, matchCriteriaId, cveId, cweId, capecId, attackTechniqueId, d3fendId, carId, shieldId, engageId).
+- [x] End-to-end test: ETL → SHACL → Neo4j load executed and passes on pipeline TTLs in tmp/.
+- [x] CI job added to run Phase 3 ingestion smoke checks and publish artifacts.
 
 ### Acceptance Tests (Measurable)
 
 - CAR ETL: Running `python -m src.etl.etl_car --input data/car/raw --output tmp/pipeline-stage8-car.ttl --validate` produces a Turtle file and a SHACL report with `conforms: true`.
 - Neo4j load: Running `python src/etl/rdf_to_neo4j.py --ttl tmp/pipeline-stage1-cpe.ttl --batch-size 1000` completes with success banner and no exceptions.
 - Constraints: After load, `MATCH (n:Platform) RETURN count(n)` and `SHOW CONSTRAINTS` confirm uniqueness constraints exist for core IDs.
-- End-to-end: Running `python scripts/validate_etl_pipeline_order.py` then loading the resulting tmp/pipeline-stage*.ttl files results in a non-empty graph (nodes and relationships) with no load errors.
+- End-to-end: Running `python scripts/validate_etl_pipeline_order.py --load-neo4j --batch-size 1000` loads combined pipeline TTLs and results in a non-empty graph (nodes and relationships) with no load errors.
 - CI: A workflow run uploads artifacts for SHACL summaries and logs, and fails the job if any summary report has `conforms: false`.
 
 ## Update Summary
 
-- **Date:** January 27, 2026  
+- **Date:** January 28, 2026  
 - **Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟢 In Progress (MVP) | Phase 4 🔵 Designed | Phase 5 🔵 Planned  
 
 ### Recent Developments
@@ -158,9 +156,13 @@ Phase 3 MVP completion requires:
 - **CI Ingestion Smoke:** Workflow added in [.github/workflows/phase3-ingest-smoke.yml](.github/workflows/phase3-ingest-smoke.yml) to run sample ETL + validate artifacts.  
 - **Cross-standard Relationships:** CAPEC→ATT&CK (`implements`) and CVE→CWE (`caused_by`) now emitted by ETL and loaded into Neo4j.  
 - **CWE/CAPEC Coverage:** Additional CWE/CAPEC relationship types (peer/sequence/alternate) now emitted.  
+- **End-to-end Tests:** Full ETL → SHACL → Neo4j test suite implemented using pipeline outputs.  
 
 ### Next Steps (Phase 3 Completion Order)
 
-1. Implement end-to-end test suite (ETL → SHACL → Neo4j) using pipeline outputs.  
-2. Wire ingestion checks into CI (artifact upload + gating).  
-3. Add relationship breakdown reporting (by label and type) to loader final stats.
+1. Add relationship breakdown reporting (by label and type) to loader final stats.  
+2. Add CI gating for full pipeline outputs and Neo4j smoke load (optional, if runtime permits).
+
+### Post-MVP Roadmap Note
+
+- Cloud migration planning is deferred until after Phase 3 MVP completion (or later if needed).

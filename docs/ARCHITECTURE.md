@@ -317,15 +317,15 @@ KGCS/
 
 ### Immediate (Phase 3 MVP, Weeks 5–7)
 
-- [ ] Implement Neo4j loader (Turtle → Cypher)
-- [ ] Create graph constraints + indexes
-- [ ] End-to-end tests (ETL → SHACL → Neo4j)
-- [ ] Update CI pipeline for ingestion
+- [x] Implement Neo4j loader (Turtle → Cypher)
+- [x] Create graph constraints + indexes
+- [x] End-to-end tests (ETL → SHACL → Neo4j)
+- [x] Update CI pipeline for ingestion
 
 ### Short-term (Phase 3 Full, Weeks 8–10)
 
-- [ ] Complete all 9 ETL transformers
-- [ ] Test production-scale data (222 MB CPE + CVE)
+- [x] Complete all 9 ETL transformers
+- [x] Test production-scale data (222 MB CPE + CVE)
 - [ ] Finalize data quality metrics
 
 ### Medium-term (Phase 4, Weeks 11–12)
@@ -339,6 +339,14 @@ KGCS/
 - [ ] RAG traversal validator
 - [ ] Query API
 - [ ] LLM integration + safety enforcement
+
+### Post-MVP (Phase 6: Cloud Migration, TBD)
+
+- [ ] Define target hosting model and service boundaries (ETL, validation, loader, API).
+- [ ] Containerize runtime services and externalize configuration/secrets.
+- [ ] Add IaC for repeatable environments (networking, storage, Neo4j).
+- [ ] Establish CI/CD deployment path and observability (logs/metrics/tracing).
+- [ ] Validate cost/performance on production-scale data.
 
 ---
 

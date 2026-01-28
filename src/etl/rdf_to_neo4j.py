@@ -391,6 +391,17 @@ class RDFtoNeo4jTransformer:
             count = record['count']
             label_str = ':'.join(labels) if labels else '(untyped)'
             print(f"   {label_str}: {count}")
+
+        rel_result = session.run("""
+            MATCH ()-[r]->() RETURN type(r) as rel_type, COUNT(r) as count
+            ORDER BY count DESC
+        """)
+
+        print("\nRelationship Types:")
+        for record in rel_result:
+            rel_type = record['rel_type'] or '(untyped)'
+            count = record['count']
+            print(f"   {rel_type}: {count}")
         
         result = session.run("MATCH (n) RETURN COUNT(n) as count")
         record = result.single()

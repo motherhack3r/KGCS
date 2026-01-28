@@ -18,6 +18,7 @@ import subprocess
 import sys
 import os
 from pathlib import Path
+import argparse
 
 def run_etl(transformer_module, input_file, output_file, extra_args=None):
     """Run a single ETL transformer."""
@@ -39,6 +40,22 @@ def run_etl(transformer_module, input_file, output_file, extra_args=None):
     return result.returncode == 0
 
 
+def combine_ttls(inputs, output_path: str) -> bool:
+    existing = [p for p in inputs if os.path.exists(p)]
+    if not existing:
+        return False
+    try:
+        from rdflib import Graph
+        graph = Graph()
+        for path in existing:
+            graph.parse(path, format='turtle')
+        graph.serialize(destination=output_path, format='turtle')
+        return True
+    except Exception as e:
+        print(f"Warning: could not combine TTLs into {output_path}: {e}")
+        return False
+
+
 def has_any_input(path_or_glob: str) -> bool:
     if os.path.isdir(path_or_glob):
         return True
@@ -51,6 +68,12 @@ def skip_stage(stage_label: str, reason: str) -> None:
     print(f"[SKIP] {stage_label} — {reason}")
 
 def main():
+    parser = argparse.ArgumentParser(description='KGCS ETL pipeline with optional Neo4j load')
+    parser.add_argument('--load-neo4j', action='store_true', help='Load combined pipeline TTL into Neo4j using local config')
+    parser.add_argument('--batch-size', type=int, default=1000, help='Neo4j batch size for load step')
+    parser.add_argument('--dry-run', action='store_true', help='Parse and extract without writing to Neo4j')
+    args = parser.parse_args()
+
     print("""
 ╔════════════════════════════════════════════════════════════════════╗
 ║         KGCS 3-Stage ETL Pipeline (Correct Ingestion Order)        ║
@@ -212,11 +235,11 @@ Generated outputs:
   Stage 3: tmp/pipeline-stage3-cve.ttl         (Vulnerability nodes + references)
   Stage 4: tmp/pipeline-stage4-attack.ttl      (Technique/Tactic nodes)
   Stage 5: tmp/pipeline-stage5-d3fend.ttl      (DefensiveTechnique nodes)
-    Stage 6: tmp/pipeline-stage6-capec.ttl       (AttackPattern nodes)
-    Stage 7: tmp/pipeline-stage7-cwe.ttl         (Weakness nodes)
-        Stage 8: tmp/pipeline-stage8-car.ttl         (DetectionAnalytic nodes)
-    Stage 9: tmp/pipeline-stage9-shield.ttl      (DeceptionTechnique nodes)
-    Stage 10: tmp/pipeline-stage10-engage.ttl    (EngagementConcept nodes)
+  Stage 6: tmp/pipeline-stage6-capec.ttl       (AttackPattern nodes)
+  Stage 7: tmp/pipeline-stage7-cwe.ttl         (Weakness nodes)
+  Stage 8: tmp/pipeline-stage8-car.ttl         (DetectionAnalytic nodes)
+  Stage 9: tmp/pipeline-stage9-shield.ttl      (DeceptionTechnique nodes)
+  Stage 10: tmp/pipeline-stage10-engage.ttl    (EngagementConcept nodes)
 
 All outputs generated successfully.
 
@@ -227,6 +250,42 @@ Architecture achieved:
   - Proper key relationships (matchCriteriaId as foreign key)
     """)
     
+    if args.load_neo4j:
+        print("\n[LOAD] Combine pipeline outputs and load into Neo4j (local config)")
+        print("-" * 70)
+        combined_path = 'tmp/pipeline-stage-all.ttl'
+        pipeline_outputs = [
+            'tmp/pipeline-stage1-cpe.ttl',
+            'tmp/pipeline-stage2-cpematch.ttl',
+            'tmp/pipeline-stage3-cve.ttl',
+            'tmp/pipeline-stage4-attack.ttl',
+            'tmp/pipeline-stage5-d3fend.ttl',
+            'tmp/pipeline-stage6-capec.ttl',
+            'tmp/pipeline-stage7-cwe.ttl',
+            'tmp/pipeline-stage8-car.ttl',
+            'tmp/pipeline-stage9-shield.ttl',
+            'tmp/pipeline-stage10-engage.ttl',
+        ]
+        if not combine_ttls(pipeline_outputs, combined_path):
+            print("No pipeline outputs found to combine; skipping Neo4j load.")
+            return 1
+
+        cmd = [
+            sys.executable,
+            'src/etl/rdf_to_neo4j.py',
+            '--ttl', combined_path,
+            '--batch-size', str(args.batch_size),
+        ]
+        if args.dry_run:
+            cmd.append('--dry-run')
+
+        print(f"Loading Neo4j from {combined_path} using local config...")
+        result = subprocess.run(cmd, cwd=os.getcwd())
+        if result.returncode != 0:
+            print("Neo4j load failed")
+            return 1
+        print("Neo4j load completed")
+
     return 0
 
 if __name__ == '__main__':
