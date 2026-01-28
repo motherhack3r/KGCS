@@ -42,6 +42,8 @@ class RelationshipData:
     target_uri: str
     relationship_type: str
     properties: Dict[str, Any]
+    source_label: str | None = None
+    target_label: str | None = None
 
 
 class RDFtoNeo4jTransformer:
@@ -132,7 +134,9 @@ class RDFtoNeo4jTransformer:
                 source_uri=subject_uri,
                 target_uri=target_uri,
                 relationship_type=rel_type,
-                properties={}
+                properties={},
+                source_label=self.nodes[subject_uri].label if subject_uri in self.nodes else None,
+                target_label=self.nodes[target_uri].label if target_uri in self.nodes else None
             ))
             self.stats['relationships'] += 1
 
@@ -270,6 +274,17 @@ class RDFtoNeo4jTransformer:
             except Exception as e:
                 if "already exists" not in str(e):
                     pass
+
+        # Create uri indexes for relationship lookups
+        for label in self.merge_keys.keys():
+            try:
+                session.run(f"""
+                    CREATE INDEX {label.lower()}_uri_index IF NOT EXISTS
+                    FOR (n:{label}) ON (n.uri)
+                """)
+            except Exception as e:
+                if "already exists" not in str(e):
+                    pass
         
         print(f"   * Indexes created")
     
@@ -339,16 +354,24 @@ class RDFtoNeo4jTransformer:
     
     def _insert_relationship_batch(self, session, rels: List[RelationshipData]) -> None:
         """Insert batch of relationships."""
-        by_type = defaultdict(list)
+        by_key = defaultdict(list)
         for rel in rels:
-            by_type[rel.relationship_type].append({
+            key = (rel.relationship_type, rel.source_label, rel.target_label)
+            by_key[key].append({
                 'sourceUri': rel.source_uri,
                 'targetUri': rel.target_uri,
-                'properties': rel.properties
+                'properties': rel.properties,
             })
-        
-        for rel_type, rel_list in by_type.items():
-            cypher = f"UNWIND $rels as rel MATCH (source {{uri: rel.sourceUri}}) MATCH (target {{uri: rel.targetUri}}) MERGE (source)-[r:`{rel_type}`]->(target) SET r += rel.properties"
+
+        for (rel_type, source_label, target_label), rel_list in by_key.items():
+            source_clause = f"MATCH (source:`{source_label}` {{uri: rel.sourceUri}})" if source_label else "MATCH (source {uri: rel.sourceUri})"
+            target_clause = f"MATCH (target:`{target_label}` {{uri: rel.targetUri}})" if target_label else "MATCH (target {uri: rel.targetUri})"
+            cypher = (
+                f"UNWIND $rels as rel "
+                f"{source_clause} "
+                f"{target_clause} "
+                f"MERGE (source)-[r:`{rel_type}`]->(target) SET r += rel.properties"
+            )
             try:
                 session.run(cypher, rels=rel_list)
             except Exception:

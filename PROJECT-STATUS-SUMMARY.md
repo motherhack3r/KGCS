@@ -1,6 +1,6 @@
 # KGCS Project Status Summary
 
-**Date:** January 27, 2026 (Updated)  
+**Date:** January 28, 2026 (Updated)  
 **Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟢 In Progress (MVP) | Phase 4 🔵 Designed | Phase 5 🔵 Planned
 
 ## Sources
@@ -11,7 +11,7 @@
 
 ## Executive Summary
 
-KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validation framework). Phase 3 ETL transforms raw data for all core standards (including CAR) and validates via parallel SHACL streaming with summary reports. The Neo4j loader exists with chunked processing/dry-run support, but production-grade load verification and ingestion CI are still pending. Phases 4–5 are designed but not implemented. Critical path remains Phase 3 MVP (Neo4j load + end-to-end validation).
+KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validation framework). Phase 3 ETL transforms raw data for all core standards (including CAR) and validates via parallel SHACL streaming with summary reports. The Neo4j loader now supports label-aware relationship inserts with per-label `uri` indexes and can load a combined TTL for cross-standard relationships. End-to-end Neo4j loads have been verified locally with full standard outputs; CI ingestion gates remain pending. Phases 4–5 are designed but not implemented. Critical path remains Phase 3 MVP (CI + repeatable end-to-end validation).
 
 ## Key Metrics
 
@@ -24,6 +24,7 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 - **9 ETL Outputs** — CPE, CPEMatch, CVE, ATT&CK, D3FEND, CAPEC, CWE, CAR, SHIELD, ENGAGE ✅
 - **9 SHACL Summary Reports** — per-standard summaries generated ✅
 - **222 MB raw data validated** — CPE (217 MB) + CVE 2026 (5 MB) production-scale testing ✅
+- **Neo4j full load (combined TTL)** — complete cross-standard graph load ✅
 
 ## Phase 1 — Core Standards (✅ Complete)
 
@@ -63,6 +64,10 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 - [x] CPE ETL tested & validated with NVD samples
 - [x] CPEMatch ETL tested & validated with NVD samples
 - [x] CVE ETL tested & validated with NVD samples (including sample_cve_with_matches.json)
+- [x] CVE → CWE (`caused_by`) relationships emitted from ETL
+- [x] CAPEC → ATT&CK (`implements`) relationships emitted from ETL
+- [x] CWE and CAPEC intra-standard relationships expanded (peer/sequence/alternate)
+- [x] CVE properties normalized to core predicates (description/referenceUrl)
 - [x] ATT&CK ETL tested & validated (STIX JSON)
 - [x] D3FEND ETL tested & validated (JSON-LD)
 - [x] CAPEC ETL tested & validated (XML)
@@ -73,13 +78,14 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 - [x] PlatformConfiguration mapping complete (includes excluding bounds, status, timestamps, match expansion)
 - [x] Match expansion feature tested with populated matches arrays (synthetic CVE data)
 - [x] Sample ETL suite available (tests/test_phase3_comprehensive.py)
+- [x] Neo4j loader optimized for relationship inserts (label-aware matches + uri indexes)
 
 ### MVP Checklist (Remaining)
 
 - [ ] Neo4j bootstrap scripts (docker-compose/setup) if required for team onboarding
 - [x] CAR raw YAML ETL implemented and validated on downloaded analytics/sensors
-- [ ] End-to-end Neo4j load (loader exists; needs verification on real outputs)
-- [ ] Verify/apply graph constraints and indexes in Neo4j
+- [x] End-to-end Neo4j load (combined TTL) verified on full outputs
+- [x] Graph constraints and indexes applied by loader (local verification complete)
 - [ ] End-to-end tests (ETL → SHACL → Neo4j)
 - [ ] CI pipeline for ingestion and artifacts
 
@@ -112,10 +118,8 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 
 Phase 3 MVP completion requires:
 
-1. Neo4j load verification on real pipeline outputs
-2. Graph constraints & indexes verification
-3. End-to-end integration tests
-4. CI ingestion automation
+1. End-to-end integration tests (ETL → SHACL → Neo4j)
+2. CI ingestion automation
 
 **Estimated timeline:** 6-10 days to production-ready Neo4j load with full CPE/CVE coverage. Phase 4–5 can begin in parallel (extension ETL, RAG framework).
 
@@ -148,14 +152,15 @@ Phase 3 MVP completion requires:
 - **SHACL Validation:** Parallel streaming validation completed with per-standard summary reports.  
 - **CPEMatch Fix:** `Platform` nodes now emit `cpeNameId` and correct `cpeUri`, and CPEMatch validation conforms (0 violations).  
 - **Repo Hygiene:** Removed oversized CPEMatch summary report from history; added ignore rule to prevent reintroduction.  
-- **Neo4j Loader:** Chunked dry-run with progress exists in [src/etl/rdf_to_neo4j.py](src/etl/rdf_to_neo4j.py); full end-to-end load verification still pending.  
-- **Neo4j Constraints:** Core-ID uniqueness constraints defined in the loader; need verification in a live DB.  
+- **Neo4j Loader:** Label-aware relationship inserts + per-label `uri` indexes for faster loads; combined TTL load verified locally.  
+- **Neo4j Constraints:** Core-ID uniqueness constraints applied and verified in a live DB (local).  
 - **Download Pipeline:** Daily downloader runs cleanly with fixed raw-path handling and no duplicate downloads.  
 - **CI Ingestion Smoke:** Workflow added in [.github/workflows/phase3-ingest-smoke.yml](.github/workflows/phase3-ingest-smoke.yml) to run sample ETL + validate artifacts.  
+- **Cross-standard Relationships:** CAPEC→ATT&CK (`implements`) and CVE→CWE (`caused_by`) now emitted by ETL and loaded into Neo4j.  
+- **CWE/CAPEC Coverage:** Additional CWE/CAPEC relationship types (peer/sequence/alternate) now emitted.  
 
 ### Next Steps (Phase 3 Completion Order)
 
-1. Verify Neo4j loader on pipeline TTLs (chunked load).  
-2. Verify Neo4j constraints/indexes in a live DB.  
-3. Implement end-to-end test suite (ETL → SHACL → Neo4j) using pipeline outputs.  
-4. Wire ingestion checks into CI (artifact upload + gating).
+1. Implement end-to-end test suite (ETL → SHACL → Neo4j) using pipeline outputs.  
+2. Wire ingestion checks into CI (artifact upload + gating).  
+3. Add relationship breakdown reporting (by label and type) to loader final stats.
