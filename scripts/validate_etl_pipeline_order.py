@@ -90,13 +90,33 @@ def main():
     # Additional standards
     print("\n[STAGE 4] Transform ATT&CK STIX → Technique/Tactic nodes")
     print("-" * 70)
-    if has_any_input('data/attack/raw/enterprise-attack.json'):
-        if not run_etl('etl_attack',
-                       'data/attack/raw/enterprise-attack.json',
-                       'tmp/pipeline-stage4-attack.ttl'):
-            print("ATT&CK ETL failed")
-            return 1
+    attack_inputs = [
+        'data/attack/raw/enterprise-attack.json',
+        'data/attack/raw/mobile-attack.json',
+        'data/attack/raw/ics-attack.json',
+        'data/attack/raw/pre-attack.json',
+    ]
+    attack_outputs = []
+    for attack_input in attack_inputs:
+        if has_any_input(attack_input):
+            name = Path(attack_input).stem.replace('-attack', '')
+            output_path = f'tmp/pipeline-stage4-attack-{name}.ttl'
+            if not run_etl('etl_attack', attack_input, output_path):
+                print("ATT&CK ETL failed")
+                return 1
+            attack_outputs.append(output_path)
+
+    if attack_outputs:
         print("ATT&CK ETL completed")
+        # Write a combined ATT&CK TTL for convenience
+        try:
+            from rdflib import Graph
+            graph = Graph()
+            for path in attack_outputs:
+                graph.parse(path, format='turtle')
+            graph.serialize(destination='tmp/pipeline-stage4-attack.ttl', format='turtle')
+        except Exception as e:
+            print(f"Warning: could not combine ATT&CK TTLs: {e}")
     else:
         skip_stage("ATT&CK", "raw STIX file not found")
 

@@ -36,30 +36,10 @@ def test_phase3_etl_pipeline_order():
     result = subprocess.run(cmd, cwd=str(PROJECT_ROOT))
     assert result.returncode == 0
 
-    driver = neo4j.GraphDatabase.driver(
-        neo4j_config.uri,
-        auth=(neo4j_config.user, neo4j_config.password),
-        encrypted=neo4j_config.encrypted,
-    )
-    with driver.session(database=neo4j_config.database) as session:
-        counts = session.run(
-            """
-            MATCH ()-[r]->() RETURN type(r) AS rel_type, count(*) AS cnt
-            """
-        ).data()
-        by_type = {row["rel_type"]: row["cnt"] for row in counts}
-
-        assert by_type.get("MATCHES_PLATFORM", 0) > 0
-        assert by_type.get("AFFECTED_BY", 0) > 0
-        assert by_type.get("CAUSED_BY", 0) > 0
-        assert by_type.get("IMPLEMENTS", 0) > 0
-    driver.close()
-
     expected_outputs = [
         TMP_DIR / "pipeline-stage1-cpe.ttl",
         TMP_DIR / "pipeline-stage2-cpematch.ttl",
         TMP_DIR / "pipeline-stage3-cve.ttl",
-        TMP_DIR / "pipeline-stage4-attack.ttl",
         TMP_DIR / "pipeline-stage5-d3fend.ttl",
         TMP_DIR / "pipeline-stage6-capec.ttl",
         TMP_DIR / "pipeline-stage7-cwe.ttl",
@@ -70,6 +50,9 @@ def test_phase3_etl_pipeline_order():
 
     missing = [str(path) for path in expected_outputs if not path.exists()]
     assert not missing, f"Missing ETL outputs: {', '.join(missing)}"
+
+    attack_outputs = sorted(TMP_DIR.glob("pipeline-stage4-attack*.ttl"))
+    assert attack_outputs, "Missing ATT&CK ETL outputs (pipeline-stage4-attack*.ttl)"
 
 
 @pytest.mark.skipif(not RUN_E2E, reason="Set RUN_PHASE3_E2E=1 to enable")
@@ -82,7 +65,6 @@ def test_phase3_neo4j_load():
         TMP_DIR / "pipeline-stage1-cpe.ttl",
         TMP_DIR / "pipeline-stage2-cpematch.ttl",
         TMP_DIR / "pipeline-stage3-cve.ttl",
-        TMP_DIR / "pipeline-stage4-attack.ttl",
         TMP_DIR / "pipeline-stage5-d3fend.ttl",
         TMP_DIR / "pipeline-stage6-capec.ttl",
         TMP_DIR / "pipeline-stage7-cwe.ttl",
@@ -90,6 +72,7 @@ def test_phase3_neo4j_load():
         TMP_DIR / "pipeline-stage9-shield.ttl",
         TMP_DIR / "pipeline-stage10-engage.ttl",
     ]
+    files.extend(sorted(TMP_DIR.glob("pipeline-stage4-attack*.ttl")))
     graph = Graph()
     for path in files:
         if path.exists():
@@ -121,6 +104,26 @@ def test_phase3_neo4j_load():
     result = subprocess.run(cmd, cwd=str(PROJECT_ROOT))
     assert result.returncode == 0
 
+    from src.config import neo4j_config
+    driver = neo4j.GraphDatabase.driver(
+        neo4j_config.uri,
+        auth=(neo4j_config.user, neo4j_config.password),
+        encrypted=neo4j_config.encrypted,
+    )
+    with driver.session(database=neo4j_config.database) as session:
+        counts = session.run(
+            """
+            MATCH ()-[r]->() RETURN type(r) AS rel_type, count(*) AS cnt
+            """
+        ).data()
+        by_type = {row["rel_type"]: row["cnt"] for row in counts}
+
+        assert by_type.get("MATCHES_PLATFORM", 0) > 0
+        assert by_type.get("AFFECTED_BY", 0) > 0
+        assert by_type.get("CAUSED_BY", 0) > 0
+        assert by_type.get("IMPLEMENTS", 0) > 0
+    driver.close()
+
 
 @pytest.mark.skipif(not (RUN_E2E and RUN_SHACL), reason="Set RUN_PHASE3_E2E=1 and RUN_PHASE3_E2E_SHACL=1 to enable")
 def test_phase3_shacl_validation():
@@ -129,9 +132,21 @@ def test_phase3_shacl_validation():
         ("tmp/pipeline-stage1-cpe.ttl", "docs/ontology/shacl/cpe-shapes.ttl"),
         ("tmp/pipeline-stage2-cpematch.ttl", "docs/ontology/shacl/cpe-shapes.ttl"),
         ("tmp/pipeline-stage3-cve.ttl", "docs/ontology/shacl/cve-shapes.ttl"),
+        ("tmp/pipeline-stage5-d3fend.ttl", "docs/ontology/shacl/d3fend-shapes.ttl"),
+        ("tmp/pipeline-stage6-capec.ttl", "docs/ontology/shacl/capec-shapes.ttl"),
+        ("tmp/pipeline-stage7-cwe.ttl", "docs/ontology/shacl/cwe-shapes.ttl"),
+        ("tmp/pipeline-stage8-car.ttl", "docs/ontology/shacl/car-shapes.ttl"),
+        ("tmp/pipeline-stage9-shield.ttl", "docs/ontology/shacl/shield-shapes.ttl"),
+        ("tmp/pipeline-stage10-engage.ttl", "docs/ontology/shacl/engage-shapes.ttl"),
     ]
 
+    attack_shapes = "docs/ontology/shacl/attck-shapes.ttl"
+    for attack_ttl in sorted(TMP_DIR.glob("pipeline-stage4-attack*.ttl")):
+        data_shapes_pairs.append((str(attack_ttl), attack_shapes))
+
     for data_file, shapes_file in data_shapes_pairs:
+        if not (PROJECT_ROOT / data_file).exists():
+            continue
         cmd = [
             sys.executable,
             str(PROJECT_ROOT / "scripts" / "validate_shacl_stream.py"),
