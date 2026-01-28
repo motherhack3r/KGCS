@@ -19,13 +19,15 @@ import sys
 import os
 from pathlib import Path
 
-def run_etl(transformer_module, input_file, output_file):
+def run_etl(transformer_module, input_file, output_file, extra_args=None):
     """Run a single ETL transformer."""
     cmd = [
         sys.executable, '-m', f'src.etl.{transformer_module}',
         '--input', input_file,
         '--output', output_file
     ]
+    if extra_args:
+        cmd.extend(extra_args)
 
     print(f"\n{'='*70}")
     print(f"Running: {transformer_module}")
@@ -115,7 +117,8 @@ def main():
     if has_any_input('data/capec/raw/capec_latest.xml'):
         if not run_etl('etl_capec',
                        'data/capec/raw/capec_latest.xml',
-                       'tmp/pipeline-stage6-capec.ttl'):
+                       'tmp/pipeline-stage6-capec.ttl',
+                       extra_args=['--attack-input', 'data/attack/raw']):
             print("CAPEC ETL failed")
             return 1
         print("CAPEC ETL completed")
