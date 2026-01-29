@@ -3,6 +3,24 @@
 **Date:** January 29, 2026 (Updated)  
 **Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟢 In Progress (MVP) | Phase 4 🔵 Designed | Phase 5 🔵 Planned
 
+- [KGCS Project Status Summary](#kgcs-project-status-summary)
+  - [Sources](#sources)
+  - [Executive Summary](#executive-summary)
+  - [Key Metrics](#key-metrics)
+  - [Phase 1 — Core Standards (✅ Complete)](#phase-1--core-standards--complete)
+  - [Phase 2 — SHACL Validation (✅ Complete)](#phase-2--shacl-validation--complete)
+  - [Phase 3 — Data Ingestion (🟢 In Progress - MVP)](#phase-3--data-ingestion--in-progress---mvp)
+  - [Phase 4 — Extension Layers (🔵 Designed)](#phase-4--extension-layers--designed)
+  - [Phase 5 — AI Integration (🔵 Planned)](#phase-5--ai-integration--planned)
+  - [Critical Path](#critical-path)
+  - [MVP "Definition of Done"](#mvp-definition-of-done)
+  - [Update Summary](#update-summary)
+    - [Recent Developments](#recent-developments)
+    - [Next Steps (Phase 3 Completion Order)](#next-steps-phase-3-completion-order)
+    - [Post-MVP Roadmap Note](#post-mvp-roadmap-note)
+
+---
+
 ## Sources
 
 - [docs/KGCS.md](docs/KGCS.md)
@@ -30,7 +48,7 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 
 **Status:** Frozen, immutable, production-ready core aligned 1:1 to standards.
 
-### Phase 1 Checklist
+**Phase 1 Checklist**  
 
 - [x] 9 standard ontologies complete (CPE, CVE, CWE, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE)
 - [x] Core extended ontology with causal chain
@@ -42,7 +60,7 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 
 **Status:** Full validation framework deployed; CI workflow present (enforcement TBD).
 
-### Phase 2 Checklist
+**Phase 2 Checklist**  
 
 - [x] Core + standards + defense + RAG SHACL shapes
 - [x] Consolidated shapes manifest
@@ -56,7 +74,7 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 
 **Status:** ETL operational for all core standards including CAR; SHACL validation passing with parallel streaming. Neo4j loader exists with chunked processing; full load verification and CI ingestion remain pending.
 
-### Completed
+**Completed**  
 
 - [x] Pipeline orchestrator with SHACL validation hooks
 - [x] 9 transformer implementations (src/etl/*.py)
@@ -80,7 +98,7 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 - [x] Sample ETL suite available (tests/test_phase3_comprehensive.py)
 - [x] Neo4j loader optimized for relationship inserts (label-aware matches + uri indexes)
 
-### MVP Checklist (Remaining)
+**MVP Checklist (Remaining)**  
 
 - [x] CAR raw YAML ETL implemented and validated on downloaded analytics/sensors
 - [x] End-to-end Neo4j load (combined TTL) verified on full outputs
@@ -92,7 +110,7 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 
 **Status:** Ontology designs complete; ETL and validation not started.
 
-### Phase 4 Checklist
+**Phase 4 Checklist**  
 
 - [x] Extension ontology designs (Incident, Risk, ThreatActor)
 - [x] RAG traversal templates T1–T7 defined
@@ -104,7 +122,7 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 
 **Status:** Designed; implementation not started.
 
-### Phase 5 Checklist
+**Phase 5 Checklist**  
 
 - [ ] RAG retrieval layer (Neo4j-backed)
 - [ ] Explanation generation with provenance
@@ -123,7 +141,9 @@ Phase 3 MVP completion requires:
 
 **Blocker Status:** ✅ **CLEARED** — Core standards including CAR validated with 0 violations. Ready for Neo4j integration.
 
-## Phase 3 “Definition of Done” (Tight Checklist)
+## MVP "Definition of Done"
+
+**Tight Checklist**  
 
 - [x] CAR raw YAML → Turtle ETL implemented and SHACL validation passes (downloaded analytics/sensors).
 - [x] Single combined or per-standard pipeline outputs load into Neo4j using [src/etl/rdf_to_neo4j.py](src/etl/rdf_to_neo4j.py) without errors.
@@ -131,7 +151,7 @@ Phase 3 MVP completion requires:
 - [x] End-to-end test: ETL → SHACL → Neo4j load executed and passes on pipeline TTLs in tmp/.
 - [x] CI job added to run Phase 3 ingestion smoke checks and publish artifacts.
 
-### Acceptance Tests (Measurable)
+**Acceptance Tests (Measurable)**  
 
 - CAR ETL: Running `python -m src.etl.etl_car --input data/car/raw --output tmp/pipeline-stage8-car.ttl --validate` produces a Turtle file and a SHACL report with `conforms: true`.
 - Neo4j load: Running `python src/etl/rdf_to_neo4j.py --ttl tmp/pipeline-stage1-cpe.ttl --batch-size 1000` completes with success banner and no exceptions.
