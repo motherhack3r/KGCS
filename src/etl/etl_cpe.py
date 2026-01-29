@@ -24,6 +24,13 @@ def turtle_escape(s: str) -> str:
     return '"%s"' % s
 
 
+def strip_cpe_prefix(cpe_uri: str) -> str:
+    prefix = 'cpe:2.3:'
+    if cpe_uri.startswith(prefix):
+        return cpe_uri[len(prefix):]
+    return cpe_uri
+
+
 def subject_for_platform(cpe_id: str) -> str:
     return f"<https://example.org/platform/{cpe_id}>"
 
@@ -41,6 +48,10 @@ def process_product(cpe: dict, out_f) -> int:
     written += 1
     out_f.write(f"{subj} <https://example.org/sec/core#cpeUri> {turtle_escape(cpe_name)} .\n")
     written += 1
+    label_value = strip_cpe_prefix(cpe_name)
+    if label_value:
+        out_f.write(f"{subj} <http://www.w3.org/2000/01/rdf-schema#label> {turtle_escape(label_value)} .\n")
+        written += 1
 
     parts = cpe_name.split(':')
     if len(parts) >= 3:

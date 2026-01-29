@@ -19,6 +19,11 @@ from datetime import datetime
 from rdflib import Graph, Namespace, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD
 
+try:
+    from src.etl.ttl_writer import write_graph_turtle_lines
+except Exception:
+    from .ttl_writer import write_graph_turtle_lines
+
 SEC = Namespace("https://example.org/sec/core#")
 EX = Namespace("https://example.org/")
 
@@ -147,7 +152,7 @@ def main():
 
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
     print(f"Writing RDF to {args.output}...")
-    graph.serialize(destination=args.output, format="turtle")
+    write_graph_turtle_lines(graph, args.output)
 
     if args.validate:
         print("\nRunning SHACL validation...")

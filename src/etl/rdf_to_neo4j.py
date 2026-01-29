@@ -10,6 +10,8 @@ import argparse
 import os
 import sys
 import tempfile
+import threading
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 from dataclasses import dataclass
@@ -53,10 +55,12 @@ class RDFtoNeo4jTransformer:
     Handles core KGCS classes and relationships in the sec/core namespace.
     """
     
-    def __init__(self, ttl_file: str, batch_size: int = 1000):
+    def __init__(self, ttl_file: str, batch_size: int = 1000, parse_heartbeat_seconds: float = 0, relationship_batch_size: int | None = None):
         """Initialize transformer with RDF file."""
         self.ttl_file = Path(ttl_file)
         self.batch_size = batch_size
+        self.relationship_batch_size = relationship_batch_size or batch_size
+        self.parse_heartbeat_seconds = parse_heartbeat_seconds
         
         # RDF namespaces
         self.sec_ns = Namespace("https://example.org/sec/core#")
@@ -90,11 +94,39 @@ class RDFtoNeo4jTransformer:
         """Load RDF graph from Turtle file."""
         print(f"\nLoading RDF from {self.ttl_file.name}...")
         g = Graph()
-        g.parse(self.ttl_file, format='turtle')
-        print(f"   * Loaded {len(g)} triples")
+        start = time.perf_counter()
+
+        if self.parse_heartbeat_seconds and self.parse_heartbeat_seconds > 0:
+            stop_event = threading.Event()
+
+            def heartbeat():
+                elapsed_ticks = 0
+                while not stop_event.wait(self.parse_heartbeat_seconds):
+                    elapsed_ticks += self.parse_heartbeat_seconds
+                    print(f"   ... parsing ({elapsed_ticks:0.0f}s elapsed) ...", flush=True)
+
+            thread = threading.Thread(target=heartbeat, daemon=True)
+            thread.start()
+            try:
+                g.parse(self.ttl_file, format='turtle')
+            finally:
+                stop_event.set()
+                thread.join()
+        else:
+            g.parse(self.ttl_file, format='turtle')
+
+        elapsed = time.perf_counter() - start
+        print(f"   * Loaded {len(g)} triples in {elapsed:0.1f}s")
         return g
     
-    def extract_nodes_and_relationships(self, g: Graph, verbose: bool = True) -> None:
+    def extract_nodes_and_relationships(
+        self,
+        g: Graph,
+        verbose: bool = True,
+        include_relationships: bool = True,
+        allow_external_targets: bool = False,
+        allow_missing_sources: bool = False,
+    ) -> None:
         """Extract nodes and relationships from RDF graph."""
         if verbose:
             print(f"\nExtracting nodes and relationships...")
@@ -111,6 +143,9 @@ class RDFtoNeo4jTransformer:
         for subject, labels in core_types_by_subject.items():
             self._extract_node(subject, g, labels)
 
+        if not include_relationships:
+            return
+
         for subject, predicate, obj in g:
             if isinstance(obj, Literal):
                 continue
@@ -121,7 +156,9 @@ class RDFtoNeo4jTransformer:
 
             subject_uri = str(subject)
             target_uri = str(obj)
-            if subject_uri not in self.nodes or target_uri not in self.nodes:
+            if subject_uri not in self.nodes and not allow_missing_sources:
+                continue
+            if not allow_external_targets and target_uri not in self.nodes:
                 continue
 
             predicate_name = self._local_name(predicate)
@@ -139,6 +176,153 @@ class RDFtoNeo4jTransformer:
                 target_label=self.nodes[target_uri].label if target_uri in self.nodes else None
             ))
             self.stats['relationships'] += 1
+
+        if verbose:
+            for label, count in sorted(self.stats['labels'].items()):
+                print(f"   * {label}: {count}")
+            print(f"   * Relationships: {self.stats['relationships']}")
+
+    def extract_nodes_and_relationships_stream(
+        self,
+        ttl_path: Path,
+        verbose: bool = True,
+        include_relationships: bool = True,
+        allow_external_targets: bool = False,
+        include_literals: bool = True,
+        allow_missing_sources: bool = False,
+    ) -> None:
+        """Stream-parse a TTL file without rdflib graph construction (fast path).
+
+        Assumes one triple per line and full URIs for subjects/predicates/objects.
+        """
+        if verbose:
+            print("\nExtracting nodes and relationships (streaming)...")
+
+        def iter_triples(path: Path):
+            with open(path, 'r', encoding='utf-8') as fh:
+                for raw_line in fh:
+                    line = raw_line.strip()
+                    if not line:
+                        continue
+                    if line.startswith('@prefix') or line.startswith('PREFIX') or line.startswith('#'):
+                        continue
+                    first_space = line.find(' ')
+                    if first_space == -1:
+                        continue
+                    second_space = line.find(' ', first_space + 1)
+                    if second_space == -1:
+                        continue
+                    subj_token = line[:first_space]
+                    pred_token = line[first_space + 1:second_space]
+                    obj_token = line[second_space + 1:]
+                    if obj_token.endswith(' .'):
+                        obj_token = obj_token[:-2]
+                    elif obj_token.endswith('.'):
+                        obj_token = obj_token[:-1]
+                    yield subj_token, pred_token, obj_token
+
+        def parse_uri(token: str) -> URIRef | None:
+            if token.startswith('<') and token.endswith('>'):
+                return URIRef(token[1:-1])
+            return None
+
+        def parse_object(token: str):
+            if token.startswith('<') and token.endswith('>'):
+                return URIRef(token[1:-1])
+            if token.startswith('"'):
+                # Handle typed literals with prefixed datatypes (e.g., ^^xsd:dateTime)
+                if '^^' in token:
+                    literal_part, dtype_part = token.rsplit('^^', 1)
+                    try:
+                        literal_val = Literal.from_n3(literal_part)  # type: ignore[attr-defined]
+                    except Exception:
+                        literal_val = Literal(literal_part.strip('"'))
+
+                    dtype_uri = None
+                    if dtype_part.startswith('xsd:'):
+                        dtype_uri = URIRef(f"http://www.w3.org/2001/XMLSchema#{dtype_part.split(':', 1)[1]}")
+                    elif dtype_part.startswith('<') and dtype_part.endswith('>'):
+                        dtype_uri = URIRef(dtype_part[1:-1])
+
+                    if dtype_uri is not None:
+                        return Literal(literal_val.toPython(), datatype=dtype_uri)
+
+                try:
+                    return Literal.from_n3(token)  # type: ignore[attr-defined]
+                except Exception:
+                    return Literal(token.strip('"'))
+            return None
+
+        core_types_by_subject: Dict[str, List[str]] = {}
+        rdfs_label = URIRef("http://www.w3.org/2000/01/rdf-schema#label")
+        rdfs_comment = URIRef("http://www.w3.org/2000/01/rdf-schema#comment")
+
+        for subj_token, pred_token, obj_token in iter_triples(ttl_path):
+            subj_uri = parse_uri(subj_token)
+            pred_uri = parse_uri(pred_token)
+            obj_uri = parse_uri(obj_token)
+            if not subj_uri or not pred_uri or not obj_uri:
+                continue
+            if str(pred_uri) != str(RDF.type):
+                continue
+            if str(obj_uri).startswith(self.sec_ns_str):
+                core_types_by_subject.setdefault(str(subj_uri), []).append(self._local_name(obj_uri))
+
+        for subject_uri, labels in core_types_by_subject.items():
+            unique_labels = sorted(set(labels))
+            if not unique_labels:
+                continue
+            properties = {}
+            if len(unique_labels) > 1:
+                properties['rdfTypes'] = unique_labels
+            primary_label = unique_labels[0]
+            self.nodes[subject_uri] = NodeData(label=primary_label, uri=subject_uri, properties=properties)
+            self.stats['labels'][primary_label] += 1
+
+        for subj_token, pred_token, obj_token in iter_triples(ttl_path):
+            subj_uri_ref = parse_uri(subj_token)
+            pred_uri_ref = parse_uri(pred_token)
+            if not subj_uri_ref or not pred_uri_ref:
+                continue
+
+            subject_uri = str(subj_uri_ref)
+            if subject_uri not in self.nodes and not allow_missing_sources:
+                continue
+
+            if str(pred_uri_ref) == str(RDF.type):
+                continue
+
+            obj_value = parse_object(obj_token)
+            if include_literals and isinstance(obj_value, Literal):
+                prop_name = self._local_name(pred_uri_ref)
+                value = self._parse_literal(obj_value)
+                if value is not None:
+                    self.nodes[subject_uri].properties[prop_name] = value
+                continue
+
+            if not self._is_core_uri(pred_uri_ref):
+                continue
+
+            if not include_relationships:
+                continue
+
+            if isinstance(obj_value, URIRef):
+                target_uri = str(obj_value)
+                if not allow_external_targets and target_uri not in self.nodes:
+                    continue
+                predicate_name = self._local_name(pred_uri_ref)
+                rel_type = self._predicate_to_relationship(predicate_name)
+                if rel_type in ['TYPE', 'VALUE', 'LABEL']:
+                    continue
+                self.relationships.append(RelationshipData(
+                    source_uri=subject_uri,
+                    target_uri=target_uri,
+                    relationship_type=rel_type,
+                    properties={},
+                    source_label=self.nodes[subject_uri].label if subject_uri in self.nodes else None,
+                    target_label=self.nodes[target_uri].label if target_uri in self.nodes else None
+                ))
+                self.stats['relationships'] += 1
 
         if verbose:
             for label, count in sorted(self.stats['labels'].items()):
@@ -219,22 +403,36 @@ class RDFtoNeo4jTransformer:
 
     def _local_name(self, uri: Node) -> str:
         """Return the local name for a URIRef."""
-        return str(uri).split('#')[-1]
+        uri_str = str(uri)
+        if '#' in uri_str:
+            return uri_str.split('#')[-1]
+        return uri_str.rsplit('/', 1)[-1]
 
     def _is_core_uri(self, uri: Node) -> bool:
         """Check if a URIRef is in the core namespace."""
         return str(uri).startswith(self.sec_ns_str)
     
-    def load_to_neo4j(self, driver, include_indexes: bool = True, include_stats: bool = True) -> bool:
+    def load_to_neo4j(
+        self,
+        driver,
+        include_indexes: bool = True,
+        include_stats: bool = True,
+        database: str | None = None,
+        load_nodes: bool = True,
+        load_relationships: bool = True,
+    ) -> bool:
         """Load nodes and relationships into Neo4j."""
         print(f"\nLoading to Neo4j...")
         
         try:
-            with driver.session(database=neo4j_config.database) as session:
+            target_db = database or neo4j_config.database
+            with driver.session(database=target_db) as session:
                 if include_indexes:
                     self._create_indexes(session)
-                self._load_nodes_batch(session)
-                self._load_relationships(session)
+                if load_nodes:
+                    self._load_nodes_batch(session)
+                if load_relationships:
+                    self._load_relationships(session)
                 if include_stats:
                     self._get_database_stats(session)
             return True
@@ -242,6 +440,26 @@ class RDFtoNeo4jTransformer:
         except Exception as e:
             print(f"\nError loading to Neo4j: {e}")
             return False
+
+    def reset_database(self, driver, database: str) -> bool:
+        """Drop and recreate the target database; fall back to delete-all if needed."""
+        print(f"\nResetting Neo4j database: {database}")
+        try:
+            with driver.session(database="system") as session:
+                session.run(f"DROP DATABASE `{database}` IF EXISTS")
+                session.run(f"CREATE DATABASE `{database}` IF NOT EXISTS WAIT")
+            print("   * Database reset complete")
+            return True
+        except Exception as e:
+            print(f"   * Database drop/create failed ({e}); falling back to DETACH DELETE")
+            try:
+                with driver.session(database=database) as session:
+                    session.run("MATCH (n) DETACH DELETE n")
+                print("   * Database cleared via DETACH DELETE")
+                return True
+            except Exception as e2:
+                print(f"   * Database clear failed: {e2}")
+                return False
     
     def _create_indexes(self, session) -> None:
         """Create indexes in Neo4j."""
@@ -344,10 +562,10 @@ class RDFtoNeo4jTransformer:
         for i, rel in enumerate(self.relationships, 1):
             batch.append(rel)
             
-            if len(batch) >= self.batch_size or i == len(self.relationships):
+            if len(batch) >= self.relationship_batch_size or i == len(self.relationships):
                 self._insert_relationship_batch(session, batch)
                 batch = []
-                if i % (self.batch_size * 10) == 0:
+                if i % (self.relationship_batch_size * 10) == 0:
                     print(f"      Progress: {i}/{len(self.relationships)} relationships")
         
         print(f"   * All relationships loaded")
@@ -374,8 +592,17 @@ class RDFtoNeo4jTransformer:
             )
             try:
                 session.run(cypher, rels=rel_list)
-            except Exception:
-                pass
+            except Exception as e:
+                # Retry once with a smaller batch if possible
+                if len(rel_list) > 1:
+                    mid = len(rel_list) // 2
+                    try:
+                        session.run(cypher, rels=rel_list[:mid])
+                        session.run(cypher, rels=rel_list[mid:])
+                        continue
+                    except Exception:
+                        pass
+                print(f"      Warning: relationship batch failed: {e}")
     
     def _get_database_stats(self, session) -> None:
         """Get and print database statistics."""
@@ -426,6 +653,57 @@ def _write_chunk_file(lines: List[str], idx: int) -> str:
         for line in lines:
             tf.write(line)
     return tmp_path
+
+
+def split_ttl_nodes_relationships(data_path: str, nodes_path: str, rels_path: str) -> Tuple[int, int]:
+    """Split a TTL file into nodes-only (rdf:type + literals) and relationships-only (URI objects)."""
+    rdf_type_token = f"<{RDF.type}>"
+    nodes_written = 0
+    rels_written = 0
+
+    nodes_out_path = Path(nodes_path)
+    rels_out_path = Path(rels_path)
+    nodes_out_path.parent.mkdir(parents=True, exist_ok=True)
+    rels_out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(data_path, 'r', encoding='utf-8') as fh, \
+            open(nodes_out_path, 'w', encoding='utf-8') as nodes_out, \
+            open(rels_out_path, 'w', encoding='utf-8') as rels_out:
+        for raw_line in fh:
+            line = raw_line.rstrip('\n')
+            if not line.strip():
+                nodes_out.write(raw_line)
+                rels_out.write(raw_line)
+                continue
+            if line.startswith('@prefix') or line.startswith('PREFIX') or line.startswith('#'):
+                nodes_out.write(raw_line)
+                rels_out.write(raw_line)
+                continue
+
+            first_space = line.find(' ')
+            if first_space == -1:
+                continue
+            second_space = line.find(' ', first_space + 1)
+            if second_space == -1:
+                continue
+            pred_token = line[first_space + 1:second_space]
+            obj_token = line[second_space + 1:]
+            if obj_token.endswith(' .'):
+                obj_token = obj_token[:-2]
+            elif obj_token.endswith('.'):
+                obj_token = obj_token[:-1]
+
+            if pred_token == rdf_type_token:
+                nodes_out.write(raw_line)
+                nodes_written += 1
+            elif obj_token.startswith('"'):
+                nodes_out.write(raw_line)
+                nodes_written += 1
+            elif obj_token.startswith('<') or obj_token.startswith('_:'):
+                rels_out.write(raw_line)
+                rels_written += 1
+
+    return nodes_written, rels_written
 
 
 def chunk_ttl_file(data_path: str, chunk_size: int) -> Tuple[List[Tuple[int, str]], int]:
@@ -508,7 +786,62 @@ def main():
     parser.add_argument("--chunk-size", type=int, default=0, help="Unique subjects per chunk (0 = load whole file)")
     parser.add_argument("--workers", type=int, default=1, help="Parallel workers for dry-run only")
     parser.add_argument("--progress-newline", action="store_true", help="Print progress updates as new lines")
+    parser.add_argument("--parse-heartbeat-seconds", type=float, default=0, help="Emit a heartbeat while parsing RDF (0 = off)")
+    parser.add_argument("--reset-db", action="store_true", help="Drop and recreate the target Neo4j database before loading")
+    parser.add_argument("--db-name", help="Override target Neo4j database name")
+    parser.add_argument("--db-version", help="Append a version suffix to the configured database name")
+    parser.add_argument("--fast-parse", action="store_true", help="Use a streaming TTL parser instead of rdflib Graph.parse")
+    parser.add_argument("--rel-batch-size", type=int, default=None, help="Batch size for relationship inserts (default: same as --batch-size)")
+    parser.add_argument("--export-nodes-ttl", help="Write a nodes-only TTL (rdf:type + literal properties)")
+    parser.add_argument("--export-rels-ttl", help="Write a relationships-only TTL (URI object triples)")
+    parser.add_argument("--export-only", action="store_true", help="Exit after exporting split TTL files")
+    parser.add_argument("--nodes-only", action="store_true", help="Load nodes only (skip relationships)")
+    parser.add_argument("--rels-only", action="store_true", help="Load relationships only (requires nodes already loaded)")
     args = parser.parse_args()
+
+    if args.db_name and args.db_version:
+        print("Error: --db-name and --db-version are mutually exclusive")
+        return 2
+
+    if args.nodes_only and args.rels_only:
+        print("Error: --nodes-only and --rels-only are mutually exclusive")
+        return 2
+
+    if args.rels_only and args.reset_db:
+        print("Error: --rels-only cannot be used with --reset-db (nodes would be deleted)")
+        return 2
+
+    if (args.export_nodes_ttl and not args.export_rels_ttl) or (args.export_rels_ttl and not args.export_nodes_ttl):
+        print("Error: --export-nodes-ttl and --export-rels-ttl must be provided together")
+        return 2
+
+    def _normalize_db_name(name: str) -> str:
+        # Neo4j allows ascii letters, numbers, dots, and dashes. Replace others with '-'.
+        import re
+        sanitized = re.sub(r"[^A-Za-z0-9.-]", "-", name)
+        sanitized = sanitized.strip("-.")
+        return sanitized or "neo4j"
+
+    if args.db_name:
+        target_db = _normalize_db_name(args.db_name)
+    elif args.db_version:
+        target_db = _normalize_db_name(f"{neo4j_config.database}-{args.db_version}")
+    else:
+        target_db = _normalize_db_name(neo4j_config.database)
+
+    if args.export_nodes_ttl and args.export_rels_ttl:
+        print(f"\nSplitting TTL into nodes/relationships files...")
+        nodes_written, rels_written = split_ttl_nodes_relationships(
+            args.ttl,
+            args.export_nodes_ttl,
+            args.export_rels_ttl,
+        )
+        print(f"   * Nodes triples: {nodes_written}")
+        print(f"   * Relationship triples: {rels_written}")
+        print(f"   * Nodes file: {args.export_nodes_ttl}")
+        print(f"   * Relationships file: {args.export_rels_ttl}")
+        if args.export_only:
+            return 0
 
     print("=" * 100)
     print("RDF-TO-NEO4J TRANSFORMATION")
@@ -558,22 +891,88 @@ def main():
                     encrypted=neo4j_config.encrypted
                 )
 
-                with driver.session(database=neo4j_config.database) as session:
+                with driver.session(database=target_db) as session:
                     transformer = RDFtoNeo4jTransformer(args.ttl, batch_size=args.batch_size)
+                    if args.reset_db and not args.dry_run:
+                        if not transformer.reset_database(driver, target_db):
+                            driver.close()
+                            return 1
                     transformer._create_indexes(session)
 
-                for chunk_idx, tmp_path in chunk_files:
-                    transformer = RDFtoNeo4jTransformer(tmp_path, batch_size=args.batch_size)
-                    g = transformer.load_rdf()
-                    transformer.extract_nodes_and_relationships(g, verbose=False)
-                    success = transformer.load_to_neo4j(driver, include_indexes=False, include_stats=False)
-                    if not success:
-                        driver.close()
-                        return 1
-                    completed += 1
-                    _update_progress(completed, total_chunks, None, args.progress_newline)
-                    _merge_label_counts(aggregate_labels, dict(transformer.stats['labels']))
-                    aggregate_rels += transformer.stats['relationships']
+                # Pass 1: load nodes only (unless relationships-only)
+                if not args.rels_only:
+                    for chunk_idx, tmp_path in chunk_files:
+                        transformer = RDFtoNeo4jTransformer(
+                            tmp_path,
+                            batch_size=args.batch_size,
+                            parse_heartbeat_seconds=args.parse_heartbeat_seconds,
+                            relationship_batch_size=args.rel_batch_size,
+                        )
+                        if args.fast_parse:
+                            transformer.extract_nodes_and_relationships_stream(
+                                Path(tmp_path),
+                                verbose=False,
+                                include_relationships=False,
+                            )
+                        else:
+                            g = transformer.load_rdf()
+                            transformer.extract_nodes_and_relationships(g, verbose=False, include_relationships=False)
+                        success = transformer.load_to_neo4j(
+                            driver,
+                            include_indexes=False,
+                            include_stats=False,
+                            database=target_db,
+                            load_nodes=True,
+                            load_relationships=False,
+                        )
+                        if not success:
+                            driver.close()
+                            return 1
+                        completed += 1
+                        _update_progress(completed, total_chunks, None, args.progress_newline)
+                        _merge_label_counts(aggregate_labels, dict(transformer.stats['labels']))
+
+                # Pass 2: load relationships after all nodes exist (unless nodes-only)
+                if not args.nodes_only:
+                    completed = 0
+                    for chunk_idx, tmp_path in chunk_files:
+                        transformer = RDFtoNeo4jTransformer(
+                            tmp_path,
+                            batch_size=args.batch_size,
+                            parse_heartbeat_seconds=args.parse_heartbeat_seconds,
+                            relationship_batch_size=args.rel_batch_size,
+                        )
+                        if args.fast_parse:
+                            transformer.extract_nodes_and_relationships_stream(
+                                Path(tmp_path),
+                                verbose=False,
+                                include_relationships=True,
+                                allow_external_targets=True,
+                                allow_missing_sources=args.rels_only,
+                            )
+                        else:
+                            g = transformer.load_rdf()
+                            transformer.extract_nodes_and_relationships(
+                                g,
+                                verbose=False,
+                                include_relationships=True,
+                                allow_external_targets=True,
+                                allow_missing_sources=args.rels_only,
+                            )
+                        success = transformer.load_to_neo4j(
+                            driver,
+                            include_indexes=False,
+                            include_stats=False,
+                            database=target_db,
+                            load_nodes=False,
+                            load_relationships=True,
+                        )
+                        if not success:
+                            driver.close()
+                            return 1
+                        completed += 1
+                        _update_progress(completed, total_chunks, None, args.progress_newline)
+                        aggregate_rels += transformer.stats['relationships']
 
                 driver.close()
                 if total_chunks:
@@ -599,9 +998,28 @@ def main():
             print("=" * 100)
             return 0
 
-        transformer = RDFtoNeo4jTransformer(args.ttl, batch_size=args.batch_size)
-        g = transformer.load_rdf()
-        transformer.extract_nodes_and_relationships(g)
+        transformer = RDFtoNeo4jTransformer(
+            args.ttl,
+            batch_size=args.batch_size,
+            parse_heartbeat_seconds=args.parse_heartbeat_seconds,
+            relationship_batch_size=args.rel_batch_size,
+        )
+        if args.fast_parse:
+            transformer.extract_nodes_and_relationships_stream(
+                Path(args.ttl),
+                include_relationships=not args.nodes_only,
+                include_literals=not args.rels_only,
+                allow_external_targets=args.rels_only,
+                allow_missing_sources=args.rels_only,
+            )
+        else:
+            g = transformer.load_rdf()
+            transformer.extract_nodes_and_relationships(
+                g,
+                include_relationships=not args.nodes_only,
+                allow_external_targets=args.rels_only,
+                allow_missing_sources=args.rels_only,
+            )
 
         if args.dry_run:
             print("\nDry run enabled — skipping Neo4j load.")
@@ -616,7 +1034,17 @@ def main():
             encrypted=neo4j_config.encrypted
         )
 
-        success = transformer.load_to_neo4j(driver)
+        if args.reset_db and not args.dry_run:
+            if not transformer.reset_database(driver, target_db):
+                driver.close()
+                return 1
+
+        success = transformer.load_to_neo4j(
+            driver,
+            database=target_db,
+            load_nodes=not args.rels_only,
+            load_relationships=not args.nodes_only,
+        )
         driver.close()
 
         if success:

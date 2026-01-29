@@ -19,6 +19,11 @@ import yaml
 from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF, RDFS, XSD
 
+try:
+    from src.etl.ttl_writer import write_graph_turtle_lines
+except Exception:
+    from .ttl_writer import write_graph_turtle_lines
+
 
 class CARtoRDFTransformer:
     """Transform CAR analytics to RDF."""
@@ -218,12 +223,9 @@ def main() -> int:
         transformer = CARtoRDFTransformer()
         print("Transforming to RDF...")
         transformer.transform(analytics)
-        ttl_content = transformer.graph.serialize(format="turtle")
-
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)
         print(f"Writing RDF to {args.output}...")
-        with open(args.output, "w", encoding="utf-8") as f:
-            f.write(ttl_content)
+        write_graph_turtle_lines(transformer.graph, args.output)
 
         if args.validate:
             print("\nRunning SHACL validation...")

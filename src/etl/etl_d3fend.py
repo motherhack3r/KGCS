@@ -16,6 +16,11 @@ import os
 from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib.namespace import RDF, RDFS, XSD
 
+try:
+    from src.etl.ttl_writer import write_graph_turtle_lines
+except Exception:
+    from .ttl_writer import write_graph_turtle_lines
+
 
 class D3FENDtoRDFTransformer:
     """Transform D3FEND JSON to RDF."""
@@ -190,12 +195,9 @@ def main():
         transformer = D3FENDtoRDFTransformer()
         print("Transforming to RDF...")
         transformer.transform(json_data)
-        ttl_content = transformer.graph.serialize(format="turtle")
-        
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)
         print(f"Writing RDF to {args.output}...")
-        with open(args.output, "w") as f:
-            f.write(ttl_content)
+        write_graph_turtle_lines(transformer.graph, args.output)
         
         print(f"Transformation complete: {args.output}")
         return 0

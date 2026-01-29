@@ -19,6 +19,7 @@ import sys
 import os
 from pathlib import Path
 import argparse
+import time
 
 def run_etl(transformer_module, input_file, output_file, extra_args=None):
     """Run a single ETL transformer."""
@@ -36,20 +37,58 @@ def run_etl(transformer_module, input_file, output_file, extra_args=None):
     print(f"Output: {output_file}")
     print(f"{'='*70}\n")
 
+    start = time.perf_counter()
     result = subprocess.run(cmd, cwd=os.getcwd())
-    return result.returncode == 0
+    elapsed = time.perf_counter() - start
+    return result.returncode == 0, elapsed
 
 
-def combine_ttls(inputs, output_path: str) -> bool:
+def combine_ttls(inputs, output_path: str, progress_newline: bool = False) -> bool:
     existing = [p for p in inputs if os.path.exists(p)]
     if not existing:
         return False
     try:
-        from rdflib import Graph
-        graph = Graph()
-        for path in existing:
-            graph.parse(path, format='turtle')
-        graph.serialize(destination=output_path, format='turtle')
+        total_bytes = sum(os.path.getsize(p) for p in existing)
+        processed_bytes = 0
+        last_update = time.perf_counter()
+
+        def update_progress(current_file: str, final: bool = False) -> None:
+            nonlocal last_update
+            if total_bytes <= 0:
+                return
+            now = time.perf_counter()
+            if not final and (now - last_update) < 0.5:
+                return
+            last_update = now
+            percent = min((processed_bytes / total_bytes) * 100, 100)
+            message = f"Combining TTLs: {percent:0.1f}% ({processed_bytes}/{total_bytes} bytes) — {current_file}"
+            if progress_newline:
+                print(message, flush=True)
+            else:
+                print(f"\r{message}", end='', flush=True)
+
+        header = (
+            "@prefix sec: <https://example.org/sec/core#> .\n"
+            "@prefix ex: <https://example.org/> .\n"
+            "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n"
+            "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n"
+            "@prefix dcterms: <http://purl.org/dc/terms/> .\n\n"
+        )
+        with open(output_path, 'w', encoding='utf-8') as out_f:
+            out_f.write(header)
+            for path in existing:
+                with open(path, 'r', encoding='utf-8') as in_f:
+                    for line in in_f:
+                        processed_bytes += len(line.encode('utf-8'))
+                        if not line.strip():
+                            continue
+                        if line.startswith('@prefix') or line.startswith('PREFIX') or line.startswith('#'):
+                            continue
+                        out_f.write(line)
+                        update_progress(os.path.basename(path))
+        update_progress(os.path.basename(existing[-1]), final=True)
+        if not progress_newline:
+            print()
         return True
     except Exception as e:
         print(f"Warning: could not combine TTLs into {output_path}: {e}")
@@ -72,7 +111,19 @@ def main():
     parser.add_argument('--load-neo4j', action='store_true', help='Load combined pipeline TTL into Neo4j using local config')
     parser.add_argument('--batch-size', type=int, default=1000, help='Neo4j batch size for load step')
     parser.add_argument('--dry-run', action='store_true', help='Parse and extract without writing to Neo4j')
+    parser.add_argument('--neo4j-chunk-size', type=int, default=0, help='Unique subjects per chunk for Neo4j load (0 = load whole file)')
+    parser.add_argument('--neo4j-workers', type=int, default=1, help='Parallel workers for Neo4j dry-run stats')
+    parser.add_argument('--progress-newline', action='store_true', help='Print progress updates as new lines')
+    parser.add_argument('--timing', action='store_true', help='Print per-stage timing summary')
+    parser.add_argument('--parse-heartbeat-seconds', type=float, default=0, help='Emit a heartbeat while parsing RDF (0 = off)')
+    parser.add_argument('--reset-db', action='store_true', help='Drop and recreate the Neo4j database before loading')
+    parser.add_argument('--db-name', help='Override target Neo4j database name')
+    parser.add_argument('--db-version', help='Append a version suffix to the configured database name')
+    parser.add_argument('--neo4j-fast-parse', action='store_true', help='Use streaming TTL parser for Neo4j load')
+    parser.add_argument('--rel-batch-size', type=int, default=None, help='Relationship batch size (default: same as --batch-size)')
     args = parser.parse_args()
+
+    timings = {}
 
     print("""
 ╔════════════════════════════════════════════════════════════════════╗
@@ -83,9 +134,11 @@ def main():
     # Stage 1: CPE ETL
     print("\n[STAGE 1/3] Transform CPE definitions → Platform nodes")
     print("-" * 70)
-    if not run_etl('etl_cpe',
-                   'data/cpe/raw/nvdcpe-2.0-chunks/*.json',
-                   'tmp/pipeline-stage1-cpe.ttl'):
+    ok, elapsed = run_etl('etl_cpe',
+                          'data/cpe/raw/nvdcpe-2.0-chunks/*.json',
+                          'tmp/pipeline-stage1-cpe.ttl')
+    timings['CPE ETL'] = elapsed
+    if not ok:
         print("CPE ETL failed")
         return 1
     print("CPE ETL completed")
@@ -93,9 +146,11 @@ def main():
     # Stage 2: CPEMatch ETL
     print("\n[STAGE 2/3] Transform CPEMatch criteria → PlatformConfiguration nodes")
     print("-" * 70)
-    if not run_etl('etl_cpematch',
-                   'data/cpe/raw/nvdcpematch-2.0-chunks/*.json',
-                   'tmp/pipeline-stage2-cpematch.ttl'):
+    ok, elapsed = run_etl('etl_cpematch',
+                          'data/cpe/raw/nvdcpematch-2.0-chunks/*.json',
+                          'tmp/pipeline-stage2-cpematch.ttl')
+    timings['CPEMatch ETL'] = elapsed
+    if not ok:
         print("CPEMatch ETL failed")
         return 1
     print("CPEMatch ETL completed")
@@ -103,9 +158,11 @@ def main():
     # Stage 3: CVE ETL
     print("\n[STAGE 3/3] Transform CVE records → Vulnerability nodes (references configs)")
     print("-" * 70)
-    if not run_etl('etl_cve',
-                   'data/cve/raw',
-                   'tmp/pipeline-stage3-cve.ttl'):
+    ok, elapsed = run_etl('etl_cve',
+                          'data/cve/raw',
+                          'tmp/pipeline-stage3-cve.ttl')
+    timings['CVE ETL'] = elapsed
+    if not ok:
         print("CVE ETL failed")
         return 1
     print("CVE ETL completed")
@@ -124,31 +181,28 @@ def main():
         if has_any_input(attack_input):
             name = Path(attack_input).stem.replace('-attack', '')
             output_path = f'tmp/pipeline-stage4-attack-{name}.ttl'
-            if not run_etl('etl_attack', attack_input, output_path):
+            ok, elapsed = run_etl('etl_attack', attack_input, output_path)
+            timings[f'ATT&CK ETL ({name})'] = elapsed
+            if not ok:
                 print("ATT&CK ETL failed")
                 return 1
             attack_outputs.append(output_path)
 
     if attack_outputs:
         print("ATT&CK ETL completed")
-        # Write a combined ATT&CK TTL for convenience
-        try:
-            from rdflib import Graph
-            graph = Graph()
-            for path in attack_outputs:
-                graph.parse(path, format='turtle')
-            graph.serialize(destination='tmp/pipeline-stage4-attack.ttl', format='turtle')
-        except Exception as e:
-            print(f"Warning: could not combine ATT&CK TTLs: {e}")
+        if not combine_ttls(attack_outputs, 'tmp/pipeline-stage4-attack.ttl', progress_newline=args.progress_newline):
+            print("Warning: could not combine ATT&CK TTLs")
     else:
         skip_stage("ATT&CK", "raw STIX file not found")
 
     print("\n[STAGE 5] Transform D3FEND → DefensiveTechnique nodes")
     print("-" * 70)
     if has_any_input('data/d3fend/raw/d3fend.json'):
-        if not run_etl('etl_d3fend',
-                       'data/d3fend/raw/d3fend.json',
-                       'tmp/pipeline-stage5-d3fend.ttl'):
+        ok, elapsed = run_etl('etl_d3fend',
+                              'data/d3fend/raw/d3fend.json',
+                              'tmp/pipeline-stage5-d3fend.ttl')
+        timings['D3FEND ETL'] = elapsed
+        if not ok:
             print("D3FEND ETL failed")
             return 1
         print("D3FEND ETL completed")
@@ -158,10 +212,12 @@ def main():
     print("\n[STAGE 6] Transform CAPEC → AttackPattern nodes")
     print("-" * 70)
     if has_any_input('data/capec/raw/capec_latest.xml'):
-        if not run_etl('etl_capec',
-                       'data/capec/raw/capec_latest.xml',
-                       'tmp/pipeline-stage6-capec.ttl',
-                       extra_args=['--attack-input', 'data/attack/raw']):
+        ok, elapsed = run_etl('etl_capec',
+                              'data/capec/raw/capec_latest.xml',
+                              'tmp/pipeline-stage6-capec.ttl',
+                              extra_args=['--attack-input', 'data/attack/raw'])
+        timings['CAPEC ETL'] = elapsed
+        if not ok:
             print("CAPEC ETL failed")
             return 1
         print("CAPEC ETL completed")
@@ -179,9 +235,11 @@ def main():
             cwe_input = sorted(candidates)[0]
 
     if cwe_input:
-        if not run_etl('etl_cwe',
-                       cwe_input,
-                       'tmp/pipeline-stage7-cwe.ttl'):
+        ok, elapsed = run_etl('etl_cwe',
+                              cwe_input,
+                              'tmp/pipeline-stage7-cwe.ttl')
+        timings['CWE ETL'] = elapsed
+        if not ok:
             print("CWE ETL failed")
             return 1
         print("CWE ETL completed")
@@ -191,9 +249,11 @@ def main():
     print("\n[STAGE 8] Transform CAR → DetectionAnalytic nodes")
     print("-" * 70)
     if has_any_input('data/car/raw/*.yaml'):
-        if not run_etl('etl_car',
-                       'data/car/raw',
-                       'tmp/pipeline-stage8-car.ttl'):
+        ok, elapsed = run_etl('etl_car',
+                              'data/car/raw',
+                              'tmp/pipeline-stage8-car.ttl')
+        timings['CAR ETL'] = elapsed
+        if not ok:
             print("CAR ETL failed")
             return 1
         print("CAR ETL completed")
@@ -203,9 +263,11 @@ def main():
     print("\n[STAGE 9] Transform SHIELD → DeceptionTechnique nodes")
     print("-" * 70)
     if has_any_input('data/shield/raw'):
-        if not run_etl('etl_shield',
-                       'data/shield/raw',
-                       'tmp/pipeline-stage9-shield.ttl'):
+        ok, elapsed = run_etl('etl_shield',
+                              'data/shield/raw',
+                              'tmp/pipeline-stage9-shield.ttl')
+        timings['SHIELD ETL'] = elapsed
+        if not ok:
             print("SHIELD ETL failed")
             return 1
         print("SHIELD ETL completed")
@@ -215,9 +277,11 @@ def main():
     print("\n[STAGE 10] Transform ENGAGE → EngagementConcept nodes")
     print("-" * 70)
     if has_any_input('data/engage/raw'):
-        if not run_etl('etl_engage',
-                       'data/engage/raw',
-                       'tmp/pipeline-stage10-engage.ttl'):
+        ok, elapsed = run_etl('etl_engage',
+                              'data/engage/raw',
+                              'tmp/pipeline-stage10-engage.ttl')
+        timings['ENGAGE ETL'] = elapsed
+        if not ok:
             print("ENGAGE ETL failed")
             return 1
         print("ENGAGE ETL completed")
@@ -250,6 +314,11 @@ Architecture achieved:
   - Proper key relationships (matchCriteriaId as foreign key)
     """)
     
+    if args.timing and timings:
+        print("\nStage timing (seconds):")
+        for name, elapsed in timings.items():
+            print(f"  - {name}: {elapsed:0.2f}s")
+
     if args.load_neo4j:
         print("\n[LOAD] Combine pipeline outputs and load into Neo4j (local config)")
         print("-" * 70)
@@ -266,25 +335,45 @@ Architecture achieved:
             'tmp/pipeline-stage9-shield.ttl',
             'tmp/pipeline-stage10-engage.ttl',
         ]
-        if not combine_ttls(pipeline_outputs, combined_path):
+        if not combine_ttls(pipeline_outputs, combined_path, progress_newline=args.progress_newline):
             print("No pipeline outputs found to combine; skipping Neo4j load.")
             return 1
 
         cmd = [
             sys.executable,
-            'src/etl/rdf_to_neo4j.py',
+            '-m', 'src.etl.rdf_to_neo4j',
             '--ttl', combined_path,
             '--batch-size', str(args.batch_size),
         ]
+        if args.neo4j_chunk_size and args.neo4j_chunk_size > 0:
+            cmd.extend(['--chunk-size', str(args.neo4j_chunk_size)])
+        if args.neo4j_workers and args.neo4j_workers > 1:
+            cmd.extend(['--workers', str(args.neo4j_workers)])
+        if args.progress_newline:
+            cmd.append('--progress-newline')
+        if args.parse_heartbeat_seconds and args.parse_heartbeat_seconds > 0:
+            cmd.extend(['--parse-heartbeat-seconds', str(args.parse_heartbeat_seconds)])
+        if args.reset_db:
+            cmd.append('--reset-db')
+        if args.db_name:
+            cmd.extend(['--db-name', args.db_name])
+        if args.db_version:
+            cmd.extend(['--db-version', args.db_version])
+        if args.neo4j_fast_parse:
+            cmd.append('--fast-parse')
+        if args.rel_batch_size:
+            cmd.extend(['--rel-batch-size', str(args.rel_batch_size)])
         if args.dry_run:
             cmd.append('--dry-run')
 
         print(f"Loading Neo4j from {combined_path} using local config...")
+        start = time.perf_counter()
         result = subprocess.run(cmd, cwd=os.getcwd())
+        elapsed = time.perf_counter() - start
         if result.returncode != 0:
             print("Neo4j load failed")
             return 1
-        print("Neo4j load completed")
+        print(f"Neo4j load completed in {elapsed:0.2f}s")
 
     return 0
 

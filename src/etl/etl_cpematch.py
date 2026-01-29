@@ -28,6 +28,13 @@ def turtle_escape(s: str) -> str:
     return '"%s"' % s
 
 
+def strip_cpe_prefix(cpe_uri: str) -> str:
+    prefix = 'cpe:2.3:'
+    if cpe_uri.startswith(prefix):
+        return cpe_uri[len(prefix):]
+    return cpe_uri
+
+
 def subject_for_config(match_id: str) -> str:
     return f"<https://example.org/platformConfiguration/{match_id}>"
 
@@ -52,6 +59,10 @@ def process_match_string(ms: dict, out_f, platform_cache: set) -> int:
     if criteria:
         out_f.write(f"{subj} <https://example.org/sec/core#configurationCriteria> {turtle_escape(criteria)} .\n")
         written += 1
+        label_value = strip_cpe_prefix(criteria)
+        if label_value:
+            out_f.write(f"{subj} <http://www.w3.org/2000/01/rdf-schema#label> {turtle_escape(label_value)} .\n")
+            written += 1
 
     status = ms.get('status')
     if status:
@@ -85,6 +96,10 @@ def process_match_string(ms: dict, out_f, platform_cache: set) -> int:
             out_f.write(f"{platform_subj} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://example.org/sec/core#Platform> .\n")
             out_f.write(f"{platform_subj} <https://example.org/sec/core#cpeUri> {turtle_escape(match_cpe)} .\n")
             out_f.write(f"{platform_subj} <https://example.org/sec/core#cpeNameId> {turtle_escape(match_platform_id)} .\n")
+            label_value = strip_cpe_prefix(match_cpe)
+            if label_value:
+                out_f.write(f"{platform_subj} <http://www.w3.org/2000/01/rdf-schema#label> {turtle_escape(label_value)} .\n")
+                written += 1
             platform_cache.add(match_platform_id)
             written += 3
 
