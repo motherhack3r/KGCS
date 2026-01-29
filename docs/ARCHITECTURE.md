@@ -1,8 +1,8 @@
 # KGCS Architecture & Roadmap
 
 **Version:** 1.0  
-**Date:** January 25, 2026  
-**Status:** Phase 3 MVP (Neo4j integration pending)
+**Date:** January 29, 2026  
+**Status:** Phase 3 MVP (Neo4j loader and end-to-end pipeline operational)
 
 ---
 
@@ -90,11 +90,11 @@ docs/ontology/GOVERNANCE.md           (Policies + procedures)
 
 ---
 
-### Phase 3: Data Ingestion & Neo4j MVP 🟢 **IN PROGRESS**
+### Phase 3: Data Ingestion & Neo4j MVP 🟢 **MVP COMPLETE**
 
 **Duration:** Weeks 5–7 (MVP) | Weeks 8–10 (full)  
-**Status:** ETL complete, Neo4j loader pending  
-**MVP Scope:** CPE + CVE + CWE + CAPEC + ATT&CK
+**Status:** ETL and Neo4j loader operational; end-to-end pipeline validated on all core standards.  
+**MVP Scope:** All 9 standards (CPE, CPEMatch, CVE, CWE, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE)
 
 **Deliverables (MVP):**
 
@@ -108,11 +108,11 @@ docs/ontology/GOVERNANCE.md           (Policies + procedures)
    - SHACL validation per chunk
    - Reports to `artifacts/` with failure payloads
 
-3. **Neo4j Loader** ⏳ Pending
-   - Parse Turtle RDF → Cypher CREATE statements
-   - Batch node/relationship creation (configurable batch size)
-   - Auto-create indexes on standard IDs (cpeUri, cveId, cweId, etc.)
-   - Graph constraints (unique, cardinality)
+3. **Neo4j Loader** ✅ Complete
+   - Loads Turtle RDF → Cypher (batch node/relationship creation)
+   - Label-aware relationship inserts, per-label `uri` indexes
+   - Graph constraints (unique, cardinality) auto-applied
+   - End-to-end loads verified on full outputs
 
 4. **Configuration Management** ✅ Complete
    - Environment-based setup (src/config.py)
@@ -128,10 +128,10 @@ python -m src.etl.etl_cpe \
   --output tmp/cpe-output.ttl \
   --validate
 
-# Load into Neo4j (pending implementation)
+# Load into Neo4j
 python src/etl/rdf_to_neo4j.py \
-  --ttl tmp/cpe-output.ttl \
-  --batch-size 1000
+   --ttl tmp/cpe-output.ttl \
+   --batch-size 1000
 ```
 
 **Files:**
@@ -326,6 +326,7 @@ KGCS/
 
 - [x] Complete all 9 ETL transformers
 - [x] Test production-scale data (222 MB CPE + CVE)
+- [x] End-to-end Neo4j loads and validation
 - [ ] Finalize data quality metrics
 
 ### Medium-term (Phase 4, Weeks 11–12)
