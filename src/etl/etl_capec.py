@@ -54,6 +54,7 @@ class CAPECtoRDFTransformer:
 
         return self.graph
 
+
     def _add_attack_pattern(self, pattern: dict):
         """Add a CAPEC attack pattern entry as a sec:AttackPattern node."""
         capec_id = pattern.get("ID", "")
@@ -65,31 +66,127 @@ class CAPECtoRDFTransformer:
         self.graph.add((pattern_node, RDF.type, SEC.AttackPattern))
         self.graph.add((pattern_node, SEC.capecId, Literal(capec_id_full, datatype=XSD.string)))
 
+        # Name/label
         if pattern.get("Name"):
             self.graph.add((pattern_node, RDFS.label, Literal(pattern["Name"], datatype=XSD.string)))
 
+        # Description
         if pattern.get("Description"):
             desc_text = self._extract_description(pattern["Description"])
             if desc_text:
                 self.graph.add((pattern_node, SEC.description, Literal(desc_text, datatype=XSD.string)))
 
+        # Abstraction Level
+        if pattern.get("Abstraction"):
+            self.graph.add((pattern_node, SEC.abstractionLevel, Literal(pattern["Abstraction"], datatype=XSD.string)))
+
+        # Status
+        if pattern.get("Status"):
+            self.graph.add((pattern_node, SEC.status, Literal(pattern["Status"], datatype=XSD.string)))
+
+        # Severity
+        if pattern.get("Severity"):
+            self.graph.add((pattern_node, SEC.severity, Literal(pattern["Severity"], datatype=XSD.string)))
+
+        # Likelihood
+        if pattern.get("Likelihood"):
+            self.graph.add((pattern_node, SEC.likelihood, Literal(pattern["Likelihood"], datatype=XSD.string)))
+
+        # Skill Level
+        if pattern.get("SkillLevel"):
+            self.graph.add((pattern_node, SEC.skillLevel, Literal(pattern["SkillLevel"], datatype=XSD.string)))
+
+        # Published Date
+        if pattern.get("PublishedDate"):
+            self.graph.add((pattern_node, SEC.publishedDate, Literal(pattern["PublishedDate"], datatype=XSD.gYear)))
+
+        # Last Modified Date
+        if pattern.get("LastModifiedDate"):
+            self.graph.add((pattern_node, SEC.lastModifiedDate, Literal(pattern["LastModifiedDate"], datatype=XSD.date)))
+
+        # Member Of (Category/View)
+        if pattern.get("MemberOf"):
+            for member in pattern["MemberOf"]:
+                if member.get("Type") == "Category":
+                    cat_id = member.get("ID")
+                    if cat_id:
+                        cat_node = URIRef(f"{EX}category/{cat_id}")
+                        self.graph.add((pattern_node, SEC.memberOf, cat_node))
+                        self.graph.add((cat_node, RDF.type, SEC.Category))
+                elif member.get("Type") == "View":
+                    view_id = member.get("ID")
+                    if view_id:
+                        view_node = URIRef(f"{EX}view/{view_id}")
+                        self.graph.add((pattern_node, SEC.memberOf, view_node))
+                        self.graph.add((view_node, RDF.type, SEC.View))
+
+        # Prerequisites (as nodes)
         if pattern.get("Prerequisites"):
-            for prereq in pattern["Prerequisites"]:
+            for i, prereq in enumerate(pattern["Prerequisites"]):
                 if prereq.get("Description"):
                     prereq_text = self._extract_description(prereq["Description"])
                     if prereq_text:
-                        self.graph.add((pattern_node, SEC.prerequisite, Literal(prereq_text, datatype=XSD.string)))
+                        prereq_node = URIRef(f"{EX}prerequisite/{capec_id_full}-{i}")
+                        self.graph.add((prereq_node, RDF.type, SEC.Prerequisite))
+                        self.graph.add((prereq_node, SEC.prerequisiteDescription, Literal(prereq_text, datatype=XSD.string)))
+                        self.graph.add((pattern_node, SEC.hasPrerequisite, prereq_node))
 
+        # Consequences (as nodes)
         if pattern.get("Consequences"):
-            for consequence in pattern["Consequences"]:
+            for i, consequence in enumerate(pattern["Consequences"]):
                 if consequence.get("Description"):
                     cons_text = self._extract_description(consequence["Description"])
                     if cons_text:
-                        self.graph.add((pattern_node, SEC.consequence, Literal(cons_text, datatype=XSD.string)))
+                        cons_node = URIRef(f"{EX}consequence/{capec_id_full}-{i}")
+                        self.graph.add((cons_node, RDF.type, SEC.Consequence))
+                        self.graph.add((cons_node, SEC.consequenceDescription, Literal(cons_text, datatype=XSD.string)))
+                        if consequence.get("Type"):
+                            self.graph.add((cons_node, SEC.consequenceType, Literal(consequence["Type"], datatype=XSD.string)))
+                        self.graph.add((pattern_node, SEC.hasConsequence, cons_node))
 
+        # Mitigations (as nodes)
+        if pattern.get("Mitigations"):
+            for i, mitig in enumerate(pattern["Mitigations"]):
+                if mitig.get("Description"):
+                    mitig_text = self._extract_description(mitig["Description"])
+                    if mitig_text:
+                        mitig_node = URIRef(f"{EX}mitigation/{capec_id_full}-{i}")
+                        self.graph.add((mitig_node, RDF.type, SEC.Mitigation))
+                        self.graph.add((mitig_node, SEC.mitigationDescription, Literal(mitig_text, datatype=XSD.string)))
+                        if mitig.get("Type"):
+                            self.graph.add((mitig_node, SEC.mitigationType, Literal(mitig["Type"], datatype=XSD.string)))
+                        self.graph.add((pattern_node, SEC.hasMitigation, mitig_node))
+
+        # Execution (as nodes)
+        if pattern.get("Execution"):
+            for i, execu in enumerate(pattern["Execution"]):
+                if execu.get("Flow"):
+                    exec_node = URIRef(f"{EX}execution/{capec_id_full}-{i}")
+                    self.graph.add((exec_node, RDF.type, SEC.Execution))
+                    self.graph.add((exec_node, SEC.executionFlow, Literal(execu["Flow"], datatype=XSD.string)))
+                    if execu.get("Phase"):
+                        self.graph.add((exec_node, SEC.executionPhase, Literal(execu["Phase"], datatype=XSD.string)))
+                    self.graph.add((pattern_node, SEC.hasExecution, exec_node))
+
+        # External References (as nodes)
+        if pattern.get("ExternalReferences"):
+            for i, ref in enumerate(pattern["ExternalReferences"]):
+                if ref.get("Title") or ref.get("URL"):
+                    ref_node = URIRef(f"{EX}externalref/{capec_id_full}-{i}")
+                    self.graph.add((ref_node, RDF.type, SEC.ExternalReference))
+                    if ref.get("Title"):
+                        self.graph.add((ref_node, SEC.referenceTitle, Literal(ref["Title"], datatype=XSD.string)))
+                    if ref.get("URL"):
+                        self.graph.add((ref_node, SEC.referenceURL, Literal(ref["URL"], datatype=XSD.anyURI)))
+                    if ref.get("Type"):
+                        self.graph.add((ref_node, SEC.referenceType, Literal(ref["Type"], datatype=XSD.string)))
+                    self.graph.add((pattern_node, SEC.hasExternalReference, ref_node))
+
+        # Related Weaknesses (CWE)
         if pattern.get("RelatedWeaknesses"):
             self._add_weakness_relationships(pattern_node, pattern["RelatedWeaknesses"])
 
+        # CAPEC→ATT&CK mappings
         attack_ids = self.capec_to_attack.get(capec_id_full, [])
         for attack_id in attack_ids:
             if not isinstance(attack_id, str) or not attack_id:
