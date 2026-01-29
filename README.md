@@ -7,8 +7,17 @@
 
 ## 📌 Overview
 
-KGCS (Cybersecurity Knowledge Graph) is a frozen, standards‑backed ontology that unifies nine MITRE security taxonomies (CVE, CWE, CPE, CVSS, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE).  
+KGCS (Cybersecurity Knowledge Graph) is a frozen, standards‑backed ontology that unifies nine MITRE security taxonomies (CVE, CWE, CPE, CVSS, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE).
 It provides a single source of truth for AI systems to reason about vulnerabilities, attacks, defenses, and threat intelligence without hallucination.
+
+**Current Status:**
+
+- **Phase 1:** Core ontologies complete and frozen
+- **Phase 2:** SHACL validation framework complete
+- **Phase 3:** MVP data ingestion and Neo4j loader operational (see [PROJECT-STATUS-SUMMARY.md](PROJECT-STATUS-SUMMARY.md))
+- **Phase 4–5:** Extensions and RAG integration designed, not yet implemented
+
+For a full technical and architectural overview, see [docs/KGCS.md](docs/KGCS.md) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ---
 
@@ -26,8 +35,8 @@ It provides a single source of truth for AI systems to reason about vulnerabilit
 └───────────────────────┘
 ```
 
-* **Core** is immutable and 1:1 mapped to official JSON/STIX schemas.  
-* **Extensions** add temporal, contextual, or subjective data without polluting the core.
+- **Core** is immutable and 1:1 mapped to official JSON/STIX schemas.  
+- **Extensions** add temporal, contextual, or subjective data without polluting the core.
 
 ---
 
@@ -52,12 +61,12 @@ It provides a single source of truth for AI systems to reason about vulnerabilit
    ```
 
 2. **Load data**  
-   * Download NVD and MITRE JSON/STIX files into data.  
-   * Run the ingestion script (Python/Neo4j or RDF).  
+   - Download NVD and MITRE JSON/STIX files into data.  
+   - Run the ingestion script (Python/Neo4j or RDF).  
 
 3. **Query the graph**  
-   * Use Neo4j Cypher or SPARQL.  
-   * Example:  
+   - Use Neo4j Cypher or SPARQL.  
+   - Example:  
 
      ```cypher
      MATCH (cve:Vulnerability {cveId:'CVE-2025-1234'})
@@ -66,8 +75,8 @@ It provides a single source of truth for AI systems to reason about vulnerabilit
      ```
 
 4. **Integrate with RAG**  
-   * Use the pre‑approved traversal templates in rag.  
-   * Ensure LLM queries follow a template; otherwise reject.
+   - Use the pre‑approved traversal templates in rag.  
+   - Ensure LLM queries follow a template; otherwise reject.
 
 ---
 
@@ -86,9 +95,9 @@ It provides a single source of truth for AI systems to reason about vulnerabilit
 
 ## 📦 Extensions
 
-* **Incident** – Observed techniques, detections, evidence.  
-* **Risk** – Assessments, scenarios, decisions.  
-* **ThreatActor** – Attribution claims, capabilities, tools.
+- **Incident** – Observed techniques, detections, evidence.  
+- **Risk** – Assessments, scenarios, decisions.  
+- **ThreatActor** – Attribution claims, capabilities, tools.
 
 Each extension lives in its own OWL file and imports the core ontology.
 
@@ -96,21 +105,21 @@ Each extension lives in its own OWL file and imports the core ontology.
 
 ## 📈 Future Work
 
-* Add new standards (e.g., NIST SP 800‑53).  
-* SHACL validation: canonical shapes, per-OWL bundles and manifest, validator CLI (`--template` / `--owl`) implemented; ETL integration and governance artifacts added. Validator emits machine-readable reports to `artifacts/` and a consolidated index `artifacts/shacl-report-consolidated.json`. CI gating remains scaffolded and requires rule‑ID policy selection.
-* Build a UI for visualizing traversal paths.  
-* Integrate with an LLM for explainable answers.
+- Add new standards (e.g., NIST SP 800‑53).  
+- SHACL validation: canonical shapes, per-OWL bundles and manifest, validator CLI (`--template` / `--owl`) implemented; ETL integration and governance artifacts added. Validator emits machine-readable reports to `artifacts/` and a consolidated index `artifacts/shacl-report-consolidated.json`. CI gating remains scaffolded and requires rule‑ID policy selection.
+- Build a UI for visualizing traversal paths.  
+- Integrate with an LLM for explainable answers.
 
 ## 🧰 Operational Scripts
 
-* `scripts/db/` holds the Phase 4 helpers (`create_cpe_cve_relationships.py`, `verify_phase4_complete.py`, the `check_*` utilities, etc.) that interact with Neo4j for reproduction or diagnostics.  
-* `scripts/legacy/phase4/` archives the one-off repair/verification scripts (`repair_cpe_properties.py`, `diagnose_cpe_mismatch.py`, `check_buggy_pattern.py`, etc.) that were needed during the CPE parsing fix but are no longer part of normal ingestion.
-* Regression and integration suites now live under `tests/` so the repository root stays focused on documentation, configuration, and operational scripts.
+- `scripts/db/` holds the Phase 4 helpers (`create_cpe_cve_relationships.py`, `verify_phase4_complete.py`, the `check_*` utilities, etc.) that interact with Neo4j for reproduction or diagnostics.  
+- `scripts/legacy/phase4/` archives the one-off repair/verification scripts (`repair_cpe_properties.py`, `diagnose_cpe_mismatch.py`, `check_buggy_pattern.py`, etc.) that were needed during the CPE parsing fix but are no longer part of normal ingestion.
+- Regression and integration suites now live under `tests/` so the repository root stays focused on documentation, configuration, and operational scripts.
 
 ### Verification Utilities (RDF/Turtle)
 
-* [tests/verify_causal_chain.py](tests/verify_causal_chain.py) — offline sanity check of CWE→CAPEC→Technique→Tactic using the pipeline Turtle outputs in tmp.
-* [tests/verify_defense_layers.py](tests/verify_defense_layers.py) — offline sanity check of defense-layer links (D3FEND/CAR/SHIELD/ENGAGE) against ATT&CK using the pipeline Turtle outputs in tmp.
+- [tests/verify_causal_chain.py](tests/verify_causal_chain.py) — offline sanity check of CWE→CAPEC→Technique→Tactic using the pipeline Turtle outputs in tmp.
+- [tests/verify_defense_layers.py](tests/verify_defense_layers.py) — offline sanity check of defense-layer links (D3FEND/CAR/SHIELD/ENGAGE) against ATT&CK using the pipeline Turtle outputs in tmp.
 
 These are manual verification utilities (not pytest tests) and expect the corresponding tmp/pipeline-stage*.ttl files to exist.
 
@@ -128,17 +137,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## **Roadmap**
 
-* **Short-term (0-3 months):** Complete CI SHACL gating, add missing per-OWL positive/negative samples, and automate validator runs in `src/core/`.
-* **Mid-term (3-9 months):** Expand modular OWL coverage (additional standards), automate ingestion pipelines, add RAG enforcement hooks, and produce more example traversal templates.
-* **Long-term (9-18 months):** Build a web UI for traversal visualization, full CI enforcement for OWL/SHACL changes, and integrate explainable LLM-backed query interfaces.
+- **Short-term (0-3 months):** Complete CI SHACL gating, add missing per-OWL positive/negative samples, and automate validator runs in `src/core/`.
+- **Mid-term (3-9 months):** Expand modular OWL coverage (additional standards), automate ingestion pipelines, add RAG enforcement hooks, and produce more example traversal templates.
+- **Long-term (9-18 months):** Build a web UI for traversal visualization, full CI enforcement for OWL/SHACL changes, and integrate explainable LLM-backed query interfaces.
 
 ## **Current Status**
 
-* **Core Ontology:** Modular OWL files and core invariants are implemented under `docs/ontology/`.
-* **SHACL Validation:** Validation module at `src/core/validation.py` with CLI entry points; machine-readable reports stored in `artifacts/`; CI gating is scaffolded but not fully enforced.
-* **Ingestion:** ETL transformers for all 9 standards live in `src/etl/` (e.g., `etl_cve.py`, `etl_cpe.py`); pre-ingest pipeline in `src/ingest/pipeline.py` with validation gates; ready for Neo4j integration.
-* **RAG Safety:** Traversal templates and safety rules are documented; runtime enforcement and query-time validation remain to be completed.
-* **Integrations & UI:** Neo4j loader and sample data are present; a production UI is planned but not yet implemented.
+- **Core Ontology:** Modular OWL files and core invariants are implemented under `docs/ontology/`.
+- **SHACL Validation:** Validation module at `src/core/validation.py` with CLI entry points; machine-readable reports stored in `artifacts/`; CI gating is scaffolded but not fully enforced.
+- **Ingestion:** ETL transformers for all 9 standards live in `src/etl/` (e.g., `etl_cve.py`, `etl_cpe.py`); pre-ingest pipeline in `src/ingest/pipeline.py` with validation gates; ready for Neo4j integration.
+- **RAG Safety:** Traversal templates and safety rules are documented; runtime enforcement and query-time validation remain to be completed.
+- **Integrations & UI:** Neo4j loader and sample data are present; a production UI is planned but not yet implemented.
 
 _For detailed technical documentation, please refer to the files in the `docs/` directory._
 _The document KGCS.md provides a comprehensive overview of the architecture and design principles._

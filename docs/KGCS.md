@@ -59,7 +59,7 @@ The result is an AI that can reason confidently, explain its reasoning, and rema
 - [9. Implementation Roadmap](#9-implementation-roadmap)
 - [10. Why This Architecture Scales](#10-why-this-architecture-scales)
 - [11. Security Guarantees](#11-security-guarantees)
-- [12. Limitations and Future Work](#12-limitations-and-future-work)
+- [12. Limitations and Next Priorities](#12-limitations-and-next-priorities)
 - [13. For the AI Engineer](#13-for-the-ai-engineer)
 - [Conclusion](#conclusion)
 
@@ -1068,19 +1068,21 @@ Every query result includes:
 
 ---
 
-## 12. Limitations and Future Work
+## 12. Limitations and Next Priorities
 
 ### 12.1 Current Scope & Status
 
-KGCS 1.0 covers:
+KGCS 1.0 MVP covers:
 
 - ✅ Core standards (CVE, CWE, CPE, CVSS, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE)
 - ✅ 1:1 alignment with JSON/STIX schemas
 - ✅ Modular OWL ontologies
 - ✅ Formal semantics and canonical invariants
-- ✅ SHACL validation: core shapes, RAG shapes, AI profile, sample data, and a validator script (Phase 2 in-progress; see Section 9)
-- 🔲 Data ingestion pipeline (planned)
+- ✅ SHACL validation: core shapes, RAG shapes, AI profile, sample data, and validator script
+- ✅ Data ingestion pipeline (all 9 standards, end-to-end tested)
+- ✅ Neo4j loader and cross-standard relationship support
 - 🔲 RAG runtime enforcement & retrieval integration (planned)
+- 🔲 Extension ETL and validation (planned)
 
 ### 12.2 Intentional Exclusions (Remains)
 
@@ -1093,27 +1095,25 @@ The following remain out of Core and belong in Extensions or operational layers:
 - SOC-specific detection rule implementations
 - Exploit code and payloads (ethical/legal constraints)
 
-### 12.3 Remaining Limitations and Prioritized Next Work
+### 12.3 Remaining Limitations and Next Priorities
 
-We have progressed SHACL validation but the project still requires targeted effort in these high-priority areas:
+With the MVP milestone reached, the following areas are the focus for the next phase:
 
-1. Governance & provenance: assign stable rule IDs, include provenance URIs, and standardize failure payloads for automation and audits.
-2. Test matrix & coverage: add positive/negative tests for every shape and every RAG template; expand `data/shacl-samples/`.
-3. CI integration: add a GitHub Actions job that runs `pyshacl` and publishes machine-readable reports on failure.
-4. ETL integration: wire SHACL validation into pre-ingest and pre-index stages of the ingestion pipeline to prevent bad data from entering the graph.
-5. Performance & scale: review and optimize SPARQL-based SHACL constraints for large graphs or move expensive checks to batch validation steps.
-6. RAG runtime enforcement: implement query-time enforcement of approved traversal templates to prevent hallucinated paths.
-7. Formal verification & backlog: schedule formal ontology consistency checks (reasoner runs) as part of the release process.
+1. **CI enforcement:** Enable full CI gating for ingestion and validation, including artifact checks and failure handling.
+2. **Extension ETL:** Implement loaders for Incident, Risk, and ThreatActor extensions and validate with SHACL.
+3. **RAG runtime enforcement:** Integrate traversal template validation and safe query API for LLM/RAG use cases.
+4. **Cloud migration:** Plan and implement containerized/cloud deployment for scalable ingestion and query services.
+5. **Performance & scale:** Optimize loader and validator for large-scale data and production workloads.
+6. **Governance & provenance:** Finalize rule ID assignment, provenance URIs, and audit payloads for automation and compliance.
 
-### 12.4 Long-Term Enhancements (Lower Priority)
+#### Long-Term Enhancements
 
-1. Temporal reasoning and versioned edge semantics (when relationships were discovered and by whom).
-2. Uncertainty quantification (explicit probability models in Risk extension).
-3. Fine-grained provenance linking of CVSS metric derivations.
-4. Linked-data/SPARQL publishing and subscription endpoints for downstream systems.
-5. Multi-language labels and user-facing documentation improvements.
+- Temporal reasoning and versioned edge semantics
+- Uncertainty quantification in Risk extension
+- Linked-data/SPARQL endpoints for downstream systems
+- Multi-language support and improved user documentation
 
-These steps complete the roadmap from "SHACL implemented" to "SHACL productionized" and will move Phase 2 from partial to done when CI, governance, and ETL integration are in place.
+These steps will move KGCS from MVP to a production-ready, extensible, and safe knowledge graph for cybersecurity AI.
 
 ---
 
