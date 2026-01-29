@@ -6,7 +6,8 @@
 
 ## When to Add to Core vs. Extension
 
-### Add to Core If:
+### Add to Core If
+
 - Standard is authoritative (e.g., NVD, MITRE)
 - Provides 1:1 mapping to official schema
 - Fits into causal chain (CPE → CVE → ... → Defense)
@@ -15,7 +16,8 @@
 
 **Examples:** CPE, CVE, CWE, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE
 
-### Add to Extension If:
+### Add to Extension If
+
 - Data is contextual, temporal, or subjective
 - Organization-specific or assessment-based
 - Requires frequent updates
@@ -284,17 +286,20 @@ Create `docs/ontology/extensions/<extension>-extension.owl`:
 ## Versioning Policy
 
 ### Core Standards
+
 - Versions frozen after Phase 1 release
 - Changes require new version (v2.0, v3.0)
 - Old versions remain available (no overwrites)
 - Deprecation period: announce changes 1–3 months before cutover
 
 ### CVSS Special Case
+
 - v2.0, v3.1, v4.0 exist as separate entities (never merged)
 - Each CVE may have multiple CVSS versions
 - New versions added incrementally
 
 ### Extensions
+
 - Can change more frequently (Phase 4+)
 - Still versioned (v1.0, v1.1, v2.0)
 - Backward-compatible updates preferred
@@ -325,4 +330,3 @@ Create `docs/ontology/extensions/<extension>-extension.owl`:
 - [GLOSSARY.md](GLOSSARY.md) — Existing standards + relationships
 - [copilot-instructions.md](../.github/copilot-instructions.md) — Development rules
 - Example transformers: `src/etl/etl_cpe.py`, `src/etl/etl_cve.py`
-

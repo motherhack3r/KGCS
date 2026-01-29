@@ -9,7 +9,7 @@ A local daily download pipeline that fetches raw data files from all 9 security 
 
 ## Architecture
 
-```
+```text
 src/ingest/download_manager.py
 ├─ StandardDownloader (base class)
 │  ├─ NVDCPEDownloader        (15 chunks)
@@ -44,7 +44,8 @@ python -m src.ingest.download_manager
 ```
 
 Output:
-```
+
+```text
 logs/
 ├─ download_manager.log         (verbose logs)
 └─ download_summary.json        (high-level report)
@@ -98,7 +99,7 @@ data/
 
 ## Data Flow
 
-```
+```text
 NVD API / MITRE GitHub
     ↓
 download_manager.py
@@ -160,7 +161,7 @@ Once local pipeline is stable, extend with:
 ## Performance Estimates
 
 | Standard | Files | Size | Est. Time |
-|----------|-------|------|-----------|
+| -------- | ----- | ---- | --------- |
 | CPE | 15 | 709 MB | 8 min |
 | CPEMatch | 55 | 2.7 GB | 30 min |
 | CVE | 25 | 1.9 GB | 21 min |
@@ -173,7 +174,7 @@ Once local pipeline is stable, extend with:
 | ENGAGE | 1 | ~1 MB | <1 min |
 | **TOTAL** | **109** | **~5.4 GB** | **~63 min** |
 
-*Includes 3x retry attempts (only on failures)*
+> *Includes 3x retry attempts (only on failures)*
 
 ## Error Handling
 
@@ -258,9 +259,9 @@ python -c "import json; m=json.load(open('../manifest.json')); print([f['sha256'
 
 ## References
 
-- **NVD API:** https://nvd.nist.gov/developers/vulnerabilities
-- **NVD Feeds:** https://nvd.nist.gov/feeds
-- **MITRE ATT&CK:** https://github.com/mitre-attack/attack-stix-data
-- **MITRE CWE:** https://cwe.mitre.org/data/downloads/
-- **MITRE CAPEC:** https://capec.mitre.org/
-- **MITRE D3FEND:** https://d3fend.mitre.org/
+- **NVD API:** <https://nvd.nist.gov/developers/vulnerabilities>
+- **NVD Feeds:** <https://nvd.nist.gov/feeds>
+- **MITRE ATT&CK:** <https://github.com/mitre-attack/attack-stix-data>
+- **MITRE CWE:** <https://cwe.mitre.org/data/downloads/>
+- **MITRE CAPEC:** <https://capec.mitre.org/>
+- **MITRE D3FEND:** <https://d3fend.mitre.org/>

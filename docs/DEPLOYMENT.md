@@ -39,6 +39,7 @@ pip install -r requirements.txt
 ```
 
 **Current dependencies:**
+
 - `rdflib>=6.0.0` — RDF/Turtle handling
 - `pyshacl>=0.20.0` — SHACL validation
 - `neo4j>=5.0.0` — Neo4j driver
@@ -55,7 +56,7 @@ cp .env.example .env
 
 Edit `.env`:
 
-```
+```python
 # Neo4j Configuration
 NEO4J_URI=bolt://localhost:7687
 NEO4J_USER=neo4j
@@ -89,7 +90,7 @@ docker run -d \
 docker logs neo4j
 ```
 
-Access Neo4j Browser: http://localhost:7474
+Access Neo4j Browser: <http://localhost:7474>
 
 ### Step 6: Verify Installation
 
@@ -472,4 +473,3 @@ Tested on:
 - [Neo4j Docs](https://neo4j.com/docs/)
 - [Docker Docs](https://docs.docker.com/)
 - [GitHub Actions](https://docs.github.com/en/actions)
-

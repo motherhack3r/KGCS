@@ -24,6 +24,7 @@
 ## Core Ontology Concepts
 
 ### Platform (CPE)
+
 - **Definition:** Atomic identifier for a software/hardware component
 - **Syntax:** `cpe:2.3:part:vendor:product:version:...`
 - **Key property:** `cpeUri` (immutable)
@@ -32,6 +33,7 @@
 - **Related:** PlatformConfiguration (contains versioning specifics)
 
 ### PlatformConfiguration
+
 - **Definition:** Deployment-specific details (updates, status, application bounds)
 - **Key properties:**
   - `cpeUri` (the platform identifier)
@@ -45,6 +47,7 @@
 - **Invariant:** Different configurations of same CPE create separate nodes
 
 ### Vulnerability (CVE)
+
 - **Definition:** Named vulnerability with unique ID
 - **Key property:** `cveId` (e.g., CVE-2025-1234)
 - **CVSS versions coexist:** v2.0, v3.1, v4.0 are separate nodes (never merged)
@@ -55,9 +58,10 @@
 - **Source:** NVD (authoritative for CVE, platform mapping)
 
 ### Weakness (CWE)
+
 - **Definition:** Type/category of weakness in code/design
 - **Key property:** `cweId` (e.g., CWE-79 Cross-site Scripting)
-- **Categories:** 
+- **Categories:**
   - **Pillar** (highest level, e.g., Improper Neutralization)
   - **Class** (middle, e.g., Improper Neutralization of Input During Web Page Generation)
   - **Base** (specific, e.g., Improper Neutralization of Input During Web Page Generation: 'Cross-site Scripting')
@@ -68,6 +72,7 @@
 - **Source:** MITRE (CWE list)
 
 ### AttackPattern (CAPEC)
+
 - **Definition:** Generalized method for attacking a system
 - **Key property:** `capecId` (e.g., CAPEC-4 XSS)
 - **Relationships:**
@@ -76,6 +81,7 @@
 - **Source:** MITRE (CAPEC database)
 
 ### Technique (ATT&CK)
+
 - **Definition:** Specific method adversaries use to achieve goals
 - **Key property:** `techniqueId` (e.g., T1021 Remote Service Session Initiation)
 - **Hierarchy:**
@@ -89,6 +95,7 @@
 - **Source:** MITRE (ATT&CK database)
 
 ### DefenseTechnique (D3FEND)
+
 - **Definition:** Method to detect, deny, disrupt threats
 - **Key property:** `d3fendId` (e.g., D3-PA Physical Access Prevention)
 - **Subcategories:**
@@ -101,6 +108,7 @@
 - **Source:** MITRE (D3FEND)
 
 ### DetectionAnalytic (CAR)
+
 - **Definition:** Method to detect specific adversary tactics
 - **Key property:** `carId` (e.g., CAR-2020-04-001)
 - **Relationships:**
@@ -108,6 +116,7 @@
 - **Source:** MITRE (CAR database)
 
 ### DeceptionTechnique (SHIELD)
+
 - **Definition:** Active deception tactic to detect/slow adversaries
 - **Key property:** `shieldId`
 - **Relationships:**
@@ -115,6 +124,7 @@
 - **Source:** MITRE (SHIELD)
 
 ### EngagementConcept (ENGAGE)
+
 - **Definition:** Engagement framework for adversary interaction
 - **Key property:** `engageId`
 - **Relationships:**
@@ -122,6 +132,7 @@
 - **Source:** MITRE (ENGAGE)
 
 ### Score (CVSS)
+
 - **Definition:** Severity score for a vulnerability
 - **Versions:** v2.0, v3.1, v4.0 (separate nodes, never merged)
 - **v2.0 metrics:** AccessVector, AccessComplexity, Authentication, ConfImpact, IntegImpact, AvailImpact
@@ -134,7 +145,7 @@
 
 ## Causal Chain (Critical Invariant)
 
-```
+```text
 CPE (Platform)
     ↓ has vulnerability
 CVE (Vulnerability)
@@ -158,8 +169,9 @@ Technique (ATT&CK Tactic/Technique)
 ## Extension Concepts (Phase 4+)
 
 ### Incident (Contextual)
+
 - **Definition:** Observed attack event with timeline
-- **Key properties:** 
+- **Key properties:**
   - `incidentId`
   - `timeline` (when observed)
   - `location` (where observed)
@@ -168,6 +180,7 @@ Technique (ATT&CK Tactic/Technique)
 - **Relationship:** Only references core (CVE, Technique, etc.), never modifies
 
 ### RiskAssessment (Subjective)
+
 - **Definition:** Decision on handling a vulnerability/threat
 - **Key properties:**
   - `riskId`
@@ -178,6 +191,7 @@ Technique (ATT&CK Tactic/Technique)
 - **Relationship:** References CVE, Platform, Threat Actor (subjective)
 
 ### ThreatActor (Attribution)
+
 - **Definition:** Claim about who might exploit a vulnerability
 - **Key properties:**
   - `actorId`
@@ -216,7 +230,7 @@ Technique (ATT&CK Tactic/Technique)
 
 ## Example: CVE-2021-44228 (Log4Shell)
 
-```
+```text
 CPE: cpe:2.3:a:apache:log4j:2.0.0:*:*:*:*:java:*:*
   ↓ (in range 2.0.0 – 2.16.0)
 CVE: CVE-2021-44228
@@ -243,19 +257,23 @@ ThreatActor: "APT-X (HIGH confidence)"
 ## Data Quality Principles
 
 ### Immutability
+
 - Core ontology concepts (CPE, CVE, CWE, etc.) are immutable post-release
 - Changes require versioning + deprecation (never override)
 
 ### Traceability
+
 - Every statement includes `source` field (cveId, techniqueId, etc.)
 - Extensions include `confidence` or `rationale`
 
 ### No Fabrication
+
 - Never invent edges to "complete the graph"
 - If a standard doesn't define a relationship, it doesn't exist in core
 - Extensions can propose relationships (with caveats)
 
 ### Version Coexistence
+
 - CVSS versions (v2.0, v3.1, v4.0) exist as separate nodes
 - New standards coexist with old; never replace
 
@@ -266,12 +284,11 @@ ThreatActor: "APT-X (HIGH confidence)"
 - [ARCHITECTURE.md](ARCHITECTURE.md) — 5-phase roadmap
 - [GOVERNANCE.md](ontology/GOVERNANCE.md) — Data policies
 - [RAG-traversal-templates.md](ontology/rag/RAG-traversal-templates.md) — Approved queries
-- NVD: https://nvd.nist.gov/
-- MITRE ATT&CK: https://attack.mitre.org/
-- MITRE CWE: https://cwe.mitre.org/
-- MITRE CAPEC: https://capec.mitre.org/
-- MITRE D3FEND: https://d3fend.mitre.org/
-- MITRE CAR: https://car.mitre.org/
-- MITRE SHIELD: https://shield.mitre.org/
-- MITRE ENGAGE: https://engage.mitre.org/
-
+- NVD: <https://nvd.nist.gov/>
+- MITRE ATT&CK: <https://attack.mitre.org/>
+- MITRE CWE: <https://cwe.mitre.org/>
+- MITRE CAPEC: <https://capec.mitre.org/>
+- MITRE D3FEND: <https://d3fend.mitre.org/>
+- MITRE CAR: <https://car.mitre.org/>
+- MITRE SHIELD: <https://shield.mitre.org/>
+- MITRE ENGAGE: <https://engage.mitre.org/>

@@ -26,7 +26,8 @@ python scripts/cleanup_workspace.py
 ```
 
 Output:
-```
+
+```text
 📋 Items to Clean:
 
   • artifacts                               - SHACL validation reports
@@ -58,7 +59,8 @@ python scripts/cleanup_workspace.py --execute
 ```
 
 Output:
-```
+
+```text
 🗑️  Cleaning workspace...
 
   ✅ Deleted: artifacts/
@@ -98,6 +100,7 @@ python scripts/cleanup_workspace.py --sources --data --execute
 ```
 
 ⚠️ **This will delete:**
+
 - All temporary files and cache
 - All test artifacts and logs
 - All downloaded source data (data/*/raw/)
@@ -110,7 +113,7 @@ Manifest files are preserved for reference.
 ### Always Cleaned (unless excluded by code)
 
 | Directory/Pattern | Purpose | Recoverable |
-|---|---|---|
+| --- | --- | --- |
 | `tmp/` | Temporary working files | Yes - recreated as needed |
 | `artifacts/` | SHACL validation reports (JSON) | Yes - re-run validation |
 | `logs/` | Application runtime logs | Yes - recreated on next run |
@@ -138,7 +141,7 @@ Manifest files are preserved for reference.
 ### Optional (with `--data` flag)
 
 | Directory | Purpose | Recoverable |
-|---|---|---|
+| --- | --- | --- |
 | `data/attack/samples/` | Transformed ATT&CK sample data | Yes - re-run ETL |
 | `data/capec/samples/` | Transformed CAPEC sample data | Yes - re-run ETL |
 | `data/car/samples/` | Transformed CAR sample data | Yes - re-run ETL |
@@ -154,12 +157,14 @@ Manifest files are preserved for reference.
 ## When to Clean
 
 **Regular cleanup** (safe, daily):
+
 ```bash
 # Remove test artifacts and cache
 python scripts/cleanup_workspace.py --execute
 ```
 
 **Before committing** (recommended):
+
 ```bash
 # Check what would be cleaned
 python scripts/cleanup_workspace.py
@@ -169,12 +174,14 @@ python scripts/cleanup_workspace.py --execute
 ```
 
 **Before deployment** (good practice):
+
 ```bash
 # Full clean including optional source and sample data
 python scripts/cleanup_workspace.py --sources --data --execute
 ```
 
 **Troubleshooting** (when tests act weird):
+
 ```bash
 # Clean all cache and restart
 python scripts/cleanup_workspace.py --execute
@@ -190,7 +197,8 @@ Typical cleanup recovers:
 - **After full cleanup:** 1-5 GB+ (includes downloaded data)
 
 Example from development run:
-```
+
+```text
 Total size: 509.38 MB
 Directories: 3
 Files: 103
@@ -199,15 +207,18 @@ Files: 103
 ## Safety Considerations
 
 ✅ **Safe to delete:**
+
 - All cache directories (auto-regenerated)
 - All test artifacts (can be re-created)
 - All logs (new ones created on next run)
 - Temporary working files (recreated as needed)
 
 ⚠️ **Be careful with:**
+
 - `data/*/raw/` - Contains downloaded source data (use `--sources` only if needed)
 
 ✅ **Never deleted:**
+
 - Source code (`src/`, `tests/`, `scripts/`)
 - Documentation (`docs/`)
 - Configuration files (`.env`, `*.json`, `*.yaml`)
@@ -235,7 +246,7 @@ The cleanup script can be integrated into CI/CD pipelines:
 
 ## Options Reference
 
-```
+```text
 python scripts/cleanup_workspace.py [OPTIONS]
 
 Options:
@@ -291,6 +302,7 @@ python scripts/cleanup_workspace.py --sources --execute
 ### Script fails with "permission denied"
 
 On Linux/macOS, ensure the script is executable:
+
 ```bash
 chmod +x scripts/cleanup_workspace.py
 ```
@@ -298,6 +310,7 @@ chmod +x scripts/cleanup_workspace.py
 ### Some files won't delete
 
 The script will report which files failed. This may happen if:
+
 - Files are open in an editor or IDE
 - Files are locked by another process
 - Insufficient permissions
