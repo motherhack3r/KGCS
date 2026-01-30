@@ -1,0 +1,1192 @@
+{
+  "data_file": "tmp/capec-output.ttl",
+  "conforms": false,
+  "chunks": 3,
+  "triples_scanned": 9082,
+  "errors": [],
+  "chunk_reports": [
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpj4esw7uy.chunk1.ttl",
+      "conforms": false,
+      "results_text": "Validation Report\nConforms: False\nResults (165):\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-205>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-205>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-264>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-264>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-672>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-672>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-428>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-428>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-524>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-524>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-451>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-451>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-678>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-678>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-82>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-82>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-532>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-532>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-289>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-289>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-570>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-570>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-446>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-446>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-535>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-535>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-629>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-629>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-626>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-626>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-585>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-585>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-529>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-529>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-432>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-432>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-422>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-422>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-507>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-507>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-548>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-548>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-656>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-656>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-392>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-392>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-431>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-431>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-413>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-413>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-397>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-397>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-434>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-434>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-165>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-165>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-408>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-408>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-520>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-520>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-534>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-534>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-670>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-670>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-407>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-407>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-559>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-559>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-411>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-411>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-604>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-604>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-415>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-415>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-440>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-440>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-427>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-427>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-603>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-603>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-630>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-630>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-518>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-518>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-557>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-557>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-195>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-195>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-544>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-544>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-425>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-425>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-106>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-106>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-200>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-200>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-605>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-605>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-280>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-280>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-249>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-249>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-236>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-236>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-56>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-56>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-567>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-567>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-265>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-265>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-543>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-543>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-517>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-517>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-611>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-611>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-421>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-421>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-445>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-445>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-505>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-505>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-315>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-315>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-405>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-405>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-430>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-430>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-450>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-450>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-438>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-438>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-235>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-235>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-484>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-484>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-241>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-241>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-391>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-391>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-400>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-400>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-671>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-671>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-311>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-311>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-602>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-602>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-416>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-416>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-246>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-246>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-511>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-511>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-393>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-393>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-628>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-628>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-409>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-409>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-601>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-601>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-435>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-435>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-581>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-581>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-410>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-410>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-99>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-99>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-599>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-599>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-316>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-316>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-399>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-399>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-398>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-398>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-429>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-429>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-433>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-433>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-395>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-395>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-584>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-584>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-449>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-449>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-447>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-447>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-542>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-542>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-414>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-414>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-258>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-258>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-211>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-211>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-454>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-454>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-673>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-673>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-677>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-677>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-426>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-426>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-572>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-572>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-617>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-617>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-260>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-260>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-566>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-566>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-179>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-179>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-420>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-420>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-522>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-522>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-583>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-583>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-418>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-418>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-423>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-423>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-519>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-519>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-607>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-607>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-452>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-452>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-674>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-674>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-516>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-516>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-547>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-547>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-700>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-700>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-424>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-424>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-655>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-655>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-453>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-453>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-266>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-266>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-214>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-214>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-254>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-254>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-443>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-443>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-171>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-171>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-272>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-272>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-598>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-598>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-444>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-444>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-690>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-690>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-238>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-238>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-521>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-521>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-417>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-417>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-396>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-396>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-419>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-419>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-569>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-569>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-314>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-314>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-412>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-412>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-404>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-404>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-455>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-455>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-638>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-638>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-406>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-406>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-537>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-537>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-571>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-571>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-530>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-530>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-523>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-523>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-631>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-631>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-91>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-91>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-394>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-394>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-669>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-669>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-582>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-582>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-531>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-531>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-568>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-568>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-213>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-213>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-269>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-269>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-539>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-539>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-627>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-627>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-390>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-390>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-257>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-257>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-259>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-259>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-239>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-239>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-288>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-288>->sec:exploits\nConstraint Violation in MinCountConstraintComponent (http://www.w3.org/ns/shacl#MinCountConstraintComponent):\n\tSeverity: sh:Violation\n\tSource Shape: [ sh:description Literal(\"Weakness URI(s) that this attack pattern exploits (IRI reference)\") ; sh:minCount Literal(\"1\", datatype=xsd:integer) ; sh:nodeKind sh:IRI ; sh:path sec:exploits ]\n\tFocus Node: <https://example.org/attackPattern/CAPEC-610>\n\tResult Path: sec:exploits\n\tMessage: Less than 1 values on <https://example.org/attackPattern/CAPEC-610>->sec:exploits\n",
+      "violations": [
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-205>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-205",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-264>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-264",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-672>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-672",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-428>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-428",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-524>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-524",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-451>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-451",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-678>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-678",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-82>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-82",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-532>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-532",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-289>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-289",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-570>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-570",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-446>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-446",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-535>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-535",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-629>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-629",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-626>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-626",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-585>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-585",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-529>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-529",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-432>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-432",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-422>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-422",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-507>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-507",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-548>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-548",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-656>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-656",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-392>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-392",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-431>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-431",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-413>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-413",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-397>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-397",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-434>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-434",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-165>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-165",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-408>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-408",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-520>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-520",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-534>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-534",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-670>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-670",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-407>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-407",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-559>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-559",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-411>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-411",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-604>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-604",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-415>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-415",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-440>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-440",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-427>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-427",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-603>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-603",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-630>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-630",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-518>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-518",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-557>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-557",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-195>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-195",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-544>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-544",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-425>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-425",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-106>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-106",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-200>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-200",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-605>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-605",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-280>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-280",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-249>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-249",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-236>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-236",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-56>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-56",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-567>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-567",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-265>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-265",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-543>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-543",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-517>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-517",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-611>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-611",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-421>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-421",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-445>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-445",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-505>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-505",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-315>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-315",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-405>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-405",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-430>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-430",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-450>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-450",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-438>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-438",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-235>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-235",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-484>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-484",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-241>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-241",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-391>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-391",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-400>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-400",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-671>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-671",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-311>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-311",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-602>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-602",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-416>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-416",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-246>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-246",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-511>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-511",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-393>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-393",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-628>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-628",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-409>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-409",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-601>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-601",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-435>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-435",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-581>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-581",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-410>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-410",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-99>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-99",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-599>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-599",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-316>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-316",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-399>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-399",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-398>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-398",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-429>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-429",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-433>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-433",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-395>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-395",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-584>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-584",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-449>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-449",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-447>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-447",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-542>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-542",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-414>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-414",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-258>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-258",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-211>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-211",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-454>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-454",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-673>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-673",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-677>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-677",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-426>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-426",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-572>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-572",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-617>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-617",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-260>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-260",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-566>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-566",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-179>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-179",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-420>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-420",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-522>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-522",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-583>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-583",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-418>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-418",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-423>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-423",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-519>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-519",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-607>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-607",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-452>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-452",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-674>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-674",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-516>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-516",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-547>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-547",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-700>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-700",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-424>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-424",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-655>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-655",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-453>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-453",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-266>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-266",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-214>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-214",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-254>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-254",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-443>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-443",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-171>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-171",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-272>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-272",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-598>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-598",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-444>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-444",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-690>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-690",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-238>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-238",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-521>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-521",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-417>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-417",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-396>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-396",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-419>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-419",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-569>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-569",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-314>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-314",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-412>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-412",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-404>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-404",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-455>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-455",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-638>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-638",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-406>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-406",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-537>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-537",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-571>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-571",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-530>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-530",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-523>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-523",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-631>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-631",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-91>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-91",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-394>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-394",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-669>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-669",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-582>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-582",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-531>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-531",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-568>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-568",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-213>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-213",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-269>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-269",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-539>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-539",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-627>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-627",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-390>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-390",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-257>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-257",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-259>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-259",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-239>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-239",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-288>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-288",
+          "path": "https://example.org/sec/core#exploits"
+        },
+        {
+          "rule_id": null,
+          "shape": "AttackPatternShape",
+          "message": "Less than 1 values on <https://example.org/attackPattern/CAPEC-610>->sec:exploits",
+          "focus_node": "https://example.org/attackPattern/CAPEC-610",
+          "path": "https://example.org/sec/core#exploits"
+        }
+      ],
+      "chunk": 1,
+      "elapsed": 1.8623878955841064,
+      "return_code": 1
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpbp95r5fl.chunk2.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 2,
+      "elapsed": 0.6078829765319824,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpe5as_tpw.chunk3.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 3,
+      "elapsed": 0.24920964241027832,
+      "return_code": 0
+    }
+  ]
+}

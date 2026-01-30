@@ -50,13 +50,21 @@ def _format_term(term) -> str | None:
 
 def write_graph_turtle_lines(graph: Graph, output_path: str, include_prefixes: bool = True) -> None:
     """Write a graph to a Turtle file with one triple per line and full URIs."""
+    # Group triples by subject
+    from collections import defaultdict
+    triples_by_subject = defaultdict(list)
+    for subj, pred, obj in graph:
+        triples_by_subject[subj].append((subj, pred, obj))
+
     with open(output_path, "w", encoding="utf-8") as fh:
         if include_prefixes:
             fh.write(PREFIXES)
-        for subj, pred, obj in graph:
-            s = _format_term(subj)
-            p = _format_term(pred)
-            o = _format_term(obj)
-            if not s or not p or not o:
-                continue
-            fh.write(f"{s} {p} {o} .\n")
+        # Write triples grouped by subject, sorted for determinism
+        for subj in sorted(triples_by_subject, key=lambda s: str(s)):
+            for s, p, o in triples_by_subject[subj]:
+                s_fmt = _format_term(s)
+                p_fmt = _format_term(p)
+                o_fmt = _format_term(o)
+                if not s_fmt or not p_fmt or not o_fmt:
+                    continue
+                fh.write(f"{s_fmt} {p_fmt} {o_fmt} .\n")

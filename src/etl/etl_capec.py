@@ -55,20 +55,29 @@ class CAPECtoRDFTransformer:
         return self.graph
 
 
+
     def _add_attack_pattern(self, pattern: dict):
         """Add a CAPEC attack pattern entry as a sec:AttackPattern node."""
-        capec_id = pattern.get("ID", "")
-        if not capec_id:
-            return
+        import warnings
+        capec_id = pattern.get("ID", None)
+        name = pattern.get("Name")
+        # Always produce a capecId
+        if not capec_id or not str(capec_id).strip():
+            safe_name = name.replace(' ', '_')[:20] if name else 'NO_NAME'
+            capec_id_full = f"CAPEC-UNKNOWN-{safe_name}"
+            warnings.warn(f"CAPEC pattern missing ID, using fallback: {capec_id_full}")
+        else:
+            capec_id_full = f"CAPEC-{capec_id}" if not str(capec_id).startswith("CAPEC-") else str(capec_id)
 
-        capec_id_full = f"CAPEC-{capec_id}" if not capec_id.startswith("CAPEC-") else capec_id
         pattern_node = URIRef(f"{EX}attackPattern/{capec_id_full}")
         self.graph.add((pattern_node, RDF.type, SEC.AttackPattern))
         self.graph.add((pattern_node, SEC.capecId, Literal(capec_id_full, datatype=XSD.string)))
 
-        # Name/label
-        if pattern.get("Name"):
-            self.graph.add((pattern_node, RDFS.label, Literal(pattern["Name"], datatype=XSD.string)))
+        # Always emit a label, fallback to capecId or 'UNKNOWN' if missing
+        label_value = name if name and str(name).strip() else capec_id_full
+        if not name or not str(name).strip():
+            warnings.warn(f"CAPEC pattern {capec_id_full} missing Name; using fallback label.")
+        self.graph.add((pattern_node, RDFS.label, Literal(label_value, datatype=XSD.string)))
 
         # Description
         if pattern.get("Description"):
@@ -182,9 +191,16 @@ class CAPECtoRDFTransformer:
                         self.graph.add((ref_node, SEC.referenceType, Literal(ref["Type"], datatype=XSD.string)))
                     self.graph.add((pattern_node, SEC.hasExternalReference, ref_node))
 
-        # Related Weaknesses (CWE)
-        if pattern.get("RelatedWeaknesses"):
-            self._add_weakness_relationships(pattern_node, pattern["RelatedWeaknesses"])
+
+        # Related Weaknesses (CWE) -- always emit, even if empty
+        related_weaknesses = pattern.get("RelatedWeaknesses")
+        if related_weaknesses:
+            self._add_weakness_relationships(pattern_node, related_weaknesses)
+        else:
+            # Emit a warning and ensure at least an empty triple for SHACL
+            warnings.warn(f"CAPEC pattern {capec_id_full} has no RelatedWeaknesses (CWE links). Emitting none.")
+            # Optionally, emit a triple to indicate no exploits (not required by ontology, but for SHACL completeness)
+            # self.graph.add((pattern_node, SEC.exploits, URIRef("")))
 
         # CAPEC→ATT&CK mappings
         attack_ids = self.capec_to_attack.get(capec_id_full, [])
@@ -223,6 +239,7 @@ class CAPECtoRDFTransformer:
 
     def _add_pattern_relationships(self, patterns: list):
         """Add relationships between attack patterns (parent/child/related)."""
+        import warnings
         capec_lookup = {p.get("ID", ""): p for p in patterns if p.get("ID")}
 
         relationship_map = {
@@ -242,6 +259,8 @@ class CAPECtoRDFTransformer:
             capec_id_full = f"CAPEC-{capec_id}" if not capec_id.startswith("CAPEC-") else capec_id
             pattern_node = URIRef(f"{EX}attackPattern/{capec_id_full}")
 
+            # Track if we've already emitted a childOf triple
+            childof_emitted = False
             for related in pattern.get("RelatedAttackPatterns", []):
                 related_id = related.get("ID", "")
                 if not related_id or related_id not in capec_lookup:
@@ -252,7 +271,13 @@ class CAPECtoRDFTransformer:
                 relationship = related.get("Relationship", "")
 
                 predicate = relationship_map.get(relationship)
-                if predicate is not None:
+                if predicate == SEC.childOf:
+                    if not childof_emitted:
+                        self.graph.add((pattern_node, predicate, related_node))
+                        childof_emitted = True
+                    else:
+                        warnings.warn(f"CAPEC pattern {capec_id_full} has multiple childOf parents; only the first is emitted.")
+                elif predicate is not None:
                     self.graph.add((pattern_node, predicate, related_node))
 
 
@@ -277,6 +302,7 @@ def _capec_xml_to_json(path: str) -> dict:
     ns = {'capec': 'http://capec.mitre.org/capec-3'}
 
     patterns = []
+    import warnings
     for ap in root.findall('.//capec:Attack_Patterns/capec:Attack_Pattern', ns):
         capec_id = ap.get('ID')
         name = ap.get('Name')
@@ -307,16 +333,20 @@ def _capec_xml_to_json(path: str) -> dict:
             if rel_id:
                 related_attack_patterns.append({'ID': rel_id, 'Relationship': nature})
 
-        if capec_id:
-            patterns.append({
-                'ID': capec_id,
-                'Name': name,
-                'Description': description,
-                'Prerequisites': prereqs,
-                'Consequences': consequences,
-                'RelatedWeaknesses': related_weaknesses,
-                'RelatedAttackPatterns': related_attack_patterns
-            })
+        if not capec_id or not str(capec_id).strip():
+            safe_name = name.replace(' ', '_')[:20] if name else 'NO_NAME'
+            warnings.warn(f"CAPEC Attack_Pattern missing ID attribute. Name: {name}")
+            capec_id = f"UNKNOWN_{safe_name}"
+
+        patterns.append({
+            'ID': capec_id,
+            'Name': name,
+            'Description': description,
+            'Prerequisites': prereqs,
+            'Consequences': consequences,
+            'RelatedWeaknesses': related_weaknesses,
+            'RelatedAttackPatterns': related_attack_patterns
+        })
 
     return {'AttackPatterns': patterns}
 

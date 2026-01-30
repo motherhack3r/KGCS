@@ -69,11 +69,12 @@ class SHIELDtoRDFTransformer:
             if desc_text:
                 self.graph.add((technique_node, self.SEC.description, Literal(desc_text, datatype=XSD.string)))
 
-        if technique.get("OperationalImpact"):
-            self.graph.add((technique_node, self.SEC.operationalImpact, Literal(technique["OperationalImpact"], datatype=XSD.string)))
-
-        if technique.get("EaseOfEmployment"):
-            self.graph.add((technique_node, self.SEC.easeOfEmployment, Literal(technique["EaseOfEmployment"], datatype=XSD.string)))
+        operational_impact = technique.get("OperationalImpact")
+        ease_of_employment = technique.get("EaseOfEmployment")
+        if operational_impact:
+            self.graph.add((technique_node, self.SEC.operationalImpact, Literal(operational_impact, datatype=XSD.string)))
+        if ease_of_employment:
+            self.graph.add((technique_node, self.SEC.easeOfEmployment, Literal(ease_of_employment, datatype=XSD.string)))
 
     def _extract_description(self, description_obj) -> str:
         """Extract description text from potentially nested structure."""
@@ -105,6 +106,15 @@ class SHIELDtoRDFTransformer:
                         att_id_full = f"{att_id}" if att_id.startswith("T") else f"T{att_id}"
                         att_node = URIRef(f"{self.EX}technique/{att_id_full}")
                         self.graph.add((technique_node, self.SEC.counters, att_node))
+            # Ensure to handle missing/optional fields gracefully
+            if technique.get("Counters"):
+                counters = technique["Counters"]
+                if isinstance(counters, list):
+                    for tech_id in counters:
+                        if tech_id:
+                            self.graph.add((technique_node, self.SEC.counters, URIRef(f"{self.EX}technique/{tech_id}")))
+                elif isinstance(counters, str):
+                    self.graph.add((technique_node, self.SEC.counters, URIRef(f"{self.EX}technique/{counters}")))
 
 
 def _load_shield_data(input_path: str) -> dict:

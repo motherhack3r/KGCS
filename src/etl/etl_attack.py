@@ -78,6 +78,17 @@ class ATTACKtoRDFTransformer:
         if tactic_obj.get("name"):
             self.graph.add((tactic_node, RDFS.label, Literal(tactic_obj["name"], datatype=XSD.string)))
 
+        if tactic_obj.get("description"):
+            self.graph.add((tactic_node, SEC.description, Literal(tactic_obj["description"], datatype=XSD.string)))
+
+        if tactic_obj.get("x_mitre_deprecated") is not None:
+            self.graph.add((tactic_node, SEC.deprecated, Literal(bool(tactic_obj["x_mitre_deprecated"]), datatype=XSD.boolean)))
+
+        if tactic_obj.get("created"):
+            self.graph.add((tactic_node, SEC.created, Literal(tactic_obj["created"], datatype=XSD.string)))
+        if tactic_obj.get("modified"):
+            self.graph.add((tactic_node, SEC.modified, Literal(tactic_obj["modified"], datatype=XSD.string)))
+
         return tactic_node
 
     def _add_technique(self, technique_obj: dict, tactics_map: dict):
@@ -109,6 +120,56 @@ class ATTACKtoRDFTransformer:
         if technique_obj.get("description"):
             self.graph.add((technique_node, SEC.description, Literal(technique_obj["description"], datatype=XSD.string)))
 
+        # Platforms
+        if technique_obj.get("x_mitre_platforms"):
+            for p in technique_obj["x_mitre_platforms"]:
+                self.graph.add((technique_node, SEC.platform, Literal(p, datatype=XSD.string)))
+
+        # Data Sources
+        if technique_obj.get("x_mitre_data_sources"):
+            for ds in technique_obj["x_mitre_data_sources"]:
+                self.graph.add((technique_node, SEC.dataSource, Literal(ds, datatype=XSD.string)))
+
+        # Data Components
+        if technique_obj.get("x_mitre_data_components"):
+            for dc in technique_obj["x_mitre_data_components"]:
+                self.graph.add((technique_node, SEC.dataComponent, Literal(dc, datatype=XSD.string)))
+
+        # Detection guidance
+        if technique_obj.get("x_mitre_detection"):
+            self.graph.add((technique_node, SEC.detection, Literal(technique_obj["x_mitre_detection"], datatype=XSD.string)))
+
+        # Permissions required
+        if technique_obj.get("x_mitre_permissions_required"):
+            for perm in technique_obj["x_mitre_permissions_required"]:
+                self.graph.add((technique_node, SEC.permissionsRequired, Literal(perm, datatype=XSD.string)))
+
+        # Effective permissions
+        if technique_obj.get("x_mitre_effective_permissions"):
+            for perm in technique_obj["x_mitre_effective_permissions"]:
+                self.graph.add((technique_node, SEC.effectivePermissions, Literal(perm, datatype=XSD.string)))
+
+        # Network requirements
+        if technique_obj.get("x_mitre_network_requirements"):
+            for req in technique_obj["x_mitre_network_requirements"]:
+                self.graph.add((technique_node, SEC.networkRequirements, Literal(req, datatype=XSD.string)))
+
+        # Contributors
+        if technique_obj.get("x_mitre_contributors"):
+            for c in technique_obj["x_mitre_contributors"]:
+                self.graph.add((technique_node, SEC.contributor, Literal(c, datatype=XSD.string)))
+
+        # Deprecated
+        if technique_obj.get("x_mitre_deprecated") is not None:
+            self.graph.add((technique_node, SEC.deprecated, Literal(bool(technique_obj["x_mitre_deprecated"]), datatype=XSD.boolean)))
+
+        # Created/Modified
+        if technique_obj.get("created"):
+            self.graph.add((technique_node, SEC.created, Literal(technique_obj["created"], datatype=XSD.string)))
+        if technique_obj.get("modified"):
+            self.graph.add((technique_node, SEC.modified, Literal(technique_obj["modified"], datatype=XSD.string)))
+
+        # Relationships: Tactic (belongs_to)
         if technique_obj.get("kill_chain_phases"):
             for phase in technique_obj["kill_chain_phases"]:
                 phase_name = phase.get("phase_name", "")
@@ -116,10 +177,15 @@ class ATTACKtoRDFTransformer:
                     tactic_node = tactics_map[phase_name]
                     self.graph.add((technique_node, SEC.belongs_to, tactic_node))
 
+        # Subtechnique-of
         if is_subtechnique:
             parent_id = attack_id.split(".")[0]
             parent_node = URIRef(f"{EX}technique/{parent_id}")
             self.graph.add((technique_node, SEC.subtechnique_of, parent_node))
+
+        # TODO: Add relationships for group, software, mitigation, detectedBy, usedBy, related, etc. as available in input
+        # This requires parsing relationship objects in STIX (not just attack-patterns)
+        # ...existing code...
 
     def _extract_attack_id(self, technique_obj: dict) -> str:
         """Extract ATT&CK ID (e.g., T1234) from external references."""

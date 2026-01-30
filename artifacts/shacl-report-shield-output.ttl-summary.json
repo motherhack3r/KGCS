@@ -1,0 +1,18 @@
+{
+  "data_file": "tmp/shield-output.ttl",
+  "conforms": true,
+  "chunks": 1,
+  "triples_scanned": 67,
+  "errors": [],
+  "chunk_reports": [
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpeocyee2t.chunk1.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 1,
+      "elapsed": 0.1990811824798584,
+      "return_code": 0
+    }
+  ]
+}

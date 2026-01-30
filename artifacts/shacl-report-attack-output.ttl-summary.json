@@ -1,0 +1,18 @@
+{
+  "data_file": "tmp/attack-output.ttl",
+  "conforms": true,
+  "chunks": 1,
+  "triples_scanned": 10796,
+  "errors": [],
+  "chunk_reports": [
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpbar7u604.chunk1.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 1,
+      "elapsed": 2.747224807739258,
+      "return_code": 0
+    }
+  ]
+}
