@@ -6,6 +6,10 @@
         "/^python scripts\\\\merge_mitre_jsons\\.py --key DeceptionTechniques --input-dir data\\\\shield\\\\raw --output data\\\\shield\\\\raw\\\\shield\\.json$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^set PYTHONPATH=\\.; pytest tests/test_phase3_comprehensive\\.py -v$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     }
 }

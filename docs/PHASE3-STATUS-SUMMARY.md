@@ -30,6 +30,7 @@ All ETL scripts for MITRE standards (CVE, CPE, CPEMatch, CAPEC, CWE, ATT&CK, D3F
    - Tag this milestone as Phase 3 ETL Audit Complete
 
 3. **Integration & End-to-End Testing**
+   - Generate sample data for each standard
    - Run the full pipeline (ETL → SHACL → Neo4j load) on sample data for each standard
    - Validate cross-standard relationships (e.g., CVE→CPEMatch→CPE, CVE→CWE→CAPEC→ATT&CK)
    - Review SHACL reports for any edge cases or missed constraints

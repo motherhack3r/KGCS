@@ -40,7 +40,9 @@ def process_product(cpe: dict, out_f) -> int:
     if not cpe_name:
         return 0
 
-    cpe_id = cpe.get('cpeNameId') or (cpe_name.replace('/', '%2F'))
+    # Use cpeNameId if present, else URI-escape cpeName
+    import urllib.parse
+    cpe_id = cpe.get('cpeNameId') or urllib.parse.quote(cpe_name, safe='')
     subj = subject_for_platform(cpe_id)
     written = 0
 

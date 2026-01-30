@@ -1,0 +1,18 @@
+{
+  "data_file": "tmp/pipeline-stage9-shield.ttl",
+  "conforms": true,
+  "chunks": 1,
+  "triples_scanned": 393,
+  "errors": [],
+  "chunk_reports": [
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp3_7cb6n7.chunk1.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 1,
+      "elapsed": 0.09958934783935547,
+      "return_code": 0
+    }
+  ]
+}

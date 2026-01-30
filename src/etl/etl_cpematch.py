@@ -50,38 +50,33 @@ def process_match_string(ms: dict, out_f, platform_cache: set) -> int:
 
     subj = subject_for_config(match_id)
     written = 0
-    out_f.write(f"{subj} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://example.org/sec/core#PlatformConfiguration> .\n")
-    written += 1
-    out_f.write(f"{subj} <https://example.org/sec/core#matchCriteriaId> {turtle_escape(match_id)} .\n")
-    written += 1
+    includes_written = 0
+    triples = []
+    triples.append(f"{subj} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://example.org/sec/core#PlatformConfiguration> .\n")
+    triples.append(f"{subj} <https://example.org/sec/core#matchCriteriaId> {turtle_escape(match_id)} .\n")
 
     criteria = ms.get('criteria')
     if criteria:
-        out_f.write(f"{subj} <https://example.org/sec/core#configurationCriteria> {turtle_escape(criteria)} .\n")
-        written += 1
+        triples.append(f"{subj} <https://example.org/sec/core#configurationCriteria> {turtle_escape(criteria)} .\n")
         label_value = strip_cpe_prefix(criteria)
         if label_value:
-            out_f.write(f"{subj} <http://www.w3.org/2000/01/rdf-schema#label> {turtle_escape(label_value)} .\n")
-            written += 1
+            triples.append(f"{subj} <http://www.w3.org/2000/01/rdf-schema#label> {turtle_escape(label_value)} .\n")
 
     status = ms.get('status')
     if status:
-        out_f.write(f"{subj} <https://example.org/sec/core#configurationStatus> {turtle_escape(status)} .\n")
-        written += 1
+        triples.append(f"{subj} <https://example.org/sec/core#configurationStatus> {turtle_escape(status)} .\n")
 
     if ms.get('created'):
         try:
             created = datetime.fromisoformat(ms['created'].replace('Z', '+00:00'))
-            out_f.write(f"{subj} <https://example.org/sec/core#configCreatedDate> \"{created.isoformat()}\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .\n")
-            written += 1
+            triples.append(f"{subj} <https://example.org/sec/core#configCreatedDate> \"{created.isoformat()}\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .\n")
         except Exception:
             pass
 
     if ms.get('lastModified'):
         try:
             modified = datetime.fromisoformat(ms['lastModified'].replace('Z', '+00:00'))
-            out_f.write(f"{subj} <https://example.org/sec/core#configLastModifiedDate> \"{modified.isoformat()}\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .\n")
-            written += 1
+            triples.append(f"{subj} <https://example.org/sec/core#configLastModifiedDate> \"{modified.isoformat()}\"^^<http://www.w3.org/2001/XMLSchema#dateTime> .\n")
         except Exception:
             pass
 
@@ -89,36 +84,32 @@ def process_match_string(ms: dict, out_f, platform_cache: set) -> int:
         match_cpe = match.get('cpeName')
         if not match_cpe:
             continue
+
         match_platform_id = match.get('cpeNameId') or urllib.parse.quote(match_cpe, safe='')
         platform_subj = subject_for_platform(match_platform_id)
 
-        if match_platform_id not in platform_cache:
-            out_f.write(f"{platform_subj} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://example.org/sec/core#Platform> .\n")
-            out_f.write(f"{platform_subj} <https://example.org/sec/core#cpeUri> {turtle_escape(match_cpe)} .\n")
-            out_f.write(f"{platform_subj} <https://example.org/sec/core#cpeNameId> {turtle_escape(match_platform_id)} .\n")
-            label_value = strip_cpe_prefix(match_cpe)
-            if label_value:
-                out_f.write(f"{platform_subj} <http://www.w3.org/2000/01/rdf-schema#label> {turtle_escape(label_value)} .\n")
-                written += 1
-            platform_cache.add(match_platform_id)
-            written += 3
+        triples.append(f"{platform_subj} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://example.org/sec/core#Platform> .\n")
+        triples.append(f"{platform_subj} <https://example.org/sec/core#cpeUri> {turtle_escape(match_cpe)} .\n")
+        triples.append(f"{platform_subj} <https://example.org/sec/core#cpeNameId> {turtle_escape(match_platform_id)} .\n")
+        label_value = strip_cpe_prefix(match_cpe)
+        if label_value:
+            triples.append(f"{platform_subj} <http://www.w3.org/2000/01/rdf-schema#label> {turtle_escape(label_value)} .\n")
+        includes_written += 1
+        triples.append(f"{subj} <https://example.org/sec/core#includes> {platform_subj} .\n")
 
-        # includes relationship
-        out_f.write(f"{subj} <https://example.org/sec/core#includes> {platform_subj} .\n")
-        written += 1
-
-        # vulnerable
         if match.get('vulnerable') is not None:
-            out_f.write(f"{subj} <https://example.org/sec/core#vulnerable> \"{str(match['vulnerable']).lower()}\"^^<http://www.w3.org/2001/XMLSchema#boolean> .\n")
-            written += 1
+            triples.append(f"{subj} <https://example.org/sec/core#vulnerable> \"{str(match['vulnerable']).lower()}\"^^<http://www.w3.org/2001/XMLSchema#boolean> .\n")
 
-        # version bounds
         for vfield in ['versionStartIncluding', 'versionStartExcluding', 'versionEndIncluding', 'versionEndExcluding']:
             if match.get(vfield):
-                out_f.write(f"{subj} <https://example.org/sec/core#{vfield}> {turtle_escape(match[vfield])} .\n")
-                written += 1
+                triples.append(f"{subj} <https://example.org/sec/core#{vfield}> {turtle_escape(match[vfield])} .\n")
 
-    return written if written is not None else 0
+    if includes_written > 0:
+        for t in triples:
+            out_f.write(t)
+            written += 1
+    # If no includes, skip emitting this PlatformConfiguration
+    return written
 def transform_cpematch(input_data, output_path):
     """
     Transforms CPEMatch JSON data (as loaded dict) to Turtle and writes to output_path.

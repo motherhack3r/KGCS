@@ -1,0 +1,10 @@
+{
+  "data_file": "tmp/phase3_engage.ttl",
+  "conforms": false,
+  "chunks": 1,
+  "triples_scanned": 688,
+  "errors": [
+    "Chunk 1: validation failed: at line 6 of <>:\nBad syntax (Prefix \"rdfs:\" not bound) at ^ in:\n\"...b'g/engagement/ENGAGE-EAC0001> a sec:EngagementConcept ;\\r\\n    '^b'rdfs:label \"API Monitoring\"^^xsd:string ;\\r\\n    sec:descripti'...\""
+  ],
+  "chunk_reports": []
+}

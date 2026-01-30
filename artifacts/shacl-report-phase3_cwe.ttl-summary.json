@@ -1,0 +1,18 @@
+{
+  "data_file": "tmp/phase3_cwe.ttl",
+  "conforms": true,
+  "chunks": 1,
+  "triples_scanned": 461,
+  "errors": [],
+  "chunk_reports": [
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp_v8frl3o.chunk1.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 1,
+      "elapsed": 0.13530850410461426,
+      "return_code": 0
+    }
+  ]
+}

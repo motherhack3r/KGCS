@@ -1,0 +1,10 @@
+{
+  "data_file": "tmp/phase3_attack.ttl",
+  "conforms": false,
+  "chunks": 1,
+  "triples_scanned": 3590,
+  "errors": [
+    "Chunk 1: validation failed: at line 6 of <>:\nBad syntax (Prefix \"rdfs:\" not bound) at ^ in:\n\"...b'https://example.org/technique/T1001> a sec:Technique ;\\r\\n    '^b'rdfs:label \"Data Obfuscation\"^^xsd:string ;\\r\\n    sec:attackT'...\""
+  ],
+  "chunk_reports": []
+}

@@ -1,10 +1,21 @@
 {
   "DefensiveTechniques": [
     {
+      "ID": "TokenBinding",
+      "Name": "Token Binding",
+      "MitigatesTechniques": [
+        "T1528",
+        "T1558"
+      ]
+    },
+    {
       "ID": "CredentialHardening",
       "Name": "Credential Hardening",
       "MitigatesTechniques": [
-        "T1003.005"
+        "T1528",
+        "T1539",
+        "T1552",
+        "T1558"
       ]
     },
     {
@@ -18,570 +29,1585 @@
       "ID": "ExecutableDenylisting",
       "Name": "Executable Denylisting",
       "MitigatesTechniques": [
+        "T1057",
+        "T1053",
+        "T1047",
+        "T1059",
+        "T1140",
+        "T1220",
+        "T1033",
+        "T1018",
+        "T1007",
+        "T1010",
+        "T1016",
         "T1082",
-        "T1055.004",
-        "T1546.008",
-        "T1036.003",
-        "T1574.008",
-        "T1574.007"
+        "T1124"
       ]
     },
     {
       "ID": "ExecutableAllowlisting",
       "Name": "Executable Allowlisting",
       "MitigatesTechniques": [
+        "T1007",
+        "T1010",
+        "T1016",
+        "T1018",
+        "T1033",
+        "T1057",
         "T1082",
-        "T1036.003",
-        "T1055.004",
-        "T1546.008",
-        "T1574.008",
-        "T1574.007"
+        "T1124",
+        "T1047",
+        "T1053",
+        "T1059",
+        "T1140",
+        "T1220"
       ]
     },
     {
       "ID": "Hardware-basedProcessIsolation",
       "Name": "Hardware-based Process Isolation",
       "MitigatesTechniques": [
+        "T1007",
+        "T1010",
+        "T1016",
+        "T1018",
+        "T1033",
+        "T1057",
         "T1082",
-        "T1055.004"
+        "T1124",
+        "T1047",
+        "T1053",
+        "T1556",
+        "T1140",
+        "T1220",
+        "T1550",
+        "T1212"
+      ]
+    },
+    {
+      "ID": "Kernel-basedProcessIsolation",
+      "Name": "Kernel-based Process Isolation",
+      "MitigatesTechniques": [
+        "T1033",
+        "T1053",
+        "T1556",
+        "T1550",
+        "T1212"
+      ]
+    },
+    {
+      "ID": "Application-basedProcessIsolation",
+      "Name": "Application-based Process Isolation",
+      "MitigatesTechniques": [
+        "T1033",
+        "T1053",
+        "T1556",
+        "T1550",
+        "T1212"
       ]
     },
     {
       "ID": "ContentFiltering",
       "Name": "Content Filtering",
       "MitigatesTechniques": [
-        "T1036.005",
-        "T1036.003",
-        "T1048.002",
-        "T1055.001",
-        "T1546.008",
-        "T1574.007",
-        "T1574.001",
-        "T1574.008"
+        "T1005",
+        "T1119",
+        "T1560",
+        "T1014",
+        "T1140",
+        "T1220",
+        "T1016",
+        "T1018",
+        "T1033",
+        "T1041",
+        "T1083",
+        "T1072",
+        "T1071",
+        "T1059",
+        "T1534",
+        "T1187",
+        "T1555"
       ]
     },
     {
       "ID": "CertificateAnalysis",
       "Name": "Certificate Analysis",
       "MitigatesTechniques": [
-        "T1048.002"
+        "T1071",
+        "T1041"
+      ]
+    },
+    {
+      "ID": "UnlockAccount",
+      "Name": "Unlock Account",
+      "MitigatesTechniques": [
+        "T1078",
+        "T1098",
+        "T1136",
+        "T1531"
+      ]
+    },
+    {
+      "ID": "RestoreUserAccountAccess",
+      "Name": "Restore User Account Access",
+      "MitigatesTechniques": [
+        "T1078",
+        "T1098",
+        "T1136",
+        "T1531"
       ]
     },
     {
       "ID": "ReissueCredential",
       "Name": "Reissue Credential",
       "MitigatesTechniques": [
-        "T1003.005"
+        "T1539",
+        "T1552",
+        "T1528",
+        "T1558"
       ]
     },
     {
       "ID": "ApplicationProtocolCommandAnalysis",
       "Name": "Application Protocol Command Analysis",
       "MitigatesTechniques": [
+        "T1001",
+        "T1008",
+        "T1071",
+        "T1102",
+        "T1104",
         "T1105",
+        "T1132",
+        "T1095",
+        "T1205",
+        "T1219",
+        "T1568",
+        "T1571",
+        "T1572",
+        "T1573",
+        "T1018",
+        "T1011",
+        "T1020",
+        "T1029",
+        "T1030",
+        "T1041",
+        "T1048",
+        "T1567",
+        "T1047",
+        "T1021",
+        "T1563",
+        "T1210",
+        "T1570",
+        "T1197",
         "T1207",
-        "T1199",
-        "T1048.002",
-        "T1204.001",
-        "T1546.008",
-        "T1557.001"
+        "T1185",
+        "T1557",
+        "T1189",
+        "T1190",
+        "T1199"
       ]
     },
     {
-      "ID": "URLReputationAnalysis",
-      "Name": "URL Reputation Analysis",
+      "ID": "ProcessTermination",
+      "Name": "Process Termination",
       "MitigatesTechniques": [
-        "T1204.001"
+        "T1033",
+        "T1053",
+        "T1550",
+        "T1556",
+        "T1212"
+      ]
+    },
+    {
+      "ID": "AgentAuthentication",
+      "Name": "Agent Authentication",
+      "MitigatesTechniques": [
+        "T1078",
+        "T1098",
+        "T1136",
+        "T1531"
       ]
     },
     {
       "ID": "URLAnalysis",
       "Name": "URL Analysis",
       "MitigatesTechniques": [
-        "T1204.001"
+        "T1189"
       ]
     },
     {
       "ID": "IdentifierActivityAnalysis",
       "Name": "Identifier Activity Analysis",
       "MitigatesTechniques": [
-        "T1204.001"
+        "T1189"
+      ]
+    },
+    {
+      "ID": "URLReputationAnalysis",
+      "Name": "URL Reputation Analysis",
+      "MitigatesTechniques": [
+        "T1189"
       ]
     },
     {
       "ID": "HomoglyphDetection",
       "Name": "Homoglyph Detection",
       "MitigatesTechniques": [
-        "T1204.001"
+        "T1189",
+        "T1534"
+      ]
+    },
+    {
+      "ID": "ChangeDefaultPassword",
+      "Name": "Change Default Password",
+      "MitigatesTechniques": [
+        "T1078",
+        "T1098",
+        "T1531",
+        "T1136"
       ]
     },
     {
       "ID": "ContentModification",
       "Name": "Content Modification",
       "MitigatesTechniques": [
-        "T1036.005",
-        "T1036.003",
-        "T1048.002",
-        "T1055.001",
-        "T1546.008",
-        "T1574.007",
-        "T1574.008",
-        "T1574.001"
+        "T1119",
+        "T1560",
+        "T1005",
+        "T1140",
+        "T1220",
+        "T1016",
+        "T1014",
+        "T1018",
+        "T1033",
+        "T1083",
+        "T1041",
+        "T1059",
+        "T1072",
+        "T1071",
+        "T1534",
+        "T1187",
+        "T1555"
+      ]
+    },
+    {
+      "ID": "SenderReputationAnalysis",
+      "Name": "Sender Reputation Analysis",
+      "MitigatesTechniques": [
+        "T1534"
+      ]
+    },
+    {
+      "ID": "SenderMTAReputationAnalysis",
+      "Name": "Sender MTA Reputation Analysis",
+      "MitigatesTechniques": [
+        "T1534"
       ]
     },
     {
       "ID": "FileAnalysis",
       "Name": "File Analysis",
       "MitigatesTechniques": [
-        "T1036.005",
-        "T1036.003",
-        "T1048.002",
-        "T1055.001",
-        "T1546.008",
-        "T1574.007",
-        "T1574.008",
-        "T1574.001"
-      ]
-    },
-    {
-      "ID": "SystemConfigurationPermissions",
-      "Name": "System Configuration Permissions",
-      "MitigatesTechniques": [
-        "T1207",
-        "T1548.004"
+        "T1014",
+        "T1140",
+        "T1220",
+        "T1016",
+        "T1033",
+        "T1083",
+        "T1005",
+        "T1119",
+        "T1560",
+        "T1018",
+        "T1041",
+        "T1059",
+        "T1072",
+        "T1534",
+        "T1187",
+        "T1555",
+        "T1071"
       ]
     },
     {
       "ID": "FileEncryption",
       "Name": "File Encryption",
       "MitigatesTechniques": [
-        "T1036.003",
-        "T1036.005",
-        "T1048.002",
-        "T1055.001",
-        "T1546.008",
-        "T1574.001",
-        "T1574.007",
-        "T1574.008"
+        "T1005",
+        "T1119",
+        "T1014",
+        "T1560",
+        "T1140",
+        "T1018",
+        "T1033",
+        "T1220",
+        "T1083",
+        "T1016",
+        "T1041",
+        "T1059",
+        "T1072",
+        "T1071",
+        "T1534",
+        "T1187",
+        "T1555"
+      ]
+    },
+    {
+      "ID": "SoftwareUpdate",
+      "Name": "Software Update",
+      "MitigatesTechniques": [
+        "T1014",
+        "T1072",
+        "T1212",
+        "T1176",
+        "T1554"
+      ]
+    },
+    {
+      "ID": "SystemConfigurationPermissions",
+      "Name": "System Configuration Permissions",
+      "MitigatesTechniques": [
+        "T1112",
+        "T1207",
+        "T1012"
+      ]
+    },
+    {
+      "ID": "DiskEncryption",
+      "Name": "Disk Encryption",
+      "MitigatesTechniques": [
+        "T1619"
+      ]
+    },
+    {
+      "ID": "Hardware-basedWriteProtection",
+      "Name": "Hardware-based Write Protection",
+      "MitigatesTechniques": [
+        "T1619"
       ]
     },
     {
       "ID": "HardwareComponentInventory",
       "Name": "Hardware Component Inventory",
       "MitigatesTechniques": [
-        "T1195.003"
+        "T1200",
+        "T1091",
+        "T1619",
+        "T1123",
+        "T1125",
+        "T1025",
+        "T1092",
+        "T1111"
       ]
     },
     {
       "ID": "NetworkTrafficFiltering",
       "Name": "Network Traffic Filtering",
       "MitigatesTechniques": [
+        "T1001",
+        "T1008",
+        "T1071",
+        "T1095",
+        "T1102",
+        "T1104",
         "T1105",
+        "T1132",
+        "T1205",
+        "T1219",
+        "T1568",
+        "T1571",
+        "T1572",
+        "T1573",
+        "T1011",
+        "T1020",
+        "T1029",
+        "T1030",
+        "T1041",
+        "T1048",
+        "T1567",
+        "T1018",
+        "T1021",
+        "T1210",
+        "T1563",
+        "T1570",
+        "T1047",
+        "T1185",
+        "T1557",
+        "T1189",
+        "T1190",
         "T1199",
-        "T1207",
-        "T1048.002",
-        "T1204.001",
-        "T1546.008",
-        "T1557.001"
+        "T1197",
+        "T1207"
+      ]
+    },
+    {
+      "ID": "DNSAllowlisting",
+      "Name": "DNS Allowlisting",
+      "MitigatesTechniques": [
+        "T1568"
+      ]
+    },
+    {
+      "ID": "DNSDenylisting",
+      "Name": "DNS Denylisting",
+      "MitigatesTechniques": [
+        "T1568"
+      ]
+    },
+    {
+      "ID": "EmailFiltering",
+      "Name": "Email Filtering",
+      "MitigatesTechniques": [
+        "T1534"
       ]
     },
     {
       "ID": "RemoteTerminalSessionDetection",
       "Name": "Remote Terminal Session Detection",
       "MitigatesTechniques": [
+        "T1001",
+        "T1008",
+        "T1071",
+        "T1095",
+        "T1102",
+        "T1104",
         "T1105",
+        "T1132",
+        "T1205",
+        "T1219",
+        "T1568",
+        "T1571",
+        "T1572",
+        "T1573",
+        "T1011",
+        "T1020",
+        "T1029",
+        "T1030",
+        "T1041",
+        "T1048",
+        "T1567",
+        "T1018",
+        "T1021",
+        "T1210",
+        "T1563",
+        "T1570",
+        "T1557",
+        "T1047",
+        "T1185",
+        "T1189",
+        "T1190",
         "T1199",
-        "T1207",
-        "T1048.002",
-        "T1204.001",
-        "T1546.008",
-        "T1557.001"
-      ]
-    },
-    {
-      "ID": "NetworkTrafficSignatureAnalysis",
-      "Name": "Network Traffic Signature Analysis",
-      "MitigatesTechniques": [
-        "T1105",
-        "T1199",
-        "T1207",
-        "T1048.002",
-        "T1204.001",
-        "T1546.008",
-        "T1557.001"
-      ]
-    },
-    {
-      "ID": "Client-serverPayloadProfiling",
-      "Name": "Client-server Payload Profiling",
-      "MitigatesTechniques": [
-        "T1105",
-        "T1199",
-        "T1207",
-        "T1048.002",
-        "T1204.001",
-        "T1546.008",
-        "T1557.001"
-      ]
-    },
-    {
-      "ID": "NetworkTrafficCommunityDeviation",
-      "Name": "Network Traffic Community Deviation",
-      "MitigatesTechniques": [
-        "T1105",
-        "T1199",
-        "T1207",
-        "T1048.002",
-        "T1204.001",
-        "T1546.008",
-        "T1557.001"
-      ]
-    },
-    {
-      "ID": "PerHostDownload-UploadRatioAnalysis",
-      "Name": "Per Host Download-Upload Ratio Analysis",
-      "MitigatesTechniques": [
-        "T1105",
-        "T1199",
-        "T1207",
-        "T1048.002",
-        "T1204.001",
-        "T1546.008",
-        "T1557.001"
-      ]
-    },
-    {
-      "ID": "ProtocolMetadataAnomalyDetection",
-      "Name": "Protocol Metadata Anomaly Detection",
-      "MitigatesTechniques": [
-        "T1105",
-        "T1199",
-        "T1207",
-        "T1048.002",
-        "T1204.001",
-        "T1546.008",
-        "T1557.001"
+        "T1197",
+        "T1207"
       ]
     },
     {
       "ID": "RelayPatternAnalysis",
       "Name": "Relay Pattern Analysis",
       "MitigatesTechniques": [
+        "T1001",
+        "T1008",
+        "T1071",
+        "T1095",
+        "T1102",
+        "T1104",
         "T1105",
-        "T1048.002",
-        "T1204.001"
+        "T1132",
+        "T1219",
+        "T1568",
+        "T1571",
+        "T1572",
+        "T1573",
+        "T1567",
+        "T1189",
+        "T1197"
+      ]
+    },
+    {
+      "ID": "NetworkTrafficSignatureAnalysis",
+      "Name": "Network Traffic Signature Analysis",
+      "MitigatesTechniques": [
+        "T1001",
+        "T1008",
+        "T1071",
+        "T1095",
+        "T1102",
+        "T1104",
+        "T1105",
+        "T1132",
+        "T1205",
+        "T1219",
+        "T1568",
+        "T1571",
+        "T1572",
+        "T1573",
+        "T1011",
+        "T1020",
+        "T1029",
+        "T1030",
+        "T1041",
+        "T1048",
+        "T1567",
+        "T1018",
+        "T1021",
+        "T1210",
+        "T1563",
+        "T1570",
+        "T1557",
+        "T1047",
+        "T1185",
+        "T1189",
+        "T1190",
+        "T1199",
+        "T1197",
+        "T1207"
+      ]
+    },
+    {
+      "ID": "Client-serverPayloadProfiling",
+      "Name": "Client-server Payload Profiling",
+      "MitigatesTechniques": [
+        "T1001",
+        "T1008",
+        "T1071",
+        "T1095",
+        "T1102",
+        "T1104",
+        "T1105",
+        "T1132",
+        "T1205",
+        "T1219",
+        "T1568",
+        "T1571",
+        "T1572",
+        "T1573",
+        "T1011",
+        "T1020",
+        "T1029",
+        "T1030",
+        "T1041",
+        "T1048",
+        "T1567",
+        "T1018",
+        "T1021",
+        "T1210",
+        "T1563",
+        "T1570",
+        "T1557",
+        "T1047",
+        "T1185",
+        "T1189",
+        "T1190",
+        "T1199",
+        "T1197",
+        "T1207"
+      ]
+    },
+    {
+      "ID": "NetworkTrafficCommunityDeviation",
+      "Name": "Network Traffic Community Deviation",
+      "MitigatesTechniques": [
+        "T1001",
+        "T1008",
+        "T1071",
+        "T1095",
+        "T1102",
+        "T1104",
+        "T1105",
+        "T1132",
+        "T1205",
+        "T1219",
+        "T1568",
+        "T1571",
+        "T1572",
+        "T1573",
+        "T1011",
+        "T1020",
+        "T1029",
+        "T1030",
+        "T1041",
+        "T1048",
+        "T1567",
+        "T1018",
+        "T1021",
+        "T1210",
+        "T1563",
+        "T1570",
+        "T1557",
+        "T1047",
+        "T1185",
+        "T1189",
+        "T1190",
+        "T1199",
+        "T1197",
+        "T1207"
+      ]
+    },
+    {
+      "ID": "PerHostDownload-UploadRatioAnalysis",
+      "Name": "Per Host Download-Upload Ratio Analysis",
+      "MitigatesTechniques": [
+        "T1001",
+        "T1008",
+        "T1071",
+        "T1095",
+        "T1102",
+        "T1104",
+        "T1105",
+        "T1132",
+        "T1205",
+        "T1219",
+        "T1568",
+        "T1571",
+        "T1572",
+        "T1573",
+        "T1011",
+        "T1020",
+        "T1029",
+        "T1030",
+        "T1041",
+        "T1048",
+        "T1567",
+        "T1018",
+        "T1021",
+        "T1210",
+        "T1563",
+        "T1570",
+        "T1557",
+        "T1047",
+        "T1185",
+        "T1189",
+        "T1190",
+        "T1199",
+        "T1197",
+        "T1207"
+      ]
+    },
+    {
+      "ID": "ProtocolMetadataAnomalyDetection",
+      "Name": "Protocol Metadata Anomaly Detection",
+      "MitigatesTechniques": [
+        "T1001",
+        "T1008",
+        "T1071",
+        "T1095",
+        "T1102",
+        "T1104",
+        "T1105",
+        "T1132",
+        "T1205",
+        "T1219",
+        "T1568",
+        "T1571",
+        "T1572",
+        "T1573",
+        "T1011",
+        "T1020",
+        "T1029",
+        "T1030",
+        "T1041",
+        "T1048",
+        "T1567",
+        "T1018",
+        "T1021",
+        "T1210",
+        "T1563",
+        "T1570",
+        "T1557",
+        "T1047",
+        "T1185",
+        "T1189",
+        "T1190",
+        "T1199",
+        "T1197",
+        "T1207"
+      ]
+    },
+    {
+      "ID": "DNSTrafficAnalysis",
+      "Name": "DNS Traffic Analysis",
+      "MitigatesTechniques": [
+        "T1568",
+        "T1040"
       ]
     },
     {
       "ID": "ConnectionAttemptAnalysis",
       "Name": "Connection Attempt Analysis",
       "MitigatesTechniques": [
+        "T1021",
+        "T1210",
+        "T1570",
+        "T1047",
         "T1199",
-        "T1207",
-        "T1546.008",
-        "T1557.001"
+        "T1197",
+        "T1207"
+      ]
+    },
+    {
+      "ID": "FileCarving",
+      "Name": "File Carving",
+      "MitigatesTechniques": [
+        "T1570"
       ]
     },
     {
       "ID": "AdministrativeNetworkActivityAnalysis",
       "Name": "Administrative Network Activity Analysis",
       "MitigatesTechniques": [
-        "T1207",
-        "T1546.008"
+        "T1047",
+        "T1207"
+      ]
+    },
+    {
+      "ID": "InboundSessionVolumeAnalysis",
+      "Name": "Inbound Session Volume Analysis",
+      "MitigatesTechniques": [
+        "T1190"
+      ]
+    },
+    {
+      "ID": "IPCTrafficAnalysis",
+      "Name": "IPC Traffic Analysis",
+      "MitigatesTechniques": [
+        "T1197"
+      ]
+    },
+    {
+      "ID": "DomainTrustPolicy",
+      "Name": "Domain Trust Policy",
+      "MitigatesTechniques": [
+        "T1033"
       ]
     },
     {
       "ID": "DecoyUserCredential",
       "Name": "Decoy User Credential",
       "MitigatesTechniques": [
-        "T1003.005"
-      ]
-    },
-    {
-      "ID": "RestoreDatabase",
-      "Name": "Restore Database",
-      "MitigatesTechniques": [
-        "T1207",
-        "T1548.004"
+        "T1528",
+        "T1539",
+        "T1552",
+        "T1558"
       ]
     },
     {
       "ID": "RestoreFile",
       "Name": "Restore File",
       "MitigatesTechniques": [
-        "T1036.003",
-        "T1036.005",
-        "T1048.002",
-        "T1055.001",
-        "T1546.008",
-        "T1574.001",
-        "T1574.007",
-        "T1574.008"
+        "T1033",
+        "T1016",
+        "T1018",
+        "T1083",
+        "T1041",
+        "T1059",
+        "T1072",
+        "T1534",
+        "T1140",
+        "T1014",
+        "T1220",
+        "T1005",
+        "T1119",
+        "T1560",
+        "T1071",
+        "T1187",
+        "T1555"
+      ]
+    },
+    {
+      "ID": "RestoreDatabase",
+      "Name": "Restore Database",
+      "MitigatesTechniques": [
+        "T1033",
+        "T1012",
+        "T1112",
+        "T1207",
+        "T1555"
       ]
     },
     {
       "ID": "RestoreConfiguration",
       "Name": "Restore Configuration",
       "MitigatesTechniques": [
-        "T1546.008"
+        "T1538",
+        "T1526",
+        "T1614",
+        "T1615",
+        "T1222",
+        "T1484"
       ]
     },
     {
-      "ID": "ApplicationExceptionMonitoring",
-      "Name": "Application Exception Monitoring",
+      "ID": "RestoreSoftware",
+      "Name": "Restore Software",
       "MitigatesTechniques": [
-        "T1003.005",
-        "T1070.003"
+        "T1072",
+        "T1014",
+        "T1176",
+        "T1554",
+        "T1212"
+      ]
+    },
+    {
+      "ID": "WebSessionAccessMediation",
+      "Name": "Web Session Access Mediation",
+      "MitigatesTechniques": [
+        "T1556",
+        "T1212",
+        "T1550",
+        "T1033"
+      ]
+    },
+    {
+      "ID": "NetworkTrafficPolicyMapping",
+      "Name": "Network Traffic Policy Mapping",
+      "MitigatesTechniques": [
+        "T1222",
+        "T1484",
+        "T1615"
       ]
     },
     {
       "ID": "FileIntegrityMonitoring",
       "Name": "File Integrity Monitoring",
       "MitigatesTechniques": [
-        "T1036.003",
-        "T1036.005",
-        "T1048.002",
-        "T1055.001",
-        "T1546.008",
-        "T1574.008",
-        "T1574.001",
-        "T1574.007"
+        "T1005",
+        "T1119",
+        "T1560",
+        "T1014",
+        "T1140",
+        "T1220",
+        "T1016",
+        "T1018",
+        "T1033",
+        "T1083",
+        "T1059",
+        "T1041",
+        "T1072",
+        "T1071",
+        "T1534",
+        "T1187",
+        "T1555"
       ]
     },
     {
-      "ID": "SystemFileAnalysis",
-      "Name": "System File Analysis",
+      "ID": "InputDeviceAnalysis",
+      "Name": "Input Device Analysis",
       "MitigatesTechniques": [
-        "T1036.003"
+        "T1123",
+        "T1125"
+      ]
+    },
+    {
+      "ID": "FirmwareEmbeddedMonitoringCode",
+      "Name": "Firmware Embedded Monitoring Code",
+      "MitigatesTechniques": [
+        "T1014"
+      ]
+    },
+    {
+      "ID": "FirmwareVerification",
+      "Name": "Firmware Verification",
+      "MitigatesTechniques": [
+        "T1014"
+      ]
+    },
+    {
+      "ID": "FirmwareBehaviorAnalysis",
+      "Name": "Firmware Behavior Analysis",
+      "MitigatesTechniques": [
+        "T1014"
+      ]
+    },
+    {
+      "ID": "ApplicationExceptionMonitoring",
+      "Name": "Application Exception Monitoring",
+      "MitigatesTechniques": [
+        "T1140",
+        "T1187"
       ]
     },
     {
       "ID": "OperationalProcessMonitoring",
       "Name": "Operational Process Monitoring",
       "MitigatesTechniques": [
-        "T1070.003"
+        "T1140",
+        "T1187"
+      ]
+    },
+    {
+      "ID": "MemoryBoundaryTracking",
+      "Name": "Memory Boundary Tracking",
+      "MitigatesTechniques": [
+        "T1211",
+        "T1203",
+        "T1210",
+        "T1212",
+        "T1068"
+      ]
+    },
+    {
+      "ID": "SystemFileAnalysis",
+      "Name": "System File Analysis",
+      "MitigatesTechniques": [
+        "T1018"
+      ]
+    },
+    {
+      "ID": "ServiceBinaryVerification",
+      "Name": "Service Binary Verification",
+      "MitigatesTechniques": [
+        "T1072",
+        "T1212"
+      ]
+    },
+    {
+      "ID": "SystemDaemonMonitoring",
+      "Name": "System Daemon Monitoring",
+      "MitigatesTechniques": [
+        "T1053"
+      ]
+    },
+    {
+      "ID": "ScheduledJobAnalysis",
+      "Name": "Scheduled Job Analysis",
+      "MitigatesTechniques": [
+        "T1053"
       ]
     },
     {
       "ID": "LocalFilePermissions",
       "Name": "Local File Permissions",
       "MitigatesTechniques": [
-        "T1036.003",
-        "T1036.005",
-        "T1055.001",
-        "T1546.008",
-        "T1048.002",
-        "T1574.007",
-        "T1574.008",
-        "T1574.001"
+        "T1014",
+        "T1140",
+        "T1220",
+        "T1005",
+        "T1119",
+        "T1560",
+        "T1016",
+        "T1018",
+        "T1033",
+        "T1083",
+        "T1041",
+        "T1059",
+        "T1072",
+        "T1071",
+        "T1187",
+        "T1555",
+        "T1534"
+      ]
+    },
+    {
+      "ID": "ProcessSuspension",
+      "Name": "Process Suspension",
+      "MitigatesTechniques": [
+        "T1212",
+        "T1556",
+        "T1053",
+        "T1033",
+        "T1550"
+      ]
+    },
+    {
+      "ID": "VideoSurveillance",
+      "Name": "Video Surveillance",
+      "MitigatesTechniques": [
+        "T1125"
+      ]
+    },
+    {
+      "ID": "ProcessCodeSegmentVerification",
+      "Name": "Process Code Segment Verification",
+      "MitigatesTechniques": [
+        "T1211",
+        "T1203",
+        "T1068",
+        "T1212",
+        "T1210"
+      ]
+    },
+    {
+      "ID": "DiskFormatting",
+      "Name": "Disk Formatting",
+      "MitigatesTechniques": [
+        "T1619"
       ]
     },
     {
       "ID": "AuthenticationCacheInvalidation",
       "Name": "Authentication Cache Invalidation",
       "MitigatesTechniques": [
-        "T1003.005"
+        "T1528",
+        "T1539",
+        "T1552",
+        "T1558"
+      ]
+    },
+    {
+      "ID": "StackFrameCanaryValidation",
+      "Name": "Stack Frame Canary Validation",
+      "MitigatesTechniques": [
+        "T1203",
+        "T1210",
+        "T1211",
+        "T1212",
+        "T1068"
+      ]
+    },
+    {
+      "ID": "SegmentAddressOffsetRandomization",
+      "Name": "Segment Address Offset Randomization",
+      "MitigatesTechniques": [
+        "T1189",
+        "T1190",
+        "T1033",
+        "T1068",
+        "T1620",
+        "T1211",
+        "T1212",
+        "T1203",
+        "T1210"
       ]
     },
     {
       "ID": "DynamicAnalysis",
       "Name": "Dynamic Analysis",
       "MitigatesTechniques": [
-        "T1036.003",
-        "T1546.008",
-        "T1574.007",
-        "T1574.008"
-      ]
-    },
-    {
-      "ID": "SystemCallAnalysis",
-      "Name": "System Call Analysis",
-      "MitigatesTechniques": [
-        "T1049",
-        "T1082",
-        "T1036.005",
-        "T1055.001",
-        "T1055.004",
-        "T1548.004"
+        "T1059",
+        "T1016",
+        "T1140",
+        "T1220",
+        "T1534"
       ]
     },
     {
       "ID": "ProcessSpawnAnalysis",
       "Name": "Process Spawn Analysis",
       "MitigatesTechniques": [
+        "T1007",
+        "T1010",
+        "T1016",
+        "T1018",
+        "T1033",
+        "T1057",
         "T1082",
-        "T1055.004"
+        "T1124",
+        "T1047",
+        "T1053",
+        "T1556",
+        "T1140",
+        "T1220",
+        "T1550",
+        "T1212"
+      ]
+    },
+    {
+      "ID": "SystemCallAnalysis",
+      "Name": "System Call Analysis",
+      "MitigatesTechniques": [
+        "T1007",
+        "T1010",
+        "T1012",
+        "T1016",
+        "T1018",
+        "T1033",
+        "T1057",
+        "T1049",
+        "T1082",
+        "T1124",
+        "T1047",
+        "T1053",
+        "T1106",
+        "T1113",
+        "T1140",
+        "T1220"
+      ]
+    },
+    {
+      "ID": "ProcessSelf-ModificationDetection",
+      "Name": "Process Self-Modification Detection",
+      "MitigatesTechniques": [
+        "T1033",
+        "T1053",
+        "T1556",
+        "T1550",
+        "T1212"
+      ]
+    },
+    {
+      "ID": "ProcessLineageAnalysis",
+      "Name": "Process Lineage Analysis",
+      "MitigatesTechniques": [
+        "T1033",
+        "T1053",
+        "T1556",
+        "T1550",
+        "T1212"
+      ]
+    },
+    {
+      "ID": "ShadowStackComparisons",
+      "Name": "Shadow Stack Comparisons",
+      "MitigatesTechniques": [
+        "T1203",
+        "T1068",
+        "T1211",
+        "T1210",
+        "T1212"
+      ]
+    },
+    {
+      "ID": "DatabaseQueryStringAnalysis",
+      "Name": "Database Query String Analysis",
+      "MitigatesTechniques": [
+        "T1190"
+      ]
+    },
+    {
+      "ID": "HostReboot",
+      "Name": "Host Reboot",
+      "MitigatesTechniques": [
+        "T1212",
+        "T1556",
+        "T1053",
+        "T1033",
+        "T1550"
+      ]
+    },
+    {
+      "ID": "InboundTrafficFiltering",
+      "Name": "Inbound Traffic Filtering",
+      "MitigatesTechniques": [
+        "T1190"
       ]
     },
     {
       "ID": "UserGeolocationLogonPatternAnalysis",
       "Name": "User Geolocation Logon Pattern Analysis",
       "MitigatesTechniques": [
+        "T1020",
+        "T1048",
+        "T1029",
+        "T1030",
+        "T1041",
+        "T1567",
+        "T1021",
+        "T1563",
+        "T1210",
+        "T1570",
+        "T1197",
         "T1207",
+        "T1205",
+        "T1047",
+        "T1185",
+        "T1557",
+        "T1189",
+        "T1190",
         "T1199",
-        "T1048.002",
+        "T1001",
+        "T1008",
+        "T1095",
+        "T1071",
+        "T1219",
+        "T1102",
+        "T1104",
         "T1105",
-        "T1204.001",
-        "T1546.008",
-        "T1557.001"
+        "T1132",
+        "T1568",
+        "T1571",
+        "T1572",
+        "T1573",
+        "T1018",
+        "T1011"
+      ]
+    },
+    {
+      "ID": "AccessModeling",
+      "Name": "Access Modeling",
+      "MitigatesTechniques": [
+        "T1078",
+        "T1484",
+        "T1222",
+        "T1098",
+        "T1136",
+        "T1531",
+        "T1615"
+      ]
+    },
+    {
+      "ID": "UserAccountPermissions",
+      "Name": "User Account Permissions",
+      "MitigatesTechniques": [
+        "T1078",
+        "T1098",
+        "T1136",
+        "T1531"
+      ]
+    },
+    {
+      "ID": "ProcessSegmentExecutionPrevention",
+      "Name": "Process Segment Execution Prevention",
+      "MitigatesTechniques": [
+        "T1033",
+        "T1068",
+        "T1189",
+        "T1190",
+        "T1203",
+        "T1210",
+        "T1211",
+        "T1620",
+        "T1212"
+      ]
+    },
+    {
+      "ID": "EmailRemoval",
+      "Name": "Email Removal",
+      "MitigatesTechniques": [
+        "T1534"
+      ]
+    },
+    {
+      "ID": "HostShutdown",
+      "Name": "Host Shutdown",
+      "MitigatesTechniques": [
+        "T1033",
+        "T1053",
+        "T1556",
+        "T1212",
+        "T1550"
       ]
     },
     {
       "ID": "SessionTermination",
       "Name": "Session Termination",
       "MitigatesTechniques": [
-        "T1199"
+        "T1133",
+        "T1199",
+        "T1563"
       ]
     },
     {
       "ID": "CredentialTransmissionScoping",
       "Name": "Credential Transmission Scoping",
       "MitigatesTechniques": [
-        "T1003.005"
+        "T1528",
+        "T1539",
+        "T1552",
+        "T1558"
       ]
     },
     {
       "ID": "SystemCallFiltering",
       "Name": "System Call Filtering",
       "MitigatesTechniques": [
+        "T1016",
+        "T1018",
+        "T1007",
+        "T1010",
+        "T1012",
+        "T1033",
+        "T1057",
         "T1049",
         "T1082",
-        "T1036.005",
-        "T1055.001",
-        "T1055.004",
-        "T1548.004"
+        "T1556",
+        "T1113",
+        "T1550",
+        "T1124",
+        "T1047",
+        "T1053",
+        "T1106",
+        "T1140",
+        "T1220",
+        "T1212"
+      ]
+    },
+    {
+      "ID": "AccountLocking",
+      "Name": "Account Locking",
+      "MitigatesTechniques": [
+        "T1078",
+        "T1098",
+        "T1136",
+        "T1531"
+      ]
+    },
+    {
+      "ID": "Token-basedAuthentication",
+      "Name": "Token-based Authentication",
+      "MitigatesTechniques": [
+        "T1528",
+        "T1558"
       ]
     },
     {
       "ID": "CredentialRevocation",
       "Name": "Credential Revocation",
       "MitigatesTechniques": [
-        "T1003.005"
+        "T1528",
+        "T1539",
+        "T1552",
+        "T1558"
       ]
     },
     {
       "ID": "RemoteFileAccessMediation",
       "Name": "Remote File Access Mediation",
       "MitigatesTechniques": [
-        "T1036.003",
-        "T1036.005",
-        "T1048.002",
-        "T1055.001",
-        "T1546.008",
-        "T1574.001",
-        "T1574.007",
-        "T1574.008"
+        "T1059",
+        "T1072",
+        "T1041",
+        "T1071",
+        "T1534",
+        "T1187",
+        "T1555",
+        "T1005",
+        "T1119",
+        "T1560",
+        "T1014",
+        "T1140",
+        "T1220",
+        "T1016",
+        "T1018",
+        "T1033",
+        "T1083"
+      ]
+    },
+    {
+      "ID": "DiskErasure",
+      "Name": "Disk Erasure",
+      "MitigatesTechniques": [
+        "T1619"
+      ]
+    },
+    {
+      "ID": "IOPortRestriction",
+      "Name": "IO Port Restriction",
+      "MitigatesTechniques": [
+        "T1025",
+        "T1123",
+        "T1125",
+        "T1091",
+        "T1092"
       ]
     },
     {
       "ID": "NetworkResourceAccessMediation",
       "Name": "Network Resource Access Mediation",
       "MitigatesTechniques": [
-        "T1039"
+        "T1039",
+        "T1080"
       ]
     },
     {
       "ID": "DataInventory",
       "Name": "Data Inventory",
       "MitigatesTechniques": [
+        "T1012",
+        "T1033",
+        "T1112",
         "T1207",
-        "T1548.004"
+        "T1534",
+        "T1555"
       ]
     },
     {
       "ID": "ConfigurationInventory",
       "Name": "Configuration Inventory",
       "MitigatesTechniques": [
-        "T1546.008"
+        "T1538",
+        "T1614",
+        "T1526",
+        "T1615",
+        "T1222",
+        "T1484"
+      ]
+    },
+    {
+      "ID": "SoftwareInventory",
+      "Name": "Software Inventory",
+      "MitigatesTechniques": [
+        "T1014",
+        "T1072",
+        "T1176",
+        "T1554",
+        "T1212"
+      ]
+    },
+    {
+      "ID": "AssetVulnerabilityEnumeration",
+      "Name": "Asset Vulnerability Enumeration",
+      "MitigatesTechniques": [
+        "T1014",
+        "T1072",
+        "T1176",
+        "T1554",
+        "T1212"
+      ]
+    },
+    {
+      "ID": "ContainerImageAnalysis",
+      "Name": "Container Image Analysis",
+      "MitigatesTechniques": [
+        "T1525"
       ]
     },
     {
       "ID": "ContentQuarantine",
       "Name": "Content Quarantine",
       "MitigatesTechniques": [
-        "T1036.003",
-        "T1036.005",
-        "T1048.002",
-        "T1055.001",
-        "T1546.008",
-        "T1574.001",
-        "T1574.007",
-        "T1574.008"
+        "T1005",
+        "T1119",
+        "T1560",
+        "T1014",
+        "T1140",
+        "T1220",
+        "T1016",
+        "T1018",
+        "T1033",
+        "T1083",
+        "T1041",
+        "T1059",
+        "T1072",
+        "T1071",
+        "T1534",
+        "T1187",
+        "T1555"
       ]
     },
     {
       "ID": "OutboundTrafficFiltering",
       "Name": "Outbound Traffic Filtering",
       "MitigatesTechniques": [
+        "T1001",
+        "T1008",
+        "T1071",
+        "T1095",
+        "T1102",
+        "T1104",
+        "T1568",
+        "T1571",
+        "T1572",
+        "T1573",
         "T1105",
-        "T1048.002",
-        "T1204.001"
+        "T1132",
+        "T1219",
+        "T1197",
+        "T1567",
+        "T1189"
       ]
     },
     {
       "ID": "FileEviction",
       "Name": "File Eviction",
       "MitigatesTechniques": [
-        "T1036.003",
-        "T1036.005",
-        "T1048.002",
-        "T1055.001",
-        "T1546.008",
-        "T1574.007",
-        "T1574.008",
-        "T1574.001"
+        "T1140",
+        "T1220",
+        "T1014",
+        "T1005",
+        "T1119",
+        "T1560",
+        "T1016",
+        "T1018",
+        "T1033",
+        "T1083",
+        "T1059",
+        "T1072",
+        "T1041",
+        "T1071",
+        "T1534",
+        "T1187",
+        "T1555"
+      ]
+    },
+    {
+      "ID": "RestoreEmail",
+      "Name": "Restore Email",
+      "MitigatesTechniques": [
+        "T1534"
       ]
     },
     {
       "ID": "DecoyFile",
       "Name": "Decoy File",
       "MitigatesTechniques": [
-        "T1036.003",
-        "T1036.005",
-        "T1048.002",
-        "T1055.001",
-        "T1546.008",
-        "T1574.007",
-        "T1574.008",
-        "T1574.001"
+        "T1005",
+        "T1119",
+        "T1560",
+        "T1033",
+        "T1016",
+        "T1018",
+        "T1083",
+        "T1014",
+        "T1140",
+        "T1220",
+        "T1059",
+        "T1072",
+        "T1071",
+        "T1041",
+        "T1534",
+        "T1187",
+        "T1555"
       ]
     },
     {
       "ID": "DecoyNetworkResource",
       "Name": "Decoy Network Resource",
       "MitigatesTechniques": [
-        "T1039"
+        "T1039",
+        "T1080"
+      ]
+    },
+    {
+      "ID": "ReverseResolutionIPDenylisting",
+      "Name": "Reverse Resolution IP Denylisting",
+      "MitigatesTechniques": [
+        "T1568"
       ]
     },
     {
       "ID": "CredentialCompromiseScopeAnalysis",
       "Name": "Credential Compromise Scope Analysis",
       "MitigatesTechniques": [
-        "T1003.005"
+        "T1528",
+        "T1539",
+        "T1552",
+        "T1558"
       ]
     },
     {
       "ID": "CredentialRotation",
       "Name": "Credential Rotation",
       "MitigatesTechniques": [
-        "T1003.005"
+        "T1528",
+        "T1552",
+        "T1539",
+        "T1558"
       ]
     },
     {
       "ID": "EmulatedFileAnalysis",
       "Name": "Emulated File Analysis",
       "MitigatesTechniques": [
-        "T1036.003",
-        "T1546.008",
-        "T1574.007",
-        "T1574.008"
+        "T1016",
+        "T1059",
+        "T1140",
+        "T1220",
+        "T1534"
       ]
     },
     {
       "ID": "Multi-factorAuthentication",
       "Name": "Multi-factor Authentication",
       "MitigatesTechniques": [
-        "T1003.005"
+        "T1552",
+        "T1528",
+        "T1558",
+        "T1539"
+      ]
+    },
+    {
+      "ID": "ForwardResolutionDomainDenylisting",
+      "Name": "Forward Resolution Domain Denylisting",
+      "MitigatesTechniques": [
+        "T1568"
       ]
     }
   ]

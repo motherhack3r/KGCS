@@ -259,8 +259,6 @@ class CAPECtoRDFTransformer:
             capec_id_full = f"CAPEC-{capec_id}" if not capec_id.startswith("CAPEC-") else capec_id
             pattern_node = URIRef(f"{EX}attackPattern/{capec_id_full}")
 
-            # Track if we've already emitted a childOf triple
-            childof_emitted = False
             for related in pattern.get("RelatedAttackPatterns", []):
                 related_id = related.get("ID", "")
                 if not related_id or related_id not in capec_lookup:
@@ -271,13 +269,7 @@ class CAPECtoRDFTransformer:
                 relationship = related.get("Relationship", "")
 
                 predicate = relationship_map.get(relationship)
-                if predicate == SEC.childOf:
-                    if not childof_emitted:
-                        self.graph.add((pattern_node, predicate, related_node))
-                        childof_emitted = True
-                    else:
-                        warnings.warn(f"CAPEC pattern {capec_id_full} has multiple childOf parents; only the first is emitted.")
-                elif predicate is not None:
+                if predicate == SEC.childOf or predicate is not None:
                     self.graph.add((pattern_node, predicate, related_node))
 
 

@@ -1,0 +1,27 @@
+{
+  "data_file": "tmp/phase3_cve.ttl",
+  "conforms": true,
+  "chunks": 2,
+  "triples_scanned": 5621,
+  "errors": [],
+  "chunk_reports": [
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpsofvondq.chunk1.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 1,
+      "elapsed": 0.5321712493896484,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp80p2qimb.chunk2.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 2,
+      "elapsed": 0.38743090629577637,
+      "return_code": 0
+    }
+  ]
+}
