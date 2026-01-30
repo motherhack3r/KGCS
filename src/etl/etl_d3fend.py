@@ -108,24 +108,51 @@ class D3FENDtoRDFTransformer:
         return value
 
     def _add_defensive_technique(self, technique: dict):
-        """Add a D3FEND defensive technique node."""
+        """Add a D3FEND defensive technique node, with status, references, and tags."""
         d3fend_id = technique.get("ID", "")
         if not d3fend_id:
             return
-        
         d3fend_id_full = f"D3FEND-{d3fend_id}" if not d3fend_id.startswith("D3FEND-") else d3fend_id
         technique_node = URIRef(f"{self.EX}deftech/{d3fend_id_full}")
-        
         self.graph.add((technique_node, RDF.type, self.SEC.DefensiveTechnique))
         self.graph.add((technique_node, self.SEC.d3fendId, Literal(d3fend_id_full, datatype=XSD.string)))
-        
+
         if technique.get("Name"):
             self.graph.add((technique_node, RDFS.label, Literal(technique["Name"], datatype=XSD.string)))
-        
+
         if technique.get("Description"):
             desc_text = self._extract_description(technique["Description"])
             if desc_text:
                 self.graph.add((technique_node, self.SEC.description, Literal(desc_text, datatype=XSD.string)))
+
+        # Emit status if present
+        if technique.get("Status"):
+            self.graph.add((technique_node, self.SEC.status, Literal(technique["Status"], datatype=XSD.string)))
+
+        # Emit tags if present (as repeated sec:tag literals)
+        tags = technique.get("Tags")
+        if tags:
+            if isinstance(tags, str):
+                self.graph.add((technique_node, self.SEC.tag, Literal(tags, datatype=XSD.string)))
+            elif isinstance(tags, list):
+                for tag in tags:
+                    if tag:
+                        self.graph.add((technique_node, self.SEC.tag, Literal(str(tag), datatype=XSD.string)))
+
+        # Emit references if present (as nodes)
+        for ref in technique.get("References", []):
+            url = ref.get("URL") or ref.get("url")
+            ref_type = ref.get("ReferenceType") or ref.get("referenceType")
+            if not (url or ref_type):
+                continue
+            ref_id = f"{d3fend_id_full}-ref-{url or ref_type}".replace(" ", "_")
+            ref_node = URIRef(f"{self.EX}reference/{ref_id}")
+            self.graph.add((ref_node, RDF.type, self.SEC.Reference))
+            if url:
+                self.graph.add((ref_node, self.SEC.url, Literal(url, datatype=XSD.anyURI)))
+            if ref_type:
+                self.graph.add((ref_node, self.SEC.referenceType, Literal(ref_type, datatype=XSD.string)))
+            self.graph.add((technique_node, self.SEC.references, ref_node))
 
     def _extract_description(self, description_obj) -> str:
         """Extract description text from potentially nested structure."""

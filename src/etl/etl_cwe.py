@@ -52,7 +52,7 @@ class CWEtoRDFTransformer:
         return self.graph
 
     def _add_weakness(self, weakness: dict):
-        """Add a CWE weakness entry as a sec:Weakness node."""
+        """Add a CWE weakness entry as a sec:Weakness node, with all ontology fields."""
         cwe_id = weakness.get("ID", "")
         if not cwe_id:
             return
@@ -85,6 +85,98 @@ class CWEtoRDFTransformer:
                     self.graph.add(
                         (weakness_node, SEC.applicablePlatform, Literal(platform_str, datatype=XSD.string))
                     )
+
+        # Consequences
+        for cons in weakness.get("Consequences", []):
+            scope = cons.get("Scope", "")
+            impact = cons.get("Impact", "")
+            if not (scope or impact):
+                continue
+            cons_id = f"{cwe_id_full}-consequence-{scope}-{impact}".replace(" ", "_")
+            cons_node = URIRef(f"{EX}consequence/{cons_id}")
+            self.graph.add((cons_node, RDF.type, SEC.Consequence))
+            if scope:
+                self.graph.add((cons_node, SEC.scope, Literal(scope, datatype=XSD.string)))
+            if impact:
+                self.graph.add((cons_node, SEC.impact, Literal(impact, datatype=XSD.string)))
+            self.graph.add((weakness_node, SEC.hasConsequence, cons_node))
+
+        # Mitigations
+        for mit in weakness.get("PotentialMitigations", []):
+            strategy = mit.get("Strategy", "")
+            effectiveness = mit.get("Effectiveness", "")
+            phase = mit.get("Phase", "")
+            if not (strategy or effectiveness or phase):
+                continue
+            mit_id = f"{cwe_id_full}-mitigation-{strategy}-{phase}".replace(" ", "_")
+            mit_node = URIRef(f"{EX}mitigation/{mit_id}")
+            self.graph.add((mit_node, RDF.type, SEC.Mitigation))
+            if strategy:
+                self.graph.add((mit_node, SEC.strategy, Literal(strategy, datatype=XSD.string)))
+            if effectiveness:
+                self.graph.add((mit_node, SEC.effectiveness, Literal(effectiveness, datatype=XSD.string)))
+            if phase:
+                # Create phase node
+                phase_id = f"{cwe_id_full}-phase-{phase}".replace(" ", "_")
+                phase_node = URIRef(f"{EX}phase/{phase_id}")
+                self.graph.add((phase_node, RDF.type, SEC.DevelopmentPhase))
+                self.graph.add((phase_node, SEC.phase, Literal(phase, datatype=XSD.string)))
+                self.graph.add((mit_node, SEC.appliesTo, phase_node))
+            self.graph.add((weakness_node, SEC.hasMitigation, mit_node))
+
+        # Detection Methods
+        for det in weakness.get("DetectionMethods", []):
+            method = det.get("Method", "")
+            effectiveness = det.get("Effectiveness", "")
+            if not (method or effectiveness):
+                continue
+            det_id = f"{cwe_id_full}-detection-{method}".replace(" ", "_")
+            det_node = URIRef(f"{EX}detection/{det_id}")
+            self.graph.add((det_node, RDF.type, SEC.DetectionMethod))
+            if method:
+                self.graph.add((det_node, SEC.method, Literal(method, datatype=XSD.string)))
+            if effectiveness:
+                self.graph.add((det_node, SEC.effectiveness, Literal(effectiveness, datatype=XSD.string)))
+            self.graph.add((weakness_node, SEC.hasDetectionMethod, det_node))
+
+        # References
+        for ref in weakness.get("References", []):
+            url = ref.get("URL", "")
+            ref_type = ref.get("ReferenceType", "")
+            if not (url or ref_type):
+                continue
+            ref_id = f"{cwe_id_full}-ref-{url or ref_type}".replace(" ", "_")
+            ref_node = URIRef(f"{EX}reference/{ref_id}")
+            self.graph.add((ref_node, RDF.type, SEC.Reference))
+            if url:
+                self.graph.add((ref_node, SEC.url, Literal(url, datatype=XSD.anyURI)))
+            if ref_type:
+                self.graph.add((ref_node, SEC.referenceType, Literal(ref_type, datatype=XSD.string)))
+            self.graph.add((weakness_node, SEC.hasReference, ref_node))
+
+        # External mappings (CAPEC, CVE, WASC, OWASP, CERT, PCI, NVD, CISQ)
+        for capec in weakness.get("RelatedAttackPatterns", []):
+            capec_id = capec.get("CAPEC_ID", "")
+            if capec_id:
+                capec_node = URIRef(f"{EX}capec/CAPEC-{capec_id}")
+                self.graph.add((weakness_node, SEC.mapsToCAPEC, capec_node))
+        for cve in weakness.get("RelatedVulnerabilities", []):
+            cve_id = cve.get("CVE_ID", "")
+            if cve_id:
+                cve_node = URIRef(f"{EX}cve/{cve_id}")
+                self.graph.add((weakness_node, SEC.mapsToVulnerability, cve_node))
+        # Add more mappings as needed for WASC, OWASP, CERT, PCI, NVD, CISQ
+        # Category/View membership (if present)
+        for cat in weakness.get("Categories", []):
+            cat_id = cat.get("ID", "")
+            if cat_id:
+                cat_node = URIRef(f"{EX}category/{cat_id}")
+                self.graph.add((weakness_node, SEC.memberOf, cat_node))
+        for view in weakness.get("Views", []):
+            view_id = view.get("ID", "")
+            if view_id:
+                view_node = URIRef(f"{EX}view/{view_id}")
+                self.graph.add((weakness_node, SEC.memberOf, view_node))
 
     def _extract_description(self, description_obj) -> str:
         """Extract description text from potentially nested structure."""
