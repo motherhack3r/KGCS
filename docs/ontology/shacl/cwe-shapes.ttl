@@ -37,21 +37,21 @@ sec:WeaknessShape a sh:NodeShape ;
     sh:description "Detailed description of the weakness"
   ] ;
   
-  # Optional: weaknessAbstraction (Class, Base, Variant)
+  # Optional: weaknessAbstraction (Class, Base, Variant, Pillar, Compound)
   sh:property [
     sh:path sec:weaknessAbstraction ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:pattern "^(Class|Base|Variant)$" ;
-    sh:description "Abstraction level: Class, Base, or Variant"
+    sh:pattern "^(Class|Base|Variant|Pillar|Compound)$" ;
+    sh:description "Abstraction level: Pillar, Compound, Class, Base, or Variant"
   ] ;
   
-  # Optional: status (Active, Draft, Incomplete, Deprecated)
+  # Optional: status (Active, Draft, Incomplete, Deprecated, Stable)
   sh:property [
     sh:path sec:status ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:pattern "^(Active|Draft|Incomplete|Deprecated)$" ;
+    sh:pattern "^(Active|Draft|Incomplete|Deprecated|Stable)$" ;
     sh:description "Status of the weakness definition"
   ] ;
   
@@ -73,7 +73,6 @@ sec:WeaknessShape a sh:NodeShape ;
   sh:property [
     sh:path sec:childOf ;
     sh:class sec:Weakness ;
-    sh:maxCount 1 ;
     sh:description "Parent weakness if this is a specialized variant"
   ] ;
   

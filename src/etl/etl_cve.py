@@ -380,6 +380,25 @@ def build_cpematch_index(path: str) -> dict:
     return criteria_to_match_id
 
 
+def transform_cve(input_data, output_path, criteria_to_match_id=None):
+    """
+    Transforms CVE JSON data (as loaded dict) to Turtle and writes to output_path.
+    Returns the number of triples written.
+    """
+    header = (
+        "@prefix sec: <https://example.org/sec/core#> .\n"
+        "@prefix dcterms: <http://purl.org/dc/terms/> .\n"
+        "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n"
+        "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\n"
+    )
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    total = 0
+    with open(output_path, 'w', encoding='utf-8') as out_f:
+        out_f.write(header)
+        for item in input_data.get('vulnerabilities', []):
+            total += process_vulnerability(item, out_f, criteria_to_match_id)
+    return total
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', '-i', required=True, help='Input JSON file or directory')

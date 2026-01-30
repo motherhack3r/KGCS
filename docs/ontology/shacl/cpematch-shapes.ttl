@@ -1,0 +1,58 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix sec: <https://example.org/sec/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# PlatformConfiguration shape for CPEMatch
+sec:PlatformConfigurationShape a sh:NodeShape ;
+    sh:targetClass sec:PlatformConfiguration ;
+    sh:property [
+        sh:path sec:matchCriteriaId ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sec:configurationCriteria ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sec:includes ;
+        sh:class sec:Platform ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sec:configurationStatus ;
+        sh:datatype xsd:string ;
+        sh:minCount 0 ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sec:configCreatedDate ;
+        sh:datatype xsd:dateTime ;
+        sh:minCount 0 ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sec:configLastModifiedDate ;
+        sh:datatype xsd:dateTime ;
+        sh:minCount 0 ;
+        sh:maxCount 1 ;
+    ] .
+
+# Platform shape for CPEMatch
+sec:PlatformShape a sh:NodeShape ;
+    sh:targetClass sec:Platform ;
+    sh:property [
+        sh:path sec:cpeUri ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sec:cpeNameId ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+    ] .

@@ -77,7 +77,6 @@ sec:AttackPatternShape a sh:NodeShape ;
   sh:property [
     sh:path sec:childOf ;
     sh:class sec:AttackPattern ;
-    sh:maxCount 1 ;
     sh:description "More general attack pattern this one specializes"
   ] ;
   

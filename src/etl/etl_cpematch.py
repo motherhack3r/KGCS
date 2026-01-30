@@ -118,6 +118,31 @@ def process_match_string(ms: dict, out_f, platform_cache: set) -> int:
                 out_f.write(f"{subj} <https://example.org/sec/core#{vfield}> {turtle_escape(match[vfield])} .\n")
                 written += 1
 
+    return written if written is not None else 0
+def transform_cpematch(input_data, output_path):
+    """
+    Transforms CPEMatch JSON data (as loaded dict) to Turtle and writes to output_path.
+    Returns the number of triples written.
+    """
+    header = (
+        "@prefix sec: <https://example.org/sec/core#> .\n"
+        "@prefix ex: <https://example.org/> .\n"
+        "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\n"
+    )
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    total = 0
+    platform_cache = set()
+    with open(output_path, 'w', encoding='utf-8') as out_f:
+        out_f.write(header)
+        # Support both 'matches' (old) and 'matchStrings' (NVD 2.3)
+        match_list = input_data.get('matches')
+        if match_list is None:
+            # Try 'matchStrings' (list of dicts with 'matchString' key)
+            match_list = [ms['matchString'] for ms in input_data.get('matchStrings', []) if 'matchString' in ms]
+        for ms in match_list or []:
+            total += process_match_string(ms, out_f, platform_cache)
+    return total
+
     return written
 
 
@@ -138,27 +163,17 @@ def main():
         "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\n"
     )
 
-    os.makedirs(os.path.dirname(args.output), exist_ok=True)
     total = 0
-    platform_cache = set()
-    with open(args.output, 'w', encoding='utf-8') as out_f:
-        out_f.write(header)
-        print(f"Loading CPEMatch JSON from {args.input}...")
-        for input_file in input_files:
-            if not os.path.exists(input_file):
-                print(f"Warning: {input_file} not found, skipping")
-                continue
-
-            with open(input_file, 'r', encoding='utf-8') as f:
-                try:
-                    cpematch_json = json.load(f)
-                    print(f"Transforming {os.path.basename(input_file)}...")
-                    for ms_container in cpematch_json.get('matchStrings', []):
-                        ms = ms_container.get('matchString') or ms_container
-                        total += process_match_string(ms, out_f, platform_cache)
-                except json.JSONDecodeError as e:
-                    print(f"Error parsing {input_file}: {e}", file=sys.stderr)
-                    sys.exit(1)
+    for input_file in input_files:
+        print(f"Loading CPEMatch JSON from {input_file}...")
+        with open(input_file, 'r', encoding='utf-8') as f:
+            try:
+                cpematch_json = json.load(f)
+                print(f"Transforming {os.path.basename(input_file)}...")
+                total += transform_cpematch(cpematch_json, args.output)
+            except json.JSONDecodeError as e:
+                print(f"Error parsing {input_file}: {e}", file=sys.stderr)
+                sys.exit(1)
 
     print(f'Done — triples written: {total}', file=sys.stderr)
 

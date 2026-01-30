@@ -15,7 +15,7 @@ for each chunk, writing per-chunk JSON reports to the output directory.
 import argparse
 import json
 import os
-import subprocess
+import importlib.util
 import sys
 import tempfile
 import time
@@ -23,20 +23,18 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 
 def _validate_chunk(tmp_path: str, shapes: str, out_dir: str, per_call_timeout: int, idx: int):
-    cmd = [sys.executable, '-m', 'src.core.validation', '--data', tmp_path, '--shapes', shapes, '--output', out_dir]
+    # Dynamically import run_validator from src.core.validation
+    spec = importlib.util.spec_from_file_location(
+        "src.core.validation",
+        os.path.join(os.path.dirname(__file__), "..", "src", "core", "validation.py")
+    )
+    validation = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(validation)
+    start = time.time()
     try:
-        start = time.time()
-        result = subprocess.run(
-            cmd,
-            check=False,
-            timeout=per_call_timeout,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
-        )
+        shapes_graph = validation.load_graph(shapes)
+        conforms, report_path, results_text = validation.run_validator(tmp_path, shapes_graph, output=out_dir)
         elapsed = time.time() - start
-        report_name = f"shacl-report-{os.path.basename(tmp_path)}.json"
-        report_path = os.path.join(out_dir, report_name)
         report = None
         if os.path.exists(report_path):
             with open(report_path, 'r', encoding='utf-8') as fh:
@@ -46,11 +44,9 @@ def _validate_chunk(tmp_path: str, shapes: str, out_dir: str, per_call_timeout: 
             except Exception:
                 pass
         error_text = None
-        if result.returncode not in (0, 1) and (result.stderr or result.stdout):
-            error_text = (result.stderr or result.stdout).strip()
-        return idx, elapsed, result.returncode, report, error_text
-    except subprocess.TimeoutExpired:
-        return idx, None, None, None, f"Chunk {idx}: validation timed out after {per_call_timeout}s"
+        return idx, elapsed, 0 if conforms else 1, report, error_text
+    except Exception as e:
+        return idx, None, None, None, f"Chunk {idx}: validation failed: {e}"
     finally:
         try:
             os.remove(tmp_path)

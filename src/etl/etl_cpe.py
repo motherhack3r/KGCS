@@ -125,6 +125,26 @@ def process_product(cpe: dict, out_f) -> int:
     return written
 
 
+def transform_cpe(input_data, output_path):
+    """
+    Transforms CPE JSON data (as loaded dict) to Turtle and writes to output_path.
+    Returns the number of triples written.
+    """
+    header = (
+        "@prefix sec: <https://example.org/sec/core#> .\n"
+        "@prefix ex: <https://example.org/> .\n"
+        "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\n"
+    )
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    total = 0
+    with open(output_path, 'w', encoding='utf-8') as out_f:
+        out_f.write(header)
+        for product in input_data.get('products', []):
+            cpe = product.get('cpe', {})
+            total += process_product(cpe, out_f)
+    return total
+
+
 def main():
     parser = argparse.ArgumentParser(description='Streaming ETL: NVD CPE JSON → Turtle')
     parser.add_argument('--input', '-i', required=True, help='Input CPE API JSON file(s), glob, or directory')
@@ -146,29 +166,16 @@ def main():
         print(f"Error: Input file not found: {args.input}", file=sys.stderr)
         sys.exit(1)
 
-    header = (
-        "@prefix sec: <https://example.org/sec/core#> .\n"
-        "@prefix ex: <https://example.org/> .\n"
-        "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\n"
-    )
-
-    os.makedirs(os.path.dirname(args.output), exist_ok=True)
+    print(f"Loading CPE JSON from {args.input}...")
+    print("Transforming and writing streaming Turtle...")
     total = 0
-    with open(args.output, 'w', encoding='utf-8') as out_f:
-        out_f.write(header)
-        print(f"Loading CPE JSON from {args.input}...")
-        print("Transforming and writing streaming Turtle...")
-        for input_file in input_files:
-            if not os.path.exists(input_file):
-                print(f"Warning: {input_file} not found, skipping")
-                continue
-
-            with open(input_file, 'r', encoding='utf-8') as f:
-                cpe_json = json.load(f)
-                for product in cpe_json.get('products', []):
-                    cpe = product.get('cpe', {})
-                    total += process_product(cpe, out_f)
-
+    for input_file in input_files:
+        if not os.path.exists(input_file):
+            print(f"Warning: {input_file} not found, skipping")
+            continue
+        with open(input_file, 'r', encoding='utf-8') as f:
+            cpe_json = json.load(f)
+            total += transform_cpe(cpe_json, args.output)
     print(f'Done — triples written: {total}', file=sys.stderr)
 
 
