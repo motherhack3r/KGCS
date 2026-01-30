@@ -32,7 +32,16 @@ def strip_cpe_prefix(cpe_uri: str) -> str:
 
 
 def subject_for_platform(cpe_id: str) -> str:
-    return f"<https://example.org/platform/{cpe_id}>"
+    # Ensure cpe_id is a string and not a dict
+    import urllib.parse
+    if isinstance(cpe_id, dict):
+        # Try to use cpeNameId or cpeName from the dict
+        cpe_name_id = cpe_id.get('cpeNameId')
+        cpe_name = cpe_id.get('cpeName', '')
+        cpe_id_str = cpe_name_id or urllib.parse.quote(str(cpe_name), safe='')
+    else:
+        cpe_id_str = str(cpe_id)
+    return f"<https://example.org/platform/{cpe_id_str}>"
 
 
 def process_product(cpe: dict, out_f) -> int:

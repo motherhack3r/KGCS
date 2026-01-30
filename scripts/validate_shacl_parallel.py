@@ -8,13 +8,14 @@ import subprocess
 from pathlib import Path
 
 STANDARD_JOBS = [
-    ("CPE", "tmp/pipeline-stage1-cpe.ttl", "docs/ontology/shacl/cpe-shapes.ttl", "artifacts/shacl-report-cpe-summary.json"),
-    ("CPEMATCH", "tmp/pipeline-stage2-cpematch.ttl", "docs/ontology/shacl/cpe-shapes.ttl", "artifacts/shacl-report-cpematch-summary.json"),
-    ("CVE", "tmp/pipeline-stage3-cve.ttl", "docs/ontology/shacl/cve-shapes.ttl", "artifacts/shacl-report-cve-summary.json"),
+    # ("CPE", "tmp/pipeline-stage1-cpe.ttl", "docs/ontology/shacl/cpe-shapes.ttl", "artifacts/shacl-report-cpe-summary.json"),
+    # ("CPEMATCH", "tmp/pipeline-stage2-cpematch.ttl", "docs/ontology/shacl/cpe-shapes.ttl", "artifacts/shacl-report-cpematch-summary.json"),
+    # ("CVE", "tmp/pipeline-stage3-cve.ttl", "docs/ontology/shacl/cve-shapes.ttl", "artifacts/shacl-report-cve-summary.json"),
     ("ATTACK", "tmp/pipeline-stage4-attack.ttl", "docs/ontology/shacl/attack-shapes.ttl", "artifacts/shacl-report-attack-summary.json"),
     ("D3FEND", "tmp/pipeline-stage5-d3fend.ttl", "docs/ontology/shacl/d3fend-shapes.ttl", "artifacts/shacl-report-d3fend-summary.json"),
     ("CAPEC", "tmp/pipeline-stage6-capec.ttl", "docs/ontology/shacl/capec-shapes.ttl", "artifacts/shacl-report-capec-summary.json"),
     ("CWE", "tmp/pipeline-stage7-cwe.ttl", "docs/ontology/shacl/cwe-shapes.ttl", "artifacts/shacl-report-cwe-summary.json"),
+    ("CAR", "tmp/pipeline-stage8-car.ttl", "docs/ontology/shacl/car-shapes.ttl", "artifacts/shacl-report-car-summary.json"),
     ("SHIELD", "tmp/pipeline-stage9-shield.ttl", "docs/ontology/shacl/shield-shapes.ttl", "artifacts/shacl-report-shield-summary.json"),
     ("ENGAGE", "tmp/pipeline-stage10-engage.ttl", "docs/ontology/shacl/engage-shapes.ttl", "artifacts/shacl-report-engage-summary.json"),
 ]

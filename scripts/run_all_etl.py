@@ -14,7 +14,7 @@ ETL_STEPS = [
     ("etl_cpematch", "data/cpe/raw/nvdcpematch-2.0.json",           "tmp/pipeline-stage2-cpematch.ttl"),
     ("etl_cve",      "data/cve/raw/nvdcve-2.0-2026.json",           "tmp/pipeline-stage3-cve.ttl"),
     ("etl_cwe",      "data/cwe/raw/cwec_latest.xml",                "tmp/pipeline-stage7-cwe.ttl"),
-    ("etl_capec",    "data/capec/raw/capec_latest.xml",             "tmp/pipeline-stage6-capec.ttl"),
+    ("etl_capec",    "data/capec/raw/capec.json",             "tmp/pipeline-stage6-capec.ttl"),
     ("etl_attack",   "data/attack/raw/enterprise-attack.json",      "tmp/pipeline-stage4-attack.ttl"),
     ("etl_d3fend",   "data/d3fend/raw/d3fend.json",                 "tmp/pipeline-stage5-d3fend.ttl"),
     ("etl_car",      "data/car/raw/analytics_CAR-2021-01-001.yaml", "tmp/pipeline-stage8-car.ttl"),
