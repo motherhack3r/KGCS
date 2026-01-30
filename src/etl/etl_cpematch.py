@@ -103,8 +103,20 @@ def process_match_string(ms: dict, out_f, platform_cache: set) -> int:
             platform_cache.add(match_platform_id)
             written += 3
 
-        out_f.write(f"{subj} <https://example.org/sec/core#matchesPlatform> {platform_subj} .\n")
+        # includes relationship
+        out_f.write(f"{subj} <https://example.org/sec/core#includes> {platform_subj} .\n")
         written += 1
+
+        # vulnerable
+        if match.get('vulnerable') is not None:
+            out_f.write(f"{subj} <https://example.org/sec/core#vulnerable> \"{str(match['vulnerable']).lower()}\"^^<http://www.w3.org/2001/XMLSchema#boolean> .\n")
+            written += 1
+
+        # version bounds
+        for vfield in ['versionStartIncluding', 'versionStartExcluding', 'versionEndIncluding', 'versionEndExcluding']:
+            if match.get(vfield):
+                out_f.write(f"{subj} <https://example.org/sec/core#{vfield}> {turtle_escape(match[vfield])} .\n")
+                written += 1
 
     return written
 

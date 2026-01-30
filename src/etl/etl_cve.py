@@ -254,6 +254,42 @@ def process_vulnerability(item, out_f, criteria_to_match_id=None):
             out_f.write(f"{subj} <https://example.org/sec/core#referenceUrl> {turtle_escape(url)} .\n")
             triples += 1
 
+    # vulnStatus
+    vuln_status = item.get('vulnStatus') or (item.get('cve', {}) or {}).get('vulnStatus')
+    if vuln_status:
+        out_f.write(f"{subj} <https://example.org/sec/core#vulnStatus> {turtle_escape(vuln_status)} .\n")
+        triples += 1
+
+    # CISA fields
+    for cisa_field in [
+        'cisaVulnerabilityName', 'cisaExploitAdd', 'cisaActionDue',
+        'cisaRequiredAction', 'cisaKnownRansomwareCampaignUse']:
+        val = item.get(cisa_field) or (item.get('cve', {}) or {}).get(cisa_field)
+        if val:
+            out_f.write(f"{subj} <https://example.org/sec/core#{cisa_field}> {turtle_escape(val)} .\n")
+            triples += 1
+
+    # CVSS scores
+    impact = item.get('impact') or (item.get('cve', {}) or {}).get('impact')
+    if impact:
+        for metric, pred, version in [
+            ('baseMetricV3', 'cvssV3Score', 'v3'),
+            ('baseMetricV2', 'cvssV2Score', 'v2')]:
+            m = impact.get(metric)
+            if m and m.get(f'cvss{version.upper()}'):
+                score = m[f'cvss{version.upper()}']
+                for k, v in score.items():
+                    out_f.write(f"{subj} <https://example.org/sec/core#{pred}_{k}> {turtle_escape(str(v))} .\n")
+                    triples += 1
+
+    # affects (PlatformConfiguration)
+    configs = item.get('configurations') or (item.get('cve', {}) or {}).get('configurations')
+    if configs:
+        for match_id in _iter_match_criteria_ids(configs, criteria_to_match_id):
+            if match_id:
+                out_f.write(f"{subj} <https://example.org/sec/core#affects> {subject_for_config(match_id)} .\n")
+                triples += 1
+
     # CWE relationships: CVE -> CWE (caused_by)
     weaknesses = []
     try:

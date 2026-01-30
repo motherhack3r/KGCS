@@ -92,6 +92,36 @@ def process_product(cpe: dict, out_f) -> int:
         except Exception:
             pass
 
+    # Additional CPE attributes
+    for attr in [
+        'update', 'edition', 'language', 'sw_edition', 'target_sw', 'target_hw', 'other']:
+        val = cpe.get(attr)
+        if val:
+            out_f.write(f"{subj} <https://example.org/sec/core#{attr}> {turtle_escape(val)} .\n")
+            written += 1
+
+    # references
+    refs = cpe.get('references') or []
+    if isinstance(refs, list):
+        for ref in refs:
+            if isinstance(ref, dict) and ref.get('url'):
+                out_f.write(f"{subj} <https://example.org/sec/core#referenceUrl> {turtle_escape(ref['url'])} .\n")
+                written += 1
+            elif isinstance(ref, str):
+                out_f.write(f"{subj} <https://example.org/sec/core#referenceUrl> {turtle_escape(ref)} .\n")
+                written += 1
+
+    # deprecates relationship
+    if cpe.get('deprecates'):
+        dep = cpe['deprecates']
+        if isinstance(dep, list):
+            for d in dep:
+                out_f.write(f"{subj} <https://example.org/sec/core#deprecates> {subject_for_platform(d)} .\n")
+                written += 1
+        elif isinstance(dep, str):
+            out_f.write(f"{subj} <https://example.org/sec/core#deprecates> {subject_for_platform(dep)} .\n")
+            written += 1
+
     return written
 
 
