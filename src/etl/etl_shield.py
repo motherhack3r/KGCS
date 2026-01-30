@@ -119,26 +119,40 @@ class SHIELDtoRDFTransformer:
 
 def _load_shield_data(input_path: str) -> dict:
     if os.path.isdir(input_path):
-        techniques_path = os.path.join(input_path, "techniques.json")
-        if not os.path.exists(techniques_path):
-            raise FileNotFoundError(f"Missing techniques.json in {input_path}")
-
-        with open(techniques_path, "r", encoding="utf-8") as f:
-            techniques = json.load(f)
-
+        # Merge all JSON files in the directory into a single DeceptionTechniques array
+        import glob
         normalized = []
-        for item in techniques:
-            tech_id = item.get("id") or item.get("ID")
-            name = item.get("name") or item.get("Name")
-            description = item.get("description") or item.get("Description") or item.get("long_description")
-            normalized.append({
-                "ID": tech_id,
-                "Name": name,
-                "Description": description
-            })
-
+        for file in glob.glob(os.path.join(input_path, "*.json")):
+            with open(file, "r", encoding="utf-8") as f:
+                try:
+                    data = json.load(f)
+                except Exception:
+                    continue
+                # Accept both arrays and dicts with arrays
+                items = []
+                if isinstance(data, list):
+                    # If the file is a top-level array, treat each element as a technique dict if possible
+                    for item in data:
+                        if isinstance(item, dict):
+                            items.append(item)
+                elif isinstance(data, dict):
+                    # Try common keys
+                    items = data.get("DeceptionTechniques") or data.get("techniques") or data.get("Techniques") or data.get("items") or []
+                    if isinstance(items, dict):
+                        items = [items]
+                # else: skip non-dict, non-list
+                for item in items:
+                    if not isinstance(item, dict):
+                        continue
+                    tech_id = item.get("id") or item.get("ID")
+                    name = item.get("name") or item.get("Name")
+                    description = item.get("description") or item.get("Description") or item.get("long_description")
+                    normalized.append({
+                        "ID": tech_id,
+                        "Name": name,
+                        "Description": description
+                    })
         return {"DeceptionTechniques": normalized}
-
     with open(input_path, "r", encoding="utf-8") as f:
         return json.load(f)
 

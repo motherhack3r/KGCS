@@ -109,26 +109,37 @@ class ENGAGEtoRDFTransformer:
 
 def _load_engage_data(input_path: str) -> dict:
     if os.path.isdir(input_path):
-        activities_path = os.path.join(input_path, "activities.json")
-        if not os.path.exists(activities_path):
-            raise FileNotFoundError(f"Missing activities.json in {input_path}")
-
-        with open(activities_path, "r", encoding="utf-8") as f:
-            activities = json.load(f)
-
+        # Merge all JSON files in the directory into a single EngagementConcepts array
+        import glob
         normalized = []
-        for item in activities:
-            concept_id = item.get("id") or item.get("ID")
-            name = item.get("name") or item.get("Name")
-            description = item.get("description") or item.get("Description") or item.get("long_description")
-            normalized.append({
-                "ID": concept_id,
-                "Name": name,
-                "Description": description
-            })
-
+        for file in glob.glob(os.path.join(input_path, "*.json")):
+            with open(file, "r", encoding="utf-8") as f:
+                try:
+                    data = json.load(f)
+                except Exception:
+                    continue
+                items = []
+                if isinstance(data, list):
+                    for item in data:
+                        if isinstance(item, dict):
+                            items.append(item)
+                elif isinstance(data, dict):
+                    items = data.get("EngagementConcepts") or data.get("activities") or data.get("Activities") or data.get("items") or []
+                    if isinstance(items, dict):
+                        items = [items]
+                # else: skip non-dict, non-list
+                for item in items:
+                    if not isinstance(item, dict):
+                        continue
+                    concept_id = item.get("id") or item.get("ID")
+                    name = item.get("name") or item.get("Name")
+                    description = item.get("description") or item.get("Description") or item.get("long_description")
+                    normalized.append({
+                        "ID": concept_id,
+                        "Name": name,
+                        "Description": description
+                    })
         return {"EngagementConcepts": normalized}
-
     with open(input_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
