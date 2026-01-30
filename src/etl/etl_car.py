@@ -48,7 +48,7 @@ class CARtoRDFTransformer:
         return self.graph
 
     def _add_detection_analytic(self, analytic: Dict[str, Any]) -> None:
-        """Add a CAR detection analytic node."""
+        """Add a CAR detection analytic node, with all ontology fields."""
         car_id = _get_first_value(analytic, ["id", "ID", "carId", "car_id", "analytic_id", "analyticId"])
         if not car_id:
             return
@@ -69,8 +69,57 @@ class CARtoRDFTransformer:
             if desc_text:
                 self.graph.add((analytic_node, self.SEC.description, Literal(desc_text, datatype=XSD.string)))
 
+        # Emit status if present
+        status = _get_first_value(analytic, ["status", "Status"])
+        if status:
+            self.graph.add((analytic_node, self.SEC.status, Literal(str(status), datatype=XSD.string)))
+
+        # Emit tags if present (as repeated sec:tag literals)
+        tags = _get_first_value(analytic, ["tags", "Tags"])
+        if tags:
+            if isinstance(tags, str):
+                self.graph.add((analytic_node, self.SEC.tag, Literal(tags, datatype=XSD.string)))
+            elif isinstance(tags, list):
+                for tag in tags:
+                    if tag:
+                        self.graph.add((analytic_node, self.SEC.tag, Literal(str(tag), datatype=XSD.string)))
+
+        # Emit platform if present
+        platform = _get_first_value(analytic, ["platform", "Platform"])
+        if platform:
+            self.graph.add((analytic_node, self.SEC.platform, Literal(str(platform), datatype=XSD.string)))
+
+        # Emit references if present (as nodes, robust to string/dict/list)
+        refs = []
+        for key in ("references", "References"):
+            val = analytic.get(key)
+            if not val:
+                continue
+            if isinstance(val, list):
+                refs.extend(val)
+            else:
+                refs.append(val)
+        for ref in refs:
+            url = None
+            ref_type = None
+            if isinstance(ref, dict):
+                url = ref.get("url") or ref.get("URL")
+                ref_type = ref.get("referenceType") or ref.get("ReferenceType")
+            elif isinstance(ref, str):
+                url = ref
+            if not (url or ref_type):
+                continue
+            ref_id = f"{car_id_full}-ref-{url or ref_type}".replace(" ", "_")
+            ref_node = URIRef(f"{self.EX}reference/{ref_id}")
+            self.graph.add((ref_node, RDF.type, self.SEC.Reference))
+            if url:
+                self.graph.add((ref_node, self.SEC.url, Literal(url, datatype=XSD.anyURI)))
+            if ref_type:
+                self.graph.add((ref_node, self.SEC.referenceType, Literal(ref_type, datatype=XSD.string)))
+            self.graph.add((analytic_node, self.SEC.reference, ref_node))
+
     def _add_detection_relationships(self, analytics: List[Dict[str, Any]]) -> None:
-        """Add detects relationships to ATT&CK techniques."""
+        """Add detects and requires relationships to ATT&CK techniques and DataSources."""
         for analytic in analytics:
             car_id = _get_first_value(analytic, ["id", "ID", "carId", "car_id", "analytic_id", "analyticId"])
             if not car_id:
@@ -83,6 +132,23 @@ class CARtoRDFTransformer:
                 att_id_full = att_id if att_id.startswith("T") else f"T{att_id}"
                 att_node = URIRef(f"{self.EX}technique/{att_id_full}")
                 self.graph.add((analytic_node, self.SEC.detects, att_node))
+
+            # DataSource relationships
+            ds_keys = ["data_sources", "DataSources", "dataSources", "dataSource"]
+            for ds_key in ds_keys:
+                ds_val = analytic.get(ds_key)
+                if not ds_val:
+                    continue
+                if isinstance(ds_val, str):
+                    ds_list = [ds_val]
+                else:
+                    ds_list = ds_val if isinstance(ds_val, list) else [ds_val]
+                for ds in ds_list:
+                    if not ds:
+                        continue
+                    ds_id = str(ds).replace(" ", "_")
+                    ds_node = URIRef(f"{self.EX}datasource/{ds_id}")
+                    self.graph.add((analytic_node, self.SEC.requires, ds_node))
 
 
 def _get_first_value(obj: Dict[str, Any], keys: List[str]) -> Any:
