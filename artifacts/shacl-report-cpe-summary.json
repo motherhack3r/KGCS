@@ -1,0 +1,18 @@
+{
+  "data_file": "tmp/pipeline-stage1-cpe.ttl",
+  "conforms": true,
+  "chunks": 1,
+  "triples_scanned": 326801,
+  "errors": [],
+  "chunk_reports": [
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp2_dlp4uv.chunk1.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 1,
+      "elapsed": 54.75012683868408,
+      "return_code": 0
+    }
+  ]
+}

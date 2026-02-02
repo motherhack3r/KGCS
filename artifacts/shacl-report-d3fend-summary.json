@@ -1,0 +1,18 @@
+{
+  "data_file": "tmp/pipeline-stage5-d3fend.ttl",
+  "conforms": true,
+  "chunks": 1,
+  "triples_scanned": 124,
+  "errors": [],
+  "chunk_reports": [
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpx2fhcfig.chunk1.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 1,
+      "elapsed": 0.06199002265930176,
+      "return_code": 0
+    }
+  ]
+}

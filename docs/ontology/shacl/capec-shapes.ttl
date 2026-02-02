@@ -55,7 +55,7 @@ sec:AttackPatternShape a sh:NodeShape ;
   sh:property [
     sh:path sec:exploits ;
     sh:nodeKind sh:IRI ;
-    sh:minCount 1 ;
+    # sh:minCount 1 ;
     sh:description "Weakness URI(s) that this attack pattern exploits (IRI reference)"
   ] ;
 
