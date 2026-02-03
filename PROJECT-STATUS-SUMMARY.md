@@ -1,7 +1,7 @@
 # KGCS Project Status Summary
 
-**Date:** January 29, 2026 (Updated)  
-**Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟢 MVP Complete | Phase 4 🔵 Designed | Phase 5 🔵 Planned
+**Date:** February 3, 2026 (Updated)  
+**Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟢 MVP Complete | Phase 3.5 🟡 Planned (OCSF/SIEM) | Phase 4 🔵 Designed | Phase 5 🔵 Planned
 
 - [KGCS Project Status Summary](#kgcs-project-status-summary)
   - [Sources](#sources)
@@ -10,6 +10,7 @@
   - [Phase 1 — Core Standards (✅ Complete)](#phase-1--core-standards--complete)
   - [Phase 2 — SHACL Validation (✅ Complete)](#phase-2--shacl-validation--complete)
   - [Phase 3 — Data Ingestion (🟢 MVP Complete)](#phase-3--data-ingestion--mvp-complete)
+  - [Phase 3.5 — OCSF/SIEM Integration (🟡 Planned)](#phase-35--ocsfsiem-integration--planned)
   - [Phase 4 — Extension Layers (🔵 Designed)](#phase-4--extension-layers--designed)
   - [Phase 5 — AI Integration (🔵 Planned)](#phase-5--ai-integration--planned)
   - [Critical Path](#critical-path)
@@ -29,7 +30,13 @@
 
 ## Executive Summary
 
-KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validation framework). Phase 3 ETL transforms raw data for all core standards (including CAR) and validates via parallel SHACL streaming with summary reports. The Neo4j loader now supports label-aware relationship inserts with per-label `uri` indexes and can load a combined TTL for cross-standard relationships. End-to-end Neo4j loads have been verified locally with full standard outputs; CI ingestion gates remain pending. Phases 4–5 are designed but not implemented. Critical path remains Phase 3 MVP (CI + repeatable end-to-end validation).
+KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validation framework). Phase 3 ETL transforms raw data for all core standards (including CAR) and validates via parallel SHACL streaming with summary reports. The Neo4j loader now supports label-aware relationship inserts with per-label `uri` indexes and can load a combined TTL for cross-standard relationships. End-to-end Neo4j loads have been verified locally with full standard outputs; CI ingestion gates remain pending.
+
+**Phase 3.5 (OCSF/SIEM Integration)** is now prioritized as next initiative: Real-time SIEM event ingestion via OCSF standard, integrating with Redis cache + query bridge for live threat investigation. Keeps Core KG immutable while enabling confidence-scored technique linking and CVE impact analysis. Estimated 3-week implementation window (Feb 10–28).
+
+Phases 4–5 are designed but not implemented. Critical path: Phase 3 final completion → Phase 3.5 OCSF integration → Phase 4 extensions.
+
+Phases 4–5 are designed but not implemented. Critical path: Phase 3 final completion → Phase 3.5 OCSF integration → Phase 4 extensions.
 
 ## Key Metrics
 
@@ -103,6 +110,66 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 - [x] End-to-end tests (ETL → SHACL → Neo4j)
 - [x] CI pipeline for ingestion and artifacts
 
+## Phase 3.5 — OCSF/SIEM Integration (🟡 Planned)
+
+**Status:** Architecture designed; implementation prioritized for 3-week sprint.
+
+**Overview:**
+Real-time SIEM event integration via OCSF standard. Enables live threat investigation agent with confidence-scored technique linking, CVE impact analysis, and defense recommendations. Keeps Core KG immutable; SIEM data stored in Redis with 30-day rolling window.
+
+**Design Reference:** [docs/.ideas/OCSF.md](docs/.ideas/OCSF.md)
+
+**Key Components:**
+
+1. **OCSF Normalizer** (Week 1)
+   - [ ] `src/ingest/ocsf_normalizer.py` — SIEM → OCSF JSON transformation
+   - [ ] Splunk parser (template for other SIEMs)
+   - [ ] Technique confidence scoring (0.5–1.0 range)
+   - [ ] Redis storage with 30-day TTL
+   - [ ] Test: 1000 sample events normalized without error
+
+2. **Query Bridge** (Week 2)
+   - [ ] `src/core/query_bridge.py` — Join Core KG + Redis observations
+   - [ ] `investigate_technique()` — Link technique to CVEs, CWEs, platforms
+   - [ ] `recommend_mitigations()` — D3FEND + CAR suggestions
+   - [ ] Performance: <500ms for 24h window queries
+   - [ ] Test: Query bridge returns causal chains with confidence
+
+3. **Agent Investigation Layer** (Week 3)
+   - [ ] `src/rag/agent.py` — SecurityInvestigationAgent class
+   - [ ] Investigate: "What CVEs enable this observed technique?"
+   - [ ] Recommend: "Apply these mitigations based on observed TTPs"
+   - [ ] Explain: "T1059 exploits CWE-94 via CVE-2025-1234..."
+   - [ ] Test: Agent answers with proper provenance citation
+
+**Architecture:**
+
+```text
+SPLUNK SIEM (5K+ events/sec)
+    ↓
+OCSFNormalizer (extract + enrich)
+    ↓
+Redis (30-day rolling, sensitive data)
+    ↓ [Real-time alerting]  ↓ [Batch analysis]
+Kafka Rules              QueryBridge
+    ↓                        ↓
+                    Neo4j Core KG
+                    (immutable)
+                        ↓
+                    Agent (LLM+RAG)
+```
+
+**Success Criteria:**
+
+- OCSF normalizer handles 1K events without error
+- Query bridge <500ms on 24h queries
+- Agent answers cite MITRE + NVD sources
+- Confidence scores prevent hallucination
+
+**Timeline:** 3 weeks (Feb 10–28) post-Phase 3 final completion
+
+**Accepts Dependency:** Phase 3 MVP complete, Neo4j loaded with Core KG
+
 ## Phase 4 — Extension Layers (🔵 Designed)
 
 **Status:** Ontology designs complete; ETL and validation not started.
@@ -134,9 +201,12 @@ Phase 3 MVP is complete. Next steps:
 
 1. Add relationship breakdown reporting (by label and type) to loader final stats
 2. Add CI gating for full pipeline outputs and Neo4j smoke load
-3. Begin extension ETL and RAG framework (Phase 4–5)
+3. Prioritize Phase 3.5 OCSF/SIEM integration (3-week sprint Feb 10–28)
+4. Begin extension ETL and RAG framework (Phase 4–5)
 
 **Blocker Status:** ✅ **CLEARED** — Core standards including CAR validated with 0 violations. Neo4j integration and end-to-end pipeline are operational.
+
+**Next Priority:** Phase 3.5 OCSF/SIEM integration (architecture finalized; implementation ready)
 
 ## MVP "Definition of Done"
 
@@ -158,27 +228,30 @@ Phase 3 MVP is complete. Next steps:
 
 ## Update Summary
 
-- **Date:** January 29, 2026  
-- **Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟢 In Progress (MVP) | Phase 4 🔵 Designed | Phase 5 🔵 Planned  
+- **Date:** February 3, 2026 (Updated)
+- **Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟢 MVP Complete | Phase 3.5 🟡 Planned (OCSF/SIEM) | Phase 4 🔵 Designed | Phase 5 🔵 Planned
 
 ### Recent Developments
 
-- **Raw-to-Turtle ETL:** CAR analytics + sensors YAML downloaded and validated to Turtle.  
-- **SHACL Validation:** Parallel streaming validation completed with per-standard summary reports.  
-- **CPEMatch Fix:** `Platform` nodes now emit `cpeNameId` and correct `cpeUri`, and CPEMatch validation conforms (0 violations).  
-- **Repo Hygiene:** Removed oversized CPEMatch summary report from history; added ignore rule to prevent reintroduction.  
-- **Neo4j Loader:** Label-aware relationship inserts + per-label `uri` indexes for faster loads; combined TTL load verified locally.  
-- **Neo4j Constraints:** Core-ID uniqueness constraints applied and verified in a live DB (local).  
-- **Download Pipeline:** Daily downloader runs cleanly with fixed raw-path handling and no duplicate downloads.  
-- **CI Ingestion Smoke:** Workflow added in [.github/workflows/phase3-ingest-smoke.yml](.github/workflows/phase3-ingest-smoke.yml) to run sample ETL + validate artifacts.  
-- **Cross-standard Relationships:** CAPEC→ATT&CK (`implements`) and CVE→CWE (`caused_by`) now emitted by ETL and loaded into Neo4j.  
-- **CWE/CAPEC Coverage:** Additional CWE/CAPEC relationship types (peer/sequence/alternate) now emitted.  
-- **End-to-end Tests:** Full ETL → SHACL → Neo4j test suite implemented using pipeline outputs.  
+- **AI Agent Instructions:** Updated [.github/copilot-instructions.md](.github/copilot-instructions.md) with comprehensive patterns, Phase 3.5 architecture, and AI workflow discipline.
+- **OCSF/SIEM Integration Designed:** Architecture finalized with Redis caching, query bridge, and agent investigation layer. Design doc at [docs/.ideas/OCSF.md](docs/.ideas/OCSF.md).
+- **Raw-to-Turtle ETL:** CAR analytics + sensors YAML downloaded and validated to Turtle.
+- **SHACL Validation:** Parallel streaming validation completed with per-standard summary reports.
+- **CPEMatch Fix:** `Platform` nodes now emit `cpeNameId` and correct `cpeUri`, and CPEMatch validation conforms (0 violations).
+- **Repo Hygiene:** Removed oversized CPEMatch summary report from history; added ignore rule to prevent reintroduction.
+- **Neo4j Loader:** Label-aware relationship inserts + per-label `uri` indexes for faster loads; combined TTL load verified locally.
+- **Neo4j Constraints:** Core-ID uniqueness constraints applied and verified in a live DB (local).
+- **Download Pipeline:** Daily downloader runs cleanly with fixed raw-path handling and no duplicate downloads.
+- **CI Ingestion Smoke:** Workflow added in [.github/workflows/phase3-ingest-smoke.yml](.github/workflows/phase3-ingest-smoke.yml) to run sample ETL + validate artifacts.
+- **Cross-standard Relationships:** CAPEC→ATT&CK (`implements`) and CVE→CWE (`caused_by`) now emitted by ETL and loaded into Neo4j.
+- **CWE/CAPEC Coverage:** Additional CWE/CAPEC relationship types (peer/sequence/alternate) now emitted.
+- **End-to-end Tests:** Full ETL → SHACL → Neo4j test suite implemented using pipeline outputs.
 
 ### Next Steps (Phase 3 Completion Order)
 
-1. Add relationship breakdown reporting (by label and type) to loader final stats.  
+1. Add relationship breakdown reporting (by label and type) to loader final stats.
 2. Add CI gating for full pipeline outputs and Neo4j smoke load (optional, if runtime permits).
+3. **Begin Phase 3.5 implementation:** OCSF normalizer + query bridge + agent (Feb 10–28, est. 3 weeks)
 
 ### Post-MVP Roadmap Note
 
