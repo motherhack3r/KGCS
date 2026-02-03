@@ -1,4 +1,4 @@
-"""ETL Pipeline: MITRE CAPEC JSON → RDF Turtle with SHACL validation.
+"""ETL Pipeline: MITRE CAPEC JSON -> RDF Turtle with SHACL validation.
 
 Transforms official MITRE CAPEC (Common Attack Pattern Enumeration and Classification)
 JSON into RDF triples conforming to the Core Ontology AttackPattern class.
@@ -202,8 +202,19 @@ class CAPECtoRDFTransformer:
             # Optionally, emit a triple to indicate no exploits (not required by ontology, but for SHACL completeness)
             # self.graph.add((pattern_node, SEC.exploits, URIRef("")))
 
-        # CAPEC→ATT&CK mappings
-        attack_ids = self.capec_to_attack.get(capec_id_full, [])
+        # CAPEC -> ATT&CK mappings: combine from external ATT&CK STIX data AND from CAPEC XML Taxonomy_Mappings
+        attack_ids = set()
+        
+        # First, add mappings from external capec_to_attack dictionary (from ATT&CK STIX parsing)
+        attack_ids.update(self.capec_to_attack.get(capec_id_full, []))
+        
+        # Second, add mappings from CAPEC XML Taxonomy_Mappings (direct from source)
+        attack_mappings = pattern.get("AttackMappings", [])
+        for mapping in attack_mappings:
+            if mapping.get("TechniqueID"):
+                attack_ids.add(mapping["TechniqueID"])
+        
+        # Create relationships to all discovered ATT&CK techniques
         for attack_id in attack_ids:
             if not isinstance(attack_id, str) or not attack_id:
                 continue
@@ -325,6 +336,17 @@ def _capec_xml_to_json(path: str) -> dict:
             if rel_id:
                 related_attack_patterns.append({'ID': rel_id, 'Relationship': nature})
 
+        # Extract Taxonomy_Mappings for ATT&CK (ATTACK) references
+        attack_mappings = []
+        tax_mappings = ap.find('capec:Taxonomy_Mappings', ns)
+        if tax_mappings is not None:
+            for mapping in tax_mappings.findall('capec:Taxonomy_Mapping', ns):
+                tax_name = mapping.get('Taxonomy_Name', '')
+                if tax_name.upper() == 'ATTACK':
+                    entry_id = mapping.find('capec:Entry_ID', ns)
+                    if entry_id is not None and entry_id.text:
+                        attack_mappings.append({'TechniqueID': entry_id.text.strip()})
+
         if not capec_id or not str(capec_id).strip():
             safe_name = name.replace(' ', '_')[:20] if name else 'NO_NAME'
             warnings.warn(f"CAPEC Attack_Pattern missing ID attribute. Name: {name}")
@@ -337,7 +359,8 @@ def _capec_xml_to_json(path: str) -> dict:
             'Prerequisites': prereqs,
             'Consequences': consequences,
             'RelatedWeaknesses': related_weaknesses,
-            'RelatedAttackPatterns': related_attack_patterns
+            'RelatedAttackPatterns': related_attack_patterns,
+            'AttackMappings': attack_mappings
         })
 
     return {'AttackPatterns': patterns}
@@ -404,10 +427,10 @@ def _build_capec_to_attack_map(attack_input: str) -> dict:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="ETL: MITRE CAPEC JSON → RDF Turtle")
+    parser = argparse.ArgumentParser(description="ETL: MITRE CAPEC JSON -> RDF Turtle")
     parser.add_argument("--input", "-i", required=True, help="Input CAPEC JSON file")
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
-    parser.add_argument("--attack-input", default="data/attack/raw", help="ATT&CK STIX JSON file or directory for CAPEC→ATT&CK mappings")
+    parser.add_argument("--attack-input", default="data/attack/raw", help="ATT&CK STIX JSON file or directory for CAPEC -> ATT&CK mappings")
     parser.add_argument("--validate", action="store_true", help="Run SHACL validation on output")
     parser.add_argument("--shapes", default="docs/ontology/shacl/capec-shapes.ttl", help="SHACL shapes file")
     args = parser.parse_args()
@@ -421,9 +444,9 @@ def main():
 
     capec_to_attack = _build_capec_to_attack_map(args.attack_input)
     if capec_to_attack:
-        print(f"Loaded {len(capec_to_attack)} CAPEC→ATT&CK mappings from {args.attack_input}")
+        print(f"Loaded {len(capec_to_attack)} CAPEC -> ATT&CK mappings from {args.attack_input}")
     else:
-        print("No CAPEC→ATT&CK mappings found (ATT&CK input missing or unmapped)")
+        print("No CAPEC -> ATT&CK mappings found (ATT&CK input missing or unmapped)")
 
     print("Transforming to RDF...")
     transformer = CAPECtoRDFTransformer(capec_to_attack=capec_to_attack)

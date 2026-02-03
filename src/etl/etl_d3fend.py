@@ -1,4 +1,4 @@
-"""ETL Pipeline: MITRE D3FEND JSON → RDF Turtle.
+"""ETL Pipeline: MITRE D3FEND JSON -> RDF Turtle.
 
 Defensive techniques that mitigate ATT&CK techniques.
 
@@ -204,9 +204,11 @@ class D3FENDtoRDFTransformer:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="ETL: MITRE D3FEND JSON → RDF Turtle")
+    parser = argparse.ArgumentParser(description="ETL: MITRE D3FEND JSON -> RDF Turtle")
     parser.add_argument("--input", "-i", required=True, help="Input D3FEND JSON file")
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
+    parser.add_argument('--validate', action='store_true', help='Validate output with SHACL')
+    parser.add_argument('--shapes', help='SHACL shapes file (defaults to docs/ontology/shacl/d3fend-shapes.ttl)')
     
     args = parser.parse_args()
     
@@ -225,6 +227,26 @@ def main():
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)
         print(f"Writing RDF to {args.output}...")
         write_graph_turtle_lines(transformer.graph, args.output)
+        
+        # SHACL validation
+        if args.validate:
+            print(f"\nValidating {args.output}...")
+            try:
+                from src.core.validation import run_validator, load_graph
+            except ImportError:
+                from core.validation import run_validator, load_graph
+            
+            shapes_file = args.shapes or 'docs/ontology/shacl/d3fend-shapes.ttl'
+            if os.path.exists(shapes_file):
+                shapes = load_graph(shapes_file)
+                conforms, _, _ = run_validator(args.output, shapes)
+                if conforms:
+                    print(f"[OK] Validation passed!")
+                else:
+                    print(f"[FAIL] Validation failed!")
+                    return 1
+            else:
+                print(f"Warning: Could not find shapes file: {shapes_file}")
         
         print(f"Transformation complete: {args.output}")
         return 0

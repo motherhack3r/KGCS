@@ -303,18 +303,18 @@ def main() -> int:
                 shapes = load_graph(args.shapes)
                 conforms, _, _ = run_validator(args.output, shapes)
                 if conforms:
-                    print("✓ Validation passed!")
+                    print("[OK] Validation passed!")
                 else:
-                    print("✗ Validation failed!")
+                    print("[FAIL] Validation failed!")
                     return 1
             except Exception as e:
                 print(f"Warning: Could not run validation: {e}")
 
-        print(f"✓ Transformation complete: {args.output}")
+        print(f"[OK] Transformation complete: {args.output}")
         return 0
 
     except Exception as e:
-        print(f"❌ Transformation error: {e}")
+        print(f"[ERROR] Transformation error: {e}")
         return 1
 
 

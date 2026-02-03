@@ -1,4 +1,4 @@
-"""ETL Pipeline: MITRE SHIELD JSON → RDF Turtle.
+"""ETL Pipeline: MITRE SHIELD JSON -> RDF Turtle.
 
 Deception techniques that counter ATT&CK techniques.
 
@@ -158,7 +158,7 @@ def _load_shield_data(input_path: str) -> dict:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="ETL: MITRE SHIELD JSON → RDF Turtle")
+    parser = argparse.ArgumentParser(description="ETL: MITRE SHIELD JSON -> RDF Turtle")
     parser.add_argument("--input", "-i", required=True, help="Input SHIELD JSON file")
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
     

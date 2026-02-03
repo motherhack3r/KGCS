@@ -183,9 +183,17 @@ class ATTACKtoRDFTransformer:
             parent_node = URIRef(f"{EX}technique/{parent_id}")
             self.graph.add((technique_node, SEC.subtechnique_of, parent_node))
 
-        # TODO: Add relationships for group, software, mitigation, detectedBy, usedBy, related, etc. as available in input
-        # This requires parsing relationship objects in STIX (not just attack-patterns)
-        # ...existing code...
+        # CAPEC References (extract from external_references with source_name='capec')
+        capec_ids = self._extract_capec_ids(technique_obj)
+        for capec_id in capec_ids:
+            # Normalize CAPEC ID (remove 'CAPEC-' prefix if double-prefixed)
+            capec_id_clean = capec_id.replace('CAPEC-CAPEC-', 'CAPEC-').replace('CAPEC-', '')
+            if capec_id_clean:
+                capec_node = URIRef(f"{EX}capec/{capec_id_clean}")
+                self.graph.add((capec_node, RDF.type, SEC.AttackPattern))
+                self.graph.add((capec_node, SEC.capecId, Literal(capec_id_clean, datatype=XSD.string)))
+                # Link technique→capec (technique implements/is_derived_from CAPEC pattern)
+                self.graph.add((technique_node, SEC.derived_from, capec_node))
 
     def _extract_attack_id(self, technique_obj: dict) -> str:
         """Extract ATT&CK ID (e.g., T1234) from external references."""
@@ -194,6 +202,22 @@ class ATTACKtoRDFTransformer:
             if ref.get("source_name") == "mitre-attack":
                 return ref.get("external_id", "")
         return ""
+
+    def _extract_capec_ids(self, technique_obj: dict) -> list:
+        """Extract CAPEC IDs from external references.
+        
+        CAPEC IDs may be stored with double prefix (CAPEC-CAPEC-13) due to STIX structure.
+        This method returns all unique CAPEC IDs found.
+        """
+        capec_ids = []
+        external_refs = technique_obj.get("external_references", [])
+        for ref in external_refs:
+            source = ref.get("source_name", "").lower()
+            if source == "capec":
+                capec_id = ref.get("external_id", "")
+                if capec_id:
+                    capec_ids.append(capec_id)
+        return capec_ids
 
 
 def main():

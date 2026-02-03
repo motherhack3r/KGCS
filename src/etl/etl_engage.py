@@ -1,4 +1,4 @@
-"""ETL Pipeline: MITRE ENGAGE JSON → RDF Turtle.
+"""ETL Pipeline: MITRE ENGAGE JSON -> RDF Turtle.
 
 Engagement concepts for adversary interaction and strategic disruption.
 
@@ -145,7 +145,7 @@ def _load_engage_data(input_path: str) -> dict:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="ETL: MITRE ENGAGE JSON → RDF Turtle")
+    parser = argparse.ArgumentParser(description="ETL: MITRE ENGAGE JSON -> RDF Turtle")
     parser.add_argument("--input", "-i", required=True, help="Input ENGAGE JSON file")
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
     

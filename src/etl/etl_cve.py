@@ -1,4 +1,4 @@
-"""ETL Pipeline: NVD CVE JSON → RDF Turtle with SHACL validation.
+"""ETL Pipeline: NVD CVE JSON -> RDF Turtle with SHACL validation.
 
 Transforms official NVD CVE API JSON (2.0) into RDF triples conforming to the
 Core Ontology Vulnerability/VulnerabilityScore classes.
@@ -403,7 +403,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', '-i', required=True, help='Input JSON file or directory')
     parser.add_argument('--output', '-o', required=True, help='Output Turtle file (.ttl)')
-    parser.add_argument('--cpematch-input', help='Optional CPEMatch JSON file/dir to resolve criteria → matchCriteriaId')
+    parser.add_argument('--cpematch-input', help='Optional CPEMatch JSON file/dir to resolve criteria -> matchCriteriaId')
+    parser.add_argument('--validate', action='store_true', help='Validate output with SHACL')
+    parser.add_argument('--shapes', help='SHACL shapes file (defaults to docs/ontology/shacl/cve-shapes.ttl)')
     args = parser.parse_args()
 
     paths = []
@@ -438,7 +440,29 @@ def main():
 
     print(f'Done — triples written: {total}', file=sys.stderr)
 
+    # SHACL validation
+    if args.validate:
+        print(f"\nValidating {args.output}...")
+        try:
+            from src.core.validation import run_validator, load_graph
+        except ImportError:
+            from core.validation import run_validator, load_graph
+        
+        shapes_file = args.shapes or 'docs/ontology/shacl/cve-shapes.ttl'
+        if os.path.exists(shapes_file):
+            shapes = load_graph(shapes_file)
+            conforms, _, _ = run_validator(args.output, shapes)
+            if conforms:
+                print(f"[OK] Validation passed!")
+            else:
+                print(f"[FAIL] Validation failed!")
+                return 1
+        else:
+            print(f"Warning: Could not find shapes file: {shapes_file}")
+
+    return 0
+
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
 
