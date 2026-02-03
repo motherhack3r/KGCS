@@ -37,12 +37,12 @@ KGCS/
 ├── requirements.txt                  (dependencies)
 │
 ├── docs/                             (📚 documentation)
-│   ├── CAPEC-ENHANCEMENT-FINAL-REPORT.md
-│   ├── PHASE3-ENHANCEMENT-COMPLETION.md
 │   ├── ARCHITECTURE.md
 │   ├── GLOSSARY.md
 │   ├── KGCS.md
 │   ├── research/                     (research analysis)
+│   │   ├── CAPEC-ENHANCEMENT-FINAL-REPORT.md
+│   │   ├── PHASE3-ENHANCEMENT-COMPLETION.md
 │   │   ├── CAPEC_MAPPING_DISCOVERY.md
 │   │   └── PIPELINE_REGENERATION_SUMMARY.md
 │   └── ontology/
