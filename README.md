@@ -118,8 +118,8 @@ Each extension lives in its own OWL file and imports the core ontology.
 
 ### Verification Utilities (RDF/Turtle)
 
-- [tests/verify_causal_chain.py](tests/verify_causal_chain.py) — offline sanity check of CWE→CAPEC→Technique→Tactic using the pipeline Turtle outputs in tmp.
-- [tests/verify_defense_layers.py](tests/verify_defense_layers.py) — offline sanity check of defense-layer links (D3FEND/CAR/SHIELD/ENGAGE) against ATT&CK using the pipeline Turtle outputs in tmp.
+- [tests/verification/verify_causal_chain.py](tests/verification/verify_causal_chain.py) — offline sanity check of CWE→CAPEC→Technique→Tactic using the pipeline Turtle outputs in tmp.
+- [tests/verification/verify_defense_layers.py](tests/verification/verify_defense_layers.py) — offline sanity check of defense-layer links (D3FEND/CAR/SHIELD/ENGAGE) against ATT&CK using the pipeline Turtle outputs in tmp.
 
 These are manual verification utilities (not pytest tests) and expect the corresponding tmp/pipeline-stage*.ttl files to exist.
 
