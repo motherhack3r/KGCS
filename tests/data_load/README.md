@@ -52,6 +52,7 @@ pytest tests/data_load/test_neo4j_connection.py::test_neo4j_connection -v
 ## Prerequisites
 
 Neo4j must be running:
+
 ```bash
 # Start Neo4j (docker or local)
 docker run -d -p 7687:7687 -e NEO4J_AUTH=neo4j/password neo4j:latest
@@ -77,6 +78,7 @@ NEO4J_PASSWORD=<password>
 ## Skipping Tests
 
 If Neo4j is unavailable:
+
 ```bash
 # Tests will be skipped gracefully (pass with skipped status)
 pytest tests/data_load/ -v
@@ -96,21 +98,24 @@ pytest tests/data_load/ -v
 ## Troubleshooting
 
 **Connection refused:**
-```
+
+```text
 Error: Could not establish connection: [Errno 111] Connection refused
 
 Solution: Start Neo4j service and check URI in .env
 ```
 
 **Authentication failed:**
-```
+
+```text
 Error: [Auth] 401: "Invalid username or password"
 
 Solution: Verify NEO4J_USER and NEO4J_PASSWORD in .env
 ```
 
 **Database error:**
-```
+
+```text
 Error: Database 'neo4j' does not exist
 
 Solution: Check Neo4j is fully initialized; may need manual database creation

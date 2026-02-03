@@ -12,9 +12,11 @@
 Single-component tests that validate transformers and isolated functionality.
 
 **Files:**
+
 - `test_etl_pipeline.py` — Individual ETL transformer unit tests
 
 **Run:**
+
 ```bash
 pytest tests/unit/ -v
 ```
@@ -28,10 +30,12 @@ pytest tests/unit/ -v
 End-to-end tests covering multiple standards working together.
 
 **Files:**
+
 - `test_phase3_comprehensive.py` — All 9 standards tested together with SHACL validation
 - `test_phase3_end_to_end.py` — Full pipeline (download → ETL → SHACL → Neo4j)
 
 **Run:**
+
 ```bash
 pytest tests/integration/ -v
 
@@ -48,10 +52,12 @@ pytest tests/integration/test_phase3_comprehensive.py -v
 Tests for Neo4j connection, graph creation, and data integrity.
 
 **Files:**
+
 - `test_neo4j_connection.py` — Neo4j driver and connection tests
 - `test_neo4j_data_load.py` — Graph load validation and constraint checks
 
 **Run:**
+
 ```bash
 pytest tests/data_load/ -v
 ```
@@ -65,11 +71,13 @@ pytest tests/data_load/ -v
 Tests for specific utilities and specialized functionality.
 
 **Files:**
+
 - `test_rag_shapes.py` — RAG traversal template SHACL validation
 - `test_standards_downloader.py` — Standard data download testing
 - `test_download_integration.py` — Download integration workflow tests
 
 **Run:**
+
 ```bash
 pytest tests/utilities/ -v
 ```
@@ -83,10 +91,12 @@ pytest tests/utilities/ -v
 Interactive scripts for visual graph inspection and debugging (always exit code 0).
 
 **Files:**
+
 - `verify_causal_chain.py` — Display CVE→CWE→CAPEC→Technique chain
 - `verify_defense_layers.py` — Show defense/detection/deception coverage per technique
 
 **Run:**
+
 ```bash
 # Visual inspection (informational, always succeeds)
 python tests/verification/verify_causal_chain.py
@@ -102,11 +112,13 @@ python tests/verification/verify_defense_layers.py
 ## Running Tests
 
 ### All Tests
+
 ```bash
 pytest tests/ -v
 ```
 
 ### Specific Category
+
 ```bash
 pytest tests/unit/ -v          # Unit tests only
 pytest tests/integration/ -v   # Integration tests only
@@ -115,12 +127,14 @@ pytest tests/utilities/ -v     # Utility tests only
 ```
 
 ### With Coverage
+
 ```bash
 pytest tests/ --cov=src --cov-report=html
 # Coverage report in: htmlcov/index.html
 ```
 
 ### Specific Test
+
 ```bash
 pytest tests/integration/test_phase3_comprehensive.py::test_cpe_etl -v
 ```
@@ -137,6 +151,7 @@ pytest tests/integration/test_phase3_comprehensive.py::test_cpe_etl -v
 **Approach:** Assert relationships exist and conform to SHACL
 
 **Example:**
+
 ```python
 def test_cpe_etl():
     # Load sample CPE → check SHACL validation passes
@@ -151,6 +166,7 @@ def test_cpe_etl():
 **Approach:** Display graph structure with labels for human review
 
 **Example:**
+
 ```bash
 python verify_causal_chain.py
 # Output: Visual chain CVE-X → CWE-Y → CAPEC-Z → T1234
@@ -161,6 +177,7 @@ python verify_causal_chain.py
 ## Test Data
 
 Sample data locations:
+
 - CPE samples: `data/cpe/samples/`
 - CVE samples: `data/cve/samples/`
 - CWE samples: `data/cwe/samples/`

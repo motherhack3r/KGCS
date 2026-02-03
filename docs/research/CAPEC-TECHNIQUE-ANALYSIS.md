@@ -32,6 +32,7 @@ Analysis: Searched ATT&CK STIX external_references for `source_name == 'cwe'`
 **Result: ZERO** CWE references found in any ATT&CK technique
 
 Implications:
+
 - CAPEC→CWE linkage: ✅ Strong (1,212 links across 450 CAPEC patterns)
 - CWE→Technique linkage: ❌ Does not exist (0 links)
 - CWE cannot be used as transitive bridge to Techniques
@@ -55,13 +56,13 @@ Key insight: ATT&CK deliberately separates from vulnerability taxonomies (CVE/CW
 
 Expected understanding:
 
-```
+```text
 CPE → CVE → CWE → CAPEC → ATT&CK → Defense Layer
 ```
 
 Actual linkage strength in data:
 
-```
+```text
 CPE ─(2.9M)─→ CVE ─(267K, 81%)─→ CWE ─(1.2K)─→ CAPEC ─(36, 2.8%)─→ Technique
 ```
 
@@ -117,16 +118,19 @@ for attack_file in _resolve_attack_files(attack_input):
 ## Recommendations
 
 ### Option A: Accept Design Limitation
+
 - Document that CAPEC→Technique coverage is intentionally sparse (2.8%)
 - Design Phase 3.5 to leverage strong CWE→CVE chain instead
 - Use 36 CAPEC→Technique links as *supplementary* evidence, not primary path
 
 ### Option B: Enhance Mappings
+
 - Check if MITRE CAPEC or ATT&CK teams have published additional mappings elsewhere
 - Consider manually curating additional CAPEC→Technique links for high-value attack patterns
 - Submit mapping suggestions back to MITRE community
 
 ### Option C: Alternative Reasoning Paths (Recommended for Phase 3.5)
+
 - **Primary:** CVE → CWE (81% coverage) → CAPEC (1.2K links) → [36 techniques with direct mapping]
 - **Secondary:** CVE → [industry threat intel mappings] → Technique
 - **Supplementary:** CAPEC → Direct Technique mapping (36 available)
@@ -138,6 +142,7 @@ for attack_file in _resolve_attack_files(attack_input):
 **Revised finding:** "CAPEC→Technique is sparse by design (36 out of 1,294 ATT&CK) - expected and correct"
 
 **Impact on Phase 3.5:**
+
 - ❌ Cannot achieve complete causal chain for all techniques
 - ✅ Can achieve strong CVE→CWE→CAPEC chains (81% CVE coverage, all CAPEC linked)
 - ✅ Can supplement with 36 direct CAPEC→Technique mappings

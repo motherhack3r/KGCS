@@ -10,6 +10,7 @@
 ## 🎯 Objective
 
 Create a production-quality, versioned Neo4j database containing:
+
 - ✅ Complete causal chain: CVE→CWE→CAPEC→ATT&CK
 - ✅ Enhanced CAPEC mapping (8.5x improvement: 36→271 relationships)
 - ✅ All 9 standards integrated (CPE, CVE, CWE, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE)
@@ -31,6 +32,7 @@ Before starting, verify:
 - [ ] Recent backup of existing databases (if any)
 
 **Verify Prerequisites:**
+
 ```bash
 # Check Neo4j connection
 python -c "from neo4j import GraphDatabase; gd = GraphDatabase.driver('bolt://localhost:7687', auth=('neo4j', 'password')); print('✅ Connected')"
@@ -51,6 +53,7 @@ python -m pip list | grep -E "rdflib|neo4j|pyshacl"
 **Goal:** Set up environment and verify all components
 
 #### Step 1.1: Review Current State
+
 ```bash
 # Check existing Neo4j databases
 python -c "
@@ -66,6 +69,7 @@ with driver.session() as session:
 ```
 
 #### Step 1.2: Verify Pipeline File
+
 ```bash
 # Check TTL file integrity
 wc -l tmp/combined-pipeline-enhanced-capec.ttl
@@ -76,11 +80,13 @@ head -50 tmp/combined-pipeline-enhanced-capec.ttl
 ```
 
 **Expected:**
+
 - File size: ~1.9 GB
 - Line count: ~2 million+ lines
 - Format: Valid Turtle/RDF (starts with `@prefix` directives)
 
 #### Step 1.3: Prepare Configuration
+
 ```bash
 # Create/verify .env with Neo4j credentials
 cat .env | grep NEO4J
@@ -92,6 +98,7 @@ cat .env | grep NEO4J
 ```
 
 #### Step 1.4: Document Version Info
+
 ```bash
 # Create version metadata
 cat > tmp/neo4j-load-metadata.json <<EOF
@@ -122,6 +129,7 @@ cat tmp/neo4j-load-metadata.json
 **Goal:** Ensure pipeline TTL is valid before loading
 
 #### Step 2.1: Quick SHACL Validation
+
 ```bash
 # Validate sample (first 10k lines) for syntax errors
 head -10000 tmp/combined-pipeline-enhanced-capec.ttl | \
@@ -134,6 +142,7 @@ head -10000 tmp/combined-pipeline-enhanced-capec.ttl | \
 ```
 
 #### Step 2.2: RDF Parsing Test
+
 ```bash
 # Quick parse test (loads sample into memory)
 python -c "
@@ -151,6 +160,7 @@ print(f'✅ Loaded {len(g)} triples (sample)')
 ```
 
 #### Step 2.3: Document Expected Statistics
+
 ```bash
 # From previous loads, we expect approximately:
 cat > tmp/expected-load-statistics.txt <<EOF
@@ -192,6 +202,7 @@ cat tmp/expected-load-statistics.txt
 **Goal:** Create fresh database with proper configuration
 
 #### Step 3.1: Create New Database
+
 ```bash
 # Using Neo4j admin or via Cypher
 python -c "
@@ -213,6 +224,7 @@ with driver.session() as session:
 ```
 
 **Alternative (Neo4j Admin CLI):**
+
 ```bash
 # If using Docker
 docker exec neo4j neo4j-admin databases create neo4j-2026-02-03-v1.0-enhanced-capec
@@ -222,6 +234,7 @@ docker exec neo4j neo4j-admin databases create neo4j-2026-02-03-v1.0-enhanced-ca
 ```
 
 #### Step 3.2: Configure Database Parameters
+
 ```bash
 # Optional: Set Neo4j memory and performance tuning
 # Edit neo4j.conf:
@@ -237,6 +250,7 @@ EOF
 ```
 
 #### Step 3.3: Verify Database Created
+
 ```bash
 python -c "
 from neo4j import GraphDatabase
@@ -262,6 +276,7 @@ with driver.session() as session:
 **Goal:** Load TTL pipeline into Neo4j with progress tracking
 
 #### Step 4.1: Run ETL Loader
+
 ```bash
 # Execute the RDF to Neo4j loader
 python src/etl/rdf_to_neo4j.py \
@@ -281,12 +296,14 @@ python src/etl/rdf_to_neo4j.py \
 ```
 
 **Performance Expectation:**
+
 - Load time: 30-60 minutes (depends on Neo4j instance size)
 - Throughput: ~40k-100k triples/minute
 - CPU: Will spike to high usage
 - RAM: Monitor heap usage (should not exceed configured max)
 
 #### Step 4.2: Monitor Progress
+
 ```bash
 # In separate terminal, monitor Neo4j stats
 while true; do
@@ -300,6 +317,7 @@ done
 ```
 
 #### Step 4.3: Capture Load Logs
+
 ```bash
 # Save loader output to file
 python src/etl/rdf_to_neo4j.py \
@@ -319,6 +337,7 @@ tail -20 tmp/neo4j-load-2026-02-03.log | grep -E "✓|complete"
 **Goal:** Verify data integrity and causal chain
 
 #### Step 5.1: Extract Statistics
+
 ```bash
 # Get comprehensive graph statistics
 python scripts/utilities/extract_neo4j_stats.py \
@@ -343,6 +362,7 @@ for node_type, count in stats.get('nodes_by_label', {}).items():
 ```
 
 #### Step 5.2: Verify Causal Chain
+
 ```bash
 # Test complete causal chain: CVE→CWE→CAPEC→Technique
 python -c "
@@ -383,6 +403,7 @@ with driver.session(database='neo4j-2026-02-03-v1.0-enhanced-capec') as session:
 ```
 
 #### Step 5.3: Run Verification Scripts
+
 ```bash
 # Visual inspection of causal chain
 python tests/verification/verify_causal_chain.py \
@@ -396,6 +417,7 @@ python tests/verification/verify_defense_layers.py \
 ```
 
 #### Step 5.4: Run Integration Tests
+
 ```bash
 # Verify with automated test suite
 pytest tests/data_load/test_neo4j_data_load.py \
@@ -405,6 +427,7 @@ pytest tests/data_load/test_neo4j_data_load.py \
 ```
 
 #### Step 5.5: Validate Constraints and Indexes
+
 ```bash
 # Check that constraints were created
 python -c "
@@ -442,7 +465,7 @@ with driver.session(database='neo4j-2026-02-03-v1.0-enhanced-capec') as session:
 **Database load is successful if:**
 
 | Criterion | Check | Expected |
-|-----------|-------|----------|
+| --------- | ----- | -------- |
 | Load completes without errors | Loader exit code | 0 |
 | Nodes created | Total node count | ~2.5M |
 | Relationships created | Total relationship count | ~26M |
@@ -459,7 +482,8 @@ with driver.session(database='neo4j-2026-02-03-v1.0-enhanced-capec') as session:
 
 **After main load completes, optionally:**
 
-#### Step 3.5.1: Create Defense Links (1-2 hours)
+### Step 3.5.1: Create Defense Links (1-2 hours)
+
 ```bash
 # Add D3FEND→Technique relationships
 python scripts/utilities/add_defense_relationships.py \
@@ -479,6 +503,7 @@ python scripts/utilities/add_deception_relationships.py \
 ```
 
 #### Step 3.5.2: Verify Defense Coverage
+
 ```bash
 python -c "
 from neo4j import GraphDatabase
@@ -505,7 +530,8 @@ with driver.session(database='neo4j-2026-02-03-v1.0-enhanced-capec') as session:
 
 **If load fails or needs to be reverted:**
 
-#### Option 1: Drop Database
+### Option 1: Drop Database
+
 ```bash
 python -c "
 from neo4j import GraphDatabase
@@ -522,7 +548,8 @@ with driver.session() as session:
 "
 ```
 
-#### Option 2: Restore Previous Database
+### Option 2: Restore Previous Database
+
 ```bash
 # If you have a backup
 neo4j-admin databases copy neo4j-2026-01-29 neo4j-restore-backup
@@ -582,6 +609,7 @@ EOF
 ## 🚀 Next Steps
 
 After successful load:
+
 1. Update PROJECT-STATUS-SUMMARY.md with database info
 2. Begin Phase 3.5 work (defense layer integration)
 3. Start Phase 5 (RAG integration) if ready
