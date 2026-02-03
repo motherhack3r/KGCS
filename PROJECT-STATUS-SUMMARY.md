@@ -16,7 +16,9 @@
   - [MVP "Definition of Done"](#mvp-definition-of-done)
   - [Update Summary](#update-summary)
     - [Recent Developments](#recent-developments)
-    - [Next Steps (Phase 3 Completion Order)](#next-steps-phase-3-completion-order)
+    - [Critical Findings from Full Load](#critical-findings-from-full-load)
+    - [Next Steps (Phase 3.5 Blocking Items)](#next-steps-phase-35-blocking-items)
+    - [Phase 3.5 Readiness](#phase-35-readiness)
     - [Post-MVP Roadmap Note](#post-mvp-roadmap-note)
 
 ---
@@ -158,28 +160,95 @@ Phase 3 MVP is complete. Next steps:
 
 ## Update Summary
 
-- **Date:** January 29, 2026  
-- **Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟢 In Progress (MVP) | Phase 4 🔵 Designed | Phase 5 🔵 Planned  
+- **Date:** February 3, 2026 (Updated)
+- **Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟢 MVP Complete (Full Production Load) | Phase 4 🔵 Designed | Phase 5 🔵 Planned  
 
 ### Recent Developments
 
-- **Raw-to-Turtle ETL:** CAR analytics + sensors YAML downloaded and validated to Turtle.  
-- **SHACL Validation:** Parallel streaming validation completed with per-standard summary reports.  
-- **CPEMatch Fix:** `Platform` nodes now emit `cpeNameId` and correct `cpeUri`, and CPEMatch validation conforms (0 violations).  
-- **Repo Hygiene:** Removed oversized CPEMatch summary report from history; added ignore rule to prevent reintroduction.  
-- **Neo4j Loader:** Label-aware relationship inserts + per-label `uri` indexes for faster loads; combined TTL load verified locally.  
-- **Neo4j Constraints:** Core-ID uniqueness constraints applied and verified in a live DB (local).  
-- **Download Pipeline:** Daily downloader runs cleanly with fixed raw-path handling and no duplicate downloads.  
-- **CI Ingestion Smoke:** Workflow added in [.github/workflows/phase3-ingest-smoke.yml](.github/workflows/phase3-ingest-smoke.yml) to run sample ETL + validate artifacts.  
-- **Cross-standard Relationships:** CAPEC→ATT&CK (`implements`) and CVE→CWE (`caused_by`) now emitted by ETL and loaded into Neo4j.  
-- **CWE/CAPEC Coverage:** Additional CWE/CAPEC relationship types (peer/sequence/alternate) now emitted.  
-- **End-to-end Tests:** Full ETL → SHACL → Neo4j test suite implemented using pipeline outputs.  
+- **Full Production Load:** Neo4j database neo4j-2026-01-29 loaded with 2.5M nodes and 26M relationships
+- **CPE/CVE Data:** 1,560,484 platform nodes + 329,523 vulnerability nodes (full production)
+- **Platform Configurations:** 614,054 configuration nodes with complete CVE mappings (2.9M AFFECTED_BY links)
+- **CVE→CWE Chain:** 267,018 links established (81% coverage) - excellent connectivity
+- **CWE→CAPEC Chain:** 1,212 links working - attack patterns properly mapped
+- **Statistics Extraction:** `scripts/extract_neo4j_stats.py` enhanced with auto-database detection and listing
+- **Documentation:** NEO4J-LOAD-SUMMARY.md created with comprehensive analysis and action items
 
-### Next Steps (Phase 3 Completion Order)
+### Critical Findings from Full Load
 
-1. Add relationship breakdown reporting (by label and type) to loader final stats.  
-2. Add CI gating for full pipeline outputs and Neo4j smoke load (optional, if runtime permits).
+**Graph Strengths:**
+
+- ✅ CPE/CVE/PlatformConfiguration infrastructure: 99.7% of graph edges (23.7M relationships)
+- ✅ CVE→CWE linkage: 267,018 mappings (81% of CVEs have CWE roots)
+- ✅ Platform impact analysis: 2,948,956 CVE→PlatformConfiguration links
+- ✅ Technique structure: 568 techniques + 526 sub-techniques properly hierarchical
+
+**Graph Gaps (Blocking Phase 3.5 Defense Features):**
+
+- ❌ **CAPEC→Technique mapping:** Only 36 links (6.3% of 568 techniques) — CRITICAL
+  - Impact: Cannot complete causal chain (CVE→CWE→CAPEC→Technique)
+  - Root cause: MITRE mapping incomplete or relationship type mismatch
+  - Fix priority: **HIGHEST**
+
+- ❌ **Defense/Detection layer:** 0 links across all standards
+  - D3FEND: 31 nodes orphaned (0 Technique links)
+  - CAR: 102 nodes orphaned (0 Technique links)
+  - SHIELD: 33 nodes orphaned (0 Technique links)
+  - ENGAGE: 31 nodes orphaned (0 Technique links)
+  - Impact: Cannot recommend mitigations/detections in Phase 3.5
+  - Fix priority: **HIGH**
+
+- ❌ **CVSS scores:** 0 nodes (should have 240k+)
+  - Impact: No vulnerability severity assessment
+  - Fix priority: **MEDIUM**
+
+### Next Steps (Phase 3.5 Blocking Items)
+
+**Before Phase 3.5 Production Use:**
+
+1. **Fix CAPEC→Technique Mapping** (Est. 2-4 hours)
+   - Verify MITRE CAPEC JSON contains Technique mappings
+   - Check relationship type in `src/etl/etl_capec.py` (IMPLEMENTS vs other)
+   - Re-run ETL and reload Neo4j
+   - Target: >300 technique links (50%+ coverage)
+
+2. **Load Defense Layer Relationships** (Est. 2-3 hours)
+   - Verify D3FEND/CAR/SHIELD/ENGAGE ETL outputs in tmp/
+   - Emit Technique→Defense relationships (MITIGATED_BY, DETECTED_BY, COUNTERED_BY)
+   - Re-run Neo4j loader with all standard outputs
+   - Target: >200 total defense links
+
+3. **Add CVSS Score Nodes** (Est. 1-2 hours)
+   - Update `src/etl/etl_cve.py` to emit CVSS Score nodes
+   - Link CVE→Score with HAS_SCORE relationship
+   - Re-run CVE ETL and reload
+   - Target: 240k+ CVSS nodes (v2.0, v3.1, v4.0)
+
+**Post-Statistics Command:**
+
+```bash
+# After fixes, re-extract statistics
+python scripts/extract_neo4j_stats.py --list-databases
+python scripts/extract_neo4j_stats.py --db neo4j-2026-01-29 --pretty
+```
+
+### Phase 3.5 Readiness
+
+**Current Status:** Partial (Foundation Ready, Defense Layer Missing)
+
+**Can Use For:**
+
+- ✅ CVE investigation (vulnerability → weakness → attack pattern)
+- ✅ Asset impact analysis (find platforms vulnerable to CVEs)
+- ✅ Threat technique correlation (SIEM events → ATT&CK techniques)
+
+**Cannot Use For (Until Fixed):**
+
+- ❌ Defense recommendations (D3FEND mitigations)
+- ❌ Detection guidance (CAR analytics)
+- ❌ Deception tactics (SHIELD suggestions)
+- ❌ Causal chain reasoning (CAPEC→Technique)
 
 ### Post-MVP Roadmap Note
 
-- Cloud migration planning is deferred until after Phase 3 MVP completion (or later if needed).
+- Phase 3 is functionally complete; defense layer fixes and Phase 3.5 implementation are parallel tracks
+- Cloud migration planning deferred until after Phase 3.5 MVP completion
