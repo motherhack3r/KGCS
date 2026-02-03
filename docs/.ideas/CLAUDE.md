@@ -1,3 +1,5 @@
+# KGCS Claude Instructions
+
 ## Workflow Orchestration
 
 ### 1. Plan Mode Default

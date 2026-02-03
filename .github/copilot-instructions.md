@@ -1,56 +1,507 @@
 # KGCS Copilot Instructions
 
-## 1. Big picture (read first)
-- KGCS is a frozen, standards‑backed knowledge graph. Every class/property maps 1:1 to an authoritative NVD/MITRE field – no invented semantics. See [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md) and [docs/KGCS.md](../docs/KGCS.md).
-- The core causal chain is **mandatory**: `CPE → CPEMatch → CVE → CWE → CAPEC → ATT&CK → {D3FEND, CAR, SHIELD, ENGAGE}`.
-- Vulnerabilities point to `PlatformConfiguration` (version/update context), not the atomic `Platform`.
-- Core OWL modules (docs/ontology/owl/) are immutable; extensions (Incident, Risk, ThreatActor) import core only.
+**Updated:** February 3, 2026 | **Status:** Phase 3 MVP Complete (Neo4j operational)
 
-## 2. Data flow & boundaries
-- **Download**: `python -m src.ingest.download_manager` → `data/{standard}/raw/` + `manifest.json` + `logs/download_manager.log`.
-- **ETL**: `src/etl/etl_*.py` parses NVD/MITRE JSON/XML → `tmp/*.ttl`.
-- **Validate**: `scripts/validate_shacl_stream.py` runs SHACL against shapes in `docs/ontology/shacl` (canonical bundle: `kgcs-shapes.ttl`).
-- **Load**: `src/etl/rdf_to_neo4j.py` transforms Turtle to Neo4j nodes/relationships.
+## 1. Big Picture & Core Invariants
 
-## 3. Project‑specific patterns
-- **Streaming ETL**: Each transformer writes one triple per line and uses helpers like `turtle_escape()` and `subject_for_*` (see `src/etl/etl_cpe.py`). Output is idempotent – same input always yields the same TTL.
-- **Template‑aware SHACL**: `TEMPLATE_SHAPE_MAP` in `src/core/validation.py` selects a subset of shapes for a given RAG template. Reports are written to `artifacts/shacl-report-*.json`.
-- **Offline sanity checks**: `tests/verify_causal_chain.py` and `tests/verify_defense_layers.py` are manual utilities that read the pipeline TTLs in `tmp/`.
+KGCS is a **frozen, standards-backed knowledge graph** for cybersecurity AI that prevents hallucination by enforcing explicit provenance and immutable ontologies.
 
-## 4. Core workflows (examples)
-- **Download raw data**: `python -m src.ingest.download_manager`
-- **Transform one standard**: `python -m src.etl.etl_cpe --input data/cpe/samples/sample_cpe.json --output tmp/cpe-output.ttl --validate`
-- **Validate a TTL file**: `python scripts/validate_shacl_stream.py --data tmp/cpe-output.ttl --shapes docs/ontology/shacl/cpe-shapes.ttl`
-- **End‑to‑end ETL validation**: `python scripts/validate_etl_pipeline_order.py`
-- **Neo4j load**: `python src/etl/rdf_to_neo4j.py --ttl tmp/cpe-output.ttl --batch-size 1000`
+**The Five Immutable Rules:**
+1. **Mandatory causal chain:** `CPE → CVEMatch → CVE → CWE → CAPEC → ATT&CK → {D3FEND, CAR, SHIELD, ENGAGE}`
+   - Every hop exists in authoritative source data (NVD JSON / MITRE STIX)
+   - Skipping steps loses information and breaks traceability
+2. **PlatformConfiguration not Platform:** Vulnerabilities affect *configurations* (version bounds, update state), not atomic platforms
+3. **CVSS version separation:** v2.0, v3.1, v4.0 are separate nodes—never merge scores
+4. **Core ontologies frozen:** OWL modules in `docs/ontology/owl/` are immutable; all extensions must import core without modification
+5. **No fabricated edges:** Every relationship must traceable to source data (cveId, techniqueId, etc.)
 
-## 5. Build / test / CI
-- **Dependencies**: `pip install -r requirements.txt` (Python 3.10+). Neo4j driver is pulled automatically.
-- **Unit tests**: `pytest tests/` – covers ETL transformers and validation helpers.
-- **Integration tests**: `pytest tests/test_phase3_comprehensive.py` – runs the full pipeline against sample data.
-- **CI**: GitHub Actions (`.github/workflows/shacl-validation.yml`) runs SHACL validation on every push/PR. The workflow also builds the Docker image for the Neo4j loader.
+**Key reference docs:**
+- [KGCS.md](../docs/KGCS.md) — Detailed architecture + causal chain semantics
+- [ARCHITECTURE.md](../docs/ARCHITECTURE.md) — 5-phase roadmap + design rationale
+- [GLOSSARY.md](../docs/GLOSSARY.md) — Standard definitions + relationships
+- [PROJECT-STATUS-SUMMARY.md](../PROJECT-STATUS-SUMMARY.md) — Current phase status
 
-## 6. Debugging & logs
-- All download and ETL steps write to `logs/` (e.g., `download_manager.log`, `etl.log`).
-- SHACL validation outputs a machine‑readable JSON report in `artifacts/` and a human‑readable summary to stdout.
-- Neo4j loader prints progress bars and a final summary of nodes/relationships loaded.
+## 2. ETL Transformer Patterns (Critical Implementation Patterns)
 
-## 7. Non‑negotiables
-- Preserve the causal chain and per‑standard IDs (`cveId`, `cweId`, `capecId`, etc.).
-- Keep CVSS versions separate nodes (`v2.0`, `v3.1`, `v4.0`).
-- Do **not** alter core OWL modules for extensions; add new extension OWL/SHACL/ETL in isolation.
-- Always validate with SHACL before any Neo4j load.
+KGCS uses **two transformer architectures** based on standard type:
 
-## 8. Quick reference
-- **Core ontology**: `docs/ontology/owl/`
-- **SHACL shapes**: `docs/ontology/shacl/`
-- **RAG templates**: `docs/ontology/rag/`
-- **Extensions**: `docs/ontology/extensions/` + `src/extensions/`
-- **ETL entry points**: `src/etl/etl_*.py`
-- **Neo4j loader**: `src/etl/rdf_to_neo4j.py`
-- **Validation CLI**: `scripts/validate_shacl_stream.py`
-- **Pipeline orchestrator**: `src/ingest/pipeline.py`
+### Functional Transformers (CPE, CVE, CPEMatch)
+
+**Pattern:** Direct file I/O with `transform_*()` functions, streaming one triple per line.
+
+```python
+# src/etl/etl_cpe.py
+def turtle_escape(s: str) -> str:
+    """Escape strings for Turtle: backslash, quotes, newlines."""
+    return '"%s"' % s.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+
+def process_product(cpe: dict, out_f):
+    """Write CPE as Platform triples, one per line (stream-friendly)."""
+    out_f.write(f"{subj} rdf:type core:Platform .\n")
+    out_f.write(f"{subj} core:cpeUri {turtle_escape(cpe_name)} .\n")
+    # ...continue with other properties
+```
+
+**Why:** Handles production-scale data (222 MB CPE) without buffering. Enables chunked SHACL validation.
+
+### Class-Based Transformers (CWE, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE)
+
+**Pattern:** `*toRDFTransformer` class with `transform(json_data) -> Graph` method returning rdflib Graph.
+
+```python
+# src/etl/etl_capec.py
+from rdflib import Graph, Namespace
+
+class CAPECtoRDFTransformer:
+    def __init__(self, capec_to_attack=None):
+        self.graph = Graph()
+        self.graph.bind("sec", Namespace("https://example.org/sec/core#"))
+    
+    def transform(self, capec_json: dict) -> Graph:
+        """Convert JSON to RDF, returning complete graph."""
+        patterns = capec_json.get("AttackPatterns", [])
+        for pattern in patterns:
+            self._add_attack_pattern(pattern)
+        self._add_pattern_relationships(patterns)
+        return self.graph
+```
+
+**Why:** Reusable, composable, easier to test. Graph returned then serialized to Turtle.
+
+### Universal CLI Pattern
+
+All transformers expose identical CLI interface:
+
+```bash
+python -m src.etl.etl_cpe --input data/cpe/raw/nvdcpe-2.0.json \
+                          --output tmp/pipeline-stage1-cpe.ttl \
+                          --validate
+
+# Output:
+# [✓] Transform complete: 28,000 triples
+# [✓] SHACL validation: PASS (0 violations)
+# Report: artifacts/shacl-report-pipeline-stage1-cpe.ttl.json
+```
+
+**Required flags:** `--input`, `--output`  
+**Optional flags:** `--validate` (run SHACL validation), `--quiet` (suppress stats)
+
+### Implementation Checklist for New Transformers
+
+- [ ] Add `from src.etl import transformers` import guard
+- [ ] Stream triples (functional) OR return Graph (class-based)
+- [ ] Include provenance: `source_uri`, `source_hash`, `ingest_timestamp`
+- [ ] Support `--validate` flag (pipe output to SHACL validator)
+- [ ] Handle missing/malformed input gracefully
+- [ ] Write stats to stdout (triple count, edge count by relationship type)
+- [ ] Test with sample data before production run
+
+## 3. Validation Workflow (SHACL as Pre-Ingest Gate)
+
+SHACL validation is **mandatory before Neo4j ingestion**. Two validation patterns:
+
+### Pattern 1: Individual Transformer Validation
+
+```bash
+# Built into every transformer via --validate flag
+python -m src.etl.etl_cpe --input data/cpe/raw/nvdcpe-2.0.json \
+                          --output tmp/pipeline-stage1-cpe.ttl \
+                          --validate
+# Exit codes: 0 = pass, 1 = fail
+```
+
+### Pattern 2: Pipeline-Wide Validation
+
+```bash
+# Validate all TTL outputs generated by ETL
+python scripts/validate_all_standards.py
+# Runs parallel SHACL validation; outputs summaries to artifacts/
+
+# Or per-standard:
+python scripts/validate_shacl_stream.py --data tmp/pipeline-stage1-cpe.ttl \
+                                        --shapes docs/ontology/shacl/cpe-shapes.ttl
+```
+
+### Pattern 3: Template-Specific Validation (RAG Use Cases)
+
+```python
+# In src/core/validation.py:
+TEMPLATE_SHAPE_MAP = {
+    'T1': ['VulnerabilityShape', 'WeaknessShape', 'AttackPatternShape', ...],
+    'T2': ['VulnerabilityShape', 'VulnerabilityScoreShape'],
+    # ...T3-T7 defined
+}
+
+# From CLI:
+python -m src.core.validation --data tmp/output.ttl --template T1
+# Returns: PASS/FAIL + report to artifacts/shacl-report-*.json
+```
+
+**Key insight:** Shape selection is **template-aware**. RAG queries validate against a subset of shapes that enforce safe traversal (T1-T7 = approved reasoning paths).
+
+### Validation Report Structure
+
+```json
+{
+  "conforms": true,
+  "focusNodes": 28000,
+  "violations": [],
+  "summary": {
+    "passed_shapes": ["PlatformShape", "PlatformConfigurationShape"],
+    "failed_shapes": [],
+    "rule_violations": []
+  },
+  "generated_at": "2026-02-03T10:00:00Z"
+}
+```
+
+**Exit codes:** `0` = valid, `1` = invalid, `2` = error (missing file, etc.)
+
+## 4. Complete Data Flow (End-to-End Pipeline)
+
+```text
+1. Download:    python -m src.ingest.download_manager
+                → data/{standard}/raw/ + manifest.json + logs/
+                
+2. Transform:   python scripts/run_all_etl.py
+                → tmp/pipeline-stage1-cpe.ttl
+                → tmp/pipeline-stage2-cpematch.ttl
+                → tmp/pipeline-stage3-cve.ttl ... stage10-engage.ttl
+                (idempotent: same input → same output)
+
+3. Validate:    python scripts/validate_all_standards.py
+                → artifacts/shacl-report-*.json (per-standard summaries)
+                → Exit 0 if all pass, 1 if any fail
+
+4. Load Neo4j:  python src/etl/rdf_to_neo4j.py --ttl tmp/*.ttl --batch-size 1000
+                → Neo4j graph with indexes, constraints, relationships loaded
+                → Cross-standard links (CVE→CWE, CAPEC→ATT&CK) integrated
+```
+
+**Critical:** Each stage's output is the input to the next. Failures stop the pipeline.
+
+**Manual verification scripts** (exploratory, not CI gates):
+```bash
+python tests/verify_causal_chain.py      # Visual inspection of CWE→CAPEC→Technique chains
+python tests/verify_defense_layers.py    # Defense/detection/deception coverage per technique
+# Exit code always 0 (informational); use for understanding before committing
+```
+
+## 5. Testing Strategy
+
+**Run tests in order:**
+```bash
+# Unit tests for individual transformers
+pytest tests/test_etl_pipeline.py -v
+
+# Integration tests for all 9 standards
+pytest tests/test_phase3_comprehensive.py -v
+
+# End-to-end pipeline test (download → ETL → SHACL → Neo4j)
+pytest tests/test_phase3_end_to_end.py -v
+
+# Neo4j connection/data validation
+pytest tests/test_neo4j_data_load.py -v
+```
+
+**Test file locations:**
+- Sample inputs: `data/{standard}/samples/`
+- Test outputs: `tmp/phase3_*.ttl`
+- Validation reports: `artifacts/`
+
+**Two testing approaches (complementary):**
+
+1. **Automated test suite** (`tests/test_*.py`): CI/CD gates, pass/fail exit codes
+   - Run on every commit via pytest
+   - Sample data in `data/{standard}/samples/`
+   - Exit code 0 = all pass, 1 = any fail
+
+2. **Manual verification scripts** (`tests/verify_*.py`): Exploratory debugging (always exit 0)
+   - Visual inspection of graph relationships  
+   - Examine causal chains before changes
+   - No enforcement; purely informational
+   
+**When to use which:**
+- Use automated tests to confirm *that* required relationships exist
+- Use manual verification scripts to understand *why* a relationship exists or is missing
+
+## 6. Configuration & Environment
+Configuration via `src/config.py` and `.env` file:
+
+```python
+# Example usage
+from src.config import neo4j_config, etl_config, validation_config
+
+# Neo4j connection
+uri = neo4j_config.uri          # bolt://localhost:7687
+user = neo4j_config.user        # neo4j
+password = neo4j_config.password
+
+# ETL settings
+batch_size = etl_config.batch_size
+chunk_size = etl_config.chunk_size
+```
+
+**Environment variables:**
+- `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD` (required for Neo4j loader)
+- `ETL_BATCH_SIZE`, `SHACL_CHUNK_SIZE` (optional performance tuning)
+
+## 7. Download Manager Workflow
+The download manager (`src/ingest/download_manager.py`) orchestrates daily data fetching from all authoritative sources.
+
+**Architecture:**
+- **Base class:** `StandardDownloader` with common download/manifest logic
+- **Specialized downloaders:** One per standard (NVDCPEDownloader, MITRECWEDownloader, etc.)
+- **Async pipeline:** `DownloadPipeline` runs all downloaders in parallel
+
+**Key features:**
+- **Retry logic:** 3 attempts per file with exponential backoff
+- **Checksum verification:** SHA256 hashing for data integrity
+- **Manifest tracking:** JSON metadata in `data/{standard}/manifest.json`
+- **Resumable downloads:** Skips existing files (check SHA256 to force re-download)
+- **Chunked archives:** Handles NVD's multi-file ZIP archives
+
+**Run the pipeline:**
+```bash
+# Download all standards (production mode)
+python -m src.ingest.download_manager
+
+# Skip large files (CPE/CVE bulk data) for testing
+python -m src.ingest.download_manager --skip-large
+```
+
+**Output locations:**
+- Raw data: `data/{standard}/raw/`
+- Manifests: `data/{standard}/manifest.json`
+- Logs: `logs/download_manager.log` + `logs/download_summary.json`
+
+**Manifest structure:**
+```json
+{
+  "files": [
+    {
+      "filename": "nvdcpe-2.0.json",
+      "size_bytes": 227000000,
+      "sha256": "abc123...",
+      "url": "https://nvd.nist.gov/...",
+      "status": "success"
+    }
+  ],
+  "last_updated": "2026-02-03T10:30:00"
+}
+```
+
+**Error handling:**
+- Failed downloads logged to `logs/download_manager.log`
+- Pipeline continues on individual failures
+- Exit code 1 if any download failed (for CI integration)
+
+## 8. Common Debugging Scenarios
+
+**Problem:** ETL produces invalid TTL
+- **Check:** Run with `--validate` flag to see SHACL violations immediately
+- **Fix:** Inspect `artifacts/shacl-report-*.json` for violation details (focusNode, resultMessage)
+
+**Problem:** Neo4j load fails with constraint violations
+- **Check:** `python tests/verify_causal_chain.py` to validate edge consistency
+- **Fix:** Re-run ETL for dependent standards (e.g., CVE requires CPE)
+
+**Problem:** SHACL validation times out on large files
+- **Solution:** Use `scripts/validate_shacl_stream.py` (chunks 10k triples at a time)
+
+## 9. Manual Verification Scripts vs. Automated Tests
+KGCS uses **two complementary validation approaches**: manual verification scripts for exploratory analysis and automated tests for CI/CD gates.
+
+**Manual verification scripts** (`tests/verify_*.py`):
+- **Purpose:** Visual inspection of graph structure during development
+- **When to use:** After ETL changes, before committing, or debugging edge relationships
+- **Human-readable output:** Pretty-printed causal chains with labels
+
+**Key scripts:**
+
+1. **`tests/verify_causal_chain.py`** – Validates CWE → CAPEC → Technique → Tactic flow
+   ```bash
+   python tests/verify_causal_chain.py
+   # Output: Displays complete chain with relationship counts
+   ```
+   - Reads: `tmp/sample_cwe.ttl`, `tmp/sample_capec_impl.ttl`, `tmp/sample_attack.ttl`
+   - Shows: Per-CAPEC breakdown of exploited weaknesses and implemented techniques
+   - Exit code: Always 0 (informational only)
+
+2. **`tests/verify_defense_layers.py`** – Validates defense/detection/deception coverage
+   ```bash
+   python tests/verify_defense_layers.py
+   # Output: Technique-by-technique defense mappings
+   ```
+   - Reads: All 7 TTL files (CWE, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE)
+   - Shows: For each technique, lists upstream (CAPEC/CWE) and downstream (mitigations/detections)
+   - Exit code: Always 0 (informational only)
+
+**Automated test suite** (`tests/test_*.py`):
+- **Purpose:** CI/CD validation gates with pass/fail exit codes
+- **When to run:** Every commit, every PR, before production loads
+- **Machine-readable output:** pytest reports + JUnit XML
+
+**Key test files:**
+- `test_etl_pipeline.py` – Unit tests for individual transformers
+- `test_phase3_comprehensive.py` – Integration tests for all 9 standards
+- `test_phase3_end_to_end.py` – Full pipeline (download → ETL → SHACL → Neo4j)
+- `test_neo4j_data_load.py` – Graph constraints and relationship validation
+
+**Comparison table:**
+
+| Aspect | Manual Scripts | Automated Tests |
+|--------|---------------|----------------|
+| **Exit code** | Always 0 (info) | 0 = pass, 1 = fail |
+| **Output** | Human-readable chains | pytest/JSON reports |
+| **Use case** | Exploratory debugging | CI/CD validation |
+| **Data source** | Sample TTLs in `tmp/` | Sample data + fixtures |
+| **Execution** | `python tests/verify_*.py` | `pytest tests/test_*.py` |
+| **Coverage** | Relationship presence | Relationship correctness + SHACL conformance |
+
+**Workflow:**
+```bash
+# 1. Make ETL changes
+vim src/etl/etl_capec.py
+
+# 2. Run ETL manually to generate sample output
+python -m src.etl.etl_capec --input data/capec/samples/sample_capec.json \
+                             --output tmp/sample_capec_impl.ttl
+
+# 3. Visual inspection (manual verification)
+python tests/verify_causal_chain.py  # Does the chain look right?
+
+# 4. Automated validation (CI gate)
+pytest tests/test_phase3_comprehensive.py::test_capec_etl -v  # Does it pass SHACL?
+
+# 5. If both pass, commit changes
+git commit -am "Fix CAPEC→Technique edge generation"
+```
+
+**When to use which:**
+- **Use manual scripts** when you need to understand *why* a relationship exists or is missing
+- **Use automated tests** when you need to confirm *that* all required relationships exist and conform to SHACL
+
+## 10. Extension Development Rules
+When adding new standards or extensions:
+
+1. **Never modify core ontologies** – create new OWL file in `docs/ontology/extensions/`
+2. **Import core only** – no circular dependencies (verify with `scripts/validate_etl_pipeline_order.py`)
+3. **Add SHACL shapes** – create `docs/ontology/shacl/{standard}-shapes.ttl`
+4. **Create sample data** – add positive/negative test cases to `data/{standard}/samples/`
+5. **Update pipeline** – add transformer to `scripts/run_all_etl.py` in dependency order
+
+**Example:** Adding fictional "MISP" standard:
+```bash
+# 1. Create ontology
+docs/ontology/extensions/misp-extension.owl  # imports core-ontology-v1.0.owl
+
+# 2. Add SHACL shapes
+docs/ontology/shacl/misp-shapes.ttl
+
+# 3. Create transformer
+src/etl/etl_misp.py  # class MISPtoRDFTransformer
+
+# 4. Add test data
+data/misp/samples/sample_misp.json
+
+# 5. Register in pipeline
+scripts/run_all_etl.py  # add ("etl_misp", ...) after dependencies
+```
+
+## 11. Key Files & Entry Points
+| Purpose | Path |
+|---------|------|
+| **Run full pipeline** | `scripts/run_all_etl.py` |
+| **Validate all outputs** | `scripts/validate_all_standards.py` |
+| **Load Neo4j** | `src/etl/rdf_to_neo4j.py` |
+| **SHACL validator** | `src/core/validation.py` |
+| **ETL transformers** | `src/etl/etl_*.py` |
+| **Test suite** | `tests/test_phase3_comprehensive.py` |
+| **Configuration** | `src/config.py` + `.env` |
+| **Ontology specs** | `docs/ontology/owl/` + `docs/ontology/shacl/` |
+
+## 12. Non-Negotiables
+❌ **Never do:**
+- Alter core OWL modules for extensions
+- Skip SHACL validation before Neo4j load
+- Link CVE directly to Platform (must use PlatformConfiguration)
+- Merge or overwrite CVSS versions
+- Fabricate relationships not in source data
+
+✅ **Always do:**
+- Preserve causal chain and per-standard IDs (`cveId`, `cweId`, etc.)
+- Write idempotent transformers (same input → same output)
+- Include provenance metadata (source_uri, source_hash)
+- Run validation on sample data before production loads
+- Update test cases when modifying transformers
 
 ---
 
-Feel free to ask for clarification on any of the steps above. Happy coding!
+**Questions?** Check [ARCHITECTURE.md](../docs/ARCHITECTURE.md) for design rationale or [GLOSSARY.md](../docs/GLOSSARY.md) for terminology.
+
+---
+
+## AI Agent Workflow (Critical for Productivity)
+
+### 1. Plan Before Implementation
+
+For any non-trivial task (3+ steps, architectural decisions, or unclear scope):
+- Write a detailed plan with checkable items using `manage_todo_list` before starting
+- Break tasks into actionable steps with specific acceptance criteria
+- Reference failing tests or error messages in the plan
+- Update the plan if blocked—never push forward with unclear direction
+
+### 2. Leverage Subagents for Parallel Work
+
+Use `runSubagent` to offload:
+- Research and exploration of complex architectural questions
+- Searching for patterns across multiple files when direction is unclear
+- Analyzing large codebases to extract context
+- Keep main context window clean for implementation
+
+**When to split:** If a task requires more exploration than implementation, use subagents.
+
+### 3. Task Completion Discipline
+
+- Mark a single todo as **in-progress** before starting work
+- Mark that same todo as **completed** immediately when done (no batching)
+- This prevents context loss and makes partial failures obvious
+- Before marking done: verify with tests, check logs, or demonstrate correctness
+
+### 4. Debugging Sequence
+
+1. **Check logs first:** Examine error messages, exit codes, assertion failures
+2. **Run the failing test/command:** Don't just read—execute and observe
+3. **Inspect related files:** Check ETL transformers, validation reports, Neo4j schemas
+4. **Verify causal chain:** Use manual verification scripts to understand "why" before fixing
+
+Example:
+```bash
+# 1. Run test and capture full output
+pytest tests/test_phase3_comprehensive.py::test_cve_etl -v
+
+# 2. If SHACL validation fails, check the report
+cat artifacts/shacl-report-*.json
+
+# 3. Run manual verification to see graph structure
+python tests/verify_causal_chain.py
+
+# 4. Only then modify the transformer
+```
+
+### 5. Code Review Self-Check
+
+Before marking a task complete, ask:
+- Are all test cases passing?
+- Does the change follow the existing patterns in `src/etl/` or `tests/`?
+- Did I update sample data and test cases if modifying a transformer?
+- Can a human quickly understand what changed and why? (Check your diff)
+- For graph changes: did I verify the causal chain is intact?
+
+### 6. Knowledge Base
+
+Actively maintain `docs/.ideas/CLAUDE.md` as a lessons file:
+- After any correction from the user: add the pattern to avoid future mistakes
+- Keep a running list of discovered conventions
+- Reference this file at the start of new sessions
