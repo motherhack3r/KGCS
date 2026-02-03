@@ -37,15 +37,31 @@ KGCS/
 ├── requirements.txt                  (dependencies)
 │
 ├── docs/                             (📚 documentation)
-│   ├── ARCHITECTURE.md
-│   ├── GLOSSARY.md
-│   ├── KGCS.md
-│   ├── research/                     (research analysis)
+│   ├── README.md                     (📖 navigation guide)
+│   ├── ARCHITECTURE.md               (core docs)
+│   ├── GLOSSARY.md                   (core docs)
+│   ├── KGCS.md                       (core docs)
+│   ├── EXTENDING.md                  (core docs)
+│   │
+│   ├── operations/                   (📋 operational guides)
+│   │   ├── README.md
+│   │   ├── DEPLOYMENT.md
+│   │   ├── DAILY-DOWNLOAD-PIPELINE.md
+│   │   ├── CLEANUP-WORKSPACE.md
+│   │   ├── NEO4J-LOAD-SUMMARY.md
+│   │   └── NEO4J-STATS.md
+│   │
+│   ├── research/                     (🔬 research & reports)
+│   │   ├── README.md
 │   │   ├── CAPEC-ENHANCEMENT-FINAL-REPORT.md
 │   │   ├── PHASE3-ENHANCEMENT-COMPLETION.md
+│   │   ├── PHASE3-STATUS-SUMMARY.md
 │   │   ├── CAPEC_MAPPING_DISCOVERY.md
 │   │   └── PIPELINE_REGENERATION_SUMMARY.md
-│   └── ontology/
+│   │
+│   ├── ontology/                     (🏛️ specifications)
+│   ├── .ideas/                       (💡 future planning)
+│   └── .archive/                     (📦 legacy)
 │
 ├── scripts/                          (🔧 organized scripts)
 │   ├── run_all_etl.py               ⭐ MAIN ENTRY
@@ -110,7 +126,14 @@ KGCS/
 **Commit 3:** Cleanup
 - Removed temporary analysis script
 
-**Result:** Clean history with 3 well-documented commits
+**Commit 4:** Documentation reorganization
+- Created docs/operations/ and docs/research/ subdirectories
+- Moved 5 operational guides to operations/
+- Moved 2 research reports to research/
+- Created comprehensive docs/README.md navigation guide
+- Added operations/README.md and research/README.md
+
+**Result:** Clean history with 4 well-documented commits
 
 ---
 
