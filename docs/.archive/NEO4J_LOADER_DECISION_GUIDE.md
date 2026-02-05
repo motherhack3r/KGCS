@@ -23,11 +23,13 @@ python src/etl/rdf_to_neo4j.py --ttl tmp/combined-pipeline.ttl --database neo4j-
 ```
 
 **What happens:**
+
 - Loads entire 22GB file into memory using rdflib
 - Single transaction to Neo4j
 - Slow parsing (rdflib processes all triples)
 
 **Results:**
+
 - ⏱️ Time: 2-4 hours
 - 💾 Memory: 16+ GB
 - ❌ Slow parsing phase
@@ -49,22 +51,26 @@ python src/etl/rdf_to_neo4j.py \
 ```
 
 **What happens:**
+
 - Uses streaming Turtle parser (no rdflib Graph)
 - Processes line-by-line, constant memory
 - Single transaction with batched writes
 
 **Results:**
+
 - ⏱️ Time: 1-2 hours
 - 💾 Memory: 8-12 GB
 - ✅ Fast parsing
 - ⚠️ Still significant memory use
 
-**When to use:** 
+**When to use:**
+
 - You have 12+ GB RAM
 - Want simplicity
 - Time is important
 
 **Execution:**
+
 ```bash
 python src/etl/rdf_to_neo4j.py \
     --ttl tmp/combined-pipeline.ttl \
@@ -92,11 +98,13 @@ python src/etl/rdf_to_neo4j.py \
 ```
 
 **What happens:**
+
 - Parse entire TTL, extract only nodes (rdf:type + literals)
 - Skip all relationships
 - Much smaller working set
 
 **Results:**
+
 - ⏱️ Time: 15-30 minutes
 - 💾 Memory: 3-4 GB
 - ✅ Nodes created
@@ -114,11 +122,13 @@ python src/etl/rdf_to_neo4j.py \
 ```
 
 **What happens:**
+
 - Parse TTL again, extract only relationships (URI objects)
 - Nodes already exist, just link them
 - Highly optimized for relationships
 
 **Results:**
+
 - ⏱️ Time: 30-60 minutes
 - 💾 Memory: 2-4 GB
 - ✅ Relationships created
@@ -149,18 +159,21 @@ python src/etl/rdf_to_neo4j.py \
 ```
 
 **What happens:**
+
 - Processes 50k unique subjects per chunk
 - Each chunk = separate Neo4j commit
 - ~50 chunks total for 2.5M nodes
 
 **Results:**
+
 - ⏱️ Time: 2-3 hours
 - 💾 Memory: 2-4 GB per chunk
 - ✅ Very low memory
 - ❌ Many Neo4j commits (slower)
 - ⚠️ Complex to resume if interrupted
 
-**When to use:** 
+**When to use:**
+
 - RAM < 4 GB
 - System is very constrained
 - Can afford slower load time
@@ -180,12 +193,14 @@ python src/etl/rdf_to_neo4j.py \
 ```
 
 **What it does:**
+
 - Parses entire file (validates format)
 - Extracts all nodes and relationships
 - Shows statistics
 - **Does NOT write to Neo4j**
 
 **Results:**
+
 - ⏱️ Time: 5-10 minutes
 - 💾 Memory: Depends on approach, but non-destructive
 - ✅ Validates data integrity
@@ -242,7 +257,8 @@ START: Need to load 22GB TTL to Neo4j
 
 **For your 22.42 GB combined-pipeline.ttl:**
 
-### Immediate Action:
+### Immediate Action
+
 ```bash
 # Validate first (non-destructive)
 python src/etl/rdf_to_neo4j.py \
@@ -253,6 +269,7 @@ python src/etl/rdf_to_neo4j.py \
 ```
 
 ### Then: Two-Phase Load (Best Balance)
+
 ```bash
 # Phase 1: Nodes (15-30 min)
 python src/etl/rdf_to_neo4j.py \
@@ -273,6 +290,7 @@ python src/etl/rdf_to_neo4j.py \
 ```
 
 **Why:**
+
 - ✅ 10-100x faster than default (uses --fast-parse)
 - ✅ 45-90 minutes total
 - ✅ Low memory (4-8 GB, safe for most systems)
@@ -281,6 +299,7 @@ python src/etl/rdf_to_neo4j.py \
 - ✅ Optimal Neo4j transaction handling
 
 **Expected Outcome:**
+
 - ~2.5M nodes in Neo4j
 - ~26M relationships in Neo4j
 - Complete causal chain: CVE→CWE→CAPEC→Technique→Defense

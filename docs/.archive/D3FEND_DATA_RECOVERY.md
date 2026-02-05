@@ -3,6 +3,7 @@
 ## Problem Summary
 
 **Data Loss:** D3FEND raw data was ~41 MB but produced TTL was only 0.02 MB
+
 - Raw file: `data/d3fend/raw/d3fend-full-mappings.json` (41.88 MB) was being completely ignored
 - Only `d3fend.json` (4.29 MB) was being processed
 - **Result:** 97.6% of defensive technique relationships were missing
@@ -108,6 +109,7 @@ for idx, d3fend_file in enumerate(d3fend_files):
 ## Results
 
 ### Before Fix
+
 ```
 pipeline-stage5-d3fend.ttl: 0.02 MB
   - d3fend.json only: 124 triples
@@ -115,6 +117,7 @@ pipeline-stage5-d3fend.ttl: 0.02 MB
 ```
 
 ### After Fix
+
 ```
 pipeline-stage5-d3fend.ttl: 0.43 MB  (21.5x larger)
   - d3fend.json: 124 triples
@@ -123,6 +126,7 @@ pipeline-stage5-d3fend.ttl: 0.43 MB  (21.5x larger)
 ```
 
 ### Impact
+
 - ✅ Recovered 3,109 defensive technique relationships
 - ✅ Complete mapping of D3FEND techniques to ATT&CK techniques
 - ✅ Enables defense layer queries in RAG (see technique → find defenses)

@@ -17,7 +17,9 @@ Multi-file ETL transformers were **overwriting** output files instead of **appen
 Two issues found:
 
 ### Issue 1: File Open Mode
+
 All transformers were opening output files in **write mode** (`'w'`):
+
 ```python
 # WRONG - overwrites file each time
 with open(output_path, 'w', encoding='utf-8') as out_f:
@@ -25,7 +27,9 @@ with open(output_path, 'w', encoding='utf-8') as out_f:
 ```
 
 ### Issue 2: CAR Glob Pattern
+
 CAR stage was using incomplete glob pattern that only matched subdirectory files:
+
 ```python
 # WRONG - only matches data/car/raw/**/*.yaml, not data/car/raw/*.yaml
 car_files = find_files("data/car/raw/**/*.yaml", recursive=True)
@@ -36,6 +40,7 @@ car_files = find_files("data/car/raw/**/*.yaml", recursive=True)
 ### 1. Added Append Mode Support to All Multi-File ETLs
 
 **Files Modified:**
+
 - `src/etl/etl_cpe.py` - Added `--append` flag and `append` parameter
 - `src/etl/etl_cpematch.py` - Added `--append` flag and `append` parameter  
 - `src/etl/etl_cve.py` - Added `--append` flag and `append` parameter
@@ -44,6 +49,7 @@ car_files = find_files("data/car/raw/**/*.yaml", recursive=True)
 - `src/etl/ttl_writer.py` - Updated to support `append=True/False` parameter
 
 **Pattern Applied:**
+
 ```python
 # Each ETL now supports:
 parser.add_argument('--append', action='store_true', 
@@ -63,6 +69,7 @@ with open(output_path, mode, encoding='utf-8') as out_f:
 **File Modified:** `scripts/run_all_etl.py`
 
 **Pattern Applied:**
+
 ```python
 # For each multi-file stage:
 output_file = "tmp/pipeline-stage-X.ttl"
@@ -83,6 +90,7 @@ for i, input_file in enumerate(input_files):
 **File Modified:** `scripts/run_all_etl.py` (CAR Stage)
 
 **Pattern Applied:**
+
 ```python
 # Match both root-level and subdirectory files
 car_files = find_files("data/car/raw/*.yaml", recursive=False)
@@ -93,12 +101,14 @@ car_files = sorted(list(set(car_files)))  # Deduplicate
 ## Verification
 
 **Manual Test (CAR Single File):**
+
 ```bash
 python -m src.etl.etl_car --input data/car/raw/analytics_CAR-2013-01-002.yaml --output tmp/test_car.ttl
 # Result: ✅ 2,243 bytes of valid RDF output
 ```
 
 **Test with Multiple Files (Append Mode):**
+
 ```bash
 # File 1: Create new output
 python -m src.etl.etl_car --input file1.yaml --output output.ttl
@@ -115,6 +125,7 @@ python -m src.etl.etl_car --input file3.yaml --output output.ttl --append
 ## Pipeline Execution
 
 **Full ETL with All Fixes:**
+
 - Terminal: `6d6f9260-7f34-448e-8329-9f2d7b96aa6e`
 - Started: Feb 3, 2026
 - Log: `logs/etl_with_append_fixes.log`
@@ -146,4 +157,3 @@ python -m src.etl.etl_car --input file3.yaml --output output.ttl --append
 - ✅ Glob patterns with `**` need explicit `recursive=True` parameter
 - ✅ Pipeline script should clean output before stage (remove old file) to ensure fresh start
 - ✅ Apply consistent append pattern across all multi-file transformers for maintainability
-

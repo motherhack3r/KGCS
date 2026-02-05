@@ -15,6 +15,7 @@
 ```
 
 **What it does:**
+
 - Uses streaming TTL parser instead of rdflib Graph.parse()
 - Processes triples line-by-line without loading entire file into memory
 - Significantly faster for large files (22GB file would take hours with rdflib)
@@ -32,19 +33,23 @@
 ```
 
 **Current Config:**
+
 - Node batch size: 1000 per write
 - Relationship batch size: 1000 per write
 
 **For 22GB file:**
+
 - Nodes: ~2.5M → ~2,500 batches (1000 each)
 - Relationships: ~26M → ~26,000 batches (1000 each)
 
 **Optimization:**
+
 - Increase node batch size: **2000-3000** (more nodes per transaction)
 - Keep relationship batch size lower: **1000-2000** (relationships are cheaper to write)
 - Reason: Relationships dominate the load time, nodes are smaller
 
 **Recommendation:**
+
 ```bash
 --batch-size 2000 --rel-batch-size 1500
 ```
@@ -60,22 +65,26 @@
 ```
 
 **What it does:**
+
 - Splits TTL processing into chunks (one chunk per commit)
 - Good for memory management and resumable loads
 - Default (0) = load entire file in one transaction
 
 **For 22GB file:**
+
 - Estimate: ~2.5M nodes across all chunks
 - Chunks of 50k = ~50 chunks
 - Each chunk: ~500k-1M relationships
 
 **Trade-offs:**
+
 - ✅ Lower memory per chunk
 - ✅ Resumable if process dies
 - ❌ More Neo4j commits (slower overall)
 - ❌ Only beneficial if memory is constrained
 
 **Recommendation:** Use only if you hit memory limits:
+
 ```bash
 --chunk-size 100000             # Larger chunks for 22GB
 ```
@@ -106,12 +115,14 @@ python src/etl/rdf_to_neo4j.py \
 ```
 
 **Benefits:**
+
 - ✅ Phase 1 is ~10x faster (no relationships = less data)
 - ✅ Phase 2 can be optimized for relationship writes
 - ✅ Better error isolation (if phase 1 succeeds, nodes are there)
 - ✅ Can pause/resume between phases
 
 **Estimated Time:**
+
 - Phase 1 (nodes only): 15-30 minutes
 - Phase 2 (relationships): 30-60 minutes
 - Total: 45-90 minutes (vs 2-4 hours single pass)
@@ -129,12 +140,14 @@ python src/etl/rdf_to_neo4j.py \
 ```
 
 **What it does:**
+
 - Parses entire TTL without writing to Neo4j
 - Shows extraction statistics (node counts, relationship counts)
 - Validates file format and data structure
 - With heartbeat: Shows progress every 30 seconds
 
 **Benefits:**
+
 - ✅ Validates file before 2-hour load
 - ✅ Gives accurate statistics
 - ✅ Tests if system can handle memory requirements
@@ -157,6 +170,7 @@ python src/etl/rdf_to_neo4j.py \
 ```
 
 **Expected Output:**
+
 ```
 Loading RDF from combined-pipeline.ttl...
    ... parsing (30s elapsed) ...
@@ -202,6 +216,7 @@ python src/etl/rdf_to_neo4j.py \
 ## Parameter Combinations for Different Scenarios
 
 ### **Scenario 1: Time-Critical (Fastest)**
+
 ```bash
 python src/etl/rdf_to_neo4j.py \
     --ttl tmp/combined-pipeline.ttl \
@@ -210,9 +225,11 @@ python src/etl/rdf_to_neo4j.py \
     --rel-batch-size 3000 \
     --database neo4j-2026-02-03
 ```
+
 **Time:** ~1-2 hours | **Memory:** ~8-16 GB
 
 ### **Scenario 2: Memory-Constrained (Safest)**
+
 ```bash
 python src/etl/rdf_to_neo4j.py \
     --ttl tmp/combined-pipeline.ttl \
@@ -222,9 +239,11 @@ python src/etl/rdf_to_neo4j.py \
     --rel-batch-size 500 \
     --database neo4j-2026-02-03
 ```
+
 **Time:** ~2-3 hours | **Memory:** ~2-4 GB per chunk
 
 ### **Scenario 3: Balanced (Recommended)**
+
 ```bash
 python src/etl/rdf_to_neo4j.py \
     --ttl tmp/combined-pipeline.ttl \
@@ -241,6 +260,7 @@ python src/etl/rdf_to_neo4j.py \
     --batch-size 1 \
     --database neo4j-2026-02-03
 ```
+
 **Time:** 45-90 minutes total | **Memory:** ~4-8 GB | **Reliability:** ✅ Highest
 
 ---
@@ -275,7 +295,8 @@ python src/etl/rdf_to_neo4j.py \
 
 ## Testing Commands
 
-### Quick Test (validation only, no load):
+### Quick Test (validation only, no load)
+
 ```bash
 python src/etl/rdf_to_neo4j.py \
     --ttl tmp/combined-pipeline.ttl \
@@ -284,7 +305,8 @@ python src/etl/rdf_to_neo4j.py \
     --parse-heartbeat-seconds 30
 ```
 
-### Full Test on Small Sample:
+### Full Test on Small Sample
+
 ```bash
 # Create 10GB sample for testing
 head -150000000 tmp/combined-pipeline.ttl > tmp/combined-pipeline-sample.ttl
@@ -328,6 +350,7 @@ python src/etl/rdf_to_neo4j.py \
 ```
 
 **Expected Results:**
+
 - ✅ Dry run validates data structure
 - ✅ Phase 1 creates 2.5M nodes in 15-30 min
 - ✅ Phase 2 creates 26M relationships in 30-60 min
@@ -338,6 +361,7 @@ python src/etl/rdf_to_neo4j.py \
 ---
 
 **Notes:**
+
 - All parameters shown with `--fast-parse` (CRITICAL for 22GB file)
 - Times are estimates; actual depends on system CPU/disk/network (if remote Neo4j)
 - Two-phase approach provides best reliability + speed trade-off

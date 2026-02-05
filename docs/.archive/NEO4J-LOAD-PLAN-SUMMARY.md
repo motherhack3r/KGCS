@@ -11,6 +11,7 @@
 A comprehensive, step-by-step plan has been created to load the **enhanced CAPEC knowledge graph** into a fresh, versioned Neo4j database.
 
 **What You Get:**
+
 - ✅ Production-quality knowledge graph with 2.5M+ nodes
 - ✅ 26M+ relationships across all 9 security standards
 - ✅ Complete causal chain: CVE → CWE → CAPEC → ATT&CK
@@ -25,6 +26,7 @@ A comprehensive, step-by-step plan has been created to load the **enhanced CAPEC
 **Location:** [NEO4J-LOAD-PLAN-2026-02-03-V1.0.md](NEO4J-LOAD-PLAN-2026-02-03-V1.0.md)
 
 The plan is comprehensive and production-ready with:
+
 - ✅ 595 lines of detailed instructions
 - ✅ 5 executable phases with time estimates
 - ✅ Success criteria and validation steps
@@ -37,9 +39,11 @@ The plan is comprehensive and production-ready with:
 ## 🚀 5-Phase Execution Roadmap
 
 ### Phase 1: Preparation (10-15 minutes)
+
 **What:** Verify Neo4j access, pipeline file, and configuration
 
 **Steps:**
+
 1. Check Neo4j connectivity
 2. Verify TTL file (1.91 GB)
 3. Validate environment variables
@@ -50,9 +54,11 @@ The plan is comprehensive and production-ready with:
 ---
 
 ### Phase 2: Pre-Load Validation (15-20 minutes)
+
 **What:** Ensure pipeline is valid before loading
 
 **Steps:**
+
 1. SHACL validation sample
 2. RDF parsing test
 3. Document expected statistics
@@ -63,9 +69,11 @@ The plan is comprehensive and production-ready with:
 ---
 
 ### Phase 3: Database Setup (5-10 minutes)
+
 **What:** Create fresh database ready to receive data
 
 **Steps:**
+
 1. Create new database: `neo4j-2026-02-03-v1.0-enhanced-capec`
 2. Configure memory/performance settings
 3. Verify database accessibility
@@ -76,9 +84,11 @@ The plan is comprehensive and production-ready with:
 ---
 
 ### Phase 4: Data Load (30-60 minutes)
+
 **What:** Load 1.91 GB TTL pipeline into Neo4j
 
 **Steps:**
+
 1. Execute: `python src/etl/rdf_to_neo4j.py --ttl ... --database ...`
 2. Monitor progress (40k-100k triples/minute)
 3. Capture detailed logs
@@ -89,9 +99,11 @@ The plan is comprehensive and production-ready with:
 ---
 
 ### Phase 5: Post-Load Validation (20-30 minutes)
+
 **What:** Verify data integrity and causal chain
 
 **Steps:**
+
 1. Extract graph statistics to JSON
 2. Verify complete causal chain (5+ samples)
 3. Test CAPEC→Technique links (expect 271)
@@ -175,6 +187,7 @@ Before starting Phase 1, verify:
 - [ ] Recent backup of existing databases (if any)
 
 **Quick Check:**
+
 ```bash
 # Test Neo4j connection
 python -c "from neo4j import GraphDatabase; print('✅ Neo4j ready')"
@@ -193,12 +206,14 @@ pip list | grep -E "rdflib|neo4j"
 **If something goes wrong:**
 
 **Option 1: Drop and retry**
+
 ```python
 # Drop the database and try again
 session.run('DROP DATABASE `neo4j-2026-02-03-v1.0-enhanced-capec` FORCE')
 ```
 
 **Option 2: Restore backup**
+
 ```bash
 # If you have previous database backup
 neo4j-admin databases copy neo4j-2026-01-29 neo4j-restore
@@ -230,6 +245,7 @@ After successful load:
    - Store backup location in documentation
 
 5. **Commit documentation**
+
    ```bash
    git add NEO4J-LOAD-REPORT-*.md
    git commit -m "docs: add Neo4j load report - 2026-02-03 v1.0"
@@ -240,10 +256,12 @@ After successful load:
 ## ✨ Key Features of This Graph
 
 ✅ **Authoritative Alignment**
+
 - Every node maps to official ID (cveId, cweId, capecId, techniqueId, etc.)
 - Complete provenance tracking
 
 ✅ **Complete Causal Chain**
+
 - CVE → PlatformConfiguration (affected platforms)
 - CVE → CWE (root cause)
 - CWE → CAPEC (attack pattern)
@@ -251,11 +269,13 @@ After successful load:
 - Technique → Defenses (mitigations, detections, deceptions)
 
 ✅ **Enhanced CAPEC Coverage**
+
 - 271 CAPEC→Technique relationships (vs 36 previously)
 - 8.5x improvement covering 31.2% of all techniques
 - Based on dual extraction: MITRE STIX + CAPEC XML Taxonomy
 
 ✅ **All 9 Standards Integrated**
+
 - CPE (Platform identification)
 - CVE (Vulnerability disclosure)
 - CWE (Root weakness)
@@ -267,6 +287,7 @@ After successful load:
 - ENGAGE (Strategic engagement)
 
 ✅ **Production-Ready**
+
 - Proper indexes for performance
 - Unique ID constraints for data integrity
 - Query-optimized schema

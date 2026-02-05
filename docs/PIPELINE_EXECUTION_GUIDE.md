@@ -42,6 +42,7 @@ pip list | grep rdflib
 ```
 
 **Required Environment:**
+
 - Conda: `E:\DEVEL\software\miniconda\envs\metadata`
 - Python: 3.9+
 - Key packages: rdflib, requests, pyshacl, neo4j
@@ -55,6 +56,7 @@ python -m src.ingest.download_manager
 ```
 
 **What it downloads:**
+
 - **CPE** (NVD): 15 chunks → `data/cpe/raw/` (~100 MB)
 - **CPEMatch** (NVD): 55 chunks → `data/cpematch/raw/` (~125 MB)
 - **CVE** (NVD): 25 files (2002-2026) → `data/cve/raw/` (~10 MB)
@@ -67,6 +69,7 @@ python -m src.ingest.download_manager
 - **ENGAGE** (MITRE): 12 JSON files → `data/engage/raw/` (~0.2 MB)
 
 **Output:**
+
 - Manifests: `data/{standard}/manifest.json` (checksums, timestamps)
 - Log: `logs/download_manager.log`
 
@@ -141,6 +144,7 @@ python scripts/run_all_etl.py
     - Strategic engagement concepts
 
 **Output:**
+
 - 10 TTL files in `tmp/pipeline-stage*.ttl`
 - Total: ~28.6 GB of RDF data
 - Log: `logs/etl_run_*.log`
@@ -158,6 +162,7 @@ python scripts/combine_ttl_pipeline.py
 ```
 
 **Output:**
+
 - `tmp/combined-pipeline.ttl` (~28.6 GB)
 - Log: `logs/combine_ttl.log`
 
@@ -176,12 +181,14 @@ python src/etl/rdf_to_neo4j.py --ttl tmp/combined-pipeline.ttl
 ```
 
 **Processing:**
+
 - Batch writes (default 1000 nodes per batch)
 - Creates label-specific indexes on `uri` field
 - Applies graph constraints (uniqueness)
 - Cross-standard relationship linking
 
 **Output:**
+
 - Neo4j graph with ~2.5M nodes and 26M relationships
 - Constraints and indexes applied
 - Success message with statistics
@@ -192,7 +199,7 @@ python src/etl/rdf_to_neo4j.py --ttl tmp/combined-pipeline.ttl
 
 After complete pipeline execution:
 
-```
+```text
 tmp/pipeline-stage1-cpe.ttl            2,472.68 MB   (15 chunks)
 tmp/pipeline-stage2-cpematch.ttl      18,689.66 MB   (55 chunks)
 tmp/pipeline-stage3-cve.ttl            1,792.56 MB   (25 files)
@@ -212,23 +219,27 @@ tmp/combined-pipeline.ttl            ~28,600 MB   (all stages combined)
 ## Troubleshooting
 
 ### Download Fails
+
 - Check network connectivity
 - Review `logs/download_manager.log` for failed URLs
 - Manually download from NVD/MITRE and place in `data/{standard}/raw/`
 
 ### ETL Produces Small Output
+
 - Check if input files exist: `Get-ChildItem data/{standard}/raw/`
 - Review `logs/etl_run_*.log` for errors
 - Verify file format matches expected (JSON, XML, YAML)
 - For multi-file stages, ensure append mode is working (check for increasing file sizes)
 
 ### Neo4j Load Fails
+
 - Verify Neo4j service is running: `neo4j status`
 - Check database connection: `neo4j console`
 - Review Neo4j logs: `logs/neo4j.log`
 - Ensure combined TTL file is valid: `python -c "from rdflib import Graph; g = Graph(); g.parse('tmp/combined-pipeline.ttl', format='turtle'); print(f'Loaded {len(g)} triples')"`
 
 ### Out of Memory
+
 - Reduce batch size: `--batch-size 500` instead of 1000
 - Process stages individually instead of combined
 - Increase system RAM or virtual memory
@@ -237,7 +248,7 @@ tmp/combined-pipeline.ttl            ~28,600 MB   (all stages combined)
 
 The pipeline follows a strict 10-stage architecture with immutable ontologies:
 
-```
+```text
 Stage 1-10 (ETL):     Raw data → RDF Turtle
    ↓ (Combine)
 Single TTL file:      All 10 stages merged
@@ -248,6 +259,7 @@ Causal chain:         CVE → CWE → CAPEC → Technique → Defense
 ```
 
 **Key Invariants:**
+
 1. Each stage produces idempotent output (same input → same output)
 2. Multi-file stages use append mode to accumulate data
 3. Header deduplication when combining files
