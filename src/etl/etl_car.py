@@ -258,6 +258,7 @@ def main() -> int:
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
     parser.add_argument("--validate", action="store_true", help="Run SHACL validation on output")
     parser.add_argument("--shapes", default="docs/ontology/shacl/car-shapes.ttl", help="SHACL shapes file")
+    parser.add_argument("--append", action="store_true", help="Append to output file instead of overwriting")
     args = parser.parse_args()
 
     input_files: List[str] = []
@@ -291,7 +292,7 @@ def main() -> int:
         transformer.transform(analytics)
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)
         print(f"Writing RDF to {args.output}...")
-        write_graph_turtle_lines(transformer.graph, args.output)
+        write_graph_turtle_lines(transformer.graph, args.output, include_prefixes=not args.append, append=args.append)
 
         if args.validate:
             print("\nRunning SHACL validation...")

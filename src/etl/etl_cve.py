@@ -406,6 +406,7 @@ def main():
     parser.add_argument('--cpematch-input', help='Optional CPEMatch JSON file/dir to resolve criteria -> matchCriteriaId')
     parser.add_argument('--validate', action='store_true', help='Validate output with SHACL')
     parser.add_argument('--shapes', help='SHACL shapes file (defaults to docs/ontology/shacl/cve-shapes.ttl)')
+    parser.add_argument('--append', action='store_true', help='Append to existing output file instead of overwriting')
     args = parser.parse_args()
 
     paths = []
@@ -431,8 +432,11 @@ def main():
         criteria_to_match_id = build_cpematch_index(args.cpematch_input)
         print(f"CPEMatch criteria index size: {len(criteria_to_match_id)}", file=sys.stderr)
 
-    with open(args.output, 'w', encoding='utf-8') as out_f:
-        out_f.write(header)
+    mode = 'a' if args.append else 'w'
+    with open(args.output, mode, encoding='utf-8') as out_f:
+        # Only write header on new files (not when appending)
+        if not args.append:
+            out_f.write(header)
         for p in paths:
             print('Processing', p, file=sys.stderr)
             for item in iter_vulnerabilities_from_file(p):

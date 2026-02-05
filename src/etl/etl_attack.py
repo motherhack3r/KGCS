@@ -226,6 +226,7 @@ def main():
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
     parser.add_argument("--validate", action="store_true", help="Run SHACL validation on output")
     parser.add_argument("--shapes", default="docs/ontology/shacl/attack-shapes.ttl", help="SHACL shapes file")
+    parser.add_argument("--append", action="store_true", help="Append to existing output file instead of overwriting")
     args = parser.parse_args()
 
     if not os.path.exists(args.input):
@@ -242,7 +243,7 @@ def main():
 
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
     print(f"Writing RDF to {args.output}...")
-    write_graph_turtle_lines(graph, args.output)
+    write_graph_turtle_lines(graph, args.output, include_prefixes=not args.append, append=args.append)
 
     if args.validate:
         print("\nRunning SHACL validation...")

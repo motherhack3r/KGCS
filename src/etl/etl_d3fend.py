@@ -51,6 +51,12 @@ class D3FENDtoRDFTransformer:
             self._transform_jsonld(json_data.get("@graph", []))
             return self.graph
 
+        # SPARQL full mappings format (results -> bindings)
+        if "results" in json_data and isinstance(json_data.get("results"), dict):
+            bindings = json_data.get("results", {}).get("bindings", [])
+            self._transform_sparql_bindings(bindings)
+            return self.graph
+
         raise ValueError("Unsupported D3FEND JSON format")
 
     def _transform_jsonld(self, graph_items: list) -> None:
@@ -82,6 +88,36 @@ class D3FENDtoRDFTransformer:
 
             if definition:
                 self.graph.add((technique_node, self.SEC.description, Literal(definition, datatype=XSD.string)))
+
+    def _transform_sparql_bindings(self, bindings: list) -> None:
+        """Transform SPARQL full mappings (D3FEND to ATT&CK) into mitigates relationships."""
+        for binding in bindings:
+            if not isinstance(binding, dict):
+                continue
+            
+            # Extract D3FEND technique label and ATT&CK technique ID from SPARQL results
+            def_tech_label = None
+            if "def_tech_label" in binding and isinstance(binding["def_tech_label"], dict):
+                def_tech_label = binding["def_tech_label"].get("value")
+            
+            att_tech_id = None
+            if "off_tech_id" in binding and isinstance(binding["off_tech_id"], dict):
+                att_tech_id = binding["off_tech_id"].get("value")
+            
+            # If we have both, create a mitigates relationship
+            if def_tech_label and att_tech_id:
+                # Normalize IDs
+                att_id_full = f"{att_tech_id}" if str(att_tech_id).startswith("T") else f"T{att_tech_id}"
+                
+                # Use def_tech_label to create URI (convert to proper D3FEND ID-like format)
+                # D3FEND uses CamelCase for technique names in URIs
+                def_tech_uri = "".join(word.capitalize() for word in def_tech_label.split())
+                
+                def_tech_node = URIRef(f"{self.EX}deftech/{def_tech_uri}")
+                att_node = URIRef(f"{self.EX}technique/{att_id_full}")
+                
+                # Add the mitigates relationship
+                self.graph.add((def_tech_node, self.SEC.mitigates, att_node))
 
     def _is_defensive_technique(self, item: dict) -> bool:
         types = item.get("@type")
@@ -207,6 +243,7 @@ def main():
     parser = argparse.ArgumentParser(description="ETL: MITRE D3FEND JSON -> RDF Turtle")
     parser.add_argument("--input", "-i", required=True, help="Input D3FEND JSON file")
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
+    parser.add_argument("--append", action='store_true', help='Append to existing output file (suppress headers)')
     parser.add_argument('--validate', action='store_true', help='Validate output with SHACL')
     parser.add_argument('--shapes', help='SHACL shapes file (defaults to docs/ontology/shacl/d3fend-shapes.ttl)')
     
@@ -226,7 +263,7 @@ def main():
         transformer.transform(json_data)
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)
         print(f"Writing RDF to {args.output}...")
-        write_graph_turtle_lines(transformer.graph, args.output)
+        write_graph_turtle_lines(transformer.graph, args.output, include_prefixes=not args.append, append=args.append)
         
         # SHACL validation
         if args.validate:

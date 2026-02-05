@@ -136,10 +136,14 @@ def process_product(cpe: dict, out_f) -> int:
     return written
 
 
-def transform_cpe(input_data, output_path):
+def transform_cpe(input_data, output_path, append=False):
     """
     Transforms CPE JSON data (as loaded dict) to Turtle and writes to output_path.
     Returns the number of triples written.
+    Args:
+        input_data: CPE JSON dictionary
+        output_path: Output file path
+        append: If True, append to existing file; if False, overwrite
     """
     header = (
         "@prefix sec: <https://example.org/sec/core#> .\n"
@@ -148,8 +152,11 @@ def transform_cpe(input_data, output_path):
     )
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     total = 0
-    with open(output_path, 'w', encoding='utf-8') as out_f:
-        out_f.write(header)
+    mode = 'a' if append else 'w'
+    with open(output_path, mode, encoding='utf-8') as out_f:
+        # Only write header on new files (not when appending)
+        if not append:
+            out_f.write(header)
         for product in input_data.get('products', []):
             cpe = product.get('cpe', {})
             total += process_product(cpe, out_f)
@@ -160,6 +167,7 @@ def main():
     parser = argparse.ArgumentParser(description='Streaming ETL: NVD CPE JSON → Turtle')
     parser.add_argument('--input', '-i', required=True, help='Input CPE API JSON file(s), glob, or directory')
     parser.add_argument('--output', '-o', required=True, help='Output Turtle file')
+    parser.add_argument('--append', action='store_true', help='Append to existing output file instead of overwriting')
     args = parser.parse_args()
 
     import glob
@@ -180,13 +188,15 @@ def main():
     print(f"Loading CPE JSON from {args.input}...")
     print("Transforming and writing streaming Turtle...")
     total = 0
-    for input_file in input_files:
+    for idx, input_file in enumerate(input_files):
         if not os.path.exists(input_file):
             print(f"Warning: {input_file} not found, skipping")
             continue
         with open(input_file, 'r', encoding='utf-8') as f:
             cpe_json = json.load(f)
-            total += transform_cpe(cpe_json, args.output)
+            # Append to output after first file (or if --append flag is set)
+            should_append = args.append or idx > 0
+            total += transform_cpe(cpe_json, args.output, append=should_append)
     print(f'Done — triples written: {total}', file=sys.stderr)
 
 

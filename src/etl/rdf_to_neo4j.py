@@ -19,8 +19,13 @@ from dotenv import load_dotenv
 from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
+# Add project root to path for imports
+project_root = Path(__file__).parent.parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
 # Load configuration
-env_devel_path = Path(__file__).parent.parent.parent / ".env.devel"
+env_devel_path = project_root / ".env.devel"
 load_dotenv(env_devel_path)
 
 from src.config import neo4j_config

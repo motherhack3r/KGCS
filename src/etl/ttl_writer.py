@@ -48,16 +48,25 @@ def _format_term(term) -> str | None:
     return None
 
 
-def write_graph_turtle_lines(graph: Graph, output_path: str, include_prefixes: bool = True) -> None:
-    """Write a graph to a Turtle file with one triple per line and full URIs."""
+def write_graph_turtle_lines(graph: Graph, output_path: str, include_prefixes: bool = True, append: bool = False) -> None:
+    """Write a graph to a Turtle file with one triple per line and full URIs.
+    
+    Args:
+        graph: RDF graph to write
+        output_path: Output Turtle file path
+        include_prefixes: Write RDF prefixes if True (only on new files)
+        append: Append to file if True, overwrite if False
+    """
     # Group triples by subject
     from collections import defaultdict
     triples_by_subject = defaultdict(list)
     for subj, pred, obj in graph:
         triples_by_subject[subj].append((subj, pred, obj))
 
-    with open(output_path, "w", encoding="utf-8") as fh:
-        if include_prefixes:
+    mode = "a" if append else "w"
+    with open(output_path, mode, encoding="utf-8") as fh:
+        # Only write prefixes on new files or when explicitly requested and not appending
+        if include_prefixes and not append:
             fh.write(PREFIXES)
         # Write triples grouped by subject, sorted for determinism
         for subj in sorted(triples_by_subject, key=lambda s: str(s)):

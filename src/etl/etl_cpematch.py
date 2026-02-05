@@ -118,10 +118,14 @@ def process_match_string(ms: dict, out_f, platform_cache: set) -> int:
             written += 1
     # If no includes, skip emitting this PlatformConfiguration
     return written
-def transform_cpematch(input_data, output_path):
+def transform_cpematch(input_data, output_path, append=False):
     """
     Transforms CPEMatch JSON data (as loaded dict) to Turtle and writes to output_path.
     Returns the number of triples written.
+    Args:
+        input_data: CPEMatch JSON dictionary
+        output_path: Output file path
+        append: If True, append to existing file; if False, overwrite
     """
     header = (
         "@prefix sec: <https://example.org/sec/core#> .\n"
@@ -131,8 +135,11 @@ def transform_cpematch(input_data, output_path):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     total = 0
     platform_cache = set()
-    with open(output_path, 'w', encoding='utf-8') as out_f:
-        out_f.write(header)
+    mode = 'a' if append else 'w'
+    with open(output_path, mode, encoding='utf-8') as out_f:
+        # Only write header on new files (not when appending)
+        if not append:
+            out_f.write(header)
         # Support both 'matches' (old) and 'matchStrings' (NVD 2.3)
         match_list = input_data.get('matches')
         if match_list is None:
@@ -142,13 +149,12 @@ def transform_cpematch(input_data, output_path):
             total += process_match_string(ms, out_f, platform_cache)
     return total
 
-    return written
-
 
 def main():
     parser = argparse.ArgumentParser(description='Streaming Transform NVD CPEMatch JSON to Turtle')
     parser.add_argument('--input', required=True, help='Input CPEMatch JSON file(s) or glob')
     parser.add_argument('--output', required=True, help='Output Turtle file')
+    parser.add_argument('--append', action='store_true', help='Append to existing output file instead of overwriting')
     args = parser.parse_args()
 
     import glob
@@ -163,13 +169,15 @@ def main():
     )
 
     total = 0
-    for input_file in input_files:
+    for idx, input_file in enumerate(input_files):
         print(f"Loading CPEMatch JSON from {input_file}...")
         with open(input_file, 'r', encoding='utf-8') as f:
             try:
                 cpematch_json = json.load(f)
                 print(f"Transforming {os.path.basename(input_file)}...")
-                total += transform_cpematch(cpematch_json, args.output)
+                # Append to output after first file (or if --append flag is set)
+                should_append = args.append or idx > 0
+                total += transform_cpematch(cpematch_json, args.output, append=should_append)
             except json.JSONDecodeError as e:
                 print(f"Error parsing {input_file}: {e}", file=sys.stderr)
                 sys.exit(1)
