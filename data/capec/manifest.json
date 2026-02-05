@@ -1,0 +1,13 @@
+{
+  "files": [
+    {
+      "filename": "capec_latest.xml",
+      "size_bytes": 3849998,
+      "sha256": "70279a2dff0cb0ad79e546adb07828335a704ad5210e047e09e986172fc9e34d",
+      "url": "https://capec.mitre.org/data/xml/capec_latest.xml",
+      "status": "success"
+    }
+  ],
+  "last_updated": "2026-02-03T15:10:59.063141",
+  "source": "https://capec.mitre.org/"
+}
