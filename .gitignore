@@ -1,5 +1,7 @@
 data/*/raw/
 /data/*/raw/
+data/*/samples/
+/data/*/samples/
 
 data/cpe/raw/
 data/cve/raw/
@@ -69,3 +71,4 @@ tmp/
 
 # Large generated reports
 artifacts/shacl-report-cpematch-summary.json
+tmp.7z
