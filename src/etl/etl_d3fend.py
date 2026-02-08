@@ -136,6 +136,15 @@ class D3FENDtoRDFTransformer:
                 if isinstance(sub, dict) and sub.get("@id") == "d3f:DefensiveTechnique":
                     return True
 
+        # Some D3FEND JSON-LD represents techniques as owl:Class entries with
+        # properties like d3f:d3fend-id or d3f:definition rather than explicit
+        # type annotations. Treat presence of d3fend-id or definition as an
+        # indicator of a defensive technique.
+        if item.get("d3f:d3fend-id") or item.get("d3f:d3fendId"):
+            return True
+        if item.get("d3f:definition") or item.get("d3f:attack-id"):
+            return True
+
         return False
 
     def _get_value(self, value):

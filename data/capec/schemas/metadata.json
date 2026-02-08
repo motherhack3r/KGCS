@@ -4,12 +4,12 @@
       "content_type": "text/xml",
       "etag": null,
       "last_modified": "Thu, 21 Oct 2021 18:18:42 GMT",
-      "saved_at": "2026-02-08T01:23:09Z",
+      "saved_at": "2026-02-08T03:10:17Z",
       "sha256": "7b6a8e95c966a51eb6844af5025614844534512daaff761ea46f585d3e6a80a0",
       "size_bytes": 51306,
       "source": "capec.mitre.org",
       "url": "https://capec.mitre.org/data/xsd/ap_schema_latest.xsd"
     }
   },
-  "generated_at": "2026-02-08T01:23:09Z"
+  "generated_at": "2026-02-08T03:10:17Z"
 }

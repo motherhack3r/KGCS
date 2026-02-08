@@ -105,8 +105,9 @@ def main():
     print("="*70)
     attack_files = find_files("data/attack/raw/*-attack.json")
     if attack_files:
-        # Clean up output file before processing
-        output_attack = "tmp/pipeline-stage4-attack.ttl"
+        # Save attack output to standard samples directory
+        output_attack = "data/attack/samples/pipeline-stage4-attack.ttl"
+        Path(output_attack).parent.mkdir(parents=True, exist_ok=True)
         if os.path.exists(output_attack):
             os.remove(output_attack)
         for i, attack_file in enumerate(attack_files):
@@ -119,7 +120,8 @@ def main():
     print("\n" + "="*70)
     print("STAGE 5: D3FEND (Detection, Denial, and Disruption Framework)")
     print("="*70)
-    output_file = "tmp/pipeline-stage5-d3fend.ttl"
+    output_file = "data/d3fend/samples/pipeline-stage5-d3fend.ttl"
+    Path(output_file).parent.mkdir(parents=True, exist_ok=True)
     if os.path.exists(output_file):
         os.remove(output_file)
     
@@ -138,13 +140,28 @@ def main():
     print("\n" + "="*70)
     print("STAGE 6: CAPEC (Common Attack Pattern Expression and Enumeration)")
     print("="*70)
-    run_etl("etl_capec", "data/capec/raw/capec_latest.xml", "tmp/pipeline-stage6-capec.ttl")
+    output_capec = "data/capec/samples/pipeline-stage6-capec.ttl"
+    Path(output_capec).parent.mkdir(parents=True, exist_ok=True)
+    run_etl("etl_capec", "data/capec/raw/capec_latest.xml", output_capec)
     
     # Stage 7: CWE
     print("\n" + "="*70)
     print("STAGE 7: CWE (Common Weakness Enumeration)")
     print("="*70)
-    run_etl("etl_cwe", "data/cwe/raw/cwec_v4.19.1.xml", "tmp/pipeline-stage7-cwe.ttl")
+    output_cwe = "data/cwe/samples/pipeline-stage7-cwe.ttl"
+    Path(output_cwe).parent.mkdir(parents=True, exist_ok=True)
+    # Support variable CWE filenames (e.g. cwe_latest.xml)
+    cwe_inputs = find_files("data/cwe/raw/*.xml")
+    if cwe_inputs:
+        # If multiple CWE XMLs are present, process the first one only
+        if len(cwe_inputs) > 1:
+            print(f"[WARN] Multiple CWE files found; using first: {cwe_inputs[0]}")
+        # Ensure fresh write
+        if os.path.exists(output_cwe):
+            os.remove(output_cwe)
+        run_etl("etl_cwe", cwe_inputs[0], output_cwe)
+    else:
+        print("[SKIP] No CWE XML file found in data/cwe/raw/")
     
     # Stage 8: CAR (Cyber Analytics Repository - all analytics, data_model, and sensors)
     print("\n" + "="*70)
@@ -155,8 +172,9 @@ def main():
     car_files += find_files("data/car/raw/**/*.yaml", recursive=True)
     car_files = sorted(list(set(car_files)))  # Deduplicate
     if car_files:
-        # Clean up output file before processing
-        output_car = "tmp/pipeline-stage8-car.ttl"
+        # Save CAR output to standard samples directory
+        output_car = "data/car/samples/pipeline-stage8-car.ttl"
+        Path(output_car).parent.mkdir(parents=True, exist_ok=True)
         if os.path.exists(output_car):
             os.remove(output_car)
         # Process all CAR files, appending to same output file after first
@@ -174,13 +192,17 @@ def main():
     print("\n" + "="*70)
     print("STAGE 9: SHIELD (Deception Techniques)")
     print("="*70)
-    run_etl("etl_shield", "data/shield/raw", "tmp/pipeline-stage9-shield.ttl")
+    output_shield = "data/shield/samples/pipeline-stage9-shield.ttl"
+    Path(output_shield).parent.mkdir(parents=True, exist_ok=True)
+    run_etl("etl_shield", "data/shield/raw", output_shield)
     
     # Stage 10: ENGAGE
     print("\n" + "="*70)
     print("STAGE 10: ENGAGE (Strategic Engagement Framework)")
     print("="*70)
-    run_etl("etl_engage", "data/engage/raw", "tmp/pipeline-stage10-engage.ttl")
+    output_engage = "data/engage/samples/pipeline-stage10-engage.ttl"
+    Path(output_engage).parent.mkdir(parents=True, exist_ok=True)
+    run_etl("etl_engage", "data/engage/raw", output_engage)
     
     print("\n" + "="*70)
     print("ETL PIPELINE COMPLETE")
