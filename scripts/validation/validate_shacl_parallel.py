@@ -41,7 +41,7 @@ def run_job(job, workers, chunk_size, timeout):
     cmd = [
         sys.executable,
         "-u",
-        "scripts/validate_shacl_stream.py",
+        os.path.join("scripts","validation","validate_shacl_stream.py"),
         "--data", data_path,
         "--shapes", shapes_path,
         "--workers", str(workers),

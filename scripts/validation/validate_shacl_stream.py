@@ -24,10 +24,15 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 def _validate_chunk(tmp_path: str, shapes: str, out_dir: str, per_call_timeout: int, idx: int):
     # Dynamically import run_validator from src.core.validation
+    # Resolve the repository root and locate src/core/validation.py reliably
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    validation_path = os.path.join(repo_root, 'src', 'core', 'validation.py')
     spec = importlib.util.spec_from_file_location(
         "src.core.validation",
-        os.path.join(os.path.dirname(__file__), "..", "src", "core", "validation.py")
+        validation_path
     )
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Failed to create module spec for {validation_path}")
     validation = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(validation)
     start = time.time()
