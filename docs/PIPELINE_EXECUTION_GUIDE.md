@@ -1,6 +1,6 @@
 # KGCS Data Pipeline: Complete Setup & Execution Guide
 
-**Last Updated:** February 3, 2026  
+**Last Updated:** February 8, 2026  
 **Status:** Production Ready (Phase 3 MVP)
 
 ## Quick Start (5 Steps)
@@ -21,7 +21,7 @@ python scripts/run_all_etl.py
 python scripts/combine_ttl_pipeline.py
 
 # Step 5: Load to Neo4j
-python src/etl/rdf_to_neo4j.py --database neo4j-2026-02-03 --ttl tmp/combined-pipeline.ttl
+python src/etl/rdf_to_neo4j.py --database neo4j-2026-02-08 --ttl tmp/combined-pipeline.ttl
 ```
 
 ## Detailed Steps

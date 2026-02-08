@@ -276,7 +276,28 @@ class StandardsDownloader:
         capec_dir.mkdir(parents=True, exist_ok=True)
         
         output_file = capec_dir / "capec_latest.xml"
+        # Primary: official MITRE CAPEC XML
         await self.download_file(APIEndpoints.MITRE_CAPEC, output_file, "MITRE CAPEC")
+
+        # Secondary: MITRE CTI STIX JSON (useful for ATT&CK mappings)
+        stix_url = getattr(APIEndpoints, 'MITRE_CTISTIX_CAPEC', None)
+        if stix_url:
+            stix_output = capec_dir / "stix-capec.json"
+            try:
+                await self.download_file(stix_url, stix_output, "MITRE CAPEC STIX")
+            except Exception:
+                logger.warning("Failed to download CTI STIX CAPEC JSON from %s", stix_url)
+
+        # Also fetch the CAPEC XSD into a schemas/ directory for validation/reference
+        xsd_url = getattr(APIEndpoints, 'MITRE_CAPEC_XSD', None)
+        if xsd_url:
+            schema_dir = self.output_dir / "capec" / "schemas"
+            schema_dir.mkdir(parents=True, exist_ok=True)
+            schema_output = schema_dir / Path(xsd_url).name
+            try:
+                await self.download_file(xsd_url, schema_output, "MITRE CAPEC XSD")
+            except Exception:
+                logger.warning("Failed to download CAPEC XSD from %s", xsd_url)
     
     # MITRE D3FEND
     async def download_mitre_d3fend(self):

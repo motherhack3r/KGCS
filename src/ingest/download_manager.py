@@ -219,6 +219,26 @@ class NVDCPEDownloader(StandardDownloader):
         if file_meta:
             manifest['files'] = [file_meta]
             manifest['source'] = 'https://nvd.nist.gov/feeds/json/cpe/2.0/'
+
+            # Also attempt to download CPE JSON schema for reference
+            try:
+                schema_url = getattr(__import__('src.ingest.ingest_config', fromlist=['APIEndpoints']).APIEndpoints, 'NIST_CPE_SCHEMA', None)
+                if schema_url:
+                    schema_dir = self.raw_dir.parent / 'schemas'
+                    schema_dir.mkdir(parents=True, exist_ok=True)
+                    schema_filename = Path(schema_url).name
+                    # Download into raw dir first, then move into the top-level schemas dir
+                    tmp_meta = self.download_file(schema_url, schema_filename, extract_zip=False)
+                    if tmp_meta:
+                        src = self.raw_dir / schema_filename
+                        dst = schema_dir / schema_filename
+                        try:
+                            src.replace(dst)
+                        except Exception:
+                            logger.debug('Could not move downloaded CPE schema to schemas dir')
+            except Exception:
+                logger.debug('Could not fetch CPE schema')
+
             self.save_manifest(manifest)
         
         return {'standard': 'cpe', 'files': [file_meta] if file_meta else []}
@@ -246,6 +266,25 @@ class NVDCPEMatchDownloader(StandardDownloader):
                 manifest['cpematch_files'] = []
             manifest['cpematch_files'] = [file_meta]
             manifest['source'] = 'https://nvd.nist.gov/feeds/json/cpematch/2.0/'
+
+            # Attempt to download CPEmatch JSON schema for reference
+            try:
+                schema_url = getattr(__import__('src.ingest.ingest_config', fromlist=['APIEndpoints']).APIEndpoints, 'NIST_CPEMATCH_SCHEMA', None)
+                if schema_url:
+                    schema_dir = self.raw_dir.parent / 'schemas'
+                    schema_dir.mkdir(parents=True, exist_ok=True)
+                    schema_filename = Path(schema_url).name
+                    tmp_meta = self.download_file(schema_url, schema_filename, extract_zip=False)
+                    if tmp_meta:
+                        src = self.raw_dir / schema_filename
+                        dst = schema_dir / schema_filename
+                        try:
+                            src.replace(dst)
+                        except Exception:
+                            logger.debug('Could not move downloaded CPEmatch schema to schemas dir')
+            except Exception:
+                logger.debug('Could not fetch CPEmatch schema')
+
             self.save_manifest(manifest)
         
         return {'standard': 'cpematch', 'files': [file_meta] if file_meta else []}
@@ -279,6 +318,48 @@ class NVDCVEDownloader(StandardDownloader):
         manifest['source'] = 'https://nvd.nist.gov/feeds/json/cve/2.0/'
         self.save_manifest(manifest)
         
+        # Attempt to download CVE JSON schema for reference
+        try:
+            schema_url = getattr(__import__('src.ingest.ingest_config', fromlist=['APIEndpoints']).APIEndpoints, 'NIST_CVE_SCHEMA', None)
+            if schema_url:
+                schema_dir = self.raw_dir.parent / 'schemas'
+                schema_dir.mkdir(parents=True, exist_ok=True)
+                schema_filename = Path(schema_url).name
+                tmp_meta = self.download_file(schema_url, schema_filename, extract_zip=False)
+                if tmp_meta:
+                    src = self.raw_dir / schema_filename
+                    dst = schema_dir / schema_filename
+                    try:
+                        src.replace(dst)
+                    except Exception:
+                        logger.debug('Could not move downloaded CVE schema to schemas dir')
+
+                    # Parse the downloaded CVE schema to find referenced CVSS schema URLs and download them
+                    try:
+                        import re
+                        # Read the schema file text and search for remote schema URLs
+                        text = dst.read_text(encoding='utf-8', errors='ignore')
+                        urls = set(re.findall(r"https?://[A-Za-z0-9./_-]+\.json", text))
+                        # Filter for CVSS related schemas hosted under csrc.nist.gov
+                        cvss_urls = [u for u in urls if 'csrc.nist.gov' in u and 'cvss' in u]
+                        for cu in cvss_urls:
+                            try:
+                                fname = Path(cu).name
+                                tmp_meta2 = self.download_file(cu, fname, extract_zip=False)
+                                if tmp_meta2:
+                                    src2 = self.raw_dir / fname
+                                    dst2 = schema_dir / fname
+                                    try:
+                                        src2.replace(dst2)
+                                    except Exception:
+                                        logger.debug('Could not move downloaded CVSS schema to schemas dir: %s', fname)
+                            except Exception:
+                                logger.debug('Failed to download CVSS schema %s', cu)
+                    except Exception:
+                        logger.debug('Failed to parse CVE schema for CVSS refs')
+        except Exception:
+            logger.debug('Could not fetch CVE schema')
+
         return {'standard': 'cve', 'files': files_metadata}
 
 
@@ -302,6 +383,24 @@ class MITRECWEDownloader(StandardDownloader):
         if file_meta:
             manifest['files'] = [file_meta]
             manifest['source'] = 'https://cwe.mitre.org/'
+            # Attempt to download CWE XSD schema into data/cwe/schemas
+            try:
+                schema_url = getattr(__import__('src.ingest.ingest_config', fromlist=['APIEndpoints']).APIEndpoints, 'MITRE_CWE_XSD', None)
+                if schema_url:
+                    schema_dir = self.raw_dir.parent / 'schemas'
+                    schema_dir.mkdir(parents=True, exist_ok=True)
+                    schema_filename = Path(schema_url).name
+                    tmp_meta = self.download_file(schema_url, schema_filename, extract_zip=False)
+                    if tmp_meta:
+                        src = self.raw_dir / schema_filename
+                        dst = schema_dir / schema_filename
+                        try:
+                            src.replace(dst)
+                        except Exception:
+                            logger.debug('Could not move downloaded CWE schema to schemas dir')
+            except Exception:
+                logger.debug('Could not fetch CWE schema')
+
             self.save_manifest(manifest)
         
         return {'standard': 'cwe', 'files': [file_meta] if file_meta else []}

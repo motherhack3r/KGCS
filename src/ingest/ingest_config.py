@@ -18,6 +18,10 @@ class APIEndpoints:
     
     # MITRE CAPEC - single file
     MITRE_CAPEC = "https://capec.mitre.org/data/xml/capec_latest.xml"
+    # MITRE CTI STIX CAPEC JSON (MITRE/CTI repository)
+    MITRE_CTISTIX_CAPEC = "https://raw.githubusercontent.com/mitre/cti/refs/heads/master/capec/2.1/stix-capec.json"
+    # MITRE CAPEC XSD schema
+    MITRE_CAPEC_XSD = "https://capec.mitre.org/data/xsd/ap_schema_latest.xsd"
     
     # MITRE CAR - GitHub API endpoint for analytics directory
     MITRE_CAR_API = "https://api.github.com/repos/mitre-attack/car/contents/analytics"
@@ -33,6 +37,8 @@ class APIEndpoints:
     
     # MITRE CWE - single zip file
     MITRE_CWE = "https://cwe.mitre.org/data/xml/cwec_latest.xml.zip"
+    # MITRE CWE XSD schema
+    MITRE_CWE_XSD = "https://cwe.mitre.org/data/xsd/cwe_schema_latest.xsd"
     
     # MITRE SHIELD - multiple JSON files
     MITRE_SHIELD = [
@@ -49,12 +55,18 @@ class APIEndpoints:
     
     # NIST CPE - single zip file
     NIST_CPE = "https://nvd.nist.gov/feeds/json/cpe/2.0/nvdcpe-2.0.zip"
+    # NIST CPE JSON Schema
+    NIST_CPE_SCHEMA = "https://csrc.nist.gov/schema/nvd/api/2.0/cpe_api_json_2.0.schema"
     
     # NIST CPE Match - single zip file
     NIST_CPEMATCH = "https://nvd.nist.gov/feeds/json/cpematch/2.0/nvdcpematch-2.0.zip"
+    # NIST CPEmatch JSON Schema
+    NIST_CPEMATCH_SCHEMA = "https://csrc.nist.gov/schema/nvd/api/2.0/cpematch_api_json_2.0.schema"
     
     # NIST CVE - base URL, files are generated per year
     NIST_CVE_BASE = "https://nvd.nist.gov/feeds/json/cve/2.0/"
+    # NIST CVE JSON Schema
+    NIST_CVE_SCHEMA = "https://csrc.nist.gov/schema/nvd/api/2.0/cve_api_json_2.0.schema"
     # MITRE D3FEND - ontology base URL and default filenames
     MITRE_D3FEND_BASE = "https://d3fend.mitre.org/ontologies/d3fend/1.3.0/"
     MITRE_D3FEND_FILES = [
