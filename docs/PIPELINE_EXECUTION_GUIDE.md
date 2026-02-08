@@ -42,6 +42,42 @@ python scripts/combine_ttl_pipeline.py
 python src/etl/rdf_to_neo4j.py --database neo4j-2026-02-08 --ttl tmp/combined-pipeline.ttl
 ```
 
+Recommended safe two-step load (nodes first, then relationships)
+
+Prepare DB and load nodes-only (creates DB + indexes):
+
+```bash
+python src/etl/rdf_to_neo4j.py \
+   --ttl tmp/combined-pipeline.ttl \
+   --chunk-size 20000 \
+   --fast-parse \
+   --progress-newline \
+   --parse-heartbeat-seconds 30 \
+   --db-version 2026-02-08 \
+   --reset-db \
+   --nodes-only
+```
+
+After nodes complete, load relationships-only (do NOT use `--reset-db`):
+
+```bash
+python src/etl/rdf_to_neo4j.py \
+   --ttl tmp/combined-pipeline.ttl \
+   --chunk-size 20000 \
+   --fast-parse \
+   --progress-newline \
+   --parse-heartbeat-seconds 30 \
+   --db-version 2026-02-08 \
+   --rel-batch-size 1000 \
+   --rels-only
+```
+
+Notes:
+
+- `--workers` is used only for dry-run estimation and is ignored for actual writes.
+- Run a `--dry-run --workers 4` first to estimate label and relationship counts without writing.
+- Verify node counts after the nodes-only step before running the relationships-only step.
+
 ### PowerShell Example (Windows)
 
 ```powershell
