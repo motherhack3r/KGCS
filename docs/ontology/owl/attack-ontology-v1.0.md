@@ -1,96 +1,113 @@
-# ATT&CK Ontology v1.0 — Field-by-Field Mapping
+# ATT&CK Ontology v1.0 — Consolidated Documentation
 
-This document summarizes the mapping between MITRE ATT&CK STIX 2.1 fields and the KGCS ontology for ATT&CK, as required for ETL emission and SHACL validation.
+This file consolidates the high-level ontology description and the field-by-field ETL mapping for MITRE ATT&CK used by KGCS.
 
-## Core Entity Types
+## Overview
 
-- **Technique** (attack-pattern)
-- **SubTechnique** (attack-pattern, with x_mitre_is_subtechnique=true)
-- **Tactic** (x-mitre-tactic)
-- **Group** (intrusion-set)
-- **Software** (malware/tool)
-- **DataSource** (x-mitre-data-source)
-- **DataComponent** (x-mitre-data-component)
-- **Mitigation** (course-of-action)
+Scope: Core ATT&CK entities and relationships as defined by the MITRE ATT&CK framework. This ontology is a frozen representation of the ATT&CK data model, suitable for knowledge graphs, RAG, and reasoning.
 
-## Field-by-Field Mapping
+## Ontology — Classes
 
-| STIX Field / Property             | Ontology Property / Node           | Notes                                            |
-|-----------------------------------|------------------------------------|--------------------------------------------------|
-| id (e.g., attack-pattern--*)      | attackId                           | Always present; Txxxx or Sxxxx for subtechniques |
-| name                              | rdfs:label                         |                                                  |
-| description                       | dct:description                    |                                                  |
-| x_mitre_tactic_type               | kgcs:tacticType                    | For tactics only                                 |
-| x_mitre_is_subtechnique           | kgcs:isSubtechnique                | Boolean; true for subtechniques                  |
-| x_mitre_platforms                 | kgcs:platform                      | List of platforms                                |
-| x_mitre_data_sources              | kgcs:dataSource                    | List; links to DataSource nodes                  |
-| x_mitre_data_components           | kgcs:dataComponent                 | List; links to DataComponent nodes               |
-| x_mitre_version                   | kgcs:version                       |                                                  |
-| x_mitre_detection                 | kgcs:detection                     | Free text detection guidance                     |
-| x_mitre_permissions_required      | kgcs:permissionsRequired           | List                                             |
-| x_mitre_effective_permissions     | kgcs:effectivePermissions          | List                                             |
-| x_mitre_network_requirements      | kgcs:networkRequirements           | List                                             |
-| x_mitre_contributors              | kgcs:contributor                   | List                                             |
-| x_mitre_deprecated                | kgcs:deprecated                    | Boolean                                          |
-| created                           | dct:created                        | Timestamp                                        |
-| modified                          | dct:modified                       | Timestamp                                        |
-| external_references[].external_id | attackId (Txxxx/Sxxxx/Gxxxx/Mxxxx) | Used for stable IDs                              |
-| kill_chain_phases[].phase_name    | kgcs:tactic                        | Maps to Tactic node                              |
-| object_marking_refs               | kgcs:markingRef                    | List                                             |
-| revoked                           | kgcs:revoked                       | Boolean                                          |
+| Class | Description |
+| ----- | ----------- |
+| `Tactic` | High‑level objective of an adversary (e.g., Initial Access, Execution). |
+| `Technique` | Concrete adversary action that achieves a tactic. |
+| `SubTechnique` | Granular variation of a technique. |
+| `Group` | Adversary group or intrusion set. |
+| `Software` | Malware or tool used by a group. |
+| `DataSource` | Source of observable data. |
+| `DataComponent` | Specific data element within a data source. |
+| `Asset` | Targeted asset or system. |
 
-## Relationships
+## Relationships (Ontology)
 
-| STIX Relationship Type     | Ontology Edge           | Source → Target                      |
-| -------------------------  | ----------------------- | ------------------------------------ |  
-| subtechnique-of            | kgcs:subtechniqueOf     | SubTechnique → Technique             |
-| part-of (tactic)           | kgcs:partOf             | Technique → Tactic                   |
-| uses (group/software)      | kgcs:usedBy             | Technique → Group/Software           |
-| mitigates                  | kgcs:mitigatedBy        | Technique → Mitigation               |
-| detected-by                | kgcs:detectedBy         | Technique → DataSource/DataComponent |
-| requires                   | kgcs:requires           | Technique → DataSource/DataComponent |
-| related-to                 | kgcs:related            | Technique ↔ Technique                |
+| Relationship | Source | Target | Notes |
+| ------------ | ------ | ------ | ----- |
+| `contains` | Tactic | Technique | Tactic contains techniques |
+| `subtechnique_of` | SubTechnique | Technique | Subtechnique specialization |
+| `uses` | Group/Software | Technique | Usage relationship |
+| `detects` | DataComponent | Technique | Detection capability |
+| `targets` | Technique | Asset | Targeting relationship |
+
+## SHACL — High Level
+
+```turtle
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ex: <http://example.org/attck#> .
+
+ex:TacticShape a sh:NodeShape ;
+    sh:targetClass ex:Tactic ;
+    sh:property [ sh:path ex:contains ; sh:class ex:Technique ; sh:minCount 1 ] .
+
+ex:TechniqueShape a sh:NodeShape ;
+    sh:targetClass ex:Technique ;
+    sh:property [ sh:path ex:subtechnique_of ; sh:class ex:Technique ; sh:maxCount 1 ] .
+
+ex:GroupShape a sh:NodeShape ;
+    sh:targetClass ex:Group ;
+    sh:property [ sh:path ex:uses ; sh:class ex:Software ] ;
+    sh:property [ sh:path ex:uses ; sh:class ex:Technique ] .
+```
+
+## Field-by-Field Mapping (ETL)
+
+This section maps STIX/ATT&CK fields to KGCS ontology properties used by the ETL.
+
+| STIX Field / Property | Ontology Property / Node | Notes |
+| --------------------- | ------------------------ | ----- |
+| id | attackId | attack-pattern id (Txxxx) |
+| name | rdfs:label | |
+| description | dct:description | |
+| x_mitre_tactic_type | kgcs:tacticType | |
+| x_mitre_is_subtechnique | kgcs:isSubtechnique | Boolean |
+| x_mitre_platforms | kgcs:platform | List |
+| x_mitre_data_sources | kgcs:dataSource | Links to DataSource nodes |
+| x_mitre_data_components | kgcs:dataComponent | Links to DataComponent nodes |
+| x_mitre_detection | kgcs:detection | Free text |
+| created / modified | dct:created / dct:modified | Timestamps |
 
 ## Node Types and IDs
 
-- **Technique**: attack-pattern, external_id = Txxxx
-- **SubTechnique**: attack-pattern, x_mitre_is_subtechnique=true, external_id = Txxxx.y
-- **Tactic**: x-mitre-tactic, external_id = TAxxxx
-- **Group**: intrusion-set, external_id = Gxxxx
-- **Software**: malware/tool, external_id = Sxxxx/Mxxxx
-- **Mitigation**: course-of-action, external_id = Mxxxx
-- **DataSource**: x-mitre-data-source, external_id = DSxxxx
-- **DataComponent**: x-mitre-data-component, external_id = DCxxxx
+- Technique: attack-pattern, external_id = Txxxx
+- SubTechnique: attack-pattern with x_mitre_is_subtechnique=true
+- Tactic: x-mitre-tactic (TAxxxx)
+- Group: intrusion-set (Gxxxx)
+- Software: malware/tool (Sxxxx/Mxxxx)
 
-## Required for ETL Emission
+## Example Instances
 
-- All above fields and relationships must be emitted as RDF triples
-- All IDs must be preserved (attackId, tacticId, groupId, etc.)
-- Relationships must use correct ontology edge (see above)
-- Subtechnique/technique/tactic hierarchy must be preserved
-- DataSource/DataComponent links must be explicit
-- Deprecated/revoked/markingRef must be handled
+```turtle
+ex:TA0001 a ex:Tactic ; ex:contains ex:T1059 .
+ex:T1059 a ex:Technique ; ex:subtechnique_of ex:T1059.001 ; ex:targets ex:WindowsServer .
+ex:T1059.001 a ex:SubTechnique ; ex:subtechnique_of ex:T1059 .
+ex:GroupA a ex:Group ; ex:uses ex:MalwareX , ex:T1059 .
+```
 
-## Example: Technique Node
+## Usage Notes
 
-- attackId: T1059
-- rdfs:label: "Command and Scripting Interpreter"
-- dct:description: "Adversaries may abuse command and script interpreters..."
-- kgcs:platform: ["Windows", "Linux", ...]
-- kgcs:partOf: TA0002 (Execution)
-- kgcs:subtechniqueOf: T1059 (if subtechnique)
-- kgcs:mitigatedBy: M1047 (Mitigation)
-- kgcs:detectedBy: DS0017 (DataSource)
-- kgcs:usedBy: G0010 (Group)
-
-## Example: Relationships
-
-- T1059 kgcs:partOf TA0002
-- T1059.001 kgcs:subtechniqueOf T1059
-- T1059 kgcs:mitigatedBy M1047
-- T1059 kgcs:detectedBy DS0017
-- T1059 kgcs:usedBy G0010
+- Frozen ontology: add instances rather than changing canonical classes.
+- Preserve official ATT&CK IDs (Txxxx, TAxxxx).
 
 ---
 
-This mapping should be used to audit and patch src/etl/etl_attack.py for full ontology conformance.
+## References
+
+- MITRE ATT&CK: <https://attack.mitre.org/>
+- STIX 2.1: <https://docs.oasis-open.org/cti/stix/v2.1/overview.html>
+
+---
+
+## Official Sources
+
+- **MITRE ATT&CK STIX repository (raw):**
+  - Enterprise: <https://github.com/mitre/cti/raw/refs/heads/master/enterprise-attack/enterprise-attack.json>
+  - Mobile: <https://github.com/mitre/cti/raw/refs/heads/master/mobile-attack/mobile-attack.json>
+  - ICS: <https://github.com/mitre/cti/raw/refs/heads/master/ics-attack/ics-attack.json>
+  - PRE-ATT&CK: <https://github.com/mitre/cti/raw/refs/heads/master/pre-attack/pre-attack.json>
+- **MITRE CTI-STIX JSON SCHEMA:** <https://github.com/oasis-open/cti-stix2-json-schemas/tree/master/schemas>
+- **SHACL shapes:** [attack-shapes.ttl](../shacl/attack-shapes.ttl)
+- **ETL transformer:** [etl_attck.py](../../scripts/etl_attck.py) (STIX → RDF)
+
+Notes: Use the official ATT&CK STIX repository for canonical IDs and timestamps; snapshots should include the commit SHA in `.meta.json`.
+ 
+- **Local schemas / samples:** `data/attack/schemas/`, `data/attack/raw/`, `data/attack/samples/` (preferred for offline snapshots)

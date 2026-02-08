@@ -163,6 +163,32 @@ def transform_cpe(input_data, output_path, append=False):
     return total
 
 
+class CPEtoRDFTransformer:
+    """Compatibility adapter: provides a `transform()` method that returns an rdflib Graph.
+
+    This preserves the existing file-writing ETL functions while offering the
+    class-based API expected by the unit tests and other pipeline harnesses.
+    """
+    def transform(self, input_data):
+        import tempfile
+        from rdflib import Graph
+
+        # Write to a temporary Turtle file using the existing transformer
+        tmp = tempfile.NamedTemporaryFile(delete=False, suffix='.ttl')
+        tmp_path = tmp.name
+        tmp.close()
+        try:
+            transform_cpe(input_data, tmp_path, append=False)
+            g = Graph()
+            g.parse(tmp_path, format='turtle')
+            return g
+        finally:
+            try:
+                os.unlink(tmp_path)
+            except Exception:
+                pass
+
+
 def main():
     parser = argparse.ArgumentParser(description='Streaming ETL: NVD CPE JSON → Turtle')
     parser.add_argument('--input', '-i', required=True, help='Input CPE API JSON file(s), glob, or directory')

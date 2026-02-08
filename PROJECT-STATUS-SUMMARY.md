@@ -158,9 +158,9 @@ Phase 3 MVP is complete. Next steps:
 
 **Acceptance Tests (Measurable)**  
 
-- CAR ETL: Running `python -m src.etl.etl_car --input data/car/raw --output tmp/pipeline-stage8-car.ttl --validate` produces a Turtle file and a SHACL report with `conforms: true`.
-- Neo4j load: Running `python src/etl/rdf_to_neo4j.py --ttl tmp/pipeline-stage1-cpe.ttl --batch-size 1000` completes with success banner and no exceptions.
-- Constraints: After load, `MATCH (n:Platform) RETURN count(n)` and `SHOW CONSTRAINTS` confirm uniqueness constraints exist for core IDs.
+- ETL for one standard (example with CAR): Running `python -m src.etl.etl_car --input data/car/raw --output tmp/pipeline-stage8-car.ttl --validate` produces a Turtle file and a SHACL report with `conforms: true`.
+- Neo4j load (example with CPE): Running `python src/etl/rdf_to_neo4j.py --ttl tmp/pipeline-stage1-cpe.ttl --batch-size 1000` completes with success banner and no exceptions.
+- Constraints (example with Platform): After load, `MATCH (n:Platform) RETURN count(n)` and `SHOW CONSTRAINTS` confirm uniqueness constraints exist for core IDs.
 - End-to-end: Running `python scripts/validate_etl_pipeline_order.py --load-neo4j --batch-size 1000` loads combined pipeline TTLs and results in a non-empty graph (nodes and relationships) with no load errors.
 - CI: A workflow run uploads artifacts for SHACL summaries and logs, and fails the job if any summary report has `conforms: false`.
 

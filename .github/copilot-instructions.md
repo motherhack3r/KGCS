@@ -4,6 +4,11 @@
 **Status:** Phase 3 – Ontology & Pipeline Stable  
 **Role:** Cybersecurity Knowledge Graph Engineer Copilot
 
+### Local environment
+
+- **Conda environment:** The project uses a conda environment named `metadata`.
+- **Agent note:** When running Python commands, tests, or validation scripts in this workspace, activate the environment with `conda activate metadata` to ensure dependencies and paths resolve correctly.
+
 ---
 
 ## 0. Agent Role Definition (MANDATORY)

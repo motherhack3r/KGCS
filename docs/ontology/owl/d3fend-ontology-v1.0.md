@@ -32,3 +32,39 @@
 - Handles both MITRE JSON and JSON-LD (@graph) input formats.
 - Each DefensiveTechnique is uniquely identified and linked to mitigated ATT&CK techniques, parent/child techniques, and references.
 - Tags and status should be emitted as properties if present.
+
+## SHACL — High Level
+
+```turtle
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix d3f: <http://example.org/d3fend#> .
+@prefix attck: <http://example.org/attck#> .
+
+d3f:DefensiveTechniqueShape a sh:NodeShape ;
+  sh:targetClass d3f:DefensiveTechnique ;
+  sh:property [ sh:path d3f:mitigates ; sh:class attck:Technique ] .
+```
+
+## Example Instance
+
+```turtle
+d3f:D3FEND-001 a d3f:DefensiveTechnique ;
+  rdfs:label "Firewall Rule" ;
+  d3f:mitigates attck:T1059 .
+```
+
+## References
+
+- <https://d3fend.mitre.org/>
+
+---
+
+## Sources
+
+- **Official D3FEND JSON:** https://raw.githubusercontent.com/d3fend/d3fend/master/d3fend.json
+- **SHACL shapes:** [d3fend-shapes.ttl](../shacl/d3fend-shapes.ttl)
+- **ETL transformer:** [etl_d3fend.py](../../scripts/etl_d3fend.py)
+
+ - **Local schemas / samples:** `data/d3fend/schemas/`, `data/d3fend/raw/`, `data/d3fend/samples/`
+
+Notes: Use the official D3FEND JSON as the authoritative source; include the commit SHA in snapshot metadata.

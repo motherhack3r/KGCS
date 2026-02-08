@@ -1,51 +1,92 @@
-# CWE Ontology v1.0: Field-by-Field Mapping
+# CWE Ontology v1.0 — Consolidated Documentation
 
-## Core Classes & Properties
+This document merges the high-level CWE ontology description with the ETL field mapping required by KGCS.
 
-| Ontology Field            | CWE JSON/XML Field(s)           | Notes / Example Value                        |
-| ------------------------- | ------------------------------- | -------------------------------------------- |
-| `cwe:Weakness`            | Weakness                        | Main node for each CWE entry                 |
-| `cwe:Category`            | Category                        | Grouping node (not always present)           |
-| `cwe:View`                | View                            | Taxonomy view (not always present)           |
-| `cwe:cwe_id`              | ID                              | "CWE-79"                                     |
-| `cwe:name`                | Name                            | "Improper Neutralization of Input..."        |
-| `cwe:description`         | Description                     | Text                                         |
-| `cwe:abstractionLevel`    | WeaknessAbstraction/Abstraction | "Base", "Class", "Variant", "Pillar"         |
-| `cwe:status`              | Status                          | "Stable", "Draft", etc.                      |
-| `cwe:hasPlatform`         | ApplicablePlatforms             | List of platforms (OS, language, etc.)       |
-| `cwe:hasConsequence`      | Consequences                    | List of consequence nodes                    |
-| `cwe:hasDetectionMethod`  | DetectionMethods                | List of detection method nodes               |
-| `cwe:hasMitigation`       | PotentialMitigations            | List of mitigation nodes                     |
-| `cwe:hasReference`        | References                      | List of reference nodes                      |
-| `cwe:memberOf`            | MemberOf                        | Category/View membership                     |
+## Overview
+
+Scope: Core CWE entities and relationships as defined by the CWE standard. Frozen ontology for KGCS use.
+
+## Classes
+
+| Class | Description |
+| ----- | ----------- |
+| `Weakness` | Individual weakness (e.g., CWE-121) |
+| `Category` | Grouping of weaknesses |
+| `View` | Taxonomy view |
+| `Platform` | Target platform |
+| `DetectionMethod` | Technique used to detect a weakness |
+| `Mitigation` | Recommended mitigation |
+| `Consequence` | Impact of exploitation |
 
 ## Relationships
 
-| Ontology Property         | CWE JSON/XML Field(s)         | Notes                                        |
-|-------------------------- |------------------------------ |--------------------------------------------- |
-| `cwe:childOf`             | RelatedWeaknesses (ChildOf)   | Hierarchy                                    |
-| `cwe:parentOf`            | RelatedWeaknesses (ParentOf)  | Hierarchy                                    |
-| `cwe:peerOf`              | RelatedWeaknesses (PeerOf)    | Sibling relationship                         |
-| `cwe:canPrecede`          | RelatedWeaknesses (CanPrecede)| Sequential                                   |
-| `cwe:canFollow`           | RelatedWeaknesses (CanFollow) | Sequential                                   |
-| `cwe:requires`            | RelatedWeaknesses (Requires)  | Prerequisite                                 |
-| `cwe:requiredBy`          | RelatedWeaknesses (RequiredBy)| Prerequisite                                 |
-| `cwe:canAlsoBe`           | RelatedWeaknesses (CanAlsoBe) | Alternative classification                   |
-| `cwe:startsWith`          | RelatedWeaknesses (StartsWith)| Sequence start                               |
-| `cwe:mapsToCAPEC`         | Related_Attack_Patterns       | CAPEC mappings                               |
-| `cwe:mapsToVulnerability` | Related_Vulnerabilities       | CVE mappings                                 |
-| `cwe:mapsToWASC`          | Related_Weaknesses (WASC)     | WASC mapping                                 |
-| `cwe:mapsToOWASP`         | Related_Weaknesses (OWASP)    | OWASP mapping                                |
-| `cwe:mapsToCERT`          | Related_Weaknesses (CERT)     | CERT mapping                                 |
-| `cwe:mapsToPCI`           | Related_Weaknesses (PCI)      | PCI mapping                                  |
-| `cwe:mapsToNVD`           | Related_Weaknesses (NVD)      | NVD mapping                                  |
-| `cwe:mapsToCISQ`          | Related_Weaknesses (CISQ)     | CISQ mapping                                 |
+| Relationship | Source | Target |
+| ------------ | ------ | ------ |
+| `childOf` | Weakness | Weakness |
+| `parentOf` | Weakness | Weakness |
+| `peerOf` | Weakness | Weakness |
+| `mapsTo` | Weakness | CAPEC/CVE/OWASP/etc. |
+| `hasMitigation` | Weakness | Mitigation |
 
-## Node Types for Consequence, Mitigation, DetectionMethod, Reference
+## SHACL — High Level
 
-| Ontology Class            | CWE JSON/XML Field(s)         | Properties                                   |
-|-------------------------- |------------------------------ |--------------------------------------------- |
-| `cwe:Consequence`         | Consequences                  | `scope`, `impact`                            |
-| `cwe:Mitigation`          | PotentialMitigations          | `strategy`, `effectiveness`, `appliesTo`     |
-| `cwe:DetectionMethod`     | DetectionMethods              | `method`, `effectiveness`                    |
-| `cwe:Reference`           | References                    | `url`, `referenceType`                       |
+```turtle
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix cwe: <http://example.org/cwe#> .
+
+cwe:WeaknessShape a sh:NodeShape ;
+    sh:targetClass cwe:Weakness ;
+    sh:property [ sh:path cwe:hasConsequence ; sh:class cwe:Consequence ] ;
+    sh:property [ sh:path cwe:hasDetectionMethod ; sh:class cwe:DetectionMethod ] ;
+    sh:property [ sh:path cwe:hasMitigation ; sh:class cwe:Mitigation ] .
+
+cwe:CategoryShape a sh:NodeShape ;
+    sh:targetClass cwe:Category ;
+    sh:property [ sh:path cwe:childOf ; sh:class cwe:Category ] .
+```
+
+## Field Mapping (ETL)
+
+| Ontology Field | CWE Field(s) |
+| --------------- | ------------- |
+| `cwe:cwe_id` | ID (e.g., CWE-79) |
+| `cwe:name` | Name |
+| `cwe:description` | Description |
+| `cwe:abstractionLevel` | WeaknessAbstraction |
+| `cwe:status` | Status |
+| `cwe:hasPlatform` | ApplicablePlatforms |
+| `cwe:hasConsequence` | Consequences |
+| `cwe:hasDetectionMethod` | DetectionMethods |
+| `cwe:hasMitigation` | PotentialMitigations |
+
+## Example Instance
+
+```turtle
+cwe:CWE-121 a cwe:Weakness ;
+    cwe:childOf cwe:CWE-787 ;
+    cwe:hasConsequence cwe:ConfidentialityImpact ;
+    cwe:hasDetectionMethod cwe:StaticAnalysis ;
+    cwe:hasMitigation cwe:BoundsChecking ;
+    cwe:appliesTo cwe:Implementation ;
+    cwe:hasPlatform cwe:Windows ;
+    cwe:hasReference cwe:Ref-12345 .
+```
+
+---
+
+## References
+
+* <https://cwe.mitre.org/>
+
+---
+
+## Sources
+
+* **MITRE CWE XML (cwec_v4.19.1.xml zipped):** <https://cwe.mitre.org/data/xml/cwec_latest.xml.zip>
+* **MITRE CWE SCHEMA:** <https://cwe.mitre.org/data/xsd/cwe_schema_latest.xsd>
+* **SHACL shapes:** [cwe-shapes.ttl](../shacl/cwe-shapes.ttl)
+* **ETL transformer:** [etl_cwe.py](../../scripts/etl_cwe.py)
+
+* **Local schemas / samples:** `data/cwe/schemas/` (e.g. `cwe_schema_latest.xsd`), `data/cwe/raw/`, `data/cwe/samples/`
+
+Notes: Use the official CWE XML/JSON feed and capture feed version in snapshot metadata.
