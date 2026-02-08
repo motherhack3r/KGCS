@@ -24,6 +24,8 @@ python scripts/combine_ttl_pipeline.py
 python src/etl/rdf_to_neo4j.py --database neo4j-2026-02-08 --ttl tmp/combined-pipeline.ttl
 ```
 
+**Verification note (Feb 8, 2026):** After activating the `metadata` conda environment (Step 1), running the downloader (`python -m src.ingest.download_manager`) successfully fetched raw files, wrote per-standard manifests (`data/{standard}/manifest.json`), and saved official schemas under `data/{standard}/schemas/` (for example, CVSS JSON schemas under `data/cve/schemas/`).
+
 ## Detailed Steps
 
 ### Step 1: Environment Setup
@@ -57,16 +59,26 @@ python -m src.ingest.download_manager
 
 **What it downloads:**
 
-- **CPE** (NVD): 15 chunks → `data/cpe/raw/` (~100 MB)
-- **CPEMatch** (NVD): 55 chunks → `data/cpematch/raw/` (~125 MB)
-- **CVE** (NVD): 25 files (2002-2026) → `data/cve/raw/` (~10 MB)
-- **CWE** (MITRE): 1 XML file → `data/cwe/raw/` (~5 MB)
-- **CAPEC** (MITRE): 1 XML file → `data/capec/raw/` (~2 MB)
-- **ATT&CK** (MITRE): 4 STIX variants → `data/attack/raw/` (~3 MB)
-- **D3FEND** (MITRE): 2 JSON files → `data/d3fend/raw/` (~46 MB)
-- **CAR** (MITRE): 122 YAML files → `data/car/raw/` (~1 MB)
-- **SHIELD** (MITRE): 12 JSON files → `data/shield/raw/` (~0.5 MB)
-- **ENGAGE** (MITRE): 12 JSON files → `data/engage/raw/` (~0.2 MB)
+- **CPE** (NVD): 15 chunk files (nvdcpe-2.0) → `data/cpe/raw/` (chunked extraction created `nvdcpe-2.0-chunks`)
+- **CPEMatch** (NVD): 55 chunk files (nvdcpematch-2.0) → `data/cpematch/raw/` (chunked extraction)
+- **CVE** (NVD): 25 yearly files (nvdcve-2.0-2002.json … nvdcve-2.0-2026.json) → `data/cve/raw/`; also downloads the CVE JSON schema and related CVSS JSON schemas → `data/cve/schemas/`
+- **CWE** (MITRE): 1 XML file (cwec_latest.xml) → `data/cwe/raw/`; also downloads the CWE XSD → `data/cwe/schemas/`
+- **CAPEC** (MITRE): 1 XML file (capec_latest.xml) plus STIX (`stix-capec.json`) and XSD (`ap_schema_latest.xsd`) → `data/capec/raw/` and `data/capec/schemas/`
+- **ATT&CK** (MITRE): 4 STIX variants (enterprise, ics, mobile, pre-attack) → `data/attack/raw/`
+- **D3FEND** (MITRE): 4 files (d3fend.json, d3fend-full-mappings.json, d3fend.owl, d3fend.ttl) → `data/d3fend/raw/`
+- **CAR** (MITRE): 122 YAML files → `data/car/raw/`
+- **SHIELD** (MITRE): 12 JSON files → `data/shield/raw/`
+- **ENGAGE** (MITRE): 12 JSON files → `data/engage/raw/`
+- **CPE** (NVD): 15 chunk files (nvdcpe-2.0) → `data/cpe/raw/` (chunked extraction created `nvdcpe-2.0-chunks`) — approx. 100–800 MB depending on extraction (single zip ~757 MB)
+- **CPEMatch** (NVD): 55 chunk files (nvdcpematch-2.0) → `data/cpematch/raw/` (chunked extraction) — approx. 125–800 MB depending on extraction
+- **CVE** (NVD): 25 yearly files (nvdcve-2.0-2002.json … nvdcve-2.0-2026.json) → `data/cve/raw/`; also downloads the CVE JSON schema and related CVSS JSON schemas → `data/cve/schemas/` — approx. 10–800 MB total for raw files (individual years small; archive set ~hundreds MB)
+- **CWE** (MITRE): 1 XML file (cwec_latest.xml) → `data/cwe/raw/`; also downloads the CWE XSD → `data/cwe/schemas/` — approx. 16 MB (XML + XSD)
+- **CAPEC** (MITRE): 1 XML file (capec_latest.xml) plus STIX (`stix-capec.json`) and XSD (`ap_schema_latest.xsd`) → `data/capec/raw/` and `data/capec/schemas/` — approx. 2–4 MB
+- **ATT&CK** (MITRE): 4 STIX variants (enterprise, ics, mobile, pre-attack) → `data/attack/raw/` — approx. 3–10 MB total
+- **D3FEND** (MITRE): 4 files (d3fend.json, d3fend-full-mappings.json, d3fend.owl, d3fend.ttl) → `data/d3fend/raw/` — approx. 40–50 MB
+- **CAR** (MITRE): 122 YAML files → `data/car/raw/` — approx. 1–5 MB
+- **SHIELD** (MITRE): 12 JSON files → `data/shield/raw/` — approx. 0.5–2 MB
+- **ENGAGE** (MITRE): 12 JSON files → `data/engage/raw/` — approx. 0.2–1 MB
 
 **Output:**
 
