@@ -23,7 +23,7 @@ python scripts/combine_ttl_pipeline.py
 Note: ETL output locations
 
 - Stages 4–10 now write stage TTL outputs into per-standard sample folders: `data/{standard}/samples/`.
-- Stages 1–3 (CPE, CPEMatch, CVE) continue to write to `tmp/` because they are chunked and very large.
+- Stages 1–3 (CPE, CPEMatch, CVE) also write stage TTLs into `data/{standard}/samples/` (before the pipeline places outputs in `tmp/`, may still be used for intermediate chunked processing).
 - The combine step must therefore merge TTLs from both `tmp/` and `data/*/samples/`. If your `scripts/combine_ttl_pipeline.py` has not been updated to discover `data/*/samples/`, you can copy the per-standard sample TTLs into `tmp/` before running the combine script:
 
 ```powershell
