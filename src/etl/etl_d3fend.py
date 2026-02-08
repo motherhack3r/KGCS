@@ -249,48 +249,61 @@ def main():
     
     args = parser.parse_args()
     
-    try:
-        with open(args.input, "r", encoding="utf-8", errors="replace") as f:
-            json_data = json.load(f)
-    except Exception as e:
-        print(f"Error loading JSON: {e}")
+    # Accept either a single JSON file or a directory containing multiple D3FEND JSON files
+    json_files = []
+    if os.path.isdir(args.input):
+        for p in sorted(Path(args.input).rglob('*.json')):
+            json_files.append(str(p))
+    else:
+        json_files = [args.input]
+
+    transformer = D3FENDtoRDFTransformer()
+    any_loaded = False
+    for jf in json_files:
+        try:
+            with open(jf, 'r', encoding='utf-8', errors='replace') as f:
+                json_data = json.load(f)
+        except Exception as e:
+            print(f"Warning: Error loading JSON {jf}: {e}")
+            continue
+        any_loaded = True
+        print(f"Transforming {os.path.basename(jf)} to RDF...")
+        try:
+            transformer.transform(json_data)
+        except Exception as e:
+            print(f"Warning: transformation failed for {jf}: {e}")
+
+    if not any_loaded:
+        print(f"Error: no D3FEND JSON files loaded from {args.input}")
         return 1
-    
-    try:
-        print(f"Loading D3FEND JSON from {args.input}...")
-        transformer = D3FENDtoRDFTransformer()
-        print("Transforming to RDF...")
-        transformer.transform(json_data)
-        Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-        print(f"Writing RDF to {args.output}...")
-        write_graph_turtle_lines(transformer.graph, args.output, include_prefixes=not args.append, append=args.append)
-        
-        # SHACL validation
-        if args.validate:
-            print(f"\nValidating {args.output}...")
-            try:
-                from src.core.validation import run_validator, load_graph
-            except ImportError:
-                from core.validation import run_validator, load_graph
-            
-            shapes_file = args.shapes or 'docs/ontology/shacl/d3fend-shapes.ttl'
-            if os.path.exists(shapes_file):
-                shapes = load_graph(shapes_file)
-                conforms, _, _ = run_validator(args.output, shapes)
-                if conforms:
-                    print(f"[OK] Validation passed!")
-                else:
-                    print(f"[FAIL] Validation failed!")
-                    return 1
+
+    # Write the combined graph to output
+    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+    print(f"Writing RDF to {args.output}...")
+    write_graph_turtle_lines(transformer.graph, args.output, include_prefixes=not args.append, append=args.append)
+
+    # SHACL validation
+    if args.validate:
+        print(f"\nValidating {args.output}...")
+        try:
+            from src.core.validation import run_validator, load_graph
+        except ImportError:
+            from core.validation import run_validator, load_graph
+
+        shapes_file = args.shapes or 'docs/ontology/shacl/d3fend-shapes.ttl'
+        if os.path.exists(shapes_file):
+            shapes = load_graph(shapes_file)
+            conforms, _, _ = run_validator(args.output, shapes)
+            if conforms:
+                print(f"[OK] Validation passed!")
             else:
-                print(f"Warning: Could not find shapes file: {shapes_file}")
-        
-        print(f"Transformation complete: {args.output}")
-        return 0
-    
-    except Exception as e:
-        print(f"Transformation error: {e}")
-        return 1
+                print(f"[FAIL] Validation failed!")
+                return 1
+        else:
+            print(f"Warning: Could not find shapes file: {shapes_file}")
+
+    print(f"Transformation complete: {args.output}")
+    return 0
 
 
 if __name__ == "__main__":

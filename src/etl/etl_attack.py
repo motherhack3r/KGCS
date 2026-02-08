@@ -222,24 +222,44 @@ class ATTACKtoRDFTransformer:
 
 def main():
     parser = argparse.ArgumentParser(description="ETL: MITRE ATT&CK STIX JSON → RDF Turtle")
-    parser.add_argument("--input", "-i", required=True, help="Input ATT&CK STIX JSON file")
+    parser.add_argument("--input", "-i", required=True, help="Input ATT&CK STIX JSON file or directory")
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
     parser.add_argument("--validate", action="store_true", help="Run SHACL validation on output")
     parser.add_argument("--shapes", default="docs/ontology/shacl/attack-shapes.ttl", help="SHACL shapes file")
     parser.add_argument("--append", action="store_true", help="Append to existing output file instead of overwriting")
     args = parser.parse_args()
 
-    if not os.path.exists(args.input):
-        print(f"Error: Input file not found: {args.input}", file=sys.stderr)
-        sys.exit(1)
+    # Support a single file or a directory of STIX JSON files (enterprise, mobile, ics, pre-attack)
+    files = []
+    if os.path.isdir(args.input):
+        for fn in sorted(os.listdir(args.input)):
+            if fn.lower().endswith('.json'):
+                files.append(os.path.join(args.input, fn))
+    else:
+        if not os.path.exists(args.input):
+            print(f"Error: Input file not found: {args.input}", file=sys.stderr)
+            sys.exit(1)
+        files = [args.input]
 
-    print(f"Loading ATT&CK STIX JSON from {args.input}...")
-    with open(args.input, "r", encoding="utf-8") as f:
-        attack_json = json.load(f)
-
-    print("Transforming to RDF...")
+    print(f"Loading ATT&CK STIX JSON files: {files}")
+    combined_graph = Graph()
     transformer = ATTACKtoRDFTransformer()
-    graph = transformer.transform(attack_json)
+    for fpath in files:
+        try:
+            with open(fpath, 'r', encoding='utf-8') as fh:
+                attack_json = json.load(fh)
+        except Exception as e:
+            print(f"Warning: failed to load {fpath}: {e}", file=sys.stderr)
+            continue
+        print(f"Transforming {os.path.basename(fpath)} to RDF...")
+        try:
+            g = transformer.transform(attack_json)
+            for t in g:
+                combined_graph.add(t)
+        except Exception as e:
+            print(f"Warning: transformation failed for {fpath}: {e}", file=sys.stderr)
+
+    graph = combined_graph
 
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
     print(f"Writing RDF to {args.output}...")
