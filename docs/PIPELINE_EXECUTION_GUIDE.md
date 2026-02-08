@@ -20,6 +20,18 @@ python scripts/run_all_etl.py
 # Step 4: Combine all TTL outputs into single file
 python scripts/combine_ttl_pipeline.py
 
+Note: ETL output locations
+
+- Stages 4–10 now write stage TTL outputs into per-standard sample folders: `data/{standard}/samples/`.
+- Stages 1–3 (CPE, CPEMatch, CVE) continue to write to `tmp/` because they are chunked and very large.
+- The combine step must therefore merge TTLs from both `tmp/` and `data/*/samples/`. If your `scripts/combine_ttl_pipeline.py` has not been updated to discover `data/*/samples/`, you can copy the per-standard sample TTLs into `tmp/` before running the combine script:
+
+```powershell
+# Copy per-standard samples into tmp/ (idempotent)
+Get-ChildItem -Path data\*\samples -Filter pipeline-stage*-*.ttl -Recurse | ForEach-Object { Copy-Item $_.FullName -Destination tmp -Force }
+python scripts/combine_ttl_pipeline.py
+```
+
 # Step 5: Load to Neo4j
 python src/etl/rdf_to_neo4j.py --database neo4j-2026-02-08 --ttl tmp/combined-pipeline.ttl
 ```
