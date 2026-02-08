@@ -1,0 +1,18 @@
+{
+  "data_file": "tmp/pipeline-stage8-car.ttl",
+  "conforms": true,
+  "chunks": 1,
+  "triples_scanned": 432,
+  "errors": [],
+  "chunk_reports": [
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp2ohweas0.chunk1.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 1,
+      "elapsed": 0.14828252792358398,
+      "return_code": 0
+    }
+  ]
+}

@@ -28,8 +28,8 @@ STANDARDS = [
     ("engage", "tmp/pipeline-stage10-engage.ttl", "docs/ontology/shacl/engage-shapes.ttl", "parallel", []),
 ]
 
-STREAM_SCRIPT = "scripts/validate_shacl_stream.py"
-PARALLEL_SCRIPT = "scripts/validate_shacl_parallel.py"
+STREAM_SCRIPT = "scripts/validation/validate_shacl_stream.py"
+PARALLEL_SCRIPT = "scripts/validation/validate_shacl_parallel.py"
 
 
 def validate_standard(standard, ttl_path, shapes_path, script_type, extra_args):

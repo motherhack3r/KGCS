@@ -1,0 +1,45 @@
+{
+  "data_file": "tmp/pipeline-stage1-cpe.ttl",
+  "conforms": true,
+  "chunks": 4,
+  "triples_scanned": 17374285,
+  "errors": [],
+  "chunk_reports": [
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpjwkq90zy.chunk4.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 4,
+      "elapsed": 230.42760944366455,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpjrl76qkw.chunk3.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 3,
+      "elapsed": 1629.0172400474548,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp1icrmibs.chunk2.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 2,
+      "elapsed": 1652.0453617572784,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpzrugr3on.chunk1.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 1,
+      "elapsed": 1665.4975616931915,
+      "return_code": 0
+    }
+  ]
+}

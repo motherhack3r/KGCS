@@ -10,6 +10,10 @@
         "/^set PYTHONPATH=\\.; pytest tests/test_phase3_comprehensive\\.py -v$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^python scripts/validation/validate_all_standards\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     }
 }

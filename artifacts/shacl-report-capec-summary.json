@@ -1,0 +1,18 @@
+{
+  "data_file": "tmp/pipeline-stage6-capec.ttl",
+  "conforms": true,
+  "chunks": 1,
+  "triples_scanned": 9387,
+  "errors": [],
+  "chunk_reports": [
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp11__0kna.chunk1.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 1,
+      "elapsed": 2.1351513862609863,
+      "return_code": 0
+    }
+  ]
+}
