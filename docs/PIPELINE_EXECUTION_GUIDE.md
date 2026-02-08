@@ -3,7 +3,7 @@
 **Last Updated:** February 8, 2026  
 **Status:** Production Ready (Phase 3 MVP)
 
-## Quick Start (5 Steps)
+## Quick Start (6 Steps)
 
 ```bash
 # Step 1: Activate conda environment
@@ -17,13 +17,18 @@ python -m src.ingest.download_manager
 # Step 3: Run ETL pipeline (transforms raw data to RDF Turtle)
 python scripts/run_all_etl.py
 
-# Step 4: Combine all TTL outputs into single file
+# Step 4: Validate outputs with SHACL (recommended)
+# Run SHACL validation for all standards before combining/loading
+python scripts/validate_all_standards.py
+
+# Step 5: Combine all TTL outputs into single file
 python scripts/combine_ttl_pipeline.py
+```
 
 Note: ETL output locations
 
-- Stages 4–10 now write stage TTL outputs into per-standard sample folders: `data/{standard}/samples/`.
-- Stages 1–3 (CPE, CPEMatch, CVE) also write stage TTLs into `data/{standard}/samples/` (before the pipeline places outputs in `tmp/`, may still be used for intermediate chunked processing).
+- Stages 4–10 write stage TTL outputs into per-standard sample folders: `data/{standard}/samples/`.
+- Stages 1–3 (CPE, CPEMatch, CVE) also emit per-standard sample TTLs; `tmp/` may still be used for intermediate chunked processing.
 - The combine step must therefore merge TTLs from both `tmp/` and `data/*/samples/`. If your `scripts/combine_ttl_pipeline.py` has not been updated to discover `data/*/samples/`, you can copy the per-standard sample TTLs into `tmp/` before running the combine script:
 
 ```powershell
@@ -32,7 +37,8 @@ Get-ChildItem -Path data\*\samples -Filter pipeline-stage*-*.ttl -Recurse | ForE
 python scripts/combine_ttl_pipeline.py
 ```
 
-# Step 5: Load to Neo4j
+```bash
+# Step 6: Load to Neo4j
 python src/etl/rdf_to_neo4j.py --database neo4j-2026-02-08 --ttl tmp/combined-pipeline.ttl
 ```
 
