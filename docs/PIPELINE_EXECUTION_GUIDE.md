@@ -24,6 +24,28 @@ python scripts/combine_ttl_pipeline.py
 python src/etl/rdf_to_neo4j.py --database neo4j-2026-02-08 --ttl tmp/combined-pipeline.ttl
 ```
 
+### PowerShell Example (Windows)
+
+```powershell
+# PowerShell: activate conda, create logs, run downloader + ETL + combine + load
+(E:\DEVEL\software\miniconda\shell\condabin\conda-hook.ps1)
+conda activate E:\DEVEL\software\miniconda\envs\metadata
+cd e:\DEVEL\LAIA\KGCS
+
+# Ensure logs directory exists
+if (!(Test-Path -Path logs)) { New-Item -ItemType Directory -Path logs }
+
+# Run downloader (creates data/{standard}/raw, data/{standard}/schemas, manifests)
+python -m src.ingest.download_manager
+
+# Run ETL and combine stages
+python scripts/run_all_etl.py
+python scripts/combine_ttl_pipeline.py
+
+# Load to Neo4j (example)
+python src/etl/rdf_to_neo4j.py --ttl tmp/combined-pipeline.ttl --batch-size 1000
+```
+
 **Verification note (Feb 8, 2026):** After activating the `metadata` conda environment (Step 1), running the downloader (`python -m src.ingest.download_manager`) successfully fetched raw files, wrote per-standard manifests (`data/{standard}/manifest.json`), and saved official schemas under `data/{standard}/schemas/` (for example, CVSS JSON schemas under `data/cve/schemas/`).
 
 ## Detailed Steps
