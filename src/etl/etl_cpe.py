@@ -196,6 +196,16 @@ def main():
     parser.add_argument('--append', action='store_true', help='Append to existing output file instead of overwriting')
     args = parser.parse_args()
 
+    # Ensure outputs go to the standard samples folder for CPE
+    samples_dir = os.path.join('data', 'cpe', 'samples')
+    os.makedirs(samples_dir, exist_ok=True)
+    requested_output = args.output
+    output_dir = os.path.dirname(os.path.normpath(requested_output))
+    if os.path.normpath(output_dir) != os.path.normpath(samples_dir):
+        # relocate to samples folder, keep basename
+        args.output = os.path.join(samples_dir, os.path.basename(requested_output))
+        print(f"Info: overriding output path to {args.output} to use CPE samples folder")
+
     import glob
     input_files = []
     if os.path.isdir(args.input):

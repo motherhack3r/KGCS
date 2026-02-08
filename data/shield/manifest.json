@@ -1,0 +1,90 @@
+{
+  "files": [
+    {
+      "filename": "attack_groups.json",
+      "size_bytes": 319621,
+      "sha256": "c7a296ca1f35bb2b30851f56dc43f59a0feb795b6dcfb71cdf64d2bcd473ecdf",
+      "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/attack_groups.json",
+      "status": "cached"
+    },
+    {
+      "filename": "attack_mapping.json",
+      "size_bytes": 641795,
+      "sha256": "fe56bdd3c61cf00f557cff44d699dc64706237723b4378ea191c93c85c607702",
+      "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/attack_mapping.json",
+      "status": "cached"
+    },
+    {
+      "filename": "mapping.json",
+      "size_bytes": 99194,
+      "sha256": "222f912469ee4b860728a75fd861d6527616a1514fb1d0d0c62d5849055a28ef",
+      "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/mapping.json",
+      "status": "cached"
+    },
+    {
+      "filename": "navigation.json",
+      "size_bytes": 11023,
+      "sha256": "2ee34af15a91f55c1e3d887c28ad66a149ffeb2c9f653864400fbfced7aee02f",
+      "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/navigation.json",
+      "status": "cached"
+    },
+    {
+      "filename": "opportunities.json",
+      "size_bytes": 13731,
+      "sha256": "c775036f672a7513e9c1a962d4e8cb6d41cdd8780722870c7a89b4dd3d5a87e2",
+      "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/opportunities.json",
+      "status": "cached"
+    },
+    {
+      "filename": "procedures.json",
+      "size_bytes": 12029,
+      "sha256": "bd98955e70676529d0618b548af34ed5d2dbfe55a6930e703dd204850b5b82ce",
+      "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/procedures.json",
+      "status": "cached"
+    },
+    {
+      "filename": "tactic_details.json",
+      "size_bytes": 67774,
+      "sha256": "ec7b76847d48727fda6d62736921393c18c8c9d10d1d6e5ebf2ff0414d05dadb",
+      "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/tactic_details.json",
+      "status": "cached"
+    },
+    {
+      "filename": "tactic_matrix.json",
+      "size_bytes": 64433,
+      "sha256": "e249cd250848df0dbe82a52fa92d9c7c0ddc3f3e84a6317a78fb3869ceca91c5",
+      "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/tactic_matrix.json",
+      "status": "cached"
+    },
+    {
+      "filename": "tactics.json",
+      "size_bytes": 3797,
+      "sha256": "8226428e70f542b51a4b47511ea0456e1ff4fe911721d8ce7905b00e8f79dc52",
+      "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/tactics.json",
+      "status": "cached"
+    },
+    {
+      "filename": "technique_details.json",
+      "size_bytes": 181237,
+      "sha256": "f698a8b97fa6ac78462fe29681cdd6f936aa3c130ea622cdeb0ec675d965c398",
+      "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/technique_details.json",
+      "status": "cached"
+    },
+    {
+      "filename": "techniques.json",
+      "size_bytes": 15863,
+      "sha256": "09150fad97afe50b33acbd4145cc5abe7f841e92fcdbd3856c7a20de283efd36",
+      "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/techniques.json",
+      "status": "cached"
+    },
+    {
+      "filename": "use_cases.json",
+      "size_bytes": 36683,
+      "sha256": "dac36dcb9cd9d5ee1c70652a230f7640113f8d023a454e9fa159349a28089c46",
+      "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/use_cases.json",
+      "status": "cached"
+    }
+  ],
+  "last_updated": "2026-02-08T02:24:30.209221",
+  "source": "https://api.github.com/repos/MITRECND/mitrecnd.github.io"
+}

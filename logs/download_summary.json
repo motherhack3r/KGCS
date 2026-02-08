@@ -1,0 +1,1382 @@
+{
+  "start_time": "2026-02-08T02:23:08.396956",
+  "end_time": "2026-02-08T02:24:30.510233",
+  "duration_seconds": 82.113277,
+  "results": [
+    {
+      "standard": "cpe",
+      "files": [
+        {
+          "filename": "nvdcpe-2.0.json",
+          "size_bytes": 757143231,
+          "sha256": "chunked-archive",
+          "url": "https://nvd.nist.gov/feeds/json/cpe/2.0/nvdcpe-2.0.zip",
+          "status": "success"
+        }
+      ]
+    },
+    {
+      "standard": "cpematch",
+      "files": [
+        {
+          "filename": "nvdcpematch-2.0.json",
+          "size_bytes": 757143231,
+          "sha256": "chunked-archive",
+          "url": "https://nvd.nist.gov/feeds/json/cpematch/2.0/nvdcpematch-2.0.zip",
+          "status": "success"
+        }
+      ]
+    },
+    {
+      "standard": "cve",
+      "files": [
+        {
+          "filename": "nvdcve-2.0-2002.json",
+          "size_bytes": 25118472,
+          "sha256": "83ae9b1154561cd0be730de7fcbd425077e67e0ac74133c541b8c09df8503e93",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2002.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2003.json",
+          "size_bytes": 7469820,
+          "sha256": "dcd1c60ae1ca42a15743e557e8e6889f352bfe9aa97fb321821d5312c9ddac7f",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2003.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2004.json",
+          "size_bytes": 15623312,
+          "sha256": "2edd3e76b8ae1eb2ed27cb0ca4498175d7c8aed37b3a802044416a96db1cb1f9",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2004.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2005.json",
+          "size_bytes": 24455332,
+          "sha256": "c8c8b6e0392bd810ed12ad36644a21f068de901f53e1bc939147818515496397",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2005.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2006.json",
+          "size_bytes": 39171785,
+          "sha256": "f8aea388e35d05e0705151a205a614fa07885fc1271cd90570ccd3c65fcb61d9",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2006.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2007.json",
+          "size_bytes": 37543105,
+          "sha256": "080831c3d8fd8a01d5d91e3a285736e6ac7ada45271a934eb194a0be83e675dc",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2007.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2008.json",
+          "size_bytes": 43506551,
+          "sha256": "eee87cd802103c943937f463dbf0623e4a6515d5bd6c88c60467a9b19b8161ca",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2008.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2009.json",
+          "size_bytes": 42207367,
+          "sha256": "6eb11885a754a2963803b3f0bf996179483784c7a80f3434bc58a71d29239f9f",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2009.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2010.json",
+          "size_bytes": 45565912,
+          "sha256": "3c09ecc46efd8dbc6d21161b660d0a4b3aa4250a7c40e1a66e42ba158997865c",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2010.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2011.json",
+          "size_bytes": 45210078,
+          "sha256": "97471220461b180ce7f0aceeb1d80a0698fdccb131a2c71c3bdbcaf6179ba965",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2011.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2012.json",
+          "size_bytes": 52096525,
+          "sha256": "9fbdb400530b309abf992e35598c152dcb944d5ebda9c07febdb505f102fb698",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2012.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2013.json",
+          "size_bytes": 57713580,
+          "sha256": "28d3150c733194ccce62eb47ec197840a268184b0ed81cbd5601d81213f22c30",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2013.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2014.json",
+          "size_bytes": 52626383,
+          "sha256": "2f094dcf6db87e1465d9c578554ce146d7c83c2d00c63384e2fba51efbb89846",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2014.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2015.json",
+          "size_bytes": 52517395,
+          "sha256": "a897095587ea70b4345c744860a3f52dfedd8f6ebfeb562f9a126ae2e5ffda86",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2015.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2016.json",
+          "size_bytes": 66149875,
+          "sha256": "dd0ca653ed96ee9d8d477d894a801c1821949f1a9bf4d45352e5faa92f72605c",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2016.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2017.json",
+          "size_bytes": 94048052,
+          "sha256": "51b9074e36b238b6fdf27066376f64d82aa7f4a54f6a9d249cffdf273da427bb",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2017.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2018.json",
+          "size_bytes": 99058238,
+          "sha256": "559e601c0e9b53b899d2ff9275b53dd35a52152a1a8f7228dfdf60a3a8e72a80",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2018.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2019.json",
+          "size_bytes": 111801485,
+          "sha256": "a05e753d4d44754e14b336a8a5efe705e9532f02a9f30caee827c0b7d2451fa1",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2019.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2020.json",
+          "size_bytes": 147873645,
+          "sha256": "00d2cd1e5e44bc74ad40980b8dc891fe4e4dbb075a48de72b7253c880c719247",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2020.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2021.json",
+          "size_bytes": 175771558,
+          "sha256": "5e641ebb0c110604c4a2d3b0008976a7732139d9ba67d5499cbecd0e10aeeaf4",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2021.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2022.json",
+          "size_bytes": 179830902,
+          "sha256": "5f6dc6b710028b5e766eeffb9c4b4dfd5e3530296e5c7e7efdadc31bf668d04f",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2022.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2023.json",
+          "size_bytes": 192229768,
+          "sha256": "cab9a5e1ccb778d9980ee2cbea8b04a87db3802a75fe9feb3a6419992dec4b19",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2023.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2024.json",
+          "size_bytes": 202629726,
+          "sha256": "df66c38d2d4c8b2b4e855451f96bb874738bea6a094ba2a060b16758e5457295",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2024.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2025.json",
+          "size_bytes": 192326242,
+          "sha256": "3bb68a75437e6bd2cc8e120419bd345f16b413cd7a76bb969c0512445c108306",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2025.json.zip",
+          "status": "cached"
+        },
+        {
+          "filename": "nvdcve-2.0-2026.json",
+          "size_bytes": 9316855,
+          "sha256": "c82e1e631b18b699bbd5925fc1a15e862ccc6b2f0dc759185bad68e35ac1b4fb",
+          "url": "https://nvd.nist.gov/feeds/json/cve/2.0/nvdcve-2.0-2026.json.zip",
+          "status": "cached"
+        }
+      ]
+    },
+    {
+      "standard": "cwe",
+      "files": [
+        {
+          "filename": "cwec_latest.xml",
+          "size_bytes": 16095784,
+          "sha256": "f7d6fae581116795aa3545ce2ab801f81cbb655410d65db703f1343df10ff7b9",
+          "url": "https://cwe.mitre.org/data/xml/cwec_latest.xml.zip",
+          "status": "success"
+        }
+      ]
+    },
+    {
+      "standard": "car",
+      "files": [
+        {
+          "filename": "data_model_authentication.yaml",
+          "size_bytes": 3569,
+          "sha256": "6d24f56ddf86498a252258440853aac8c659ca2f824d96890bdae45fd026dbfb",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/data_model/authentication.yaml",
+          "status": "cached",
+          "source_dir": "data_model"
+        },
+        {
+          "filename": "data_model_driver.yaml",
+          "size_bytes": 2266,
+          "sha256": "957705a9d2b7d5ec1950a98bee55ad326107717c2c450df9e7150e4d4799c5f7",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/data_model/driver.yaml",
+          "status": "cached",
+          "source_dir": "data_model"
+        },
+        {
+          "filename": "data_model_email.yaml",
+          "size_bytes": 3230,
+          "sha256": "fa0e66a29ce4c0838c82c1f74ae8694fe4f5842cece3c59446251a3430363202",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/data_model/email.yaml",
+          "status": "cached",
+          "source_dir": "data_model"
+        },
+        {
+          "filename": "data_model_file.yaml",
+          "size_bytes": 5396,
+          "sha256": "ecbd72806716dc6a78ed1cea5d8437f6f7a8aeae153794ec8e8968919aaf2a19",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/data_model/file.yaml",
+          "status": "cached",
+          "source_dir": "data_model"
+        },
+        {
+          "filename": "data_model_flow.yaml",
+          "size_bytes": 4776,
+          "sha256": "76fa69a6bbca302f24170878fd1e92021625e4a8fadd1b18e4f043d22eb795e7",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/data_model/flow.yaml",
+          "status": "cached",
+          "source_dir": "data_model"
+        },
+        {
+          "filename": "data_model_http.yaml",
+          "size_bytes": 2645,
+          "sha256": "613a622131781a2db799cddb23f33e68a75a10f7b33036026c8806de0f570ed2",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/data_model/http.yaml",
+          "status": "cached",
+          "source_dir": "data_model"
+        },
+        {
+          "filename": "data_model_module.yaml",
+          "size_bytes": 2935,
+          "sha256": "fd9481ad99f442118f3fdf1c650acd9817647a140b1fd02228a393259f89d4c6",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/data_model/module.yaml",
+          "status": "cached",
+          "source_dir": "data_model"
+        },
+        {
+          "filename": "data_model_process.yaml",
+          "size_bytes": 5745,
+          "sha256": "7060d32477dd920ba09050108adf3106db76f99721738df65e4252d46d62b52a",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/data_model/process.yaml",
+          "status": "cached",
+          "source_dir": "data_model"
+        },
+        {
+          "filename": "data_model_registry.yaml",
+          "size_bytes": 3613,
+          "sha256": "77c83cd70f5328bd1625e5dd555d11832c7e1a22b77b632991a49de58790b9cb",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/data_model/registry.yaml",
+          "status": "cached",
+          "source_dir": "data_model"
+        },
+        {
+          "filename": "data_model_service.yaml",
+          "size_bytes": 2396,
+          "sha256": "0284d899de1949e9209dae027f74a51d18e249a1df544d06ce1efbbe43b8db77",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/data_model/service.yaml",
+          "status": "cached",
+          "source_dir": "data_model"
+        },
+        {
+          "filename": "data_model_socket.yaml",
+          "size_bytes": 2815,
+          "sha256": "770530565df212255becebdc8e58465e6c4d04d5ef7e440dc05f7abd118e1b80",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/data_model/socket.yaml",
+          "status": "cached",
+          "source_dir": "data_model"
+        },
+        {
+          "filename": "data_model_thread.yaml",
+          "size_bytes": 3278,
+          "sha256": "692b393634dc6c122754b52d68b3713648d79efa915bee929c363d5d08374603",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/data_model/thread.yaml",
+          "status": "cached",
+          "source_dir": "data_model"
+        },
+        {
+          "filename": "data_model_user_session.yaml",
+          "size_bytes": 2237,
+          "sha256": "838fcab87cfa53651a79c182e3ff90ad41d5226655de3351f8775a89afab6be2",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/data_model/user_session.yaml",
+          "status": "cached",
+          "source_dir": "data_model"
+        },
+        {
+          "filename": "analytics_CAR-2013-01-002.yaml",
+          "size_bytes": 2693,
+          "sha256": "6f49a68377df61575ec2937ec14963b5ebd7a3fef87fb43b43b171d23bd8b71a",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-01-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-01-003.yaml",
+          "size_bytes": 2249,
+          "sha256": "8ee75c1c3d2673ebc39c3a18fe1d0817bf555bda41a839295df3ebe5d2151bd1",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-01-003.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-02-003.yaml",
+          "size_bytes": 2181,
+          "sha256": "9982c3706457d076704f443ed5da2311ab862ce9c6f1e07b092e9bf939ae1c53",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-02-003.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-02-008.yaml",
+          "size_bytes": 1553,
+          "sha256": "3c7a79f6442638077049e2099f8d8fdbb9111af664329af6e01895c0e4f23732",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-02-008.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-02-012.yaml",
+          "size_bytes": 1191,
+          "sha256": "6cc1411e1aa30df44713c23c5f63358a6cdc0662131ce599cd0644d721044ec3",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-02-012.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-03-001.yaml",
+          "size_bytes": 3617,
+          "sha256": "b1dd4d81d588a475aedff64669db60a8c324ed6c2002e55c3873760e575277e9",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-03-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-04-002.yaml",
+          "size_bytes": 6152,
+          "sha256": "8f60fd0dde8306ca5242f2f184ddb708cbd5dc0b558196058788667e2968910f",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-04-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-05-002.yaml",
+          "size_bytes": 3045,
+          "sha256": "df7a789a7b288aace1bda7acfc7d077b9f659fa01a3aa5b415f967e5973624e6",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-05-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-05-003.yaml",
+          "size_bytes": 1655,
+          "sha256": "4c5fdd66251f4763ac5b748e3f51a0738da524aff0f1032145aecbe732c46d81",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-05-003.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-05-004.yaml",
+          "size_bytes": 3271,
+          "sha256": "87f5725cd01a191b978e671d02c15a58e71523db0fdd32c2570e882684d0ef97",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-05-004.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-05-005.yaml",
+          "size_bytes": 2106,
+          "sha256": "d24ae8726fa3b6344fb626734d8a1ffc22110c70c0666f5c198a562aff7c7837",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-05-005.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-05-009.yaml",
+          "size_bytes": 3067,
+          "sha256": "e89d69475fa22a1949da2b164ee7a8f3cbae394eaf60fd1bd56e0711aa7a1e5e",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-05-009.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-07-001.yaml",
+          "size_bytes": 4953,
+          "sha256": "6812c7393545e6a471dc2c8ccbb11ba1b888e8f2a92ce7d39d63ec355367b8b9",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-07-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-07-002.yaml",
+          "size_bytes": 2382,
+          "sha256": "4c4be526f582b6ee37ed4c18a3d4c570c9290e90bc95c219dbb3586ccb04db10",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-07-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-07-005.yaml",
+          "size_bytes": 2261,
+          "sha256": "b914dbff469d06f10353ca10b2c52c6c159b6b3f0682f44de9434a2af99a2c4c",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-07-005.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-08-001.yaml",
+          "size_bytes": 3513,
+          "sha256": "612b568649058dec580e00dd4567ab3bd14c11ae2d155952d6cbfaf0ed5db54a",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-08-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-09-003.yaml",
+          "size_bytes": 994,
+          "sha256": "bbf46add3ebcff96ecc86fa238e912135fb262d645bd543fa17eb21bf521c852",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-09-003.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-09-005.yaml",
+          "size_bytes": 1738,
+          "sha256": "0de414c90ebb288e0468d20f617b4fc39f601da0d6761872404a2a2846d33a8f",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-09-005.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-10-001.yaml",
+          "size_bytes": 2846,
+          "sha256": "5be76516ab1c8c73672c92eb235f6fd64cb813c4d535cd5106c81d3fde9739e1",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-10-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2013-10-002.yaml",
+          "size_bytes": 4020,
+          "sha256": "9c6cf8a6eac2e1105f07b24b6bc52b52f236bd218dbe68234359c2cae13ffb6f",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2013-10-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-02-001.yaml",
+          "size_bytes": 2412,
+          "sha256": "4fdcd7382ed9f1de1bfcd303b2fb5bf524f339b81557f550d54446f941ce73c9",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-02-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-03-001.yaml",
+          "size_bytes": 1769,
+          "sha256": "25f2149409c7af77a9ebf12f3c79e141e813cae8507c7f3cda6008e42ba98713",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-03-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-03-005.yaml",
+          "size_bytes": 2308,
+          "sha256": "9c0fab087c25a02ac31a4de020a80f9b9daaf9c479e564e267e67dfd1d6c1d5b",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-03-005.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-03-006.yaml",
+          "size_bytes": 2170,
+          "sha256": "41b278ac1f15f0589593b618a61108989e5ce3027ab09113f9e52031baf0eca5",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-03-006.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-04-003.yaml",
+          "size_bytes": 2876,
+          "sha256": "1c704066cd143a1ca7c18c4f8cfbbaa5d58e4df46937047d7d1744e280260ab7",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-04-003.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-05-001.yaml",
+          "size_bytes": 3427,
+          "sha256": "53998412a272d211bbbdc422c1ff8cf81e9ac24b81c19c632822bc55177daeb7",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-05-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-05-002.yaml",
+          "size_bytes": 3287,
+          "sha256": "5b33fc193bc338704ecb8bfd8da0d657da59bdf688719d6053604a325c38008c",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-05-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-07-001.yaml",
+          "size_bytes": 2020,
+          "sha256": "ac2bd66e8ebef74aeca3e0b487be2b367d7ecd103ca2624619c5d13b379c3126",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-07-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-11-002.yaml",
+          "size_bytes": 2069,
+          "sha256": "6f8a3783ff0b1510099bc77b7e763bb74d503dc0e769a6331eb4df40965c5972",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-11-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-11-003.yaml",
+          "size_bytes": 3000,
+          "sha256": "42dbcc21d3df934cb393a8b189df89aaa3879458afdc3623d63ac2949e8c34a1",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-11-003.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-11-004.yaml",
+          "size_bytes": 1724,
+          "sha256": "ea0656f82b3bc232b2d37d128c01a525a99b26e75a81cf99c45b7847697d334a",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-11-004.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-11-005.yaml",
+          "size_bytes": 2270,
+          "sha256": "a0b754953cbba1ab582da0f8181fbc8eedd3bf73543049ee03e50bcf990cfbac",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-11-005.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-11-006.yaml",
+          "size_bytes": 1558,
+          "sha256": "456283965b88b35734750ef021645ecabbf70ef468b02a55630892fbcee5fcae",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-11-006.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-11-007.yaml",
+          "size_bytes": 2506,
+          "sha256": "6101c6d284c0c77c14f696fc47d9fbc4e33cbece9d5f40290ec8b96651b6d75b",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-11-007.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-11-008.yaml",
+          "size_bytes": 2876,
+          "sha256": "c919a03495b6fde47e7a26ed2dab9dc0eefd8d5eb743728ad18cb08ee1dd5d24",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-11-008.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2014-12-001.yaml",
+          "size_bytes": 3940,
+          "sha256": "1c184656d1303b6682a34c97dbb9a09ecb4f562d6747b3c030be2ec3693513a3",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2014-12-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2015-04-001.yaml",
+          "size_bytes": 2397,
+          "sha256": "cab5c8d0805e4b156fc46ace4746e2e6cd1c773de0ee067cfd2f23ea1984e961",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2015-04-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2015-04-002.yaml",
+          "size_bytes": 2813,
+          "sha256": "2118e5d2d68c82a80fee2be6230ff160153af224323038b7013e2d378f705f7b",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2015-04-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2015-07-001.yaml",
+          "size_bytes": 2104,
+          "sha256": "3f420878c201858efc045c2c872a2132e132eb14c28e215ba768d3621cd30974",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2015-07-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2016-03-001.yaml",
+          "size_bytes": 5378,
+          "sha256": "8d6afea34e2e97d625d055a9d6fefbfef7695209f5823adda5ce80db6a5eb306",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2016-03-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2016-03-002.yaml",
+          "size_bytes": 2687,
+          "sha256": "a7ef0025f1de62fd2fed100f09373df889a920589d002cc593b028f8b9fa2cef",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2016-03-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2016-04-002.yaml",
+          "size_bytes": 5649,
+          "sha256": "9215c5beda2a6dcdd7da44f1eae03b76a98440dff3480f5d863aa8f89f0738d6",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2016-04-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2016-04-003.yaml",
+          "size_bytes": 1841,
+          "sha256": "e99b390b69c3b7f6878d6e534934225c7576cdfa806872a93d059e0cbf62f44a",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2016-04-003.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2016-04-004.yaml",
+          "size_bytes": 1395,
+          "sha256": "16d8d9ed2d2f2bb92ae66c9affd0e48557f549eaf22e2ab7565c24c6767c344a",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2016-04-004.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2016-04-005.yaml",
+          "size_bytes": 1454,
+          "sha256": "d1c73e8eb33d8717fa39c742621f752921885a34973b0ecee93f48008f476e02",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2016-04-005.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2019-04-001.yaml",
+          "size_bytes": 4497,
+          "sha256": "cb9e69b66f7e3e2d0c15e62c84af4796dfdcf6be20fb7c0bed8595864711dbf5",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2019-04-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2019-04-002.yaml",
+          "size_bytes": 5522,
+          "sha256": "64250484051e57a3778c1542848007e93d685bb27cf5cc6ef02d1c1c130afe86",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2019-04-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2019-04-003.yaml",
+          "size_bytes": 2659,
+          "sha256": "666d5c5d28ea08da631c73f3075fb56c11d2cc9db1994315dc21e93b6a7b2fcb",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2019-04-003.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2019-04-004.yaml",
+          "size_bytes": 3526,
+          "sha256": "7495ea65430ec1eb6adf9afe6ce61512e41ed3b079724dfa63ede7afd2735f83",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2019-04-004.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2019-07-001.yaml",
+          "size_bytes": 3156,
+          "sha256": "d7d25553f4e3d63cffdd03f81da9cbcf061e0e71805f2f7de46e7c31faa84b98",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2019-07-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2019-07-002.yaml",
+          "size_bytes": 3250,
+          "sha256": "395181f1e5fae08f00a912aecab5e05330b13db2674a45bfcbbf656385ec1a01",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2019-07-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2019-08-001.yaml",
+          "size_bytes": 2720,
+          "sha256": "75c7f7342038155383fb93b2fdda0f0725e176a818c366b304c67fd38fabe096",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2019-08-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2019-08-002.yaml",
+          "size_bytes": 2351,
+          "sha256": "9ea29be5e7d24714e39e913506ca7e6cd70853bdf668a905d7f6becd9bca7265",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2019-08-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-04-001.yaml",
+          "size_bytes": 352,
+          "sha256": "d7c8c4f626cc79f9eb12d36f4272a7c6644a2fa3664f3307d5c6b07fd18bc100",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-04-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-05-001.yaml",
+          "size_bytes": 2991,
+          "sha256": "0cd20a89da9b4de41c5935b759194cb17ee36fc1e605719ac1563d661fcab759",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-05-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-05-003.yaml",
+          "size_bytes": 9437,
+          "sha256": "1fe8f70991601fe97854cdb248bcc233e00a39367188038b8119892bb229a373",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-05-003.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-08-001.yaml",
+          "size_bytes": 3435,
+          "sha256": "c7ac1e08383ab2a9c3f594c5f39f5db63bd8261557209306231d7f7062d3a13e",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-08-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-08-002.yaml",
+          "size_bytes": 4479,
+          "sha256": "9f58656b0253767e9ad0a18b7f56940b935731b2134ae29bd7198e144a1496c4",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-08-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-09-001.yaml",
+          "size_bytes": 2193,
+          "sha256": "df4f578befa83604726bab384a32c332178f1a07446f0ba1941a868d9ddc6462",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-09-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-09-002.yaml",
+          "size_bytes": 2294,
+          "sha256": "10d7322264d649417de167621b7d8db69cb79f9738e3a7665d3709c14cb8f41f",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-09-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-09-003.yaml",
+          "size_bytes": 1996,
+          "sha256": "3b258851a1f759738659caddc8969edf61381dd88d395449cb62092b77559672",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-09-003.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-09-004.yaml",
+          "size_bytes": 3285,
+          "sha256": "78e3d0c674cc51eeed0937f410a2b47c09064c16ccee966015e665956e5439ee",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-09-004.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-09-005.yaml",
+          "size_bytes": 3025,
+          "sha256": "413e8a91b9f5e979154e8bf3b95a1b951355727d9ce5cf3b31e7e1ca1c41e994",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-09-005.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-11-001.yaml",
+          "size_bytes": 2984,
+          "sha256": "560bb06b423136d4ef201417eeab776818c4eada3164e5f6a1f02a6bdb1c5bd8",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-11-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-11-002.yaml",
+          "size_bytes": 2617,
+          "sha256": "8c113467d6d0ba4410a7d3ade8c8185f519ae6cc26e385110cb1502ecc5450aa",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-11-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-11-003.yaml",
+          "size_bytes": 2162,
+          "sha256": "542ecef64aaf5cab626a70927bcdb0d7b371cb781759282286a98696ffb27833",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-11-003.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-11-004.yaml",
+          "size_bytes": 5570,
+          "sha256": "e27b804de19956a666aaefb94a2193550e1e8f35e489e4a2c8ac1ef3732c6a27",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-11-004.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-11-005.yaml",
+          "size_bytes": 2927,
+          "sha256": "b1d146f39f2521207158668347d9e4296f657e5fb93a10b6717946a42919e931",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-11-005.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-11-006.yaml",
+          "size_bytes": 2181,
+          "sha256": "cdf62338497d3888f7951066d24d1ccbede9fd680e88caff1fbda300ac138c7f",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-11-006.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-11-007.yaml",
+          "size_bytes": 1977,
+          "sha256": "676f27c1e461e2918b0849fc9e4d233430808179cab3edd86901b4b0e297b27e",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-11-007.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-11-008.yaml",
+          "size_bytes": 2416,
+          "sha256": "caafd6fc4322d1c146eaba5cbbc1c1dbe5c7445b2e9de8a5a1bb15d296bec563",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-11-008.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-11-009.yaml",
+          "size_bytes": 1586,
+          "sha256": "c212636b499ee65bdc689e3cb3589ec4d1661df12a005d49b04268653e913357",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-11-009.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-11-010.yaml",
+          "size_bytes": 1922,
+          "sha256": "7d45eac59af07ef1b516ad060cd0b589e2c13a52c77e01afd569f94b35574791",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-11-010.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2020-11-011.yaml",
+          "size_bytes": 1827,
+          "sha256": "dc43e1533efc4e2a4db52247a7981e5067fe97033698fda28f192d083a364bf2",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2020-11-011.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-01-001.yaml",
+          "size_bytes": 1376,
+          "sha256": "cd1fe99772fd98e63c7e9114238cb4a8588edd5970b44e1a2ed2e2908f970274",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-01-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-01-002.yaml",
+          "size_bytes": 1519,
+          "sha256": "2df477538deeed0e7027284faa489aae6b26ecec075730395f85a46c70b9ce67",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-01-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-01-003.yaml",
+          "size_bytes": 1410,
+          "sha256": "edc8f2e6a64a17cb7c39b58e26596aed324a246e5cdb437e82b196fa65920c29",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-01-003.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-01-004.yaml",
+          "size_bytes": 1550,
+          "sha256": "c78d7349e5b369382ef39777e56aac1b248bff2d279dd3837468a335a3135a21",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-01-004.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-01-006.yaml",
+          "size_bytes": 1785,
+          "sha256": "30c758f213869e182db09e518bace651d64672de3c2f8fc376cd43907ba3bb0f",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-01-006.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-01-007.yaml",
+          "size_bytes": 1888,
+          "sha256": "cd727c2e0a9cf0c471746cb0e98db2831fc9f7ee672fe4093746c29d105d893e",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-01-007.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-01-008.yaml",
+          "size_bytes": 1958,
+          "sha256": "1ff93947e3d7648afb740f13a253a05cc48cee370146a06d89e47728533f5b7e",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-01-008.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-01-009.yaml",
+          "size_bytes": 3172,
+          "sha256": "7e51ffe242c218e546ba039304edeeb1ce32b22e9003ae57d63ac0be0dd686e3",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-01-009.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-02-001.yaml",
+          "size_bytes": 2464,
+          "sha256": "b8890cb837af20fdeeb8a0fa0a235807bfe0f1d3e00c59391842281d8bca1094",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-02-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-02-002.yaml",
+          "size_bytes": 3732,
+          "sha256": "731b8d25f99d94ed43a3f30cbb86f94d4dba284868b15b9f7c3646e50f6f0975",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-02-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-04-001.yaml",
+          "size_bytes": 4422,
+          "sha256": "7cc9dddccf3265d76b324130eda9bec2d2baf6c32f8e9620e24d04d0b3c94bbd",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-04-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-05-001.yaml",
+          "size_bytes": 2786,
+          "sha256": "ebd97e032e410b7740d6ea7a80e893cfc854f64245a36e0423a784271c31d0e0",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-05-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-05-002.yaml",
+          "size_bytes": 2801,
+          "sha256": "2db730b5c489f2ea15d715a5fc01b01388c9966551e6858d6e702861a6d379a9",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-05-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-05-003.yaml",
+          "size_bytes": 2653,
+          "sha256": "18b2b2266fb25ee33a7eba92a8f6ad1cdb23ee93667430d385f2172e9a8bed13",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-05-003.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-05-004.yaml",
+          "size_bytes": 3176,
+          "sha256": "ab65d8dc470c5d44eb2e8e0d3e1fd681bf898d8e66641e2bed945e7259a9edcb",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-05-004.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-05-005.yaml",
+          "size_bytes": 3403,
+          "sha256": "86a87131a3ad3b34ebae768358da60607636601894169972856c738447ff2590",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-05-005.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-05-006.yaml",
+          "size_bytes": 2950,
+          "sha256": "93db5b77e9a9e130bf477d89e461623e668120767e792fc4bf220e19211bc177",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-05-006.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-05-007.yaml",
+          "size_bytes": 3045,
+          "sha256": "53540042d40ebbef25fcc46e9d964cfd247b1888e7dcff59a4ea0b65b5133949",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-05-007.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-05-008.yaml",
+          "size_bytes": 2434,
+          "sha256": "c966228265f629eb07944b23f1dd26da86b2652209c71729ef39bb2abd9bfecf",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-05-008.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-05-009.yaml",
+          "size_bytes": 3006,
+          "sha256": "721e9f50b5035bbb36ee4e234532d91e450fe63b57c48af596349e4a199469dc",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-05-009.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-05-010.yaml",
+          "size_bytes": 2849,
+          "sha256": "c4a5f698bb9c4b8dcd3e3e640b6bca848d107a1256ccb305f85cd705aab4dacd",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-05-010.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-05-011.yaml",
+          "size_bytes": 2753,
+          "sha256": "d96f33e341c32497a354a2db9bab37d4594511ac1961c40be54b963afbbc5418",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-05-011.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-05-012.yaml",
+          "size_bytes": 2614,
+          "sha256": "471fc345434c6183c768d5a90f2941fe45d5ba29c79905ffff3fec6c7a0bd608",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-05-012.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-11-001.yaml",
+          "size_bytes": 4220,
+          "sha256": "4468ebe7706120d9d86520574b4e1348d888324d9bc55b4d45a02a71fb6ecbea",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-11-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-11-002.yaml",
+          "size_bytes": 4840,
+          "sha256": "cb4cb1596ac4515ac437771d5700dde4eaedde2579cc7b1bfe766b7575ba7de5",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-11-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-12-001.yaml",
+          "size_bytes": 10331,
+          "sha256": "1f66dd4dd782f68f08d7def8f86b81ce9d40cd9c79069f0318f75f3868ac51b1",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-12-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2021-12-002.yaml",
+          "size_bytes": 4470,
+          "sha256": "8aedae9d2d697aaa244e0c82c288ae8f7afbcad35c13e44f302576c7560b2940",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2021-12-002.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "analytics_CAR-2022-03-001.yaml",
+          "size_bytes": 7666,
+          "sha256": "4fac5bdbf742b73309255f29843bb580b748eb7d668aa5b9c7915bb3994e17ec",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/analytics/CAR-2022-03-001.yaml",
+          "status": "cached",
+          "source_dir": "analytics"
+        },
+        {
+          "filename": "sensors_auditd_2.8.yaml",
+          "size_bytes": 2898,
+          "sha256": "a4eac455e986351a0ca6437aae3dda6b91078ae232eb297de5bccbafd15d0964",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/sensors/auditd_2.8.yaml",
+          "status": "cached",
+          "source_dir": "sensors"
+        },
+        {
+          "filename": "sensors_autoruns_13.98.yaml",
+          "size_bytes": 1963,
+          "sha256": "8955115e8f82666e3778e0f0e7574899ad9a1e433e19fdeae91fac4b331af060",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/sensors/autoruns_13.98.yaml",
+          "status": "cached",
+          "source_dir": "sensors"
+        },
+        {
+          "filename": "sensors_osquery_4.1.2.yaml",
+          "size_bytes": 2924,
+          "sha256": "863fcd26467a9fd1384f8241c264e121029dcb3a1a132f74af192e2d8bd0c865",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/sensors/osquery_4.1.2.yaml",
+          "status": "cached",
+          "source_dir": "sensors"
+        },
+        {
+          "filename": "sensors_osquery_4.6.0.yaml",
+          "size_bytes": 3314,
+          "sha256": "f9fdae25e676b8bf68bbef7d12532631b6cc3d3becef4609ef6985c5299fcd55",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/sensors/osquery_4.6.0.yaml",
+          "status": "cached",
+          "source_dir": "sensors"
+        },
+        {
+          "filename": "sensors_sysmon_10.4.yaml",
+          "size_bytes": 3081,
+          "sha256": "ffcb7d60a2a8905d4b478013f37d60e67ee0fc4904e93a355d769047410a2c8a",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/sensors/sysmon_10.4.yaml",
+          "status": "cached",
+          "source_dir": "sensors"
+        },
+        {
+          "filename": "sensors_sysmon_11.0.yaml",
+          "size_bytes": 3332,
+          "sha256": "1975e9d70c3998a99ac378ad8e7a45ad301e6842b22be5d8b752710b805638db",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/sensors/sysmon_11.0.yaml",
+          "status": "cached",
+          "source_dir": "sensors"
+        },
+        {
+          "filename": "sensors_sysmon_13.yaml",
+          "size_bytes": 3638,
+          "sha256": "28f5caeddc44fd6a47975650b46c327af99e04def0c5c19e958d6815977e480b",
+          "url": "https://raw.githubusercontent.com/mitre-attack/car/master/sensors/sysmon_13.yaml",
+          "status": "cached",
+          "source_dir": "sensors"
+        }
+      ]
+    },
+    {
+      "standard": "shield",
+      "files": [
+        {
+          "filename": "attack_groups.json",
+          "size_bytes": 319621,
+          "sha256": "c7a296ca1f35bb2b30851f56dc43f59a0feb795b6dcfb71cdf64d2bcd473ecdf",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/attack_groups.json",
+          "status": "cached"
+        },
+        {
+          "filename": "attack_mapping.json",
+          "size_bytes": 641795,
+          "sha256": "fe56bdd3c61cf00f557cff44d699dc64706237723b4378ea191c93c85c607702",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/attack_mapping.json",
+          "status": "cached"
+        },
+        {
+          "filename": "mapping.json",
+          "size_bytes": 99194,
+          "sha256": "222f912469ee4b860728a75fd861d6527616a1514fb1d0d0c62d5849055a28ef",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/mapping.json",
+          "status": "cached"
+        },
+        {
+          "filename": "navigation.json",
+          "size_bytes": 11023,
+          "sha256": "2ee34af15a91f55c1e3d887c28ad66a149ffeb2c9f653864400fbfced7aee02f",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/navigation.json",
+          "status": "cached"
+        },
+        {
+          "filename": "opportunities.json",
+          "size_bytes": 13731,
+          "sha256": "c775036f672a7513e9c1a962d4e8cb6d41cdd8780722870c7a89b4dd3d5a87e2",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/opportunities.json",
+          "status": "cached"
+        },
+        {
+          "filename": "procedures.json",
+          "size_bytes": 12029,
+          "sha256": "bd98955e70676529d0618b548af34ed5d2dbfe55a6930e703dd204850b5b82ce",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/procedures.json",
+          "status": "cached"
+        },
+        {
+          "filename": "tactic_details.json",
+          "size_bytes": 67774,
+          "sha256": "ec7b76847d48727fda6d62736921393c18c8c9d10d1d6e5ebf2ff0414d05dadb",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/tactic_details.json",
+          "status": "cached"
+        },
+        {
+          "filename": "tactic_matrix.json",
+          "size_bytes": 64433,
+          "sha256": "e249cd250848df0dbe82a52fa92d9c7c0ddc3f3e84a6317a78fb3869ceca91c5",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/tactic_matrix.json",
+          "status": "cached"
+        },
+        {
+          "filename": "tactics.json",
+          "size_bytes": 3797,
+          "sha256": "8226428e70f542b51a4b47511ea0456e1ff4fe911721d8ce7905b00e8f79dc52",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/tactics.json",
+          "status": "cached"
+        },
+        {
+          "filename": "technique_details.json",
+          "size_bytes": 181237,
+          "sha256": "f698a8b97fa6ac78462fe29681cdd6f936aa3c130ea622cdeb0ec675d965c398",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/technique_details.json",
+          "status": "cached"
+        },
+        {
+          "filename": "techniques.json",
+          "size_bytes": 15863,
+          "sha256": "09150fad97afe50b33acbd4145cc5abe7f841e92fcdbd3856c7a20de283efd36",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/techniques.json",
+          "status": "cached"
+        },
+        {
+          "filename": "use_cases.json",
+          "size_bytes": 36683,
+          "sha256": "dac36dcb9cd9d5ee1c70652a230f7640113f8d023a454e9fa159349a28089c46",
+          "url": "https://raw.githubusercontent.com/MITRECND/mitrecnd.github.io/master/_data/use_cases.json",
+          "status": "cached"
+        }
+      ]
+    },
+    {
+      "standard": "engage",
+      "files": [
+        {
+          "filename": "activities.json",
+          "size_bytes": 37415,
+          "sha256": "19c8788bdd8615a0d5dddf8046c902c00b453c1b0247e35c9ca610a99ad98e07",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/activities.json",
+          "status": "cached"
+        },
+        {
+          "filename": "activity_details.json",
+          "size_bytes": 153319,
+          "sha256": "4e47d11af0428ad1d3b1782c367a3e4a0abf850e6809fd838e350d31886a1abf",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/activity_details.json",
+          "status": "cached"
+        },
+        {
+          "filename": "approach_activity_mappings.json",
+          "size_bytes": 2754,
+          "sha256": "604f9e9e38431ec83a0fdcaa0c7d2f88c4b5d20a4f2ff4c94e497a78c6ccbe06",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/approach_activity_mappings.json",
+          "status": "cached"
+        },
+        {
+          "filename": "approach_details.json",
+          "size_bytes": 9000,
+          "sha256": "cff1b915f0fbba99373bb2322a1b1c4abccb300bada6cd8eefb482caec97d5db",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/approach_details.json",
+          "status": "cached"
+        },
+        {
+          "filename": "approach_matrix.json",
+          "size_bytes": 61875,
+          "sha256": "9f52e275f4125b19bf70b1544632e4b7f516c2463a20b7c7a7989536588f367c",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/approach_matrix.json",
+          "status": "cached"
+        },
+        {
+          "filename": "approaches.json",
+          "size_bytes": 7955,
+          "sha256": "da2e09ad8c93f4aa463afaa9c5b1ef27eae91b444b580c4af432ae4ba05dadb7",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/approaches.json",
+          "status": "cached"
+        },
+        {
+          "filename": "attack_mapping.json",
+          "size_bytes": 282159,
+          "sha256": "8004901aa219813a4b7105665aa5e9cd2128beeccc818b2c3e42324f1ad609bf",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/attack_mapping.json",
+          "status": "cached"
+        },
+        {
+          "filename": "attack_tactics_techniques.json",
+          "size_bytes": 36411,
+          "sha256": "6ea21f2dbab322ab093b79ae140d4e55445995bca81ed9a4634563d25ab8a270",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/attack_tactics_techniques.json",
+          "status": "cached"
+        },
+        {
+          "filename": "goal_approach_mappings.json",
+          "size_bytes": 450,
+          "sha256": "150d4384e9d2f242a5a6301202a6d560a46ecb265566382f94e35900ae02af3d",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/goal_approach_mappings.json",
+          "status": "cached"
+        },
+        {
+          "filename": "goal_details.json",
+          "size_bytes": 10105,
+          "sha256": "c82463eb407eb4f8e74ebdf59afad1f7b0cde8ef42c2a96356fc69ff85436402",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/goal_details.json",
+          "status": "cached"
+        },
+        {
+          "filename": "goals.json",
+          "size_bytes": 9848,
+          "sha256": "7056089a8f1c76304feab9d0ba3695e9410c5e6636487b907cf676c7f2e22d72",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/goals.json",
+          "status": "cached"
+        },
+        {
+          "filename": "references.json",
+          "size_bytes": 13543,
+          "sha256": "6598c1c3cad875b33586b88732ac1c27faa9d376529db8730e56889ccd1e316a",
+          "url": "https://raw.githubusercontent.com/mitre/engage/main/Data/json/references.json",
+          "status": "cached"
+        }
+      ]
+    }
+  ]
+}

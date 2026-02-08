@@ -1,0 +1,50 @@
+{
+  "files": [
+    {
+      "content_type": "application/json; charset=utf-8",
+      "etag": "W/\"694183c2-29e01c8\"",
+      "last_modified": "Tue, 16 Dec 2025 16:07:30 GMT",
+      "saved_at": "2026-02-08T01:23:09Z",
+      "sha256": "671377151dd2882820897f137e99df8ebd5a87d0cc69650ed9f43bf8e1a830f2",
+      "size_bytes": 43909576,
+      "source": "d3fend.mitre.org",
+      "url": "https://d3fend.mitre.org/ontologies/d3fend/1.3.0/d3fend-full-mappings.json",
+      "filename": "d3fend-full-mappings.json"
+    },
+    {
+      "content_type": "application/json; charset=utf-8",
+      "etag": "W/\"694183c2-44b4b2\"",
+      "last_modified": "Tue, 16 Dec 2025 16:07:30 GMT",
+      "saved_at": "2026-02-08T01:23:09Z",
+      "sha256": "a7157ac5aa51011a82bd031ab61181cc952b0f1b621ad82fa073b0f13f10f43f",
+      "size_bytes": 4502706,
+      "source": "d3fend.mitre.org",
+      "url": "https://d3fend.mitre.org/ontologies/d3fend/1.3.0/d3fend.json",
+      "filename": "d3fend.json"
+    },
+    {
+      "content_type": "application/rdf+xml",
+      "etag": "W/\"694183c2-5cab76\"",
+      "last_modified": "Tue, 16 Dec 2025 16:07:30 GMT",
+      "saved_at": "2026-02-08T01:23:08Z",
+      "sha256": "501934ed1630f0fcf55df4c2ce0977b489f4db6864db50df6357cae45f806180",
+      "size_bytes": 6073206,
+      "source": "d3fend.mitre.org",
+      "url": "https://d3fend.mitre.org/ontologies/d3fend/1.3.0/d3fend.owl",
+      "filename": "d3fend.owl"
+    },
+    {
+      "content_type": "text/turtle; charset=utf-8",
+      "etag": "\"694183c2-345fa5\"",
+      "last_modified": "Tue, 16 Dec 2025 16:07:30 GMT",
+      "saved_at": "2026-02-08T01:23:08Z",
+      "sha256": "1ea4343ed1fcfb48448d26cefaddaf2911c98a66ab3f531be9422df54bd9c1ad",
+      "size_bytes": 3432357,
+      "source": "d3fend.mitre.org",
+      "url": "https://d3fend.mitre.org/ontologies/d3fend/1.3.0/d3fend.ttl",
+      "filename": "d3fend.ttl"
+    }
+  ],
+  "last_updated": "2026-02-08T01:23:09.884849",
+  "source": null
+}

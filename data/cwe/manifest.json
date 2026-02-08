@@ -1,0 +1,13 @@
+{
+  "files": [
+    {
+      "filename": "cwec_latest.xml",
+      "size_bytes": 16095784,
+      "sha256": "f7d6fae581116795aa3545ce2ab801f81cbb655410d65db703f1343df10ff7b9",
+      "url": "https://cwe.mitre.org/data/xml/cwec_latest.xml.zip",
+      "status": "success"
+    }
+  ],
+  "last_updated": "2026-02-08T02:24:28.946344",
+  "source": "https://cwe.mitre.org/"
+}
