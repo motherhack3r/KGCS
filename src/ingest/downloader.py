@@ -72,6 +72,16 @@ class StandardsDownloader:
             ]
             await asyncio.gather(*tasks, return_exceptions=True)
             
+            # After async downloads complete, create standard-level manifests so they
+            # match sync downloaders (data/{standard}/manifest.json). The async
+            # downloader writes per-file metadata.json inside raw/; convert that
+            # into a manifest at the standard root for consistency.
+            for std in ("attack", "capec", "d3fend"):
+                try:
+                    await asyncio.to_thread(self._write_manifest_from_metadata, std)
+                except Exception:
+                    logger.debug("Could not create manifest for %s", std)
+
             logger.info("Download completed")
         except Exception as e:
             logger.error(f"Download failed: {str(e)}", exc_info=True)
@@ -374,6 +384,59 @@ class StandardsDownloader:
                         logger.exception("Failed to update metadata for extracted member %s", target)
         except Exception:
             logger.exception("Failed to extract ZIP file: %s", zip_path)
+
+    def _write_manifest_from_metadata(self, standard: str):
+        """Create data/{standard}/manifest.json from raw/metadata.json or raw files.
+
+        This mirrors the sync downloader behavior so all standards have a
+        top-level `manifest.json` file.
+        """
+        std_dir = self.output_dir / standard
+        raw_dir = std_dir / 'raw'
+        manifest_path = std_dir / 'manifest.json'
+
+        manifest = {'files': [], 'last_updated': None}
+
+        meta_file = raw_dir / 'metadata.json'
+        if meta_file.exists():
+            try:
+                data = json.loads(meta_file.read_text(encoding='utf-8'))
+                files = data.get('files', {})
+                # Convert files dict to list of file metadata entries
+                for name, entry in files.items():
+                    rec = entry.copy()
+                    rec['filename'] = name
+                    manifest['files'].append(rec)
+                manifest['source'] = None
+            except Exception:
+                # Fall back to listing raw files
+                manifest['files'] = self._list_raw_files_for_manifest(raw_dir)
+        else:
+            manifest['files'] = self._list_raw_files_for_manifest(raw_dir)
+
+        manifest['last_updated'] = datetime.utcnow().isoformat()
+        try:
+            std_dir.mkdir(parents=True, exist_ok=True)
+            with open(manifest_path, 'w', encoding='utf-8') as fh:
+                json.dump(manifest, fh, indent=2)
+            logger.info(f"Manifest saved: {manifest_path}")
+        except Exception:
+            logger.debug("Failed to write manifest for %s", standard)
+
+    def _list_raw_files_for_manifest(self, raw_dir: Path):
+        files = []
+        if not raw_dir.exists():
+            return files
+        for p in sorted(raw_dir.iterdir()):
+            if p.is_file():
+                try:
+                    files.append({
+                        'filename': p.name,
+                        'size_bytes': p.stat().st_size,
+                    })
+                except Exception:
+                    files.append({'filename': p.name})
+        return files
 
     def _update_metadata(self, directory: Path, filename: str, url: str, *, size_bytes: Optional[int] = None, content_type: Optional[str] = None, last_modified: Optional[str] = None, etag: Optional[str] = None, sha256: Optional[str] = None):
         """Create or update metadata.json in `directory` recording file metadata.
