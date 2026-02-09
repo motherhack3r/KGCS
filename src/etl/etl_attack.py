@@ -20,9 +20,9 @@ from rdflib import Graph, Namespace, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD
 
 try:
-    from src.etl.ttl_writer import write_graph_turtle_lines
+    from src.etl.ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
 except Exception:
-    from .ttl_writer import write_graph_turtle_lines
+    from .ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
 
 SEC = Namespace("https://example.org/sec/core#")
 EX = Namespace("https://example.org/")
@@ -227,6 +227,7 @@ def main():
     parser.add_argument("--validate", action="store_true", help="Run SHACL validation on output")
     parser.add_argument("--shapes", default="docs/ontology/shacl/attack-shapes.ttl", help="SHACL shapes file")
     parser.add_argument("--append", action="store_true", help="Append to existing output file instead of overwriting")
+    parser.add_argument("--format", choices=["ttl","nt"], default="ttl", help="Output format (ttl or nt)")
     args = parser.parse_args()
 
     # Support a single file or a directory of STIX JSON files (enterprise, mobile, ics, pre-attack)
@@ -263,7 +264,10 @@ def main():
 
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
     print(f"Writing RDF to {args.output}...")
-    write_graph_turtle_lines(graph, args.output, include_prefixes=not args.append, append=args.append)
+    if args.format == "nt":
+        write_graph_ntriples_lines(graph, args.output, append=args.append)
+    else:
+        write_graph_turtle_lines(graph, args.output, include_prefixes=not args.append, append=args.append)
 
     if args.validate:
         print("\nRunning SHACL validation...")

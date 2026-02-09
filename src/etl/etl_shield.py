@@ -17,9 +17,9 @@ from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib.namespace import RDF, RDFS, XSD
 
 try:
-    from src.etl.ttl_writer import write_graph_turtle_lines
+    from src.etl.ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
 except Exception:
-    from .ttl_writer import write_graph_turtle_lines
+    from .ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
 
 
 class SHIELDtoRDFTransformer:

@@ -173,6 +173,14 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
 
         print(f"\nSummary written to: {summary_path}")
 
+        # Reorder node triples by subject (rdf:type first) to produce a grouped nodes file.
+        # Uses disk-backed bucketing to avoid loading the full file into memory.
+        try:
+            _reorder_nodes_grouped(nodes_out)
+            print(f"Reordered nodes file by subject: {nodes_out}")
+        except Exception as e:
+            print(f"Warning: node reordering failed: {e}")
+
         # Post-combine diagnostics: scan nodes output for suspicious lines that do not start
         # with a valid subject token (i.e., '<', '_:', or 'a'). This detects stray fragments
         # caused by multi-line triples or tokenization problems and writes examples to a log.
@@ -313,6 +321,85 @@ def parse_with_heuristic(input_file, nodes_f, rels_f, node_predicates_set):
     else:
         print(f"       Heuristic triples: {triples:,} (nodes: {nodes_t:,}, rels: {rels_t:,})")
     return triples, nodes_t, rels_t, malformed
+
+
+def _reorder_nodes_grouped(nodes_out: str, buckets: int = 256) -> None:
+    """Reorder the node triples file so that triples are grouped by subject and any
+    rdf:type triples for a subject are written before other triples for the same
+    subject.
+
+    Uses on-disk bucketing (by SHA1 prefix) to avoid holding the entire file in
+    memory for large datasets.
+    """
+    import hashlib
+    import shutil
+    from pathlib import Path
+
+    nodes_path = Path(nodes_out)
+    if not nodes_path.exists():
+        return
+
+    bucket_dir = nodes_path.parent / 'combine_buckets'
+    if bucket_dir.exists():
+        shutil.rmtree(bucket_dir)
+    bucket_dir.mkdir(parents=True, exist_ok=True)
+
+    header_lines = []
+
+    # Distribute lines into buckets (skip header/prefix lines)
+    with open(nodes_out, 'r', encoding='utf-8') as nf:
+        for line in nf:
+            if not line.strip():
+                continue
+            if line.startswith('@prefix') or line.startswith('@base') or line.startswith('#'):
+                header_lines.append(line)
+                continue
+            first_tok = line.split(' ', 1)[0]
+            bucket_name = hashlib.sha1(first_tok.encode('utf-8')).hexdigest()[:2]
+            with open(bucket_dir / f'bucket_{bucket_name}.tmp', 'a', encoding='utf-8') as bf:
+                bf.write(line)
+
+    # Assemble final nodes file
+    tmp_nodes = nodes_path.with_suffix(nodes_path.suffix + '.sorted')
+    with open(tmp_nodes, 'w', encoding='utf-8') as out_f:
+        # write header lines first
+        for hl in header_lines:
+            out_f.write(hl)
+        out_f.write('\n')
+
+        # process buckets in sorted order for determinism
+        for bucket in sorted(bucket_dir.iterdir()):
+            lines = bucket.read_text(encoding='utf-8').splitlines()
+            # sort by subject then predicate for deterministic grouping
+            lines.sort(key=lambda l: (l.split(' ', 2)[0], l.split(' ', 2)[1]))
+
+            i = 0
+            while i < len(lines):
+                subj = lines[i].split(' ', 2)[0]
+                group = []
+                j = i
+                while j < len(lines) and lines[j].split(' ', 2)[0] == subj:
+                    group.append(lines[j] + '\n')
+                    j += 1
+                # Within group, write rdf:type lines first
+                type_lines = []
+                other_lines = []
+                for l in group:
+                    parts = l.strip().split(' ', 2)
+                    pred_tok = parts[1]
+                    pred_lower = pred_tok.lower()
+                    if pred_tok == 'a' or 'rdf:type' in pred_lower or '#type' in pred_lower:
+                        type_lines.append(l)
+                    else:
+                        other_lines.append(l)
+                for l in type_lines + other_lines:
+                    out_f.write(l)
+                i = j
+
+    # Move sorted file into place
+    shutil.move(str(tmp_nodes), str(nodes_path))
+    # cleanup buckets
+    shutil.rmtree(bucket_dir, ignore_errors=True)
 
 
 def main():

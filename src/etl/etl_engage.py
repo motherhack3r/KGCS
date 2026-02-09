@@ -17,9 +17,9 @@ from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib.namespace import RDF, RDFS, XSD
 
 try:
-    from src.etl.ttl_writer import write_graph_turtle_lines
+    from src.etl.ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
 except Exception:
-    from .ttl_writer import write_graph_turtle_lines
+    from .ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
 
 
 class ENGAGEtoRDFTransformer:
@@ -365,7 +365,10 @@ def main():
         transformer.transform(json_data)
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)
         print(f"Writing RDF to {args.output}...")
-        write_graph_turtle_lines(transformer.graph, args.output)
+        if args.format == "nt":
+            write_graph_ntriples_lines(transformer.graph, args.output)
+        else:
+            write_graph_turtle_lines(transformer.graph, args.output)
         
         print(f"Transformation complete: {args.output}")
         return 0

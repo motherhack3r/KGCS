@@ -77,3 +77,25 @@ def write_graph_turtle_lines(graph: Graph, output_path: str, include_prefixes: b
                 if not s_fmt or not p_fmt or not o_fmt:
                     continue
                 fh.write(f"{s_fmt} {p_fmt} {o_fmt} .\n")
+
+
+def write_graph_ntriples_lines(graph: Graph, output_path: str, append: bool = False) -> None:
+    """Write a graph in N-Triples format (one triple per line).
+
+    Args:
+        graph: RDF graph to write
+        output_path: Output file path
+        append: Append to file if True, overwrite if False
+    """
+    mode = "a" if append else "w"
+    # Sort triples for deterministic output
+    triples = sorted(graph, key=lambda t: (str(t[0]), str(t[1]), str(t[2])))
+    with open(output_path, mode, encoding="utf-8") as fh:
+        for s, p, o in triples:
+            s_fmt = _format_term(s)
+            p_fmt = _format_term(p)
+            o_fmt = _format_term(o)
+            if not s_fmt or not p_fmt or not o_fmt:
+                # Skip triples we cannot serialize safely
+                continue
+            fh.write(f"{s_fmt} {p_fmt} {o_fmt} .\n")

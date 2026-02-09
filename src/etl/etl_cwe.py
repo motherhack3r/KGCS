@@ -20,9 +20,9 @@ from rdflib import Graph, Namespace, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD
 
 try:
-    from src.etl.ttl_writer import write_graph_turtle_lines
+    from src.etl.ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
 except Exception:
-    from .ttl_writer import write_graph_turtle_lines
+    from .ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
 
 SEC = Namespace("https://example.org/sec/core#")
 EX = Namespace("https://example.org/")
@@ -322,6 +322,7 @@ def main():
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
     parser.add_argument("--validate", action="store_true", help="Run SHACL validation on output")
     parser.add_argument("--shapes", default="docs/ontology/shacl/cwe-shapes.ttl", help="SHACL shapes file")
+    parser.add_argument("--format", choices=["ttl","nt"], default="ttl", help="Output format (ttl or nt)")
     args = parser.parse_args()
 
     if not os.path.exists(args.input):
@@ -337,7 +338,10 @@ def main():
 
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
     print(f"Writing RDF to {args.output}...")
-    write_graph_turtle_lines(graph, args.output)
+    if args.format == "nt":
+        write_graph_ntriples_lines(graph, args.output)
+    else:
+        write_graph_turtle_lines(graph, args.output)
 
     if args.validate:
         print("\nRunning SHACL validation...")

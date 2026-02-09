@@ -454,7 +454,10 @@ def main():
 
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
     print(f"Writing RDF to {args.output}...")
-    write_graph_turtle_lines(graph, args.output)
+    if args.format == "nt":
+        write_graph_ntriples_lines(graph, args.output)
+    else:
+        write_graph_turtle_lines(graph, args.output)
 
     if args.validate:
         print("\nRunning SHACL validation...")
