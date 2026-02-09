@@ -18,12 +18,13 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from datetime import datetime
 from rdflib import Graph, Namespace, Literal, URIRef
-from rdflib.namespace import RDF, RDFS, XSD
+from rdflib import RDF, RDFS, XSD
+
 
 try:
-    from src.etl.ttl_writer import write_graph_turtle_lines
+    from src.etl.ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
 except Exception:
-    from .ttl_writer import write_graph_turtle_lines
+    from .ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
 
 SEC = Namespace("https://example.org/sec/core#")
 EX = Namespace("https://example.org/")
@@ -280,7 +281,7 @@ class CAPECtoRDFTransformer:
                 relationship = related.get("Relationship", "")
 
                 predicate = relationship_map.get(relationship)
-                if predicate == SEC.childOf or predicate is not None:
+                if predicate is not None:
                     self.graph.add((pattern_node, predicate, related_node))
 
 
@@ -433,6 +434,7 @@ def main():
     parser.add_argument("--attack-input", default="data/attack/raw", help="ATT&CK STIX JSON file or directory for CAPEC -> ATT&CK mappings")
     parser.add_argument("--validate", action="store_true", help="Run SHACL validation on output")
     parser.add_argument("--shapes", default="docs/ontology/shacl/capec-shapes.ttl", help="SHACL shapes file")
+    parser.add_argument("--format", choices=["ttl","nt"], default="ttl", help="Output format (ttl or nt)")
     args = parser.parse_args()
 
     if not os.path.exists(args.input):

@@ -14,7 +14,7 @@ import sys
 import os
 
 from rdflib import Graph, Namespace, URIRef, Literal
-from rdflib.namespace import RDF, RDFS, XSD
+from rdflib import RDF, RDFS, XSD
 
 try:
     from src.etl.ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
@@ -295,10 +295,10 @@ def main():
     # Write the combined graph to output
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
     print(f"Writing RDF to {args.output}...")
-if args.format == "nt":
-            write_graph_ntriples_lines(transformer.graph, args.output, append=args.append)
-        else:
-            write_graph_turtle_lines(transformer.graph, args.output, include_prefixes=not args.append, append=args.append)
+    if args.format == "nt":
+        write_graph_ntriples_lines(transformer.graph, args.output, append=args.append)
+    else:
+        write_graph_turtle_lines(transformer.graph, args.output, include_prefixes=not args.append, append=args.append)
 
     # SHACL validation
     if args.validate:

@@ -17,7 +17,7 @@ import subprocess
 import sys
 from datetime import datetime
 from rdflib import Graph, Namespace, Literal, URIRef
-from rdflib.namespace import RDF, RDFS, XSD
+from rdflib import RDF, RDFS, XSD
 
 try:
     from src.etl.ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines

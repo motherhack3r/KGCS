@@ -17,7 +17,7 @@ from typing import Any, Dict, Iterable, List
 
 import yaml
 from rdflib import Graph, Literal, Namespace, URIRef
-from rdflib.namespace import RDF, RDFS, XSD
+from rdflib import RDF, RDFS, XSD
 
 try:
     from src.etl.ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
@@ -277,7 +277,9 @@ def main() -> int:
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
     parser.add_argument("--validate", action="store_true", help="Run SHACL validation on output")
     parser.add_argument("--shapes", default="docs/ontology/shacl/car-shapes.ttl", help="SHACL shapes file")
-    parser.add_argument("--append", action="store_true", help="Append to output file instead of overwriting")    parser.add_argument("--format", choices=["ttl","nt"], default="ttl", help="Output format (ttl or nt)")    args = parser.parse_args()
+    parser.add_argument("--append", action="store_true", help="Append to output file instead of overwriting")
+    parser.add_argument("--format", choices=["ttl","nt"], default="ttl", help="Output format (ttl or nt)")
+    args = parser.parse_args()
 
     input_files: List[str] = []
     if os.path.isdir(args.input):
