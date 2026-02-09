@@ -234,6 +234,9 @@ def main():
     files = []
     if os.path.isdir(args.input):
         for fn in sorted(os.listdir(args.input)):
+            # Skip per-directory metadata files (created by downloader)
+            if fn.lower() == 'metadata.json':
+                continue
             if fn.lower().endswith('.json'):
                 files.append(os.path.join(args.input, fn))
     else:

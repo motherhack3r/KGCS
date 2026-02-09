@@ -557,11 +557,54 @@ def _sanitize_nodes_file(nodes_out: str, max_accum_lines: int = 6) -> int:
     removed = 0
 
     def _escape_newlines_in_literals(s: str) -> str:
-        # Heuristic: replace raw newlines inside double-quoted literal segments with escaped \n
-        parts = s.split('"')
-        for i in range(1, len(parts), 2):
-            parts[i] = parts[i].replace('\n', '\\n').replace('\r', '\\r')
-        return '"'.join(parts)
+        # Heuristic: find double-quoted (and triple-quoted) literal segments and sanitize their contents.
+        # The goals are:
+        # - remove Python byte-repr fragments like b'...'/b"..."
+        # - escape internal newlines, backslashes and double-quotes so rdflib can parse the triple
+        # - strip or replace non-printable control characters
+        # Implementation uses regex to operate on literal spans only.
+        def _clean_literal(text: str) -> str:
+            # Remove Python byte-string repr fragments (e.g., b'\x00\xff') - fall back to
+            # a simple prefix strip in case the byte-repr contains complex escapes that
+            # are hard to match reliably.
+            text = text.replace("b'", '').replace('b"', '')
+            text = re.sub(r"b'(?:\\.|[^'])*'|b\"(?:\\.|[^\"])*\"", '', text)
+
+            # Remove common Python-style escape sequences (\xNN, \uNNNN, etc.) which are invalid in TTL
+            text = re.sub(r'\\x[0-9A-Fa-f]{2}', ' ', text)
+            text = re.sub(r'\\u[0-9A-Fa-f]{4}', ' ', text)
+            text = re.sub(r'\\U[0-9A-Fa-f]{8}', ' ', text)
+            # Remove any remaining backslash-escaped fragment (e.g., \n, \t, \') by converting to space
+            text = re.sub(r'\\.', ' ', text)
+
+            # Normalize newlines to escaped \n (we write as two characters backslash+n)
+            text = text.replace('\r\n', '\\n').replace('\r', '\\n').replace('\n', '\\n')
+
+            # Escape backslashes first, then double quotes so they are safe inside a double-quoted literal
+            text = text.replace('\\', '\\\\')
+            text = text.replace('"', '\\"')
+
+            # Replace remaining control characters (except common whitespace) with a single space
+            text = ''.join(ch if (ch == '\n' or ch == '\r' or ch == '\t' or ord(ch) >= 0x20) else ' ' for ch in text)
+
+            return text
+
+        # Handle triple-quoted literals first (""" ... """) using DOTALL
+        def _triple_repl(m: re.Match) -> str:
+            inner = m.group(1)
+            return '"""' + _clean_literal(inner) + '"""'
+
+        s = re.sub(r'"""(.*?)"""', _triple_repl, s, flags=re.DOTALL)
+
+        # Now handle single-line double-quoted literals. Use a greedy match so that
+        # unescaped inner quotes are captured from the first to the last quote on the line
+        # and then sanitized inside.
+        def _single_repl(m: re.Match) -> str:
+            inner = m.group(1)
+            return '"' + _clean_literal(inner) + '"'
+
+        s = re.sub(r'"(.*)"', _single_repl, s, flags=re.DOTALL)
+        return s
 
     buffer = ''
     lines_accum = 0
@@ -591,12 +634,40 @@ def _sanitize_nodes_file(nodes_out: str, max_accum_lines: int = 6) -> int:
             if buffer.strip().endswith('.'):
                 subj = buffer.strip().split(' ', 1)[0] if buffer.strip() else ''
                 if subj.startswith('<') or subj.startswith('_:') or subj == 'a':
-                    # Escape internal newlines inside literal segments before writing
+                    # Escape internal newlines inside literal segments before writing.
+                    # After sanitizing, attempt to validate the single-triple by parsing it with rdflib.
                     try:
                         out_line = _escape_newlines_in_literals(buffer)
-                        outf.write(out_line)
+                        # Aggressive in-line cleaning for known bad escape sequences (\xNN, etc.)
+                        out_line = re.sub(r'\\x[0-9A-Fa-f]{2}', ' ', out_line)
+                        out_line = re.sub(r'\\u[0-9A-Fa-f]{4}', ' ', out_line)
+                        out_line = re.sub(r'\\.', ' ', out_line)
+                        out_line = out_line.replace('\\', '\\\\').replace('"', '\\"')
+
+                        # Quick validation: parsing a single triple in isolation
+                        from rdflib import Graph
+                        try:
+                            gtest = Graph()
+                            gtest.parse(data=out_line, format='turtle')
+                            outf.write(out_line)
+                        except Exception:
+                            # Aggressive fallback cleaning: remove b'...' fragments and
+                            # residual escaped-byte sequences, then try parsing again.
+                            cleaned = re.sub(r"b'(?:\\.|[^'])*'|b\"(?:\\.|[^\"])*\"", '', buffer)
+                            cleaned = re.sub(r'\\x[0-9A-Fa-f]{2}', ' ', cleaned)
+                            cleaned = re.sub(r'\\u[0-9A-Fa-f]{4}', ' ', cleaned)
+                            cleaned = re.sub(r'\\.', ' ', cleaned)
+                            # Escape quotes/backslashes and newlines to yield a valid literal
+                            cleaned = cleaned.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').replace('\r', '\\n')
+                            try:
+                                gtest2 = Graph()
+                                gtest2.parse(data=cleaned, format='turtle')
+                                outf.write(cleaned)
+                            except Exception:
+                                rf.write(f"{lineno-lines_accum+1}-{lineno}: {buffer[:400]}\n")
+                                removed += 1
                     except Exception:
-                        # fallback: write as-is
+                        # fallback: write as-is (best-effort)
                         outf.write(buffer)
                 else:
                     rf.write(f"{lineno-lines_accum+1}-{lineno}: {buffer[:400]}\n")

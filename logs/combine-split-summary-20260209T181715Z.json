@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-02-09T18:17:15.758241Z",
+  "nodes_out": "C:\\Users\\humbe\\AppData\\Local\\Temp\\pytest-of-humbe\\pytest-24\\test_sanitizer_escapes_unescap0\\nodes_out3.ttl",
+  "rels_out": "C:\\Users\\humbe\\AppData\\Local\\Temp\\pytest-of-humbe\\pytest-24\\test_sanitizer_escapes_unescap0\\rels_out3.ttl",
+  "stages": [
+    {
+      "name": "pipeline-stage-quotes.ttl",
+      "size_bytes": 173,
+      "triples": 2,
+      "node_triples": 2,
+      "rel_triples": 0,
+      "malformed_triples": 0
+    }
+  ],
+  "totals": {
+    "triples": 2,
+    "node_triples": 2,
+    "rel_triples": 0
+  }
+}

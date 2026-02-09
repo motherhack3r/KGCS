@@ -35,6 +35,40 @@ class D3FENDtoRDFTransformer:
         self.graph.bind("rdfs", RDFS)
         self.graph.bind("xsd", XSD)
 
+    def _normalize_d3fend_id(self, id_value: str) -> str:
+        """Normalize D3FEND IDs into safe local name for URI creation.
+
+        - Replace namespace separators and whitespace with '-'
+        - Remove any remaining unsafe characters
+        - Ensure a D3FEND- or D3- prefix exists (preserve if starts with D3)
+        - Fallback to a short sha1 digest if the result is empty
+        """
+        import re
+        import hashlib
+
+        if not id_value:
+            digest = hashlib.sha1(b"").hexdigest()[:8]
+            return f"D3FEND-UNKNOWN-{digest}"
+
+        s = str(id_value).strip()
+        # Replace colon, slash, backslash, whitespace with hyphen
+        s = re.sub(r"[:/\\\s]+", "-", s)
+        # Remove leading d3f/d3fend namespace fragments (they are noisy in IDs)
+        s = re.sub(r'^(?:d3f(?:end)?-?)', '', s, flags=re.IGNORECASE)
+        # Remove characters that are not generally safe in URL local names
+        s = re.sub(r"[^A-Za-z0-9_.-]", "", s)
+        # Collapse multiple hyphens
+        s = re.sub(r"-+", "-", s).strip('-')
+
+        if not s:
+            digest = hashlib.sha1(str(id_value).encode('utf-8')).hexdigest()[:8]
+            return f"D3FEND-UNKNOWN-{digest}"
+
+        if not s.upper().startswith('D3'):
+            s = f"D3FEND-{s}"
+
+        return s
+
     def transform(self, json_data: dict) -> Graph:
         """Transform D3FEND JSON to RDF graph."""
         if "DefensiveTechniques" in json_data:
@@ -77,11 +111,13 @@ class D3FENDtoRDFTransformer:
                     continue
                 d3fend_id = fallback_id
 
-            d3fend_id_full = f"{d3fend_id}" if str(d3fend_id).startswith("D3") else f"D3FEND-{d3fend_id}"
-            technique_node = URIRef(f"{self.EX}deftech/{d3fend_id_full}")
+            # Normalize ID for safe URI creation, but preserve original as a literal
+            normalized = self._normalize_d3fend_id(d3fend_id)
+            technique_node = URIRef(f"{self.EX}deftech/{normalized}")
 
             self.graph.add((technique_node, RDF.type, self.SEC.DefensiveTechnique))
-            self.graph.add((technique_node, self.SEC.d3fendId, Literal(d3fend_id_full, datatype=XSD.string)))
+            # Store the original (potentially namespaced) id as a literal for provenance
+            self.graph.add((technique_node, self.SEC.d3fendId, Literal(str(d3fend_id), datatype=XSD.string)))
 
             if label:
                 self.graph.add((technique_node, RDFS.label, Literal(label, datatype=XSD.string)))
@@ -157,10 +193,11 @@ class D3FENDtoRDFTransformer:
         d3fend_id = technique.get("ID", "")
         if not d3fend_id:
             return
-        d3fend_id_full = f"D3FEND-{d3fend_id}" if not d3fend_id.startswith("D3FEND-") else d3fend_id
-        technique_node = URIRef(f"{self.EX}deftech/{d3fend_id_full}")
+        normalized = self._normalize_d3fend_id(d3fend_id)
+        technique_node = URIRef(f"{self.EX}deftech/{normalized}")
         self.graph.add((technique_node, RDF.type, self.SEC.DefensiveTechnique))
-        self.graph.add((technique_node, self.SEC.d3fendId, Literal(d3fend_id_full, datatype=XSD.string)))
+        # preserve original as literal
+        self.graph.add((technique_node, self.SEC.d3fendId, Literal(str(d3fend_id), datatype=XSD.string)))
 
         if technique.get("Name"):
             self.graph.add((technique_node, RDFS.label, Literal(technique["Name"], datatype=XSD.string)))
@@ -194,7 +231,9 @@ class D3FENDtoRDFTransformer:
                 continue
             id_source = (url or ref_type or ref_text or "").strip()
             digest = hashlib.sha1(id_source.encode('utf-8')).hexdigest()[:12]
-            ref_id = f"{d3fend_id_full}-ref-{digest}"
+            # Use normalized id for stable, safe reference node ids
+            ref_parent = normalized if 'normalized' in locals() else self._normalize_d3fend_id(d3fend_id)
+            ref_id = f"{ref_parent}-ref-{digest}"
             ref_node = URIRef(f"{self.EX}reference/{ref_id}")
             self.graph.add((ref_node, RDF.type, self.SEC.Reference))
             if url:
@@ -224,14 +263,14 @@ class D3FENDtoRDFTransformer:
             d3fend_id = technique.get("ID", "")
             if not d3fend_id:
                 continue
-            
-            d3fend_id_full = f"D3FEND-{d3fend_id}" if not d3fend_id.startswith("D3FEND-") else d3fend_id
-            technique_node = URIRef(f"{self.EX}deftech/{d3fend_id_full}")
-            
+
+            normalized = self._normalize_d3fend_id(d3fend_id)
+            technique_node = URIRef(f"{self.EX}deftech/{normalized}")
+
             if technique.get("ParentID"):
                 parent_id = technique["ParentID"]
-                parent_id_full = f"D3FEND-{parent_id}" if not parent_id.startswith("D3FEND-") else parent_id
-                parent_node = URIRef(f"{self.EX}deftech/{parent_id_full}")
+                parent_norm = self._normalize_d3fend_id(parent_id)
+                parent_node = URIRef(f"{self.EX}deftech/{parent_norm}")
                 self.graph.add((technique_node, self.SEC.childOf, parent_node))
                 self.graph.add((parent_node, self.SEC.parentOf, technique_node))
 
@@ -241,10 +280,10 @@ class D3FENDtoRDFTransformer:
             d3fend_id = technique.get("ID", "")
             if not d3fend_id:
                 continue
-            
-            d3fend_id_full = f"D3FEND-{d3fend_id}" if not d3fend_id.startswith("D3FEND-") else d3fend_id
-            technique_node = URIRef(f"{self.EX}deftech/{d3fend_id_full}")
-            
+
+            normalized = self._normalize_d3fend_id(d3fend_id)
+            technique_node = URIRef(f"{self.EX}deftech/{normalized}")
+
             if technique.get("MitigatesTechniques"):
                 for att_technique in technique["MitigatesTechniques"]:
                     att_id = att_technique if isinstance(att_technique, str) else att_technique.get("ID", "")
@@ -269,6 +308,9 @@ def main():
     json_files = []
     if os.path.isdir(args.input):
         for p in sorted(Path(args.input).rglob('*.json')):
+            # Skip per-directory metadata files (created by downloader)
+            if p.name.lower() == 'metadata.json':
+                continue
             json_files.append(str(p))
     else:
         json_files = [args.input]

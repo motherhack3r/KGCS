@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-02-09T18:15:46.022368Z",
+  "nodes_out": "C:\\Users\\humbe\\AppData\\Local\\Temp\\pytest-of-humbe\\pytest-22\\test_sanitizer_removes_byte_re0\\nodes_out2.ttl",
+  "rels_out": "C:\\Users\\humbe\\AppData\\Local\\Temp\\pytest-of-humbe\\pytest-22\\test_sanitizer_removes_byte_re0\\rels_out2.ttl",
+  "stages": [
+    {
+      "name": "pipeline-stage-byte.ttl",
+      "size_bytes": 196,
+      "triples": 2,
+      "node_triples": 2,
+      "rel_triples": 0,
+      "malformed_triples": 0
+    }
+  ],
+  "totals": {
+    "triples": 2,
+    "node_triples": 2,
+    "rel_triples": 0
+  }
+}
