@@ -13,7 +13,7 @@ from pathlib import Path
 from datetime import datetime
 
 def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined-rels.ttl",
-                      heuristic_threshold=200_000_000, node_predicates=None):
+                      heuristic_threshold=200_000_000, node_predicates=None, inputs=None):
     """Stream-combine pipeline TTL files into two outputs: nodes and relationships.
 
     For each stage file we attempt to parse with rdflib (safe, accurate). If the file
@@ -21,23 +21,56 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
     loading very large files into memory.
     """
 
-    # Find all pipeline stage files in order
+    # Determine stage files to process (either explicit inputs or default stage discovery)
     stage_files = []
     import glob
-    for i in range(1, 11):
-        stage_file = f"tmp/pipeline-stage{i}-*.ttl"
-        # Use glob to find all matching files for this stage (tmp/ or data/*/samples/ fallback)
-        matches = sorted(glob.glob(stage_file))
-        if not matches:
-            # Fallback to per-standard samples if tmp/ doesn't contain stage files
-            fallback_pattern = f"data/*/samples/pipeline-stage{i}-*.ttl"
-            fb_matches = sorted(glob.glob(fallback_pattern))
-            if fb_matches:
-                print(f"  Found {len(fb_matches)} data/samples file(s) for stage {i}: {fb_matches}")
-                matches = fb_matches
-        if matches:
-            print(f"  Found {len(matches)} file(s) for stage {i}: {matches}")
-            stage_files.extend(matches)
+    import os
+
+    if inputs:
+        # Explicit inputs provided: accept files, directories, or glob patterns
+        expanded = []
+        for inp in inputs:
+            hits = sorted(glob.glob(inp))
+            if hits:
+                for h in hits:
+                    if os.path.isdir(h):
+                        # include .ttl and .nt files in directory
+                        expanded.extend(sorted(glob.glob(os.path.join(h, "*.ttl")) + glob.glob(os.path.join(h, "*.nt"))))
+                    else:
+                        expanded.append(h)
+            else:
+                # not a glob match: treat as path
+                if os.path.isdir(inp):
+                    expanded.extend(sorted(glob.glob(os.path.join(inp, "*.ttl")) + glob.glob(os.path.join(inp, "*.nt"))))
+                elif os.path.exists(inp):
+                    expanded.append(inp)
+                else:
+                    # try to find matching files in data/*/samples/
+                    fb_matches = sorted(glob.glob(inp) + glob.glob(os.path.join('data', '*', 'samples', os.path.basename(inp))))
+                    if fb_matches:
+                        expanded.extend(fb_matches)
+        # deduplicate and sort
+        stage_files = sorted(dict.fromkeys(expanded))
+        print(f"Combining explicit inputs ({len(stage_files)} files): {stage_files}")
+    else:
+        for i in range(1, 11):
+            # search for both .ttl and .nt pipeline stage outputs
+            patterns = [f"tmp/pipeline-stage{i}-*.ttl", f"tmp/pipeline-stage{i}-*.nt"]
+            matches = []
+            for p in patterns:
+                matches.extend(sorted(glob.glob(p)))
+            # If no matches in tmp/, fall back to data/*/samples/ for both extensions
+            if not matches:
+                fb_patterns = [f"data/*/samples/pipeline-stage{i}-*.ttl", f"data/*/samples/pipeline-stage{i}-*.nt"]
+                fb_matches = []
+                for p in fb_patterns:
+                    fb_matches.extend(sorted(glob.glob(p)))
+                if fb_matches:
+                    print(f"  Found {len(fb_matches)} data/samples file(s) for stage {i}: {fb_matches}")
+                    matches = fb_matches
+            if matches:
+                print(f"  Found {len(matches)} file(s) for stage {i}: {matches}")
+                stage_files.extend(matches)
 
     if not stage_files:
         print("[ERROR] No pipeline stage files found in tmp/")
@@ -92,7 +125,10 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
                     try:
                         from rdflib import Graph, RDF, Literal
                         g = Graph()
-                        g.parse(input_file, format='turtle')
+                        # select parse format by file extension
+                        ext = path_p.suffix.lower()
+                        parse_format = 'nt' if ext == '.nt' else 'turtle'
+                        g.parse(input_file, format=parse_format)
 
                         # bind namespaces to a tmp graph for n3() rendering
                         tmp = Graph()
@@ -411,6 +447,7 @@ def main():
     parser.add_argument("--rels-out", default="tmp/combined-rels.ttl", help="Output file for relationship triples")
     parser.add_argument("--heuristic-threshold", type=int, default=200_000_000, help="File size in bytes above which to use heuristic parsing")
     parser.add_argument("--node-predicate", action="append", help="Predicate URI (or substring) to force into nodes file; repeatable")
+    parser.add_argument("--inputs", nargs='*', help="Explicit list of input files or directories to combine (overrides automatic discovery)")
 
     args = parser.parse_args()
     
@@ -423,7 +460,8 @@ def main():
     
     success = combine_ttl_files(nodes_out=args.nodes_out, rels_out=args.rels_out,
                                 heuristic_threshold=args.heuristic_threshold,
-                                node_predicates=args.node_predicate)
+                                node_predicates=args.node_predicate,
+                                inputs=args.inputs)
     
     if success:
         print(f"End time: {datetime.now().isoformat()}")
