@@ -22,7 +22,7 @@ python scripts/run_all_etl.py
 python scripts/validate_all_standards.py
 
 # Step 5: Combine all TTL outputs into single file
-python scripts/combine_ttl_pipeline.py
+python scripts/combine_ttl_pipeline.py --nodes-out tmp/combined-nodes.ttl --rels-out tmp/combined-rels.ttl
 ```
 
 Note: ETL output locations
@@ -96,6 +96,11 @@ python -m src.ingest.download_manager
 python scripts/run_all_etl.py
 python scripts/combine_ttl_pipeline.py --nodes-out tmp/combined-nodes.ttl --rels-out tmp/combined-rels.ttl
 
+# Optional: produce a single full-load file (nodes then relationships)
+# Useful when your loader accepts a single input file. Use `--full-out` to write a concatenated file.
+python scripts/combine_ttl_pipeline.py --inputs tmp/pipeline-stage6-capec.nt tmp/pipeline-stage7-cwe.nt \
+    --nodes-out tmp/selected-nodes.nt --rels-out tmp/selected-rels.nt --full-out tmp/selected-full.nt
+
 # Load to Neo4j using the helper wrapper (nodes then relationships)
 .
 \scripts\load_to_neo4j.ps1 -DbVersion 2026-02-08
@@ -139,7 +144,7 @@ python -m src.ingest.download_manager
 - **CPE** (NVD): 15 chunk files (nvdcpe-2.0) → `data/cpe/raw/` (chunked extraction created `nvdcpe-2.0-chunks`)
 - **CPEMatch** (NVD): 55 chunk files (nvdcpematch-2.0) → `data/cpematch/raw/` (chunked extraction)
 - **CVE** (NVD): 25 yearly files (nvdcve-2.0-2002.json … nvdcve-2.0-2026.json) → `data/cve/raw/`; also downloads the CVE JSON schema and related CVSS JSON schemas → `data/cve/schemas/`
-- **CWE** (MITRE): 1 XML file (cwec_latest.xml) → `data/cwe/raw/`; also downloads the CWE XSD → `data/cwe/schemas/`
+- **CWE** (MITRE): 1 XML file (cwe_latest.xml) → `data/cwe/raw/`; also downloads the CWE XSD → `data/cwe/schemas/`
 - **CAPEC** (MITRE): 1 XML file (capec_latest.xml) plus STIX (`stix-capec.json`) and XSD (`ap_schema_latest.xsd`) → `data/capec/raw/` and `data/capec/schemas/`
 - **ATT&CK** (MITRE): 4 STIX variants (enterprise, ics, mobile, pre-attack) → `data/attack/raw/`
 - **D3FEND** (MITRE): 4 files (d3fend.json, d3fend-full-mappings.json, d3fend.owl, d3fend.ttl) → `data/d3fend/raw/`
@@ -283,6 +288,57 @@ python src/etl/rdf_to_neo4j.py --ttl tmp/combined-rels.ttl --rels-only
 ```
 
 If you still need a separate splitter utility for special cases, `scripts/utilities/split_ttl.py` remains available as a fallback (it parses a single TTL and emits nodes/rels outputs).
+
+### E2E run for selected standards (nodes-first, rels-second) 🔁
+
+Use this when you want to run the pipeline only for a subset of standards (for faster iteration or debugging). The pattern is:
+
+1. Run ETL for each selected standard and emit N-Triples (one triple per line) using `--format nt` so normalization is guaranteed:
+
+```bash
+# Example: run CWE and CAR only (writes to tmp/)
+python -m src.etl.etl_cwe --input data/cwe/samples/sample_cwe.json --output tmp/pipeline-stage7-cwe.nt --format nt
+python -m src.etl.etl_car --input data/car/samples --output tmp/pipeline-stage8-car.nt --format nt
+```
+
+1. Combine only the `tmp/` pipeline-stage files (the combine script auto-discovers `.ttl` and `.nt`):
+
+```bash
+python scripts/combine_ttl_pipeline.py --nodes-out tmp/selected-nodes.nt --rels-out tmp/selected-rels.nt
+```
+
+1. Validate combined outputs with SHACL (mandatory):
+
+```bash
+python scripts/validate_all_standards.py --input tmp/selected-nodes.nt
+# or run targeted shape checks for the standards involved
+```
+
+1. Dry-run the Neo4j loader to inspect label & relationship counts and reveal missing types or subjects:
+
+```bash
+python src/etl/rdf_to_neo4j.py --ttl tmp/selected-nodes.nt --fast-parse --dry-run --workers 4
+```
+
+1. Load nodes-only for the selected standards (create DB, indexes, insert nodes):
+
+```bash
+python src/etl/rdf_to_neo4j.py --ttl tmp/selected-nodes.nt --reset-db --nodes-only --chunk-size 50000 --fast-parse
+```
+
+1. Load relationships-only (no reset):
+
+```bash
+python src/etl/rdf_to_neo4j.py --ttl tmp/selected-rels.nt --rels-only --rel-batch-size 1000 --fast-parse
+```
+
+Notes & troubleshooting:
+
+- Use `--dry-run` first to avoid partial writes and to inspect diagnostics (`logs/combine-*.json` and `logs/bad_node_subjects.log`).
+- If the combine diagnostics show `bad_node_subjects_count > 0`, fix the originating ETL (do not fabricate types) and re-run the ETL + combine steps.
+- Keep ETL pipeline outputs in *N-Triples* format for the pipeline (human-readable TTL can still be generated separately if needed).
+- For large selections, run nodes load in the KGCS-prescribed causal order (CPE → CVE → CWE → CAPEC → ATT&CK → {D3FEND, CAR, SHIELD, ENGAGE}) to ensure relationship targets exist before rel ingestion.
+
 
 ### Step 5: Load to Neo4j
 
