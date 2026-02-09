@@ -94,10 +94,11 @@ python -m src.ingest.download_manager
 
 # Run ETL and combine stages
 python scripts/run_all_etl.py
-python scripts/combine_ttl_pipeline.py
+python scripts/combine_ttl_pipeline.py --nodes-out tmp/combined-nodes.ttl --rels-out tmp/combined-rels.ttl
 
-# Load to Neo4j (example)
-python src/etl/rdf_to_neo4j.py --ttl tmp/combined-pipeline.ttl --batch-size 1000
+# Load to Neo4j using the helper wrapper (nodes then relationships)
+.
+\scripts\load_to_neo4j.ps1 -DbVersion 2026-02-08
 ```
 
 **Verification note (Feb 8, 2026):** After activating the `metadata` conda environment (Step 1), running the downloader (`python -m src.ingest.download_manager`) successfully fetched raw files, wrote per-standard manifests (`data/{standard}/manifest.json`), and saved official schemas under `data/{standard}/schemas/` (for example, CVSS JSON schemas under `data/cve/schemas/`).
@@ -256,32 +257,76 @@ python scripts/combine_ttl_pipeline.py
 
 **Time:** ~5-10 minutes
 
-### Step 5: Load to Neo4j
+### Preferred: Combine with streaming split into nodes + relationships
 
-Loads RDF data into Neo4j graph database:
+Instead of combining into one huge TTL and splitting afterwards, use the updated combine script which streams each stage file and writes two outputs directly: a nodes TTL and a relationships TTL. This avoids building a giant in-memory RDF graph and is faster/more memory-safe.
+
+Run the streaming combine (defaults produce `tmp/combined-nodes.ttl` and `tmp/combined-rels.ttl`):
 
 ```bash
-# Load to specific Neo4j instance
-python src/etl/rdf_to_neo4j.py --database neo4j-2026-02-03 --ttl tmp/combined-pipeline.ttl --batch-size 1000
-
-# Or use default (neo4j)
-python src/etl/rdf_to_neo4j.py --ttl tmp/combined-pipeline.ttl
+python scripts/combine_ttl_pipeline.py --nodes-out tmp/combined-nodes.ttl --rels-out tmp/combined-rels.ttl
 ```
 
-**Processing:**
+Options:
 
-- Batch writes (default 1000 nodes per batch)
-- Creates label-specific indexes on `uri` field
-- Applies graph constraints (uniqueness)
-- Cross-standard relationship linking
+- `--heuristic-threshold N` — file size in bytes above which the combine step will use a simple line-based heuristic instead of rdflib parsing (default ~200MB).
+- `--node-predicate <URI>` — repeatable; force triples whose predicate contains this substring into the nodes file.
 
-**Output:**
+After combining, load nodes first and relationships second (do NOT reset DB on the second step):
 
-- Neo4j graph with ~2.5M nodes and 26M relationships
-- Constraints and indexes applied
-- Success message with statistics
+```bash
+# load nodes-only
+python src/etl/rdf_to_neo4j.py --ttl tmp/combined-nodes.ttl --reset-db --nodes-only
 
-**Time:** ~30-60 minutes
+# load relationships-only
+python src/etl/rdf_to_neo4j.py --ttl tmp/combined-rels.ttl --rels-only
+```
+
+If you still need a separate splitter utility for special cases, `scripts/utilities/split_ttl.py` remains available as a fallback (it parses a single TTL and emits nodes/rels outputs).
+
+### Step 5: Load to Neo4j
+
+Load RDF into Neo4j using a nodes-first then relationships-second approach (recommended). The loader supports chunked, streaming parsing and a variety of tuning options to match your machine resources.
+
+Quick workflow (recommended):
+
+1. Dry-run to estimate counts (uses --workers to parallelize estimation):
+
+```bash
+python src/etl/rdf_to_neo4j.py --ttl tmp/combined-nodes.ttl --chunk-size 50000 --fast-parse --dry-run --workers 8 --progress-newline
+```
+
+1. Nodes load (reset DB, create indexes, load nodes):
+
+```bash
+python src/etl/rdf_to_neo4j.py --ttl tmp/combined-nodes.ttl --chunk-size 100000 --fast-parse --batch-size 20000 --db-version 2026-02-08 --reset-db --nodes-only --progress-newline --parse-heartbeat-seconds 30
+```
+
+1. Relationships load (no reset):
+
+```bash
+python src/etl/rdf_to_neo4j.py --ttl tmp/combined-rels.ttl --chunk-size 100000 --fast-parse --batch-size 20000 --rel-batch-size 5000 --db-version 2026-02-08 --rels-only --progress-newline --parse-heartbeat-seconds 30
+```
+
+Notes on tuning and flags:
+
+- `--chunk-size` — number of unique subjects per chunk. Use chunking (50k–100k) to avoid large in-memory loads and to parallelize work across chunks.
+- `--fast-parse` — use the streaming extractor to avoid building an rdflib Graph for very large TTLs.
+- `--batch-size` — controls node insert batch size (5k–20k). Increase if Neo4j can handle larger transactions.
+- `--rel-batch-size` — relationship insert batch size (start at 1k).
+- `--reset-db` — drop & recreate the target versioned DB (requires admin privileges); fallback is `MATCH (n) DETACH DELETE n`.
+- `--db-version` — append a version suffix to the configured DB name so you can create/reset a versioned DB safely.
+- `--progress-newline` — print progress updates as new lines (useful for log capture).
+- `--parse-heartbeat-seconds` — heartbeat interval during long parses (e.g., 30s).
+
+Processing performed by the loader:
+
+- Chunking (optional) to break the TTL into manageable pieces
+- Streaming extraction of nodes and relationship triples
+- Create constraints and indexes (unique constraints on key properties and URI indexes)
+- Two-pass load: nodes first (create/merge nodes), relationships second (MERGE relationships between existing nodes)
+
+Expected time depends on hardware and Neo4j configuration; on a modern workstation with tuned Neo4j, nodes + relationships can complete in under an hour but may take longer for very large datasets.
 
 ## Expected Output Sizes
 

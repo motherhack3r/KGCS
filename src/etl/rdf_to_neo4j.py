@@ -77,6 +77,7 @@ class RDFtoNeo4jTransformer:
         self.stats = {
             'labels': defaultdict(int),
             'relationships': 0,
+            'rel_types': defaultdict(int),
         }
         self.merge_keys = {
             "Platform": "cpeNameId",
@@ -176,11 +177,15 @@ class RDFtoNeo4jTransformer:
                 source_uri=subject_uri,
                 target_uri=target_uri,
                 relationship_type=rel_type,
-                properties={},
+                properties={"predicate_uri": str(predicate)},
                 source_label=self.nodes[subject_uri].label if subject_uri in self.nodes else None,
                 target_label=self.nodes[target_uri].label if target_uri in self.nodes else None
             ))
             self.stats['relationships'] += 1
+            try:
+                self.stats['rel_types'][rel_type] += 1
+            except Exception:
+                pass
 
         if verbose:
             for label, count in sorted(self.stats['labels'].items()):
@@ -202,6 +207,31 @@ class RDFtoNeo4jTransformer:
         """
         if verbose:
             print("\nExtracting nodes and relationships (streaming)...")
+
+        # Read prefix mappings from the TTL header so we can expand prefixed names
+        prefix_map: Dict[str, str] = {}
+        try:
+            with open(ttl_path, 'r', encoding='utf-8') as fh:
+                for raw_line in fh:
+                    line = raw_line.strip()
+                    if not line:
+                        continue
+                    if line.startswith('@prefix'):
+                        # expected form: @prefix sec: <https://example.org/sec/core#> .
+                        parts = line.split()
+                        if len(parts) >= 3:
+                            pfx = parts[1]
+                            ns = parts[2]
+                            if pfx.endswith(':'):
+                                pfx_key = pfx[:-1]
+                                if ns.startswith('<') and ns.endswith('>'):
+                                    prefix_map[pfx_key] = ns[1:-1]
+                        continue
+                    # stop at first non-prefix/header line
+                    break
+
+        except Exception:
+            prefix_map = {}
 
         def iter_triples(path: Path):
             with open(path, 'r', encoding='utf-8') as fh:
@@ -227,8 +257,17 @@ class RDFtoNeo4jTransformer:
                     yield subj_token, pred_token, obj_token
 
         def parse_uri(token: str) -> URIRef | None:
+            # full URI: <http://...>
             if token.startswith('<') and token.endswith('>'):
                 return URIRef(token[1:-1])
+            # shorthand rdf:type
+            if token == 'a':
+                return RDF.type
+            # prefixed name: prefix:local
+            if ':' in token:
+                pfx, local = token.split(':', 1)
+                if pfx in prefix_map:
+                    return URIRef(prefix_map[pfx] + local)
             return None
 
         def parse_object(token: str):
@@ -323,11 +362,15 @@ class RDFtoNeo4jTransformer:
                     source_uri=subject_uri,
                     target_uri=target_uri,
                     relationship_type=rel_type,
-                    properties={},
+                    properties={"predicate_uri": str(pred_uri_ref)},
                     source_label=self.nodes[subject_uri].label if subject_uri in self.nodes else None,
                     target_label=self.nodes[target_uri].label if target_uri in self.nodes else None
                 ))
                 self.stats['relationships'] += 1
+                try:
+                    self.stats['rel_types'][rel_type] += 1
+                except Exception:
+                    pass
 
         if verbose:
             for label, count in sorted(self.stats['labels'].items()):
@@ -652,6 +695,7 @@ def _write_chunk_file(lines: List[str], idx: int) -> str:
     with open(tmp_path, 'w', encoding='utf-8') as tf:
         tf.write('@prefix dcterms: <http://purl.org/dc/terms/> .\n')
         tf.write('@prefix sec: <https://example.org/sec/core#> .\n')
+        tf.write('@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n')
         tf.write('@prefix ex: <https://example.org/> .\n\n')
         tf.write('@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n')
         tf.write('@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\n')
@@ -663,6 +707,8 @@ def _write_chunk_file(lines: List[str], idx: int) -> str:
 def split_ttl_nodes_relationships(data_path: str, nodes_path: str, rels_path: str) -> Tuple[int, int]:
     """Split a TTL file into nodes-only (rdf:type + literals) and relationships-only (URI objects)."""
     rdf_type_token = f"<{RDF.type}>"
+    rdf_prefixed_token = "rdf:type"
+    rdf_shorthand_token = "a"
     nodes_written = 0
     rels_written = 0
 
@@ -698,7 +744,7 @@ def split_ttl_nodes_relationships(data_path: str, nodes_path: str, rels_path: st
             elif obj_token.endswith('.'):
                 obj_token = obj_token[:-1]
 
-            if pred_token == rdf_type_token:
+            if pred_token == rdf_type_token or pred_token == rdf_prefixed_token or pred_token == rdf_shorthand_token:
                 nodes_out.write(raw_line)
                 nodes_written += 1
             elif obj_token.startswith('"'):
@@ -760,6 +806,7 @@ def _dry_run_chunk(tmp_path: str) -> Dict[str, Any]:
     return {
         'labels': dict(transformer.stats['labels']),
         'relationships': transformer.stats['relationships'],
+        'rel_types': dict(transformer.stats.get('rel_types', {})),
     }
 
 
@@ -859,6 +906,7 @@ def main():
             completed = 0
             aggregate_labels: Dict[str, int] = {}
             aggregate_rels = 0
+            aggregate_rel_types: Dict[str, int] = {}
 
             if args.dry_run:
                 workers = max(args.workers or 1, 1)
@@ -872,6 +920,7 @@ def main():
                             _update_progress(completed, total_chunks, worker_id, args.progress_newline)
                             _merge_label_counts(aggregate_labels, result.get('labels', {}))
                             aggregate_rels += result.get('relationships', 0)
+                            _merge_label_counts(aggregate_rel_types, result.get('rel_types', {}))
                 else:
                     for chunk_idx, tmp_path in chunk_files:
                         result = _dry_run_chunk(tmp_path)
@@ -879,6 +928,7 @@ def main():
                         _update_progress(completed, total_chunks, ((chunk_idx - 1) % workers) + 1, args.progress_newline)
                         _merge_label_counts(aggregate_labels, result.get('labels', {}))
                         aggregate_rels += result.get('relationships', 0)
+                        _merge_label_counts(aggregate_rel_types, result.get('rel_types', {}))
 
                 if total_chunks:
                     print()
@@ -992,6 +1042,10 @@ def main():
             print("\nSummary:")
             for label, count in sorted(aggregate_labels.items()):
                 print(f"   * {label}: {count}")
+            if aggregate_rel_types:
+                print("   * Relationships by type:")
+                for rel_type, count in sorted(aggregate_rel_types.items(), key=lambda x: -x[1]):
+                    print(f"      - {rel_type}: {count}")
             print(f"   * Relationships: {aggregate_rels}")
             print(f"   * Triples scanned: {total_triples}")
 
@@ -1027,7 +1081,17 @@ def main():
             )
 
         if args.dry_run:
-            print("\nDry run enabled — skipping Neo4j load.")
+            print()
+            print("Dry run enabled — skipping Neo4j load.")
+            print("\nSummary:")
+            for label, count in sorted(transformer.stats['labels'].items()):
+                print(f"   * {label}: {count}")
+            rel_types = transformer.stats.get('rel_types', {})
+            if rel_types:
+                print("   * Relationships by type:")
+                for rel_type, count in sorted(rel_types.items(), key=lambda x: -x[1]):
+                    print(f"      - {rel_type}: {count}")
+            print(f"   * Relationships: {transformer.stats['relationships']}")
             return 0
 
         from neo4j import GraphDatabase

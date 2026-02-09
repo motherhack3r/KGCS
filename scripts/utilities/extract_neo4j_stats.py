@@ -3,11 +3,12 @@
 Extract comprehensive statistics from Neo4j KGCS graph.
 
 Usage:
-    python scripts/extract_neo4j_stats.py [--output artifacts/neo4j-stats.json]
+    python scripts/utilities/extract_neo4j_stats.py [--output artifacts/neo4j-stats.json]
 """
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -19,8 +20,10 @@ if sys.platform == "win32":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+# sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+# Add project root to Python path to enable src imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 from src.config import neo4j_config
 
 
