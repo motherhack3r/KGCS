@@ -99,23 +99,42 @@ class CARtoRDFTransformer:
                 refs.extend(val)
             else:
                 refs.append(val)
+        import hashlib
         for ref in refs:
             url = None
             ref_type = None
+            ref_text = None
             if isinstance(ref, dict):
                 url = ref.get("url") or ref.get("URL")
                 ref_type = ref.get("referenceType") or ref.get("ReferenceType")
+                # support free-text descriptions in dicts
+                ref_text = ref.get("title") or ref.get("description") or ref.get("text")
             elif isinstance(ref, str):
-                url = ref
-            if not (url or ref_type):
+                # If ref is a bare string, it may be a URL or a free-text citation
+                if str(ref).startswith("http://") or str(ref).startswith("https://"):
+                    url = ref
+                else:
+                    ref_text = ref
+            if not (url or ref_type or ref_text):
                 continue
-            ref_id = f"{car_id_full}-ref-{url or ref_type}".replace(" ", "_")
+
+            # Create a compact, safe reference id using a short hash of the reference content
+            id_source = (url or ref_type or ref_text or "").strip()
+            digest = hashlib.sha1(id_source.encode('utf-8')).hexdigest()[:12]
+            ref_id = f"{car_id_full}-ref-{digest}"
+
             ref_node = URIRef(f"{self.EX}reference/{ref_id}")
             self.graph.add((ref_node, RDF.type, self.SEC.Reference))
+
+            # Attach properties sensibly: URLs as xsd:anyURI, types as strings, free-text as rdfs:label
             if url:
                 self.graph.add((ref_node, self.SEC.url, Literal(url, datatype=XSD.anyURI)))
             if ref_type:
                 self.graph.add((ref_node, self.SEC.referenceType, Literal(ref_type, datatype=XSD.string)))
+            if ref_text:
+                # Use rdfs:label for brief free-text citations to avoid embedding raw text into URIs
+                self.graph.add((ref_node, RDFS.label, Literal(ref_text, datatype=XSD.string)))
+
             self.graph.add((analytic_node, self.SEC.reference, ref_node))
 
     def _add_detection_relationships(self, analytics: List[Dict[str, Any]]) -> None:

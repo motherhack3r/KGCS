@@ -162,20 +162,27 @@ class ENGAGEtoRDFTransformer:
         else:
             return
 
+        import hashlib
         for r in items:
             rid = r.get("id") or r.get("ID") or r.get("referenceId")
-            # If no id, try to construct from url
+            title = r.get("title") or r.get("Title")
+            url = r.get("url") or r.get("URL")
+            citation = r.get("citation") or r.get("Citation")
+
+            # If no id, create a compact digest-based id from available content
             if not rid:
-                rid = (r.get("url") or r.get("URL") or r.get("citation") or r.get("title") or "ref")
-                rid = str(rid).replace("/", "_")[:64]
+                id_source = (url or citation or title or "ref").strip()
+                digest = hashlib.sha1(str(id_source).encode('utf-8')).hexdigest()[:12]
+                rid = f"ref-{digest}"
+
             node = URIRef(f"{self.EX}reference/{rid}")
             self.graph.add((node, RDF.type, self.SEC.Reference))
-            if r.get("title") or r.get("Title"):
-                self.graph.add((node, RDFS.label, Literal(r.get("title") or r.get("Title"), datatype=XSD.string)))
-            if r.get("url") or r.get("URL"):
-                self.graph.add((node, self.SEC.url, Literal(r.get("url") or r.get("URL"), datatype=XSD.string)))
-            if r.get("citation") or r.get("Citation"):
-                self.graph.add((node, self.SEC.citation, Literal(r.get("citation") or r.get("Citation"), datatype=XSD.string)))
+            if title:
+                self.graph.add((node, RDFS.label, Literal(title, datatype=XSD.string)))
+            if url:
+                self.graph.add((node, self.SEC.url, Literal(url, datatype=XSD.anyURI)))
+            if citation:
+                self.graph.add((node, self.SEC.citation, Literal(citation, datatype=XSD.string)))
             # If reference mentions a goal or engagement, attempt to link
             targets = r.get("targets") or r.get("related_goals") or r.get("goals") or []
             if isinstance(targets, list):

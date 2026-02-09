@@ -185,18 +185,24 @@ class D3FENDtoRDFTransformer:
                         self.graph.add((technique_node, self.SEC.tag, Literal(str(tag), datatype=XSD.string)))
 
         # Emit references if present (as nodes)
+        import hashlib
         for ref in technique.get("References", []):
             url = ref.get("URL") or ref.get("url")
             ref_type = ref.get("ReferenceType") or ref.get("referenceType")
-            if not (url or ref_type):
+            ref_text = ref.get("title") or ref.get("Title") or ref.get("description") or ref.get("text")
+            if not (url or ref_type or ref_text):
                 continue
-            ref_id = f"{d3fend_id_full}-ref-{url or ref_type}".replace(" ", "_")
+            id_source = (url or ref_type or ref_text or "").strip()
+            digest = hashlib.sha1(id_source.encode('utf-8')).hexdigest()[:12]
+            ref_id = f"{d3fend_id_full}-ref-{digest}"
             ref_node = URIRef(f"{self.EX}reference/{ref_id}")
             self.graph.add((ref_node, RDF.type, self.SEC.Reference))
             if url:
                 self.graph.add((ref_node, self.SEC.url, Literal(url, datatype=XSD.anyURI)))
             if ref_type:
                 self.graph.add((ref_node, self.SEC.referenceType, Literal(ref_type, datatype=XSD.string)))
+            if ref_text:
+                self.graph.add((ref_node, RDFS.label, Literal(ref_text, datatype=XSD.string)))
             self.graph.add((technique_node, self.SEC.references, ref_node))
 
     def _extract_description(self, description_obj) -> str:

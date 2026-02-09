@@ -1,0 +1,92 @@
+{
+  "timestamp": "2026-02-09T13:40:38.807530Z",
+  "nodes_out": "tmp/combined-nodes.ttl",
+  "rels_out": "tmp/combined-rels.ttl",
+  "stages": [
+    {
+      "name": "pipeline-stage1-cpe.ttl",
+      "size_bytes": 424119711,
+      "triples": 2847324,
+      "node_triples": 2837879,
+      "rel_triples": 9445,
+      "malformed_triples": 0
+    },
+    {
+      "name": "pipeline-stage2-cpematch.ttl",
+      "size_bytes": 19638607532,
+      "triples": 118438440,
+      "node_triples": 95336785,
+      "rel_triples": 23101655,
+      "malformed_triples": 0
+    },
+    {
+      "name": "pipeline-stage3-cve.ttl",
+      "size_bytes": 1882739390,
+      "triples": 10240344,
+      "node_triples": 3985560,
+      "rel_triples": 6254784,
+      "malformed_triples": 0
+    },
+    {
+      "name": "pipeline-stage4-attack.ttl",
+      "size_bytes": 3451989,
+      "triples": 13776,
+      "node_triples": 11819,
+      "rel_triples": 1957,
+      "malformed_triples": 0
+    },
+    {
+      "name": "pipeline-stage5-d3fend.ttl",
+      "size_bytes": 4555813,
+      "triples": 21631,
+      "node_triples": 18522,
+      "rel_triples": 3109,
+      "malformed_triples": 0
+    },
+    {
+      "name": "pipeline-stage6-capec.ttl",
+      "size_bytes": 1753139,
+      "triples": 9387,
+      "node_triples": 5580,
+      "rel_triples": 3807,
+      "malformed_triples": 0
+    },
+    {
+      "name": "pipeline-stage7-cwe.ttl",
+      "size_bytes": 1369229,
+      "triples": 8639,
+      "node_triples": 7196,
+      "rel_triples": 1443,
+      "malformed_triples": 0
+    },
+    {
+      "name": "pipeline-stage8-car.ttl",
+      "size_bytes": 144574,
+      "triples": 432,
+      "node_triples": 424,
+      "rel_triples": 8,
+      "malformed_triples": 0
+    },
+    {
+      "name": "pipeline-stage9-shield.ttl",
+      "size_bytes": 323595,
+      "triples": 1632,
+      "node_triples": 1632,
+      "rel_triples": 0,
+      "malformed_triples": 0
+    },
+    {
+      "name": "pipeline-stage10-engage.ttl",
+      "size_bytes": 65329,
+      "triples": 386,
+      "node_triples": 386,
+      "rel_triples": 0,
+      "malformed_triples": 0
+    }
+  ],
+  "totals": {
+    "triples": 131581991,
+    "node_triples": 102205783,
+    "rel_triples": 29376208
+  }
+}

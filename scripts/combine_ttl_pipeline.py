@@ -23,13 +23,21 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
 
     # Find all pipeline stage files in order
     stage_files = []
+    import glob
     for i in range(1, 11):
         stage_file = f"tmp/pipeline-stage{i}-*.ttl"
-        # Use glob to find exact file
-        import glob
-        matches = glob.glob(stage_file)
+        # Use glob to find all matching files for this stage (tmp/ or data/*/samples/ fallback)
+        matches = sorted(glob.glob(stage_file))
+        if not matches:
+            # Fallback to per-standard samples if tmp/ doesn't contain stage files
+            fallback_pattern = f"data/*/samples/pipeline-stage{i}-*.ttl"
+            fb_matches = sorted(glob.glob(fallback_pattern))
+            if fb_matches:
+                print(f"  Found {len(fb_matches)} data/samples file(s) for stage {i}: {fb_matches}")
+                matches = fb_matches
         if matches:
-            stage_files.append(matches[0])
+            print(f"  Found {len(matches)} file(s) for stage {i}: {matches}")
+            stage_files.extend(matches)
 
     if not stage_files:
         print("[ERROR] No pipeline stage files found in tmp/")
@@ -117,21 +125,22 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
                                 rels_f.write(f"{subj_txt} {pred_txt} {obj_txt} .\n")
                                 rel_triples += 1
 
-                        file_stats.append((path_p.name, size, triples, node_triples, rel_triples))
+                        malformed = 0
+                        file_stats.append((path_p.name, size, triples, node_triples, rel_triples, malformed))
                         print(f"       Parsed triples: {triples:,} (nodes: {node_triples:,}, rels: {rel_triples:,})")
                     except Exception as e:
                         print(f"       rdflib parse failed ({e}), falling back to heuristic line parser")
                         # fall through to heuristic
                         res = parse_with_heuristic(input_file, nodes_f, rels_f, node_predicates_set)
                         if res:
-                            triples, nodes_t, rels_t = res
-                            file_stats.append((path_p.name, size, triples, nodes_t, rels_t))
+                            triples, nodes_t, rels_t, malformed = res
+                            file_stats.append((path_p.name, size, triples, nodes_t, rels_t, malformed))
                 else:
                     # large file: heuristic parse
                     res = parse_with_heuristic(input_file, nodes_f, rels_f, node_predicates_set)
                     if res:
-                        triples, nodes_t, rels_t = res
-                        file_stats.append((path_p.name, size, triples, nodes_t, rels_t))
+                        triples, nodes_t, rels_t, malformed = res
+                        file_stats.append((path_p.name, size, triples, nodes_t, rels_t, malformed))
 
         # Report
         print("\nCOMBINE/SPLIT COMPLETE\n")
@@ -140,12 +149,15 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
         total_nodes = 0
         total_rels = 0
         stages = []
-        for name, size, triples, nodes_t, rels_t in file_stats:
-            print(f"  {name:40s} size={size/1024/1024:7.2f}MB triples={triples:,} nodes={nodes_t:,} rels={rels_t:,}")
+        for name, size, triples, nodes_t, rels_t, malformed in file_stats:
+            if malformed:
+                print(f"  {name:40s} size={size/1024/1024:7.2f}MB triples={triples:,} nodes={nodes_t:,} rels={rels_t:,} malformed={malformed:,}")
+            else:
+                print(f"  {name:40s} size={size/1024/1024:7.2f}MB triples={triples:,} nodes={nodes_t:,} rels={rels_t:,}")
             total_triples += triples
             total_nodes += nodes_t
             total_rels += rels_t
-            stages.append({"name": name, "size_bytes": size, "triples": triples, "node_triples": nodes_t, "rel_triples": rels_t})
+            stages.append({"name": name, "size_bytes": size, "triples": triples, "node_triples": nodes_t, "rel_triples": rels_t, "malformed_triples": malformed})
 
         # write summary JSON to logs
         summary = {
@@ -160,6 +172,71 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
             json.dump(summary, sf, indent=2)
 
         print(f"\nSummary written to: {summary_path}")
+
+        # Post-combine diagnostics: scan nodes output for suspicious lines that do not start
+        # with a valid subject token (i.e., '<', '_:', or 'a'). This detects stray fragments
+        # caused by multi-line triples or tokenization problems and writes examples to a log.
+        bad_examples = []
+        try:
+            with open(nodes_out, 'r', encoding='utf-8') as nf:
+                for idx, line in enumerate(nf, start=1):
+                    ln = line.strip()
+                    if not ln or ln.startswith('@') or ln.startswith('#'):
+                        continue
+                    first_tok = ln.split(' ', 1)[0]
+                    if not (first_tok.startswith('<') or first_tok.startswith('_:') or first_tok == 'a'):
+                        bad_examples.append({'line': idx, 'token': first_tok, 'snippet': ln[:200]})
+                        if len(bad_examples) >= 50:
+                            break
+        except Exception:
+            bad_examples = []
+
+        if bad_examples:
+            Path('logs').mkdir(exist_ok=True)
+            bad_nodes_log = Path('logs') / 'bad_nodes_lines.log'
+            with open(bad_nodes_log, 'w', encoding='utf-8') as bf:
+                for ex in bad_examples:
+                    bf.write(f"{nodes_out}:{ex['line']}: {ex['token']}: {ex['snippet']}\n")
+            print(f"[WARN] Suspicious lines found in {nodes_out}: {len(bad_examples)} (see {bad_nodes_log})")
+            # Add to summary JSON
+            summary.setdefault('diagnostics', {})['bad_node_lines_examples'] = bad_examples[:10]
+            summary['diagnostics']['bad_node_lines_count'] = len(bad_examples)
+            with open(summary_path, 'w', encoding='utf-8') as sf:
+                json.dump(summary, sf, indent=2)
+
+        # Post-combine diagnostics: detect subjects that have literal properties but no rdf:type
+        # (these are the small set of problematic subjects you observed; report examples).
+        try:
+            types_set = set()
+            literal_subjects = set()
+            with open(nodes_out, 'r', encoding='utf-8') as nf:
+                for line in nf:
+                    ln = line.strip()
+                    if not ln or ln.startswith('@') or ln.startswith('#'):
+                        continue
+                    parts = ln.split(' ', 2)
+                    if len(parts) < 3:
+                        continue
+                    subj_tok, pred_tok, obj_tok = parts[0], parts[1], parts[2]
+                    lower_pred = pred_tok.lower()
+                    if 'rdf-syntax-ns#type' in lower_pred or 'rdf:type' in lower_pred or pred_tok == 'a':
+                        types_set.add(subj_tok)
+                    if obj_tok.startswith('"') or obj_tok.startswith("'"):
+                        literal_subjects.add(subj_tok)
+            candidates = sorted(list(literal_subjects - types_set))
+            if candidates:
+                Path('logs').mkdir(exist_ok=True)
+                bad_subjects_log = Path('logs') / 'bad_node_subjects.log'
+                with open(bad_subjects_log, 'w', encoding='utf-8') as bf:
+                    for c in candidates[:50]:
+                        bf.write(f"{nodes_out}: SUBJECT_WITH_LITERAL_NO_TYPE: {c}\n")
+                print(f"[WARN] Subjects have literals but no rdf:type: {len(candidates)} examples written to {bad_subjects_log}")
+                summary.setdefault('diagnostics', {})['bad_node_subjects_examples'] = candidates[:10]
+                summary['diagnostics']['bad_node_subjects_count'] = len(candidates)
+                with open(summary_path, 'w', encoding='utf-8') as sf:
+                    json.dump(summary, sf, indent=2)
+        except Exception:
+            pass
         return True
 
     except Exception as e:
@@ -168,38 +245,74 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
 
 
 def parse_with_heuristic(input_file, nodes_f, rels_f, node_predicates_set):
-    """Very small heuristic line-based parser: assumes triples are single-line and headers handled."""
+    """Very small heuristic line-based parser: assumes triples are single-line and headers handled.
+
+    Adds a lightweight validation pass to detect malformed triples (tokenization errors) and
+    writes them to logs/bad_triples.log for later inspection.
+    """
+    from pathlib import Path
+    Path('logs').mkdir(exist_ok=True)
+    bad_log = Path('logs') / 'bad_triples.log'
+
     triples = 0
     nodes_t = 0
     rels_t = 0
-    with open(input_file, 'r', encoding='utf-8') as fh:
-        for line in fh:
+    malformed = 0
+
+    with open(input_file, 'r', encoding='utf-8') as fh, open(bad_log, 'a', encoding='utf-8') as bad_f:
+        for lineno, line in enumerate(fh, start=1):
             if not line.strip() or line.startswith('@prefix') or line.startswith('@base') or line.startswith('#'):
                 continue
             triples += 1
+
+            # Basic tokenization check: ensure at least 3 whitespace-separated tokens
+            parts = line.strip().split()
+            if len(parts) < 3:
+                malformed += 1
+                bad_f.write(f"{input_file}:{lineno}: MALFORMED (too few tokens): {line}")
+                continue
+
+            subj_tok, pred_tok = parts[0], parts[1]
+            obj_tok = ' '.join(parts[2:])
+
+            # Validate subject/predicate minimal form
+            subj_valid = subj_tok.startswith('<') or subj_tok.startswith('_:') or subj_tok == 'a'
+            pred_valid = pred_tok.startswith('<') or (':' in pred_tok) or pred_tok == 'a'
+            if not subj_valid or not pred_valid:
+                malformed += 1
+                bad_f.write(f"{input_file}:{lineno}: MALFORMED (bad subject/predicate): {line}")
+                continue
+
             # crude: if line contains a quote it's likely a literal -> node triple
             if '"' in line or "'" in line:
                 nodes_f.write(line)
                 nodes_t += 1
-            else:
-                # check for ' a ' (rdf:type) or explicit node_predicates substring
-                lower = line.lower()
-                if ' a ' in lower or 'rdf:type' in lower:
+                continue
+
+            # check for ' a ' (rdf:type), explicit rdf:type tokens, or '#type' in full-URI predicates
+            lower = line.lower()
+            if ' a ' in lower or 'rdf:type' in lower or '#type' in lower or 'rdf-syntax-ns#type' in lower:
+                nodes_f.write(line)
+                nodes_t += 1
+                continue
+
+            # check configured node_predicates
+            matched = False
+            for pred in node_predicates_set:
+                if pred in line:
                     nodes_f.write(line)
                     nodes_t += 1
-                else:
-                    matched = False
-                    for pred in node_predicates_set:
-                        if pred in line:
-                            nodes_f.write(line)
-                            nodes_t += 1
-                            matched = True
-                            break
-                    if not matched:
-                        rels_f.write(line)
-                        rels_t += 1
-    print(f"       Heuristic triples: {triples:,} (nodes: {nodes_t:,}, rels: {rels_t:,})")
-    return triples, nodes_t, rels_t
+                    matched = True
+                    break
+            if not matched:
+                rels_f.write(line)
+                rels_t += 1
+
+    if malformed:
+        print(f"       Heuristic triples: {triples:,} (nodes: {nodes_t:,}, rels: {rels_t:,}, malformed: {malformed:,})")
+    else:
+        print(f"       Heuristic triples: {triples:,} (nodes: {nodes_t:,}, rels: {rels_t:,})")
+    return triples, nodes_t, rels_t, malformed
 
 
 def main():

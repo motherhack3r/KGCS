@@ -33,8 +33,11 @@ class CWEtoRDFTransformer:
 
     def __init__(self):
         self.graph = Graph()
-        self.graph.bind("sec", SEC)
-        self.graph.bind("ex", EX)
+        # Expose namespaces as instance attributes for tests and consistency with other transformers
+        self.SEC = SEC
+        self.EX = EX
+        self.graph.bind("sec", self.SEC)
+        self.graph.bind("ex", self.EX)
         self.graph.bind("xsd", XSD)
         self.graph.bind("rdf", RDF)
         self.graph.bind("rdfs", RDFS)
@@ -140,18 +143,24 @@ class CWEtoRDFTransformer:
             self.graph.add((weakness_node, SEC.hasDetectionMethod, det_node))
 
         # References
+        import hashlib
         for ref in weakness.get("References", []):
             url = ref.get("URL", "")
             ref_type = ref.get("ReferenceType", "")
-            if not (url or ref_type):
+            ref_text = ref.get("Title") or ref.get("title") or ref.get("Description") or ref.get("description")
+            if not (url or ref_type or ref_text):
                 continue
-            ref_id = f"{cwe_id_full}-ref-{url or ref_type}".replace(" ", "_")
+            id_source = (url or ref_type or ref_text or "").strip()
+            digest = hashlib.sha1(id_source.encode('utf-8')).hexdigest()[:12]
+            ref_id = f"{cwe_id_full}-ref-{digest}"
             ref_node = URIRef(f"{EX}reference/{ref_id}")
             self.graph.add((ref_node, RDF.type, SEC.Reference))
             if url:
                 self.graph.add((ref_node, SEC.url, Literal(url, datatype=XSD.anyURI)))
             if ref_type:
                 self.graph.add((ref_node, SEC.referenceType, Literal(ref_type, datatype=XSD.string)))
+            if ref_text:
+                self.graph.add((ref_node, RDFS.label, Literal(ref_text, datatype=XSD.string)))
             self.graph.add((weakness_node, SEC.hasReference, ref_node))
 
         # External mappings (CAPEC, CVE, WASC, OWASP, CERT, PCI, NVD, CISQ)
