@@ -349,6 +349,8 @@ def main():
     parser = argparse.ArgumentParser(description="ETL: MITRE ENGAGE JSON -> RDF Turtle")
     parser.add_argument("--input", "-i", required=True, help="Input ENGAGE JSON file")
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
+    parser.add_argument("--format", choices=["ttl","nt"], default="ttl", help="Output format (ttl or nt)")
+    parser.add_argument("--append", action='store_true', help='Append to existing output file (suppress headers)')
     
     args = parser.parse_args()
     

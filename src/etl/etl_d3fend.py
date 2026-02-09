@@ -261,6 +261,7 @@ def main():
     parser.add_argument("--append", action='store_true', help='Append to existing output file (suppress headers)')
     parser.add_argument('--validate', action='store_true', help='Validate output with SHACL')
     parser.add_argument('--shapes', help='SHACL shapes file (defaults to docs/ontology/shacl/d3fend-shapes.ttl)')
+    parser.add_argument("--format", choices=["ttl","nt"], default="ttl", help="Output format (ttl or nt)")
     
     args = parser.parse_args()
     

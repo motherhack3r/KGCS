@@ -1,0 +1,91 @@
+{
+  "timestamp": "2026-02-09T15:26:03.910651Z",
+  "nodes_out": "tmp/e2e-nodes.nt",
+  "rels_out": "tmp/e2e-rels.nt",
+  "stages": [
+    {
+      "name": "pipeline-stage6-capec.nt",
+      "size_bytes": 1752880,
+      "triples": 9387,
+      "node_triples": 5580,
+      "rel_triples": 3807,
+      "malformed_triples": 0
+    },
+    {
+      "name": "pipeline-stage7-cwe.nt",
+      "size_bytes": 1368970,
+      "triples": 8639,
+      "node_triples": 7196,
+      "rel_triples": 1443,
+      "malformed_triples": 0
+    },
+    {
+      "name": "pipeline-stage8-car.nt",
+      "size_bytes": 140865,
+      "triples": 432,
+      "node_triples": 424,
+      "rel_triples": 8,
+      "malformed_triples": 0
+    }
+  ],
+  "totals": {
+    "triples": 18458,
+    "node_triples": 13200,
+    "rel_triples": 5258
+  },
+  "diagnostics": {
+    "bad_node_lines_examples": [
+      {
+        "line": 12788,
+        "token": "\"\"\"^^<http://www.w3.org/2001/XMLSchema#string>",
+        "snippet": "\"\"\"^^<http://www.w3.org/2001/XMLSchema#string> ."
+      },
+      {
+        "line": 12796,
+        "token": "Remote",
+        "snippet": "Remote Desktop can be detected in several ways"
+      },
+      {
+        "line": 12798,
+        "token": "-",
+        "snippet": "-   Network connections to port 3389/tcp (assuming use of the default port)"
+      },
+      {
+        "line": 12799,
+        "token": "-",
+        "snippet": "-   Packet capture analysis"
+      },
+      {
+        "line": 12800,
+        "token": "-",
+        "snippet": "-   Windows security logs (Event ID 4624, 4634, 4647, 4778)"
+      },
+      {
+        "line": 12801,
+        "token": "-",
+        "snippet": "-   Detecting network connections from `mstsc.exe`"
+      },
+      {
+        "line": 12802,
+        "token": "-",
+        "snippet": "-   Execution of the process `rdpclip.exe`"
+      },
+      {
+        "line": 12803,
+        "token": "-",
+        "snippet": "-   Runs as the clipboard manager on the RDP target if clipboard sharing is enabled"
+      },
+      {
+        "line": 12807,
+        "token": "The",
+        "snippet": "The time of the Connection, the source, the destination, and the user name used\"\"\"^^<http://www.w3.org/2001/XMLSchema#string> ."
+      },
+      {
+        "line": 12816,
+        "token": "The",
+        "snippet": "The Service Name and approximate time in which changes occurred on each host"
+      }
+    ],
+    "bad_node_lines_count": 50
+  }
+}

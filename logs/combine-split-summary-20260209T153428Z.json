@@ -1,0 +1,28 @@
+{
+  "timestamp": "2026-02-09T15:34:28.632289Z",
+  "nodes_out": "C:\\Users\\humbe\\AppData\\Local\\Temp\\pytest-of-humbe\\pytest-15\\test_combine_writes_full_out0\\nodes_out.nt",
+  "rels_out": "C:\\Users\\humbe\\AppData\\Local\\Temp\\pytest-of-humbe\\pytest-15\\test_combine_writes_full_out0\\rels_out.nt",
+  "stages": [
+    {
+      "name": "pipeline-stage1-a.ttl",
+      "size_bytes": 155,
+      "triples": 2,
+      "node_triples": 2,
+      "rel_triples": 0,
+      "malformed_triples": 0
+    },
+    {
+      "name": "pipeline-stage2-b.nt",
+      "size_bytes": 79,
+      "triples": 1,
+      "node_triples": 0,
+      "rel_triples": 1,
+      "malformed_triples": 0
+    }
+  ],
+  "totals": {
+    "triples": 3,
+    "node_triples": 2,
+    "rel_triples": 1
+  }
+}

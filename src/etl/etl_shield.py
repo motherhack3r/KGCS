@@ -162,6 +162,8 @@ def main():
     parser = argparse.ArgumentParser(description="ETL: MITRE SHIELD JSON -> RDF Turtle")
     parser.add_argument("--input", "-i", required=True, help="Input SHIELD JSON file")
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
+    parser.add_argument("--format", choices=["ttl","nt"], default="ttl", help="Output format (ttl or nt)")
+    parser.add_argument("--append", action='store_true', help='Append to existing output file (suppress headers)')
     
     args = parser.parse_args()
     
@@ -178,7 +180,10 @@ def main():
         transformer.transform(json_data)
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)
         print(f"Writing RDF to {args.output}...")
-        write_graph_turtle_lines(transformer.graph, args.output)
+        if args.format == "nt":
+            write_graph_ntriples_lines(transformer.graph, args.output, append=args.append)
+        else:
+            write_graph_turtle_lines(transformer.graph, args.output, include_prefixes=not args.append, append=args.append)
         
         print(f"Transformation complete: {args.output}")
         return 0

@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-02-09T15:37:06.479642Z",
+  "nodes_out": "tmp/e2e-nodes.nt",
+  "rels_out": "tmp/e2e-rels.nt",
+  "stages": [
+    {
+      "name": "pipeline-stage8-car.nt",
+      "size_bytes": 140865,
+      "triples": 432,
+      "node_triples": 424,
+      "rel_triples": 8,
+      "malformed_triples": 0
+    }
+  ],
+  "totals": {
+    "triples": 432,
+    "node_triples": 424,
+    "rel_triples": 8
+  }
+}

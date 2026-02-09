@@ -223,15 +223,86 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
         except Exception as e:
             print(f"Warning: node reordering failed: {e}")
 
-        # Optionally write a full combined file with nodes followed by relationships
+        # Optionally write a full combined file with nodes followed by relationships.
+        # Make the combined TTL safe by sanitizing node triples (merge multi-line triples,
+        # escape newlines inside literals) and by deduplicating header/prefix lines.
         if full_out:
             try:
+                removed_nodes = _sanitize_nodes_file(nodes_out)
+                removed_rels = _sanitize_nodes_file(rels_out)
+                removed = removed_nodes + removed_rels
+
+                # Collect unique prefix/header lines from nodes and rels (write them once)
+                prefix_lines = []
+                def _collect_prefixes(path: str):
+                    try:
+                        with open(path, 'r', encoding='utf-8') as fh:
+                            for line in fh:
+                                if line.startswith('@prefix') or line.startswith('@base') or line.startswith('#'):
+                                    if line not in prefix_lines:
+                                        prefix_lines.append(line)
+                                else:
+                                    break
+                    except Exception:
+                        pass
+
+                _collect_prefixes(nodes_out)
+                _collect_prefixes(rels_out)
+
                 with open(full_out, 'w', encoding='utf-8') as fo, open(nodes_out, 'r', encoding='utf-8') as nf, open(rels_out, 'r', encoding='utf-8') as rf:
-                    for line in nf:
-                        fo.write(line)
-                    for line in rf:
-                        fo.write(line)
-                print(f"Wrote combined full load file: {full_out}")
+                    # write prefixes once
+                    for pl in prefix_lines:
+                        fo.write(pl)
+                    if prefix_lines:
+                        fo.write('\n')
+
+                    # write body skipping header lines
+                    def _write_body(src):
+                        started = False
+                        for line in src:
+                            if not started and (line.startswith('@prefix') or line.startswith('@base') or line.startswith('#') or not line.strip()):
+                                continue
+                            started = True
+                            fo.write(line)
+
+                    _write_body(nf)
+                    _write_body(rf)
+
+                print(f"Wrote combined full load file: {full_out} (removed malformed node lines: {removed})")
+
+                # Quick validation: try to parse the TTL we just wrote. If rdflib fails
+                # to parse it, emit an N-Triples fallback which is line-oriented and
+                # safer for downstream loaders.
+                try:
+                    from rdflib import Graph
+                    g = Graph()
+                    g.parse(full_out, format='turtle')
+                    print(f"Validated TTL full file: {full_out}")
+                except Exception as e:
+                    print(f"Warning: TTL parse failed for {full_out}; generating NT fallback: {e}")
+                    nt_path = Path(str(full_out)).with_suffix('.nt')
+
+                    def _escape_newlines_in_literals_local(s: str) -> str:
+                        parts = s.split('"')
+                        for i in range(1, len(parts), 2):
+                            parts[i] = parts[i].replace('\n', '\\n').replace('\r', '\\r')
+                        return '"'.join(parts)
+
+                    def _write_nt_from_ttl(src_path, out_f):
+                        with open(src_path, 'r', encoding='utf-8', errors='replace') as src:
+                            for line in src:
+                                if not line.strip() or line.startswith('@') or line.startswith('#'):
+                                    continue
+                                out_line = _escape_newlines_in_literals_local(line)
+                                if not out_line.strip().endswith('.'):
+                                    out_line = out_line.rstrip() + ' .\n'
+                                out_f.write(out_line)
+
+                    with open(nt_path, 'w', encoding='utf-8') as outf:
+                        _write_nt_from_ttl(nodes_out, outf)
+                        _write_nt_from_ttl(rels_out, outf)
+
+                    print(f"Wrote fallback NT file: {nt_path}")
             except Exception as e:
                 print(f"Warning: could not write full_out file {full_out}: {e}")
 
@@ -462,6 +533,98 @@ def _reorder_nodes_grouped(nodes_out: str, buckets: int = 256) -> None:
     shutil.move(str(tmp_nodes), str(nodes_path))
     # cleanup buckets
     shutil.rmtree(bucket_dir, ignore_errors=True)
+
+
+def _sanitize_nodes_file(nodes_out: str, max_accum_lines: int = 6) -> int:
+    """Sanitize a nodes TTL file by merging simple multi-line triples, escaping
+    internal newlines inside literal values, and removing malformed fragments.
+
+    Returns the number of removed/malformed fragments.
+    """
+    import shutil
+    import re
+    from pathlib import Path
+
+    logs_dir = Path('logs')
+    logs_dir.mkdir(exist_ok=True)
+    removed_log = logs_dir / 'removed_nodes_lines.log'
+
+    nodes_path = Path(nodes_out)
+    if not nodes_path.exists():
+        return 0
+
+    tmp = nodes_path.with_suffix(nodes_path.suffix + '.sanitized')
+    removed = 0
+
+    def _escape_newlines_in_literals(s: str) -> str:
+        # Heuristic: replace raw newlines inside double-quoted literal segments with escaped \n
+        parts = s.split('"')
+        for i in range(1, len(parts), 2):
+            parts[i] = parts[i].replace('\n', '\\n').replace('\r', '\\r')
+        return '"'.join(parts)
+
+    buffer = ''
+    lines_accum = 0
+
+    with open(nodes_path, 'r', encoding='utf-8', errors='replace') as inf, open(tmp, 'w', encoding='utf-8') as outf, open(removed_log, 'w', encoding='utf-8') as rf:
+        lineno = 0
+        for lineno, line in enumerate(inf, start=1):
+            # Preserve blank lines and prefixes/comments directly
+            if not line.strip() or line.startswith('@') or line.startswith('#'):
+                if buffer:
+                    rf.write(f"{lineno-lines_accum}:{buffer[:400]}\n")
+                    removed += 1
+                    buffer = ''
+                    lines_accum = 0
+                outf.write(line)
+                continue
+
+            # Accumulate (start or continue a possibly multi-line triple)
+            if buffer:
+                buffer += line
+                lines_accum += 1
+            else:
+                buffer = line
+                lines_accum = 1
+
+            # If the buffer now ends with a closing period (triple terminator)
+            if buffer.strip().endswith('.'):
+                subj = buffer.strip().split(' ', 1)[0] if buffer.strip() else ''
+                if subj.startswith('<') or subj.startswith('_:') or subj == 'a':
+                    # Escape internal newlines inside literal segments before writing
+                    try:
+                        out_line = _escape_newlines_in_literals(buffer)
+                        outf.write(out_line)
+                    except Exception:
+                        # fallback: write as-is
+                        outf.write(buffer)
+                else:
+                    rf.write(f"{lineno-lines_accum+1}-{lineno}: {buffer[:400]}\n")
+                    removed += 1
+                buffer = ''
+                lines_accum = 0
+            elif lines_accum >= max_accum_lines:
+                # Too many continuation lines: treat as malformed and drop
+                rf.write(f"{lineno-lines_accum+1}-{lineno}: {buffer[:400]}\n")
+                removed += 1
+                buffer = ''
+                lines_accum = 0
+
+        # End of file: if buffer remains, log as removed
+        if buffer:
+            rf.write(f"{lineno-lines_accum+1}-{lineno}: {buffer[:400]}\n")
+            removed += 1
+
+    # Replace original file only if we removed/adjusted anything
+    if removed > 0:
+        shutil.move(str(tmp), str(nodes_path))
+    else:
+        try:
+            tmp.unlink(missing_ok=True)
+        except Exception:
+            pass
+
+    return removed
 
 
 def main():

@@ -407,6 +407,7 @@ def main():
     parser.add_argument('--validate', action='store_true', help='Validate output with SHACL')
     parser.add_argument('--shapes', help='SHACL shapes file (defaults to docs/ontology/shacl/cve-shapes.ttl)')
     parser.add_argument('--append', action='store_true', help='Append to existing output file instead of overwriting')
+    parser.add_argument('--format', choices=['ttl','nt'], default='ttl', help='Output format (ttl or nt)')
     args = parser.parse_args()
 
     # Ensure outputs go to the standard samples folder for CVE
@@ -443,8 +444,8 @@ def main():
 
     mode = 'a' if args.append else 'w'
     with open(args.output, mode, encoding='utf-8') as out_f:
-        # Only write header on new files (not when appending)
-        if not args.append:
+        # Only write header on new files (not when appending), and skip header for N-Triples
+        if not args.append and args.format != 'nt':
             out_f.write(header)
         for p in paths:
             print('Processing', p, file=sys.stderr)
