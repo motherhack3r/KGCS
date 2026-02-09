@@ -13,7 +13,7 @@ from pathlib import Path
 from datetime import datetime
 
 def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined-rels.ttl",
-                      heuristic_threshold=200_000_000, node_predicates=None, inputs=None):
+                      heuristic_threshold=200_000_000, node_predicates=None, inputs=None, full_out: str | None = None):
     """Stream-combine pipeline TTL files into two outputs: nodes and relationships.
 
     For each stage file we attempt to parse with rdflib (safe, accurate). If the file
@@ -138,10 +138,16 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
                         triples = 0
                         node_triples = 0
                         rel_triples = 0
+                        # Use a safe literal formatter so large literals are written as single-line
+                        try:
+                            from src.etl.ttl_writer import _format_literal
+                        except Exception:
+                            from .ttl_writer import _format_literal
+
                         def _n3_full(node):
                             from rdflib import Literal as _Literal
                             if isinstance(node, _Literal):
-                                return node.n3()
+                                return _format_literal(node)
                             return f"<{str(node)}>"
 
                         for s, p, o in g:
@@ -150,7 +156,7 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
                             subj_txt = _n3_full(s)
                             pred_txt = _n3_full(p)
                             if isinstance(o, Literal):
-                                obj_txt = o.n3()
+                                obj_txt = _format_literal(o)
                             else:
                                 obj_txt = _n3_full(o)
 
@@ -216,6 +222,18 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
             print(f"Reordered nodes file by subject: {nodes_out}")
         except Exception as e:
             print(f"Warning: node reordering failed: {e}")
+
+        # Optionally write a full combined file with nodes followed by relationships
+        if full_out:
+            try:
+                with open(full_out, 'w', encoding='utf-8') as fo, open(nodes_out, 'r', encoding='utf-8') as nf, open(rels_out, 'r', encoding='utf-8') as rf:
+                    for line in nf:
+                        fo.write(line)
+                    for line in rf:
+                        fo.write(line)
+                print(f"Wrote combined full load file: {full_out}")
+            except Exception as e:
+                print(f"Warning: could not write full_out file {full_out}: {e}")
 
         # Post-combine diagnostics: scan nodes output for suspicious lines that do not start
         # with a valid subject token (i.e., '<', '_:', or 'a'). This detects stray fragments
@@ -407,31 +425,39 @@ def _reorder_nodes_grouped(nodes_out: str, buckets: int = 256) -> None:
         for bucket in sorted(bucket_dir.iterdir()):
             lines = bucket.read_text(encoding='utf-8').splitlines()
             # sort by subject then predicate for deterministic grouping
-            lines.sort(key=lambda l: (l.split(' ', 2)[0], l.split(' ', 2)[1]))
+            def _sort_key(l: str):
+                parts = l.split(' ', 2)
+                subj = parts[0] if len(parts) >= 1 else ''
+                pred = parts[1] if len(parts) >= 2 else ''
+                return (subj, pred)
+            lines.sort(key=_sort_key)
 
             i = 0
             while i < len(lines):
-                subj = lines[i].split(' ', 2)[0]
-                group = []
-                j = i
-                while j < len(lines) and lines[j].split(' ', 2)[0] == subj:
-                    group.append(lines[j] + '\n')
-                    j += 1
-                # Within group, write rdf:type lines first
-                type_lines = []
-                other_lines = []
-                for l in group:
-                    parts = l.strip().split(' ', 2)
-                    pred_tok = parts[1]
-                    pred_lower = pred_tok.lower()
-                    if pred_tok == 'a' or 'rdf:type' in pred_lower or '#type' in pred_lower:
-                        type_lines.append(l)
-                    else:
-                        other_lines.append(l)
-                for l in type_lines + other_lines:
-                    out_f.write(l)
-                i = j
-
+                    parts0 = lines[i].split(' ', 2)
+                    subj = parts0[0] if parts0 else ''
+                    group = []
+                    j = i
+                    while j < len(lines) and lines[j].split(' ', 2)[0] == subj:
+                        group.append(lines[j] + '\n')
+                        j += 1
+                    # Within group, write rdf:type lines first
+                    type_lines = []
+                    other_lines = []
+                    for l in group:
+                        parts = l.strip().split(' ', 2)
+                        if len(parts) < 2:
+                            other_lines.append(l)
+                            continue
+                        pred_tok = parts[1]
+                        pred_lower = pred_tok.lower()
+                        if pred_tok == 'a' or 'rdf:type' in pred_lower or '#type' in pred_lower:
+                            type_lines.append(l)
+                        else:
+                            other_lines.append(l)
+                    for l in type_lines + other_lines:
+                        out_f.write(l)
+                    i = j
     # Move sorted file into place
     shutil.move(str(tmp_nodes), str(nodes_path))
     # cleanup buckets
@@ -448,6 +474,7 @@ def main():
     parser.add_argument("--heuristic-threshold", type=int, default=200_000_000, help="File size in bytes above which to use heuristic parsing")
     parser.add_argument("--node-predicate", action="append", help="Predicate URI (or substring) to force into nodes file; repeatable")
     parser.add_argument("--inputs", nargs='*', help="Explicit list of input files or directories to combine (overrides automatic discovery)")
+    parser.add_argument("--full-out", help="Write a single combined file with nodes followed by relationships (path)")
 
     args = parser.parse_args()
     
@@ -461,7 +488,8 @@ def main():
     success = combine_ttl_files(nodes_out=args.nodes_out, rels_out=args.rels_out,
                                 heuristic_threshold=args.heuristic_threshold,
                                 node_predicates=args.node_predicate,
-                                inputs=args.inputs)
+                                inputs=args.inputs,
+                                full_out=args.full_out)
     
     if success:
         print(f"End time: {datetime.now().isoformat()}")
