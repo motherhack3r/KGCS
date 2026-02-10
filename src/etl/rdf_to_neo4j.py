@@ -642,6 +642,10 @@ class RDFtoNeo4jTransformer:
             })
 
         for (rel_type, source_label, target_label), rel_list in by_key.items():
+            unique_rels = {}
+            for rel in rel_list:
+                unique_rels[(rel['sourceUri'], rel['targetUri'])] = rel
+            rel_list = list(unique_rels.values())
             source_clause = f"MATCH (source:`{source_label}` {{uri: rel.sourceUri}})" if source_label else "MATCH (source {uri: rel.sourceUri})"
             target_clause = f"MATCH (target:`{target_label}` {{uri: rel.targetUri}})" if target_label else "MATCH (target {uri: rel.targetUri})"
             cypher = (

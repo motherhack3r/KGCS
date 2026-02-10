@@ -72,3 +72,7 @@ tmp/
 # Large generated reports
 artifacts/shacl-report-cpematch-summary.json
 tmp.7z
+artifacts/ttl_pair_counts_summary.json
+artifacts/ttl_rel_stats_summary.json
+artifacts/*-rels-*-top*.csv
+artifacts/*-rels-dedup*.ttl
