@@ -19,16 +19,16 @@ python scripts/extract_neo4j_stats.py
 
 ```bash
 # Auto-detect most recently updated database
-python scripts/extract_neo4j_stats.py
+python scripts/utilities/extract_neo4j_stats.py
 
 # List all available databases
-python scripts/extract_neo4j_stats.py --list-databases
+python scripts/utilities/extract_neo4j_stats.py --list-databases
 
 # Extract from specific database with pretty-print
-python scripts/extract_neo4j_stats.py --db neo4j-2026-01-29 --pretty
+python scripts/utilities/extract_neo4j_stats.py --db neo4j-2026-01-29 --pretty
 
 # Save to custom location
-python scripts/extract_neo4j_stats.py --output /tmp/stats.json
+python scripts/utilities/extract_neo4j_stats.py --output /tmp/stats.json
 ```
 
 ## What Gets Extracted

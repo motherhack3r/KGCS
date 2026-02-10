@@ -68,6 +68,18 @@ python scripts/utilities/export_ttl_to_csv.py \
 
 ---
 
+### `inspect_combined_ttl.py`
+
+Inspects combined TTL files for quick sanity checks.
+
+**Usage:**
+
+```bash
+python scripts/utilities/inspect_combined_ttl.py --input tmp/combined-pipeline-enhanced-capec.ttl
+```
+
+---
+
 ### `ttl_rel_stats.py`
 
 Computes relationship counts for TTL files.

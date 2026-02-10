@@ -7,15 +7,18 @@ Comprehensive collection of production and support scripts for the Knowledge Gra
 ## 🎯 Quick Navigation
 
 **Core Pipeline Scripts** (run these)
+
 - [`run_all_etl.py`](#run_all_etlpy) - Main ETL orchestrator
 - [`combine_pipeline.py`](#combine_pipelinepy) - Combine pipeline stages
 - [`verify_combined_capec.py`](#verify_combined_capecpy) - Verify CAPEC enhancement
 
 **Validation Scripts** (`validation/`)
+
 - Run quality assurance checks on ETL outputs
 - See [Validation README](validation/README.md)
 
 **Utility Scripts** (`utilities/`)
+
 - Support tools for database operations and data export
 - See [Utilities README](utilities/README.md)
 
@@ -24,15 +27,18 @@ Comprehensive collection of production and support scripts for the Knowledge Gra
 ## 📋 Core Scripts (Root Level)
 
 ### `run_all_etl.py`
+
 **Purpose:** Main ETL pipeline orchestrator  
 **Usage:** `python scripts/run_all_etl.py`  
 **What it does:**
+
 - Orchestrates all 13 ETL transformation stages
 - Manages dependencies between stages
 - Handles timeouts and error recovery
 - Generates combined pipeline output
 
 **Key Features:**
+
 - Sequential/parallel execution modes
 - Progress tracking and logging
 - Automatic validation hooks
@@ -41,9 +47,11 @@ Comprehensive collection of production and support scripts for the Knowledge Gra
 ---
 
 ### `combine_pipeline.py`
+
 **Purpose:** Combine all pipeline stages into single file  
 **Usage:** `python scripts/combine_pipeline.py`  
 **What it does:**
+
 - Merges 13 stage TTL files into combined output
 - Validates file integrity
 - Generates statistics and summary
@@ -53,16 +61,19 @@ Comprehensive collection of production and support scripts for the Knowledge Gra
 ---
 
 ### `verify_combined_capec.py`
+
 **Purpose:** Verify CAPEC enhancement in combined pipeline  
 **Usage:** `python scripts/verify_combined_capec.py`  
 **What it does:**
+
 - Scans for CAPEC→Technique relationships
 - Counts patterns and relationships
 - Compares pre/post enhancement metrics
 - Shows sample mappings
 
 **Example Output:**
-```
+
+```text
 CAPEC patterns with techniques: 179
 Implements relationships: 307
 Unique techniques: 225
@@ -73,7 +84,7 @@ Coverage: 39.6% of ATT&CK techniques
 
 ## 📁 Directory Structure
 
-```
+```text
 scripts/
 ├── run_all_etl.py                    ⭐ MAIN ENTRY POINT
 ├── combine_pipeline.py               ⭐ PIPELINE ORCHESTRATION
@@ -91,6 +102,7 @@ scripts/
 ├── utilities/                        🔧 SUPPORT TOOLS
 │   ├── __init__.py
 │   ├── extract_neo4j_stats.py
+│   ├── inspect_combined_ttl.py
 │   ├── reload_neo4j.py
 │   ├── export_ttl_to_csv.py
 │   ├── cleanup_workspace.py
@@ -110,6 +122,7 @@ scripts/
 ## 🚀 Common Workflows
 
 ### Running the Full ETL Pipeline
+
 ```bash
 # Execute all 13 transformation stages
 python scripts/run_all_etl.py
@@ -125,6 +138,7 @@ python scripts/verify_combined_capec.py
 ```
 
 ### Validating Specific Standards
+
 ```bash
 # Validate SHACL with streaming (for large files)
 python scripts/validation/validate_shacl_stream.py --data tmp/pipeline-stage3-cve.ttl --shapes docs/ontology/shacl/cve-shapes.ttl
@@ -137,6 +151,7 @@ python scripts/validation/regenerate_pipeline.py
 ```
 
 ### Database Operations
+
 ```bash
 # Extract Neo4j statistics
 python scripts/utilities/extract_neo4j_stats.py
@@ -149,6 +164,7 @@ python scripts/utilities/create_phase3_samples.py
 ```
 
 ### Data Export
+
 ```bash
 # Export RDF/TTL to CSV format
 python scripts/utilities/export_ttl_to_csv.py --input tmp/combined-pipeline-enhanced-capec.ttl --output artifacts/graph.csv
@@ -162,7 +178,9 @@ python scripts/utilities/cleanup_workspace.py
 ## 📊 Script Categories
 
 ### Validation Scripts (`validation/`)
+
 Quality assurance and conformance checking:
+
 - **validate_all_standards.py** - SHACL validation for all standards
 - **validate_shacl_stream.py** - Memory-efficient streaming SHACL validator
 - **validate_etl_pipeline_order.py** - Verify ETL dependency order
@@ -170,8 +188,11 @@ Quality assurance and conformance checking:
 - **regenerate_pipeline.py** - Full pipeline regeneration with validation
 
 ### Utility Scripts (`utilities/`)
+
 Support tools and administrative tasks:
+
 - **extract_neo4j_stats.py** - Extract statistics from Neo4j database
+- **inspect_combined_ttl.py** - Inspect combined TTL files for quick sanity checks
 - **reload_neo4j.py** - Load RDF data into Neo4j
 - **export_ttl_to_csv.py** - Convert RDF/TTL to CSV format
 - **cleanup_workspace.py** - Clean temporary files and caches

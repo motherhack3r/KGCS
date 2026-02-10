@@ -7,11 +7,14 @@ Welcome to the KGCS (Cybersecurity Knowledge Graph) documentation. This director
 ## 🎯 Where to Start?
 
 **New to KGCS?** Start here:
+
 1. [**KGCS.md**](KGCS.md) — Executive summary and big picture
 2. [**ARCHITECTURE.md**](ARCHITECTURE.md) — System design and 5-phase roadmap
 3. [**GLOSSARY.md**](GLOSSARY.md) — Standard definitions and terminology
+4. [**PIPELINE_EXECUTION_GUIDE.md**](PIPELINE_EXECUTION_GUIDE.md) — End-to-end pipeline execution
 
 **Want to extend the system?**
+
 - [**EXTENDING.md**](EXTENDING.md) — How to add new standards or features
 
 ---
@@ -38,12 +41,15 @@ Need to deploy, run, or maintain the system?
 | [operations/CLEANUP-WORKSPACE.md](operations/CLEANUP-WORKSPACE.md) | Cleaning up temporary files and caches |
 | [operations/NEO4J-LOAD-SUMMARY.md](operations/NEO4J-LOAD-SUMMARY.md) | Latest Neo4j statistics and load analysis |
 | [operations/NEO4J-STATS.md](operations/NEO4J-STATS.md) | Guide to extracting Neo4j statistics |
+| [PIPELINE_EXECUTION_GUIDE.md](PIPELINE_EXECUTION_GUIDE.md) | Full pipeline execution guide (download → ETL → load) |
 
 **Quick Links:**
+
 - **Deploy to production?** → [DEPLOYMENT.md](operations/DEPLOYMENT.md)
 - **Set up automated downloads?** → [DAILY-DOWNLOAD-PIPELINE.md](operations/DAILY-DOWNLOAD-PIPELINE.md)
 - **Check Neo4j statistics?** → [NEO4J-LOAD-SUMMARY.md](operations/NEO4J-LOAD-SUMMARY.md)
 - **Need to clean up?** → [CLEANUP-WORKSPACE.md](operations/CLEANUP-WORKSPACE.md)
+- **Run the full pipeline?** → [PIPELINE_EXECUTION_GUIDE.md](PIPELINE_EXECUTION_GUIDE.md)
 
 ### 🔬 Research & Enhancement Reports
 
@@ -71,42 +77,51 @@ Core ontology and validation framework specifications.
 
 ### By Role
 
-**System Architect or Designer**
+#### System Architect or Designer
+
 - [ARCHITECTURE.md](ARCHITECTURE.md)
 - [KGCS.md](KGCS.md)
 - [GLOSSARY.md](GLOSSARY.md)
 
-**DevOps / System Administrator**
+#### DevOps / System Administrator
+
 - [operations/DEPLOYMENT.md](operations/DEPLOYMENT.md)
 - [operations/DAILY-DOWNLOAD-PIPELINE.md](operations/DAILY-DOWNLOAD-PIPELINE.md)
 - [operations/NEO4J-LOAD-SUMMARY.md](operations/NEO4J-LOAD-SUMMARY.md)
 
-**Developer / Data Engineer**
+#### Developer / Data Engineer
+
 - [EXTENDING.md](EXTENDING.md)
 - [ontology/](ontology/)
 - [operations/NEO4J-STATS.md](operations/NEO4J-STATS.md)
+- [PIPELINE_EXECUTION_GUIDE.md](PIPELINE_EXECUTION_GUIDE.md)
 
-**Researcher / Analyst**
+#### Researcher / Analyst
+
 - [research/](research/)
 - [ARCHITECTURE.md](ARCHITECTURE.md)
 
 ### By Topic
 
-**Understanding the System**
+#### Understanding the System
+
 - Core principles: [KGCS.md](KGCS.md)
 - Architecture & design: [ARCHITECTURE.md](ARCHITECTURE.md)
 - Definitions & terms: [GLOSSARY.md](GLOSSARY.md)
 
-**Adding New Standards**
+#### Adding New Standards
+
 - [EXTENDING.md](EXTENDING.md)
 - [ontology/](ontology/)
 
-**Running the System**
+#### Running the System
+
 - Deployment: [operations/DEPLOYMENT.md](operations/DEPLOYMENT.md)
 - Daily automation: [operations/DAILY-DOWNLOAD-PIPELINE.md](operations/DAILY-DOWNLOAD-PIPELINE.md)
 - Statistics: [operations/NEO4J-LOAD-SUMMARY.md](operations/NEO4J-LOAD-SUMMARY.md)
 
-**Understanding Phase 3**
+#### Understanding Phase 3
+
 - [research/CAPEC-ENHANCEMENT-FINAL-REPORT.md](research/CAPEC-ENHANCEMENT-FINAL-REPORT.md)
 - [research/PHASE3-ENHANCEMENT-COMPLETION.md](research/PHASE3-ENHANCEMENT-COMPLETION.md)
 
@@ -118,7 +133,7 @@ Core ontology and validation framework specifications.
 - **25+ SHACL Shapes** — Validation rules
 - **2.5M Neo4j Nodes** — Knowledge graph content
 - **26M Relationships** — Cross-standard links
-- **9 Data Standards** — CPE, CVE, CVSS, CWE, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE
+- **10 Data Standards** — CPE, CVE, CVSS, CWE, CAPEC, ATT&CK, D3FEND, CAR, SHIELD, ENGAGE
 
 ---
 
@@ -161,5 +176,5 @@ See [PROJECT-STATUS-SUMMARY.md](../PROJECT-STATUS-SUMMARY.md) for current projec
 
 ---
 
-**Last Updated:** February 3, 2026  
+**Last Updated:** February 10, 2026  
 **Status:** ✅ Complete documentation structure

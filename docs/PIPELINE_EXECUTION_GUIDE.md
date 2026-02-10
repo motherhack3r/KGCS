@@ -1,6 +1,6 @@
 # KGCS Data Pipeline: Complete Setup & Execution Guide
 
-**Last Updated:** February 8, 2026  
+**Last Updated:** February 10, 2026  
 **Status:** Production Ready (Phase 3 MVP)
 
 ## Quick Start (6 Steps)
@@ -19,27 +19,22 @@ python scripts/run_all_etl.py
 
 # Step 4: Validate outputs with SHACL (recommended)
 # Run SHACL validation for all standards before combining/loading
-python scripts/validate_all_standards.py
+python scripts/validation/validate_all_standards.py
 
-# Step 5: Combine all TTL outputs into single file
+# Step 5: Combine all TTL outputs into nodes + relationships files (optional)
 python scripts/combine_ttl_pipeline.py --nodes-out tmp/combined-nodes.ttl --rels-out tmp/combined-rels.ttl
 ```
 
 Note: ETL output locations
 
-- Stages 4–10 write stage TTL outputs into per-standard sample folders: `data/{standard}/samples/`.
-- Stages 1–3 (CPE, CPEMatch, CVE) also emit per-standard sample TTLs; `tmp/` may still be used for intermediate chunked processing.
-- The combine step must therefore merge TTLs from both `tmp/` and `data/*/samples/`. If your `scripts/combine_ttl_pipeline.py` has not been updated to discover `data/*/samples/`, you can copy the per-standard sample TTLs into `tmp/` before running the combine script:
-
-```powershell
-# Copy per-standard samples into tmp/ (idempotent)
-Get-ChildItem -Path data\*\samples -Filter pipeline-stage*-*.ttl -Recurse | ForEach-Object { Copy-Item $_.FullName -Destination tmp -Force }
-python scripts/combine_ttl_pipeline.py
-```
+- Stages 1–10 write per-standard TTLs into `data/{standard}/samples/`.
+- `tmp/` is used only for intermediate chunked processing and combined outputs.
+- `scripts/combine_ttl_pipeline.py` auto-discovers stage TTLs under both `data/*/samples/` and `tmp/`.
 
 ```bash
-# Step 6: Load to Neo4j
-python src/etl/rdf_to_neo4j.py --database neo4j-2026-02-08 --ttl tmp/combined-pipeline.ttl
+# Step 6: Load to Neo4j (nodes first, then relationships)
+python src/etl/rdf_to_neo4j.py --ttl tmp/combined-nodes.ttl --db-version 2026-02-08 --reset-db --nodes-only
+python src/etl/rdf_to_neo4j.py --ttl tmp/combined-rels.ttl --db-version 2026-02-08 --rels-only
 ```
 
 Recommended safe two-step load (nodes first, then relationships)
@@ -48,7 +43,7 @@ Prepare DB and load nodes-only (creates DB + indexes):
 
 ```bash
 python src/etl/rdf_to_neo4j.py \
-   --ttl tmp/combined-pipeline.ttl \
+   --ttl tmp/combined-nodes.ttl \
    --chunk-size 20000 \
    --fast-parse \
    --progress-newline \
@@ -62,7 +57,7 @@ After nodes complete, load relationships-only (do NOT use `--reset-db`):
 
 ```bash
 python src/etl/rdf_to_neo4j.py \
-   --ttl tmp/combined-pipeline.ttl \
+   --ttl tmp/combined-rels.ttl \
    --chunk-size 20000 \
    --fast-parse \
    --progress-newline \
@@ -92,7 +87,7 @@ if (!(Test-Path -Path logs)) { New-Item -ItemType Directory -Path logs }
 # Run downloader (creates data/{standard}/raw, data/{standard}/schemas, manifests)
 python -m src.ingest.download_manager
 
-# Run ETL and combine stages
+# Run ETL and combine stages (combine is optional for per-standard loads)
 python scripts/run_all_etl.py
 python scripts/combine_ttl_pipeline.py --nodes-out tmp/combined-nodes.ttl --rels-out tmp/combined-rels.ttl
 
@@ -101,12 +96,12 @@ python scripts/combine_ttl_pipeline.py --nodes-out tmp/combined-nodes.ttl --rels
 python scripts/combine_ttl_pipeline.py --inputs tmp/pipeline-stage6-capec.nt tmp/pipeline-stage7-cwe.nt \
     --nodes-out tmp/selected-nodes.nt --rels-out tmp/selected-rels.nt --full-out tmp/selected-full.nt
 
-# Load to Neo4j using the helper wrapper (nodes then relationships)
-.
-\scripts\load_to_neo4j.ps1 -DbVersion 2026-02-08
+# Load to Neo4j using the helper wrappers (nodes then relationships)
+.\scripts\load_nodes_all.ps1 -DbVersion 2026-02-08 -FastParse -ProgressNewline
+.\scripts\load_rels_all.ps1 -DbVersion 2026-02-08 -FastParse -ProgressNewline
 ```
 
-**Verification note (Feb 8, 2026):** After activating the `metadata` conda environment (Step 1), running the downloader (`python -m src.ingest.download_manager`) successfully fetched raw files, wrote per-standard manifests (`data/{standard}/manifest.json`), and saved official schemas under `data/{standard}/schemas/` (for example, CVSS JSON schemas under `data/cve/schemas/`).
+See Appendix for verification notes and troubleshooting.
 
 ## Detailed Steps
 
@@ -181,65 +176,66 @@ python scripts/run_all_etl.py
 
 1. **Stage 1: CPE** (15 chunks)
    - Input: `data/cpe/raw/*.json` (chunked)
-   - Output: `tmp/pipeline-stage1-cpe.ttl` (~2.5 GB)
+   - Output: `data/cpe/samples/pipeline-stage1-cpe.ttl` (~2.5 GB)
    - Processing: Loop with append mode, accumulate all chunks
 
 2. **Stage 2: CPEMatch** (55 chunks)
    - Input: `data/cpematch/raw/*.json` (chunked)
-   - Output: `tmp/pipeline-stage2-cpematch.ttl` (~18.7 GB)
+   - Output: `data/cpe/samples/pipeline-stage2-cpematch.ttl` (~18.7 GB)
    - Processing: Loop with append mode, accumulate all chunks
    - **Note:** This is the largest stage - creates 614k PlatformConfiguration nodes
 
 3. **Stage 3: CVE** (25 files)
    - Input: `data/cve/raw/nvdcve-2.0-*.json` (one per year)
-   - Output: `tmp/pipeline-stage3-cve.ttl` (~1.8 GB)
+   - Output: `data/cve/samples/pipeline-stage3-cve.ttl` (~1.8 GB)
    - Processing: Loop with append mode, accumulate all years
    - Links CVE → CWE relationships
 
 4. **Stage 4: ATT&CK** (4 variants)
    - Input: `data/attack/raw/enterprise|ics|mobile|pre.json`
-   - Output: `tmp/pipeline-stage4-attack.ttl` (~3.3 MB)
+   - Output: `data/attack/samples/pipeline-stage4-attack.ttl` (~3.3 MB)
    - Processing: Loop with append mode, merge all variants
 
 5. **Stage 5: D3FEND** (2 files) ⭐ ENHANCED
    - Input: `data/d3fend/raw/d3fend.json` + `d3fend-full-mappings.json`
-   - Output: `tmp/pipeline-stage5-d3fend.ttl` (~0.43 MB)
+   - Output: `data/d3fend/samples/pipeline-stage5-d3fend.ttl` (~0.43 MB)
    - Processing: Loop with append mode
    - **New:** SPARQL binding extraction yields 3,109 D3FEND→Technique relationships
 
 6. **Stage 6: CAPEC**
    - Input: `data/capec/raw/capec_latest.xml`
-   - Output: `tmp/pipeline-stage6-capec.ttl` (~1.67 MB)
+   - Output: `data/capec/samples/pipeline-stage6-capec.ttl` (~1.67 MB)
    - Processing: Single file
    - Links CAPEC → ATT&CK Technique (271 relationships)
 
 7. **Stage 7: CWE**
    - Input: `data/cwe/raw/cwe_latest.xml`
-   - Output: `tmp/pipeline-stage7-cwe.ttl` (~1.31 MB)
+   - Output: `data/cwe/samples/pipeline-stage7-cwe.ttl` (~1.31 MB)
    - Processing: Single file
    - Parent/child hierarchy preserved
 
 8. **Stage 8: CAR** (122 analytics)
    - Input: `data/car/raw/**/*.yaml`
-   - Output: `tmp/pipeline-stage8-car.ttl` (~0.14 MB)
+   - Output: `data/car/samples/pipeline-stage8-car.ttl` (~0.14 MB)
    - Processing: Loop with append mode, accumulate all YAML files
    - Links CAR analytics → ATT&CK Techniques
 
 9. **Stage 9: SHIELD** (12 files)
    - Input: `data/shield/raw/*.json`
-   - Output: `tmp/pipeline-stage9-shield.ttl` (~0.31 MB)
+   - Output: `data/shield/samples/pipeline-stage9-shield.ttl` (~0.31 MB)
    - Processing: Directory merge (loads all in memory)
    - Deception techniques
 
 10. **Stage 10: ENGAGE** (12 files)
-    - Input: `data/engage/raw/*.json`
-    - Output: `tmp/pipeline-stage10-engage.ttl` (~0.05 MB)
-    - Processing: Directory merge (loads all in memory)
-    - Strategic engagement concepts
+   - Input: `data/engage/raw/*.json`
+   - Output: `data/engage/samples/pipeline-stage10-engage.ttl` (~0.05 MB)
+   - Processing: Directory merge (loads all in memory)
+   - Strategic engagement concepts
 
 **Output:**
 
-- 10 TTL files in `tmp/pipeline-stage*.ttl`
+- Stage TTLs in `data/{standard}/samples/`
+- Split outputs alongside each stage: `pipeline-stageX-*-nodes.ttl` and `pipeline-stageX-*-rels.ttl`
 - Total: ~28.6 GB of RDF data
 - Log: `logs/etl_run_*.log`
 
@@ -249,24 +245,7 @@ python scripts/run_all_etl.py
 
 ### Step 4: Combine TTL Files
 
-Merges all 10 stage outputs into single combined file (removes duplicate headers):
-
-```bash
-python scripts/combine_ttl_pipeline.py
-```
-
-**Output:**
-
-- `tmp/combined-pipeline.ttl` (~28.6 GB)
-- Log: `logs/combine_ttl.log`
-
-**Time:** ~5-10 minutes
-
-### Preferred: Combine with streaming split into nodes + relationships
-
-Instead of combining into one huge TTL and splitting afterwards, use the updated combine script which streams each stage file and writes two outputs directly: a nodes TTL and a relationships TTL. This avoids building a giant in-memory RDF graph and is faster/more memory-safe.
-
-Run the streaming combine (defaults produce `tmp/combined-nodes.ttl` and `tmp/combined-rels.ttl`):
+Combine stage outputs into nodes and relationships TTLs (streaming, memory-safe):
 
 ```bash
 python scripts/combine_ttl_pipeline.py --nodes-out tmp/combined-nodes.ttl --rels-out tmp/combined-rels.ttl
@@ -277,67 +256,17 @@ Options:
 - `--heuristic-threshold N` — file size in bytes above which the combine step will use a simple line-based heuristic instead of rdflib parsing (default ~200MB).
 - `--node-predicate <URI>` — repeatable; force triples whose predicate contains this substring into the nodes file.
 
-After combining, load nodes first and relationships second (do NOT reset DB on the second step):
+**Output:**
 
-```bash
-# load nodes-only
-python src/etl/rdf_to_neo4j.py --ttl tmp/combined-nodes.ttl --reset-db --nodes-only
+- `tmp/combined-nodes.ttl`
+- `tmp/combined-rels.ttl`
+- Log: `logs/combine_ttl.log`
 
-# load relationships-only
-python src/etl/rdf_to_neo4j.py --ttl tmp/combined-rels.ttl --rels-only
-```
+**Time:** ~5-10 minutes
 
 If you still need a separate splitter utility for special cases, `scripts/utilities/split_ttl.py` remains available as a fallback (it parses a single TTL and emits nodes/rels outputs).
 
-### E2E run for selected standards (nodes-first, rels-second) 🔁
-
-Use this when you want to run the pipeline only for a subset of standards (for faster iteration or debugging). The pattern is:
-
-1. Run ETL for each selected standard and emit N-Triples (one triple per line) using `--format nt` so normalization is guaranteed:
-
-```bash
-# Example: run CWE and CAR only (writes to tmp/)
-python -m src.etl.etl_cwe --input data/cwe/samples/sample_cwe.json --output tmp/pipeline-stage7-cwe.nt --format nt
-python -m src.etl.etl_car --input data/car/samples --output tmp/pipeline-stage8-car.nt --format nt
-```
-
-1. Combine only the `tmp/` pipeline-stage files (the combine script auto-discovers `.ttl` and `.nt`):
-
-```bash
-python scripts/combine_ttl_pipeline.py --nodes-out tmp/selected-nodes.nt --rels-out tmp/selected-rels.nt
-```
-
-1. Validate combined outputs with SHACL (mandatory):
-
-```bash
-python scripts/validate_all_standards.py --input tmp/selected-nodes.nt
-# or run targeted shape checks for the standards involved
-```
-
-1. Dry-run the Neo4j loader to inspect label & relationship counts and reveal missing types or subjects:
-
-```bash
-python src/etl/rdf_to_neo4j.py --ttl tmp/selected-nodes.nt --fast-parse --dry-run --workers 4
-```
-
-1. Load nodes-only for the selected standards (create DB, indexes, insert nodes):
-
-```bash
-python src/etl/rdf_to_neo4j.py --ttl tmp/selected-nodes.nt --reset-db --nodes-only --chunk-size 50000 --fast-parse
-```
-
-1. Load relationships-only (no reset):
-
-```bash
-python src/etl/rdf_to_neo4j.py --ttl tmp/selected-rels.nt --rels-only --rel-batch-size 1000 --fast-parse
-```
-
-Notes & troubleshooting:
-
-- Use `--dry-run` first to avoid partial writes and to inspect diagnostics (`logs/combine-*.json` and `logs/bad_node_subjects.log`).
-- If the combine diagnostics show `bad_node_subjects_count > 0`, fix the originating ETL (do not fabricate types) and re-run the ETL + combine steps.
-- Keep ETL pipeline outputs in *N-Triples* format for the pipeline (human-readable TTL can still be generated separately if needed).
-- For large selections, run nodes load in the KGCS-prescribed causal order (CPE → CVE → CWE → CAPEC → ATT&CK → {D3FEND, CAR, SHIELD, ENGAGE}) to ensure relationship targets exist before rel ingestion.
+See Appendix for the selected-standards workflow, tuning notes, and troubleshooting tips.
 
 ### Step 5: Load to Neo4j
 
@@ -363,17 +292,6 @@ python src/etl/rdf_to_neo4j.py --ttl tmp/combined-nodes.ttl --chunk-size 100000 
 python src/etl/rdf_to_neo4j.py --ttl tmp/combined-rels.ttl --chunk-size 100000 --fast-parse --batch-size 20000 --rel-batch-size 5000 --db-version 2026-02-08 --rels-only --progress-newline --parse-heartbeat-seconds 30
 ```
 
-Notes on tuning and flags:
-
-- `--chunk-size` — number of unique subjects per chunk. Use chunking (50k–100k) to avoid large in-memory loads and to parallelize work across chunks.
-- `--fast-parse` — use the streaming extractor to avoid building an rdflib Graph for very large TTLs.
-- `--batch-size` — controls node insert batch size (5k–20k). Increase if Neo4j can handle larger transactions.
-- `--rel-batch-size` — relationship insert batch size (start at 1k).
-- `--reset-db` — drop & recreate the target versioned DB (requires admin privileges); fallback is `MATCH (n) DETACH DELETE n`.
-- `--db-version` — append a version suffix to the configured DB name so you can create/reset a versioned DB safely.
-- `--progress-newline` — print progress updates as new lines (useful for log capture).
-- `--parse-heartbeat-seconds` — heartbeat interval during long parses (e.g., 30s).
-
 Processing performed by the loader:
 
 - Chunking (optional) to break the TTL into manageable pieces
@@ -382,55 +300,6 @@ Processing performed by the loader:
 - Two-pass load: nodes first (create/merge nodes), relationships second (MERGE relationships between existing nodes)
 
 Expected time depends on hardware and Neo4j configuration; on a modern workstation with tuned Neo4j, nodes + relationships can complete in under an hour but may take longer for very large datasets.
-
-## Expected Output Sizes
-
-After complete pipeline execution:
-
-```text
-tmp/pipeline-stage1-cpe.ttl            2,472.68 MB   (15 chunks)
-tmp/pipeline-stage2-cpematch.ttl      18,689.66 MB   (55 chunks)
-tmp/pipeline-stage3-cve.ttl            1,792.56 MB   (25 files)
-tmp/pipeline-stage4-attack.ttl             3.29 MB   (4 variants)
-tmp/pipeline-stage5-d3fend.ttl             0.43 MB   (2 files)
-tmp/pipeline-stage6-capec.ttl              1.67 MB   (1 file)
-tmp/pipeline-stage7-cwe.ttl                1.31 MB   (1 file)
-tmp/pipeline-stage8-car.ttl                0.14 MB   (122 files)
-tmp/pipeline-stage9-shield.ttl             0.31 MB   (12 files)
-tmp/pipeline-stage10-engage.ttl            0.05 MB   (12 files)
-────────────────────────────────────────────────────
-tmp/combined-pipeline.ttl            ~28,600 MB   (all stages combined)
-```
-
-**Total RDF triples:** ~3.2M triples across all standards
-
-## Troubleshooting
-
-### Download Fails
-
-- Check network connectivity
-- Review `logs/download_manager.log` for failed URLs
-- Manually download from NVD/MITRE and place in `data/{standard}/raw/`
-
-### ETL Produces Small Output
-
-- Check if input files exist: `Get-ChildItem data/{standard}/raw/`
-- Review `logs/etl_run_*.log` for errors
-- Verify file format matches expected (JSON, XML, YAML)
-- For multi-file stages, ensure append mode is working (check for increasing file sizes)
-
-### Neo4j Load Fails
-
-- Verify Neo4j service is running: `neo4j status`
-- Check database connection: `neo4j console`
-- Review Neo4j logs: `logs/neo4j.log`
-- Ensure combined TTL file is valid: `python -c "from rdflib import Graph; g = Graph(); g.parse('tmp/combined-pipeline.ttl', format='turtle'); print(f'Loaded {len(g)} triples')"`
-
-### Out of Memory
-
-- Reduce batch size: `--batch-size 500` instead of 1000
-- Process stages individually instead of combined
-- Increase system RAM or virtual memory
 
 ## Architecture
 
@@ -460,11 +329,135 @@ Optional: Validate outputs with SHACL before loading:
 
 ```bash
 # Validate individual stage
-python scripts/validate_shacl_stream.py --data tmp/pipeline-stage1-cpe.ttl --shapes docs/ontology/shacl/cpe-shapes.ttl
+python scripts/validation/validate_shacl_stream.py --data tmp/pipeline-stage1-cpe.ttl --shapes docs/ontology/shacl/cpe-shapes.ttl
 
 # Validate all outputs
-python scripts/validate_all_standards.py
+python scripts/validation/validate_all_standards.py
 ```
+
+## Appendix: Development Notes and Troubleshooting
+
+### Verification Notes
+
+**Verification note (Feb 8, 2026):** After activating the `metadata` conda environment (Step 1), running the downloader (`python -m src.ingest.download_manager`) successfully fetched raw files, wrote per-standard manifests (`data/{standard}/manifest.json`), and saved official schemas under `data/{standard}/schemas/` (for example, CVSS JSON schemas under `data/cve/schemas/`).
+
+### Combine Fallback (if auto-discovery is unavailable)
+
+```powershell
+# Copy per-standard samples into tmp/ (idempotent)
+Get-ChildItem -Path data\*\samples -Filter pipeline-stage*-*.ttl -Recurse | ForEach-Object { Copy-Item $_.FullName -Destination tmp -Force }
+python scripts/combine_ttl_pipeline.py
+```
+
+### E2E Run for Selected Standards (nodes-first, rels-second)
+
+Use this when you want to run the pipeline only for a subset of standards (for faster iteration or debugging). The pattern is:
+
+1. Run ETL for each selected standard and emit N-Triples (one triple per line) using `--format nt` so normalization is guaranteed:
+
+```bash
+# Example: run CWE and CAR only (writes to tmp/)
+python -m src.etl.etl_cwe --input data/cwe/samples/sample_cwe.json --output tmp/pipeline-stage7-cwe.nt --format nt
+python -m src.etl.etl_car --input data/car/samples --output tmp/pipeline-stage8-car.nt --format nt
+```
+
+1. Combine only the `tmp/` pipeline-stage files (the combine script auto-discovers `.ttl` and `.nt`):
+
+```bash
+python scripts/combine_ttl_pipeline.py --nodes-out tmp/selected-nodes.nt --rels-out tmp/selected-rels.nt
+```
+
+1. Validate combined outputs with SHACL (mandatory):
+
+```bash
+python scripts/validation/validate_all_standards.py --input tmp/selected-nodes.nt
+# or run targeted shape checks for the standards involved
+```
+
+1. Dry-run the Neo4j loader to inspect label & relationship counts and reveal missing types or subjects:
+
+```bash
+python src/etl/rdf_to_neo4j.py --ttl tmp/selected-nodes.nt --fast-parse --dry-run --workers 4
+```
+
+1. Load nodes-only for the selected standards (create DB, indexes, insert nodes):
+
+```bash
+python src/etl/rdf_to_neo4j.py --ttl tmp/selected-nodes.nt --reset-db --nodes-only --chunk-size 50000 --fast-parse
+```
+
+1. Load relationships-only (no reset):
+
+```bash
+python src/etl/rdf_to_neo4j.py --ttl tmp/selected-rels.nt --rels-only --rel-batch-size 1000 --fast-parse
+```
+
+Notes & troubleshooting:
+
+- Use `--dry-run` first to avoid partial writes and to inspect diagnostics (`logs/combine-*.json` and `logs/bad_node_subjects.log`).
+- If the combine diagnostics show `bad_node_subjects_count > 0`, fix the originating ETL (do not fabricate types) and re-run the ETL + combine steps.
+- Keep ETL pipeline outputs in *N-Triples* format for the pipeline (human-readable TTL can still be generated separately if needed).
+- For large selections, run nodes load in the KGCS-prescribed causal order (CPE → CVE → CWE → CAPEC → ATT&CK → {D3FEND, CAR, SHIELD, ENGAGE}) to ensure relationship targets exist before rel ingestion.
+
+### Loader Tuning Notes
+
+- `--chunk-size` — number of unique subjects per chunk. Use chunking (50k–100k) to avoid large in-memory loads and to parallelize work across chunks.
+- `--fast-parse` — use the streaming extractor to avoid building an rdflib Graph for very large TTLs.
+- `--batch-size` — controls node insert batch size (5k–20k). Increase if Neo4j can handle larger transactions.
+- `--rel-batch-size` — relationship insert batch size (start at 1k).
+- `--reset-db` — drop & recreate the target versioned DB (requires admin privileges); fallback is `MATCH (n) DETACH DELETE n`.
+- `--db-version` — append a version suffix to the configured DB name so you can create/reset a versioned DB safely.
+- `--progress-newline` — print progress updates as new lines (useful for log capture).
+- `--parse-heartbeat-seconds` — heartbeat interval during long parses (e.g., 30s).
+
+### Expected Output Sizes
+
+After complete pipeline execution:
+
+```text
+data/cpe/samples/pipeline-stage1-cpe.ttl            2,472.68 MB   (15 chunks)
+data/cpe/samples/pipeline-stage2-cpematch.ttl      18,689.66 MB   (55 chunks)
+data/cve/samples/pipeline-stage3-cve.ttl            1,792.56 MB   (25 files)
+data/attack/samples/pipeline-stage4-attack.ttl          3.29 MB   (4 variants)
+data/d3fend/samples/pipeline-stage5-d3fend.ttl          0.43 MB   (2 files)
+data/capec/samples/pipeline-stage6-capec.ttl           1.67 MB   (1 file)
+data/cwe/samples/pipeline-stage7-cwe.ttl               1.31 MB   (1 file)
+data/car/samples/pipeline-stage8-car.ttl               0.14 MB   (122 files)
+data/shield/samples/pipeline-stage9-shield.ttl         0.31 MB   (12 files)
+data/engage/samples/pipeline-stage10-engage.ttl        0.05 MB   (12 files)
+────────────────────────────────────────────────────────────────
+tmp/combined-nodes.ttl + tmp/combined-rels.ttl     ~28,600 MB   (combined total)
+```
+
+**Total RDF triples:** ~3.2M triples across all standards
+
+### Troubleshooting
+
+#### Download Fails
+
+- Check network connectivity
+- Review `logs/download_manager.log` for failed URLs
+- Manually download from NVD/MITRE and place in `data/{standard}/raw/`
+
+#### ETL Produces Small Output
+
+- Check if input files exist: `Get-ChildItem data/{standard}/raw/`
+- Review `logs/etl_run_*.log` for errors
+- Verify file format matches expected (JSON, XML, YAML)
+- For multi-file stages, ensure append mode is working (check for increasing file sizes)
+
+#### Neo4j Load Fails
+
+- Verify Neo4j service is running: `neo4j status`
+- Check database connection: `neo4j console`
+- Review Neo4j logs: `logs/neo4j.log`
+- Ensure combined TTL file is valid: `python -c "from rdflib import Graph; g = Graph(); g.parse('tmp/combined-nodes.ttl', format='turtle'); print(f'Loaded {len(g)} triples')"`
+
+#### Out of Memory
+
+- Reduce batch size: `--batch-size 500` instead of 1000
+- Process stages individually instead of combined
+- Increase system RAM or virtual memory
 
 ## References
 
