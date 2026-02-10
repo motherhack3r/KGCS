@@ -17,9 +17,19 @@ from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib import RDF, RDFS, XSD
 
 try:
-    from src.etl.ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
+    from src.etl.ttl_writer import (
+        write_graph_turtle_lines,
+        write_graph_ntriples_lines,
+        write_graph_turtle_split_lines,
+        write_graph_ntriples_split_lines,
+    )
 except Exception:
-    from .ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
+    from .ttl_writer import (
+        write_graph_turtle_lines,
+        write_graph_ntriples_lines,
+        write_graph_turtle_split_lines,
+        write_graph_ntriples_split_lines,
+    )
 
 
 class D3FENDtoRDFTransformer:
@@ -297,12 +307,19 @@ def main():
     parser = argparse.ArgumentParser(description="ETL: MITRE D3FEND JSON -> RDF Turtle")
     parser.add_argument("--input", "-i", required=True, help="Input D3FEND JSON file")
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
+    parser.add_argument("--nodes-out", help="Optional nodes-only output file")
+    parser.add_argument("--rels-out", help="Optional relationships-only output file")
+    parser.add_argument("--rels-include-types", action="store_true", help="Also write rdf:type triples to rels output")
     parser.add_argument("--append", action='store_true', help='Append to existing output file (suppress headers)')
     parser.add_argument('--validate', action='store_true', help='Validate output with SHACL')
     parser.add_argument('--shapes', help='SHACL shapes file (defaults to docs/ontology/shacl/d3fend-shapes.ttl)')
     parser.add_argument("--format", choices=["ttl","nt"], default="ttl", help="Output format (ttl or nt)")
     
     args = parser.parse_args()
+
+    if (args.nodes_out and not args.rels_out) or (args.rels_out and not args.nodes_out):
+        print("Error: --nodes-out and --rels-out must be provided together", file=sys.stderr)
+        return 1
     
     # Accept either a single JSON file or a directory containing multiple D3FEND JSON files
     json_files = []
@@ -342,6 +359,27 @@ def main():
         write_graph_ntriples_lines(transformer.graph, args.output, append=args.append)
     else:
         write_graph_turtle_lines(transformer.graph, args.output, include_prefixes=not args.append, append=args.append)
+
+    if args.nodes_out and args.rels_out:
+        Path(args.nodes_out).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.rels_out).parent.mkdir(parents=True, exist_ok=True)
+        if args.format == "nt":
+            write_graph_ntriples_split_lines(
+                transformer.graph,
+                args.nodes_out,
+                args.rels_out,
+                append=args.append,
+                rels_include_types=args.rels_include_types,
+            )
+        else:
+            write_graph_turtle_split_lines(
+                transformer.graph,
+                args.nodes_out,
+                args.rels_out,
+                include_prefixes=not args.append,
+                append=args.append,
+                rels_include_types=args.rels_include_types,
+            )
 
     # SHACL validation
     if args.validate:

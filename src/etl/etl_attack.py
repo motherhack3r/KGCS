@@ -20,9 +20,19 @@ from rdflib import Graph, Namespace, Literal, URIRef
 from rdflib import RDF, RDFS, XSD
 
 try:
-    from src.etl.ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
+    from src.etl.ttl_writer import (
+        write_graph_turtle_lines,
+        write_graph_ntriples_lines,
+        write_graph_turtle_split_lines,
+        write_graph_ntriples_split_lines,
+    )
 except Exception:
-    from .ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
+    from .ttl_writer import (
+        write_graph_turtle_lines,
+        write_graph_ntriples_lines,
+        write_graph_turtle_split_lines,
+        write_graph_ntriples_split_lines,
+    )
 
 SEC = Namespace("https://example.org/sec/core#")
 EX = Namespace("https://example.org/")
@@ -224,11 +234,18 @@ def main():
     parser = argparse.ArgumentParser(description="ETL: MITRE ATT&CK STIX JSON → RDF Turtle")
     parser.add_argument("--input", "-i", required=True, help="Input ATT&CK STIX JSON file or directory")
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
+    parser.add_argument("--nodes-out", help="Optional nodes-only output file")
+    parser.add_argument("--rels-out", help="Optional relationships-only output file")
+    parser.add_argument("--rels-include-types", action="store_true", help="Also write rdf:type triples to rels output")
     parser.add_argument("--validate", action="store_true", help="Run SHACL validation on output")
     parser.add_argument("--shapes", default="docs/ontology/shacl/attack-shapes.ttl", help="SHACL shapes file")
     parser.add_argument("--append", action="store_true", help="Append to existing output file instead of overwriting")
     parser.add_argument("--format", choices=["ttl","nt"], default="ttl", help="Output format (ttl or nt)")
     args = parser.parse_args()
+
+    if (args.nodes_out and not args.rels_out) or (args.rels_out and not args.nodes_out):
+        print("Error: --nodes-out and --rels-out must be provided together", file=sys.stderr)
+        sys.exit(1)
 
     # Support a single file or a directory of STIX JSON files (enterprise, mobile, ics, pre-attack)
     files = []
@@ -271,6 +288,27 @@ def main():
         write_graph_ntriples_lines(graph, args.output, append=args.append)
     else:
         write_graph_turtle_lines(graph, args.output, include_prefixes=not args.append, append=args.append)
+
+    if args.nodes_out and args.rels_out:
+        os.makedirs(os.path.dirname(args.nodes_out) or ".", exist_ok=True)
+        os.makedirs(os.path.dirname(args.rels_out) or ".", exist_ok=True)
+        if args.format == "nt":
+            write_graph_ntriples_split_lines(
+                graph,
+                args.nodes_out,
+                args.rels_out,
+                append=args.append,
+                rels_include_types=args.rels_include_types,
+            )
+        else:
+            write_graph_turtle_split_lines(
+                graph,
+                args.nodes_out,
+                args.rels_out,
+                include_prefixes=not args.append,
+                append=args.append,
+                rels_include_types=args.rels_include_types,
+            )
 
     if args.validate:
         print("\nRunning SHACL validation...")

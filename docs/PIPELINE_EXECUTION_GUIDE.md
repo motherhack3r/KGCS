@@ -339,7 +339,6 @@ Notes & troubleshooting:
 - Keep ETL pipeline outputs in *N-Triples* format for the pipeline (human-readable TTL can still be generated separately if needed).
 - For large selections, run nodes load in the KGCS-prescribed causal order (CPE → CVE → CWE → CAPEC → ATT&CK → {D3FEND, CAR, SHIELD, ENGAGE}) to ensure relationship targets exist before rel ingestion.
 
-
 ### Step 5: Load to Neo4j
 
 Load RDF into Neo4j using a nodes-first then relationships-second approach (recommended). The loader supports chunked, streaming parsing and a variety of tuning options to match your machine resources.

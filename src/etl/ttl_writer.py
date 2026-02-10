@@ -6,7 +6,7 @@ This ensures one triple per line, which is required by KGCS streaming parsers.
 from __future__ import annotations
 
 from typing import Iterable
-from rdflib import Graph
+from rdflib import Graph, RDF
 from rdflib.term import URIRef, BNode, Literal
 
 PREFIXES = (
@@ -57,7 +57,7 @@ def _format_term(term) -> str | None:
     return None
 
 
-def write_graph_turtle_lines(graph: Graph, output_path: str, include_prefixes: bool = True, append: bool = False, nodes_first: bool = False) -> None:
+def write_graph_turtle_lines(graph: Graph, output_path: str, include_prefixes: bool = True, append: bool = False, nodes_first: bool = True) -> None:
     """Write a graph to a Turtle file with one triple per line and full URIs.
 
     Args:
@@ -112,7 +112,7 @@ def write_graph_turtle_lines(graph: Graph, output_path: str, include_prefixes: b
                     fh.write(f"{s_fmt} {p_fmt} {o_fmt} .\n")
 
 
-def write_graph_ntriples_lines(graph: Graph, output_path: str, append: bool = False, nodes_first: bool = False) -> None:
+def write_graph_ntriples_lines(graph: Graph, output_path: str, append: bool = False, nodes_first: bool = True) -> None:
     """Write a graph in N-Triples format (one triple per line).
 
     Args:
@@ -151,3 +151,104 @@ def write_graph_ntriples_lines(graph: Graph, output_path: str, append: bool = Fa
                 # Skip triples we cannot serialize safely
                 continue
             fh.write(f"{s_fmt} {p_fmt} {o_fmt} .\n")
+
+
+def _is_node_triple(triple) -> bool:
+    _, pred, obj = triple
+    if isinstance(obj, Literal):
+        return True
+    try:
+        return str(pred) == str(RDF.type)
+    except Exception:
+        return False
+
+
+def write_graph_turtle_split_lines(
+    graph: Graph,
+    nodes_output_path: str,
+    rels_output_path: str,
+    include_prefixes: bool = True,
+    append: bool = False,
+    nodes_first: bool = True,
+    rels_include_types: bool = False,
+) -> None:
+    """Write a graph into nodes-only and relationships-only Turtle files."""
+    mode = "a" if append else "w"
+    with open(nodes_output_path, mode, encoding="utf-8") as nodes_fh, \
+            open(rels_output_path, mode, encoding="utf-8") as rels_fh:
+        if include_prefixes and not append:
+            nodes_fh.write(PREFIXES)
+            rels_fh.write(PREFIXES)
+
+        triples = list(graph)
+        rel_endpoints = set()
+        if rels_include_types:
+            for s, p, o in triples:
+                if _is_node_triple((s, p, o)):
+                    continue
+                if isinstance(o, Literal):
+                    continue
+                rel_endpoints.add(s)
+                rel_endpoints.add(o)
+        if nodes_first:
+            triples = sorted(triples, key=lambda t: (str(t[0]), 0 if _is_node_triple(t) else 1, str(t[1]), str(t[2])))
+        else:
+            triples = sorted(triples, key=lambda t: (str(t[0]), str(t[1]), str(t[2])))
+
+        for s, p, o in triples:
+            s_fmt = _format_term(s)
+            p_fmt = _format_term(p)
+            o_fmt = _format_term(o)
+            if not s_fmt or not p_fmt or not o_fmt:
+                continue
+            line = f"{s_fmt} {p_fmt} {o_fmt} .\n"
+            is_node_triple = _is_node_triple((s, p, o))
+            if is_node_triple:
+                nodes_fh.write(line)
+                if rels_include_types and str(p) == str(RDF.type) and s in rel_endpoints:
+                    rels_fh.write(line)
+            else:
+                rels_fh.write(line)
+
+
+def write_graph_ntriples_split_lines(
+    graph: Graph,
+    nodes_output_path: str,
+    rels_output_path: str,
+    append: bool = False,
+    nodes_first: bool = True,
+    rels_include_types: bool = False,
+) -> None:
+    """Write a graph into nodes-only and relationships-only N-Triples files."""
+    mode = "a" if append else "w"
+    triples = list(graph)
+    rel_endpoints = set()
+    if rels_include_types:
+        for s, p, o in triples:
+            if _is_node_triple((s, p, o)):
+                continue
+            if isinstance(o, Literal):
+                continue
+            rel_endpoints.add(s)
+            rel_endpoints.add(o)
+    if nodes_first:
+        triples = sorted(triples, key=lambda t: (str(t[0]), 0 if _is_node_triple(t) else 1, str(t[1]), str(t[2])))
+    else:
+        triples = sorted(triples, key=lambda t: (str(t[0]), str(t[1]), str(t[2])))
+
+    with open(nodes_output_path, mode, encoding="utf-8") as nodes_fh, \
+            open(rels_output_path, mode, encoding="utf-8") as rels_fh:
+        for s, p, o in triples:
+            s_fmt = _format_term(s)
+            p_fmt = _format_term(p)
+            o_fmt = _format_term(o)
+            if not s_fmt or not p_fmt or not o_fmt:
+                continue
+            line = f"{s_fmt} {p_fmt} {o_fmt} .\n"
+            is_node_triple = _is_node_triple((s, p, o))
+            if is_node_triple:
+                nodes_fh.write(line)
+                if rels_include_types and str(p) == str(RDF.type) and s in rel_endpoints:
+                    rels_fh.write(line)
+            else:
+                rels_fh.write(line)

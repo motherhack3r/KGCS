@@ -17,9 +17,19 @@ from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib import RDF, RDFS, XSD
 
 try:
-    from src.etl.ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
+    from src.etl.ttl_writer import (
+        write_graph_turtle_lines,
+        write_graph_ntriples_lines,
+        write_graph_turtle_split_lines,
+        write_graph_ntriples_split_lines,
+    )
 except Exception:
-    from .ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
+    from .ttl_writer import (
+        write_graph_turtle_lines,
+        write_graph_ntriples_lines,
+        write_graph_turtle_split_lines,
+        write_graph_ntriples_split_lines,
+    )
 
 
 class ENGAGEtoRDFTransformer:
@@ -349,10 +359,17 @@ def main():
     parser = argparse.ArgumentParser(description="ETL: MITRE ENGAGE JSON -> RDF Turtle")
     parser.add_argument("--input", "-i", required=True, help="Input ENGAGE JSON file")
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
+    parser.add_argument("--nodes-out", help="Optional nodes-only output file")
+    parser.add_argument("--rels-out", help="Optional relationships-only output file")
+    parser.add_argument("--rels-include-types", action="store_true", help="Also write rdf:type triples to rels output")
     parser.add_argument("--format", choices=["ttl","nt"], default="ttl", help="Output format (ttl or nt)")
     parser.add_argument("--append", action='store_true', help='Append to existing output file (suppress headers)')
     
     args = parser.parse_args()
+
+    if (args.nodes_out and not args.rels_out) or (args.rels_out and not args.nodes_out):
+        print("Error: --nodes-out and --rels-out must be provided together", file=sys.stderr)
+        return 1
     
     try:
         json_data = _load_engage_data(args.input)
@@ -371,6 +388,27 @@ def main():
             write_graph_ntriples_lines(transformer.graph, args.output)
         else:
             write_graph_turtle_lines(transformer.graph, args.output)
+
+        if args.nodes_out and args.rels_out:
+            Path(args.nodes_out).parent.mkdir(parents=True, exist_ok=True)
+            Path(args.rels_out).parent.mkdir(parents=True, exist_ok=True)
+            if args.format == "nt":
+                write_graph_ntriples_split_lines(
+                    transformer.graph,
+                    args.nodes_out,
+                    args.rels_out,
+                    append=args.append,
+                    rels_include_types=args.rels_include_types,
+                )
+            else:
+                write_graph_turtle_split_lines(
+                    transformer.graph,
+                    args.nodes_out,
+                    args.rels_out,
+                    include_prefixes=not args.append,
+                    append=args.append,
+                    rels_include_types=args.rels_include_types,
+                )
         
         print(f"Transformation complete: {args.output}")
         return 0

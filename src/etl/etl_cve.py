@@ -100,6 +100,45 @@ def subject_for_weakness(cwe_id: str) -> str:
     return f"<https://example.org/weakness/{cwe_id_full}>"
 
 
+class TripleWriter:
+    def __init__(self, main_f, nodes_f=None, rels_f=None, rels_include_types: bool = False):
+        self.main_f = main_f
+        self.nodes_f = nodes_f
+        self.rels_f = rels_f
+        self.rels_include_types = rels_include_types
+        self.type_lines = {}
+        self.rel_endpoints = set()
+        self.types_written = set()
+
+    def write(self, subj: str, pred: str, obj: str, is_uri_obj: bool = False, is_rdf_type: bool = False) -> None:
+        line = f"{subj} {pred} {obj} .\n"
+        self.main_f.write(line)
+        if self.nodes_f is None and self.rels_f is None:
+            return
+        if is_rdf_type or not is_uri_obj:
+            if self.nodes_f:
+                self.nodes_f.write(line)
+            if is_rdf_type:
+                self.type_lines[subj] = line
+        else:
+            if self.rels_f:
+                self.rels_f.write(line)
+            if self.rels_include_types:
+                self.rel_endpoints.add(subj)
+                self.rel_endpoints.add(obj)
+
+    def finalize(self) -> None:
+        if not self.rels_include_types or not self.rels_f:
+            return
+        for subj in self.rel_endpoints:
+            if subj in self.types_written:
+                continue
+            line = self.type_lines.get(subj)
+            if line:
+                self.rels_f.write(line)
+                self.types_written.add(subj)
+
+
 def _extract_configs(item: dict):
     if not isinstance(item, dict):
         return None
@@ -158,7 +197,7 @@ def _iter_match_criteria_ids(configs, criteria_to_match_id=None):
             stack.extend(children)
 
 
-def process_vulnerability(item, out_f, criteria_to_match_id=None):
+def process_vulnerability(item, writer: TripleWriter, criteria_to_match_id=None):
     cve_id = None
     if isinstance(item, dict):
         if 'cve' in item and isinstance(item['cve'], dict):
@@ -172,15 +211,21 @@ def process_vulnerability(item, out_f, criteria_to_match_id=None):
     triples = 0
 
     # rdf:type
-    out_f.write(f"{subj} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://example.org/sec/core#Vulnerability> .\n")
+    writer.write(
+        subj,
+        "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>",
+        "<https://example.org/sec/core#Vulnerability>",
+        is_uri_obj=True,
+        is_rdf_type=True,
+    )
     triples += 1
 
     # cveId
-    out_f.write(f"{subj} <https://example.org/sec/core#cveId> {turtle_escape(cve_id)} .\n")
+    writer.write(subj, "<https://example.org/sec/core#cveId>", turtle_escape(cve_id))
     triples += 1
 
     # rdfs:label
-    out_f.write(f"{subj} <http://www.w3.org/2000/01/rdf-schema#label> {turtle_escape(cve_id)} .\n")
+    writer.write(subj, "<http://www.w3.org/2000/01/rdf-schema#label>", turtle_escape(cve_id))
     triples += 1
 
     # description
@@ -202,7 +247,7 @@ def process_vulnerability(item, out_f, criteria_to_match_id=None):
         desc = None
 
     if desc:
-        out_f.write(f"{subj} <https://example.org/sec/core#description> {turtle_escape(desc)} .\n")
+        writer.write(subj, "<https://example.org/sec/core#description>", turtle_escape(desc))
         triples += 1
 
     # published date
@@ -216,7 +261,11 @@ def process_vulnerability(item, out_f, criteria_to_match_id=None):
         try:
             dt = datetime.fromisoformat(pub.replace('Z', '+00:00'))
             ds = dt.date().isoformat()
-            out_f.write(f"{subj} <http://purl.org/dc/terms/issued> \"{ds}\"^^<http://www.w3.org/2001/XMLSchema#date> .\n")
+            writer.write(
+                subj,
+                "<http://purl.org/dc/terms/issued>",
+                f"\"{ds}\"^^<http://www.w3.org/2001/XMLSchema#date>",
+            )
             triples += 1
         except Exception:
             pass
@@ -251,13 +300,13 @@ def process_vulnerability(item, out_f, criteria_to_match_id=None):
         if not url:
             continue
         if url.startswith('http'):
-            out_f.write(f"{subj} <https://example.org/sec/core#referenceUrl> {turtle_escape(url)} .\n")
+            writer.write(subj, "<https://example.org/sec/core#referenceUrl>", turtle_escape(url))
             triples += 1
 
     # vulnStatus
     vuln_status = item.get('vulnStatus') or (item.get('cve', {}) or {}).get('vulnStatus')
     if vuln_status:
-        out_f.write(f"{subj} <https://example.org/sec/core#vulnStatus> {turtle_escape(vuln_status)} .\n")
+        writer.write(subj, "<https://example.org/sec/core#vulnStatus>", turtle_escape(vuln_status))
         triples += 1
 
     # CISA fields
@@ -266,7 +315,7 @@ def process_vulnerability(item, out_f, criteria_to_match_id=None):
         'cisaRequiredAction', 'cisaKnownRansomwareCampaignUse']:
         val = item.get(cisa_field) or (item.get('cve', {}) or {}).get(cisa_field)
         if val:
-            out_f.write(f"{subj} <https://example.org/sec/core#{cisa_field}> {turtle_escape(val)} .\n")
+            writer.write(subj, f"<https://example.org/sec/core#{cisa_field}>", turtle_escape(val))
             triples += 1
 
     # CVSS scores
@@ -279,7 +328,7 @@ def process_vulnerability(item, out_f, criteria_to_match_id=None):
             if m and m.get(f'cvss{version.upper()}'):
                 score = m[f'cvss{version.upper()}']
                 for k, v in score.items():
-                    out_f.write(f"{subj} <https://example.org/sec/core#{pred}_{k}> {turtle_escape(str(v))} .\n")
+                    writer.write(subj, f"<https://example.org/sec/core#{pred}_{k}>", turtle_escape(str(v)))
                     triples += 1
 
     # affects (PlatformConfiguration)
@@ -287,7 +336,7 @@ def process_vulnerability(item, out_f, criteria_to_match_id=None):
     if configs:
         for match_id in _iter_match_criteria_ids(configs, criteria_to_match_id):
             if match_id:
-                out_f.write(f"{subj} <https://example.org/sec/core#affects> {subject_for_config(match_id)} .\n")
+                writer.write(subj, "<https://example.org/sec/core#affects>", subject_for_config(match_id), is_uri_obj=True)
                 triples += 1
 
     # CWE relationships: CVE -> CWE (caused_by)
@@ -316,7 +365,7 @@ def process_vulnerability(item, out_f, criteria_to_match_id=None):
 
     for cwe_id in sorted(cwe_ids):
         weakness_subj = subject_for_weakness(cwe_id)
-        out_f.write(f"{subj} <https://example.org/sec/core#caused_by> {weakness_subj} .\n")
+        writer.write(subj, "<https://example.org/sec/core#caused_by>", weakness_subj, is_uri_obj=True)
         triples += 1
 
     # configurations: link PlatformConfiguration -> Vulnerability via matchCriteriaId
@@ -328,7 +377,7 @@ def process_vulnerability(item, out_f, criteria_to_match_id=None):
                 continue
             seen.add(match_id)
             config_subj = subject_for_config(match_id)
-            out_f.write(f"{config_subj} <https://example.org/sec/core#affected_by> {subj} .\n")
+            writer.write(config_subj, "<https://example.org/sec/core#affected_by>", subj, is_uri_obj=True)
             triples += 1
 
     return triples
@@ -380,7 +429,7 @@ def build_cpematch_index(path: str) -> dict:
     return criteria_to_match_id
 
 
-def transform_cve(input_data, output_path, criteria_to_match_id=None):
+def transform_cve(input_data, output_path, criteria_to_match_id=None, nodes_output_path=None, rels_output_path=None, rels_include_types: bool = False):
     """
     Transforms CVE JSON data (as loaded dict) to Turtle and writes to output_path.
     Returns the number of triples written.
@@ -394,21 +443,43 @@ def transform_cve(input_data, output_path, criteria_to_match_id=None):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     total = 0
     with open(output_path, 'w', encoding='utf-8') as out_f:
+        nodes_f = None
+        rels_f = None
+        if nodes_output_path and rels_output_path:
+            nodes_f = open(nodes_output_path, 'w', encoding='utf-8')
+            rels_f = open(rels_output_path, 'w', encoding='utf-8')
         out_f.write(header)
+        if nodes_f:
+            nodes_f.write(header)
+        if rels_f:
+            rels_f.write(header)
+        writer = TripleWriter(out_f, nodes_f, rels_f, rels_include_types=rels_include_types)
         for item in input_data.get('vulnerabilities', []):
-            total += process_vulnerability(item, out_f, criteria_to_match_id)
+            total += process_vulnerability(item, writer, criteria_to_match_id)
+        writer.finalize()
+        if nodes_f:
+            nodes_f.close()
+        if rels_f:
+            rels_f.close()
     return total
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', '-i', required=True, help='Input JSON file or directory')
     parser.add_argument('--output', '-o', required=True, help='Output Turtle file (.ttl)')
+    parser.add_argument('--nodes-out', help='Optional nodes-only Turtle output file')
+    parser.add_argument('--rels-out', help='Optional relationships-only Turtle output file')
+    parser.add_argument('--rels-include-types', action='store_true', help='Also write rdf:type triples to rels output')
     parser.add_argument('--cpematch-input', help='Optional CPEMatch JSON file/dir to resolve criteria -> matchCriteriaId')
     parser.add_argument('--validate', action='store_true', help='Validate output with SHACL')
     parser.add_argument('--shapes', help='SHACL shapes file (defaults to docs/ontology/shacl/cve-shapes.ttl)')
     parser.add_argument('--append', action='store_true', help='Append to existing output file instead of overwriting')
     parser.add_argument('--format', choices=['ttl','nt'], default='ttl', help='Output format (ttl or nt)')
     args = parser.parse_args()
+
+    if (args.nodes_out and not args.rels_out) or (args.rels_out and not args.nodes_out):
+        print("Error: --nodes-out and --rels-out must be provided together", file=sys.stderr)
+        return 1
 
     # Ensure outputs go to the standard samples folder for CVE
     samples_dir = os.path.join('data', 'cve', 'samples')
@@ -418,6 +489,16 @@ def main():
     if os.path.normpath(output_dir) != os.path.normpath(samples_dir):
         args.output = os.path.join(samples_dir, os.path.basename(requested_output))
         print(f"Info: overriding output path to {args.output} to use CVE samples folder")
+
+    if args.nodes_out and args.rels_out:
+        nodes_dir = os.path.dirname(os.path.normpath(args.nodes_out))
+        rels_dir = os.path.dirname(os.path.normpath(args.rels_out))
+        if os.path.normpath(nodes_dir) != os.path.normpath(samples_dir):
+            args.nodes_out = os.path.join(samples_dir, os.path.basename(args.nodes_out))
+            print(f"Info: overriding nodes output path to {args.nodes_out} to use CVE samples folder")
+        if os.path.normpath(rels_dir) != os.path.normpath(samples_dir):
+            args.rels_out = os.path.join(samples_dir, os.path.basename(args.rels_out))
+            print(f"Info: overriding rels output path to {args.rels_out} to use CVE samples folder")
 
     paths = []
     if os.path.isdir(args.input):
@@ -444,13 +525,28 @@ def main():
 
     mode = 'a' if args.append else 'w'
     with open(args.output, mode, encoding='utf-8') as out_f:
+        nodes_f = None
+        rels_f = None
+        if args.nodes_out and args.rels_out:
+            nodes_f = open(args.nodes_out, mode, encoding='utf-8')
+            rels_f = open(args.rels_out, mode, encoding='utf-8')
         # Only write header on new files (not when appending), and skip header for N-Triples
         if not args.append and args.format != 'nt':
             out_f.write(header)
+            if nodes_f:
+                nodes_f.write(header)
+            if rels_f:
+                rels_f.write(header)
+        writer = TripleWriter(out_f, nodes_f, rels_f, rels_include_types=args.rels_include_types)
         for p in paths:
             print('Processing', p, file=sys.stderr)
             for item in iter_vulnerabilities_from_file(p):
-                total += process_vulnerability(item, out_f, criteria_to_match_id)
+                total += process_vulnerability(item, writer, criteria_to_match_id)
+        writer.finalize()
+        if nodes_f:
+            nodes_f.close()
+        if rels_f:
+            rels_f.close()
 
     print(f'Done — triples written: {total}', file=sys.stderr)
 

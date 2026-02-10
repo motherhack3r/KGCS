@@ -60,12 +60,20 @@ class RDFtoNeo4jTransformer:
     Handles core KGCS classes and relationships in the sec/core namespace.
     """
     
-    def __init__(self, ttl_file: str, batch_size: int = 1000, parse_heartbeat_seconds: float = 0, relationship_batch_size: int | None = None):
+    def __init__(
+        self,
+        ttl_file: str,
+        batch_size: int = 1000,
+        parse_heartbeat_seconds: float = 0,
+        relationship_batch_size: int | None = None,
+        skip_deprecates: bool = False,
+    ):
         """Initialize transformer with RDF file."""
         self.ttl_file = Path(ttl_file)
         self.batch_size = batch_size
         self.relationship_batch_size = relationship_batch_size or batch_size
         self.parse_heartbeat_seconds = parse_heartbeat_seconds
+        self.skip_deprecates = skip_deprecates
         
         # RDF namespaces
         self.sec_ns = Namespace("https://example.org/sec/core#")
@@ -171,6 +179,8 @@ class RDFtoNeo4jTransformer:
             rel_type = self._predicate_to_relationship(predicate_name)
 
             if rel_type in ['TYPE', 'VALUE', 'LABEL']:
+                continue
+            if self.skip_deprecates and rel_type == 'DEPRECATES':
                 continue
 
             self.relationships.append(RelationshipData(
@@ -357,6 +367,8 @@ class RDFtoNeo4jTransformer:
                 predicate_name = self._local_name(pred_uri_ref)
                 rel_type = self._predicate_to_relationship(predicate_name)
                 if rel_type in ['TYPE', 'VALUE', 'LABEL']:
+                    continue
+                if self.skip_deprecates and rel_type == 'DEPRECATES':
                     continue
                 self.relationships.append(RelationshipData(
                     source_uri=subject_uri,
@@ -798,10 +810,10 @@ def chunk_ttl_file(data_path: str, chunk_size: int) -> Tuple[List[Tuple[int, str
     return chunk_files, total_triples
 
 
-def _dry_run_chunk(tmp_path: str) -> Dict[str, Any]:
+def _dry_run_chunk(tmp_path: str, skip_deprecates: bool) -> Dict[str, Any]:
     g = Graph()
     g.parse(tmp_path, format='turtle')
-    transformer = RDFtoNeo4jTransformer(tmp_path)
+    transformer = RDFtoNeo4jTransformer(tmp_path, skip_deprecates=skip_deprecates)
     transformer.extract_nodes_and_relationships(g, verbose=False)
     return {
         'labels': dict(transformer.stats['labels']),
@@ -849,6 +861,7 @@ def main():
     parser.add_argument("--export-only", action="store_true", help="Exit after exporting split TTL files")
     parser.add_argument("--nodes-only", action="store_true", help="Load nodes only (skip relationships)")
     parser.add_argument("--rels-only", action="store_true", help="Load relationships only (requires nodes already loaded)")
+    parser.add_argument("--skip-deprecates", action="store_true", help="Skip DEPRECATES relationships during load")
     args = parser.parse_args()
 
     if args.db_name and args.db_version:
@@ -912,7 +925,7 @@ def main():
                 workers = max(args.workers or 1, 1)
                 if workers > 1:
                     with ProcessPoolExecutor(max_workers=workers) as executor:
-                        futures = [executor.submit(_dry_run_chunk, tmp_path) for _, tmp_path in chunk_files]
+                        futures = [executor.submit(_dry_run_chunk, tmp_path, args.skip_deprecates) for _, tmp_path in chunk_files]
                         for future in as_completed(futures):
                             result = future.result()
                             completed += 1
@@ -923,7 +936,7 @@ def main():
                             _merge_label_counts(aggregate_rel_types, result.get('rel_types', {}))
                 else:
                     for chunk_idx, tmp_path in chunk_files:
-                        result = _dry_run_chunk(tmp_path)
+                        result = _dry_run_chunk(tmp_path, args.skip_deprecates)
                         completed += 1
                         _update_progress(completed, total_chunks, ((chunk_idx - 1) % workers) + 1, args.progress_newline)
                         _merge_label_counts(aggregate_labels, result.get('labels', {}))
@@ -947,7 +960,11 @@ def main():
                 )
 
                 with driver.session(database=target_db) as session:
-                    transformer = RDFtoNeo4jTransformer(args.ttl, batch_size=args.batch_size)
+                    transformer = RDFtoNeo4jTransformer(
+                        args.ttl,
+                        batch_size=args.batch_size,
+                        skip_deprecates=args.skip_deprecates,
+                    )
                     if args.reset_db and not args.dry_run:
                         if not transformer.reset_database(driver, target_db):
                             driver.close()
@@ -962,6 +979,7 @@ def main():
                             batch_size=args.batch_size,
                             parse_heartbeat_seconds=args.parse_heartbeat_seconds,
                             relationship_batch_size=args.rel_batch_size,
+                            skip_deprecates=args.skip_deprecates,
                         )
                         if args.fast_parse:
                             transformer.extract_nodes_and_relationships_stream(
@@ -996,6 +1014,7 @@ def main():
                             batch_size=args.batch_size,
                             parse_heartbeat_seconds=args.parse_heartbeat_seconds,
                             relationship_batch_size=args.rel_batch_size,
+                            skip_deprecates=args.skip_deprecates,
                         )
                         if args.fast_parse:
                             transformer.extract_nodes_and_relationships_stream(
@@ -1062,6 +1081,7 @@ def main():
             batch_size=args.batch_size,
             parse_heartbeat_seconds=args.parse_heartbeat_seconds,
             relationship_batch_size=args.rel_batch_size,
+            skip_deprecates=args.skip_deprecates,
         )
         if args.fast_parse:
             transformer.extract_nodes_and_relationships_stream(

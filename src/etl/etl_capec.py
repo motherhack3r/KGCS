@@ -22,9 +22,19 @@ from rdflib import RDF, RDFS, XSD
 
 
 try:
-    from src.etl.ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
+    from src.etl.ttl_writer import (
+        write_graph_turtle_lines,
+        write_graph_ntriples_lines,
+        write_graph_turtle_split_lines,
+        write_graph_ntriples_split_lines,
+    )
 except Exception:
-    from .ttl_writer import write_graph_turtle_lines, write_graph_ntriples_lines
+    from .ttl_writer import (
+        write_graph_turtle_lines,
+        write_graph_ntriples_lines,
+        write_graph_turtle_split_lines,
+        write_graph_ntriples_split_lines,
+    )
 
 SEC = Namespace("https://example.org/sec/core#")
 EX = Namespace("https://example.org/")
@@ -431,11 +441,18 @@ def main():
     parser = argparse.ArgumentParser(description="ETL: MITRE CAPEC JSON -> RDF Turtle")
     parser.add_argument("--input", "-i", required=True, help="Input CAPEC JSON file")
     parser.add_argument("--output", "-o", required=True, help="Output Turtle file")
+    parser.add_argument("--nodes-out", help="Optional nodes-only output file")
+    parser.add_argument("--rels-out", help="Optional relationships-only output file")
+    parser.add_argument("--rels-include-types", action="store_true", help="Also write rdf:type triples to rels output")
     parser.add_argument("--attack-input", default="data/attack/raw", help="ATT&CK STIX JSON file or directory for CAPEC -> ATT&CK mappings")
     parser.add_argument("--validate", action="store_true", help="Run SHACL validation on output")
     parser.add_argument("--shapes", default="docs/ontology/shacl/capec-shapes.ttl", help="SHACL shapes file")
     parser.add_argument("--format", choices=["ttl","nt"], default="ttl", help="Output format (ttl or nt)")
     args = parser.parse_args()
+
+    if (args.nodes_out and not args.rels_out) or (args.rels_out and not args.nodes_out):
+        print("Error: --nodes-out and --rels-out must be provided together", file=sys.stderr)
+        sys.exit(1)
 
     if not os.path.exists(args.input):
         print(f"Error: Input file not found: {args.input}", file=sys.stderr)
@@ -460,6 +477,24 @@ def main():
         write_graph_ntriples_lines(graph, args.output)
     else:
         write_graph_turtle_lines(graph, args.output)
+
+    if args.nodes_out and args.rels_out:
+        os.makedirs(os.path.dirname(args.nodes_out) or ".", exist_ok=True)
+        os.makedirs(os.path.dirname(args.rels_out) or ".", exist_ok=True)
+        if args.format == "nt":
+            write_graph_ntriples_split_lines(
+                graph,
+                args.nodes_out,
+                args.rels_out,
+                rels_include_types=args.rels_include_types,
+            )
+        else:
+            write_graph_turtle_split_lines(
+                graph,
+                args.nodes_out,
+                args.rels_out,
+                rels_include_types=args.rels_include_types,
+            )
 
     if args.validate:
         print("\nRunning SHACL validation...")
