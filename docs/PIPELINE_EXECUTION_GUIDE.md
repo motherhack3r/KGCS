@@ -72,6 +72,8 @@ Notes:
 - `--workers` is used only for dry-run estimation and is ignored for actual writes.
 - Run a `--dry-run --workers 4` first to estimate label and relationship counts without writing.
 - Verify node counts after the nodes-only step before running the relationships-only step.
+- In `--rels-only` mode, loader endpoint labels are inferred from URI paths when rel files do not include `rdf:type` triples.
+- URI alias inference covers ETL-emitted variants to prevent unlabeled endpoint matches (for example: `deftech→DefensiveTechnique`, `capec→AttackPattern`, `analytic→DetectionAnalytic`, `consequence/prerequisite` for CAPEC relation targets).
 
 ### PowerShell Example (Windows)
 

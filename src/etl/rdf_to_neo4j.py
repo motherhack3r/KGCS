@@ -14,6 +14,7 @@ import threading
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+from urllib.parse import urlparse
 from dataclasses import dataclass
 from dotenv import load_dotenv
 from collections import defaultdict
@@ -188,8 +189,16 @@ class RDFtoNeo4jTransformer:
                 target_uri=target_uri,
                 relationship_type=rel_type,
                 properties={"predicate_uri": str(predicate)},
-                source_label=self.nodes[subject_uri].label if subject_uri in self.nodes else None,
-                target_label=self.nodes[target_uri].label if target_uri in self.nodes else None,
+                source_label=(
+                    self.nodes[subject_uri].label
+                    if subject_uri in self.nodes
+                    else self._infer_label_from_uri(subject_uri)
+                ),
+                target_label=(
+                    self.nodes[target_uri].label
+                    if target_uri in self.nodes
+                    else self._infer_label_from_uri(target_uri)
+                ),
             ))
             self.stats['relationships'] += 1
             try:
@@ -375,8 +384,16 @@ class RDFtoNeo4jTransformer:
                     target_uri=target_uri,
                     relationship_type=rel_type,
                     properties={"predicate_uri": str(pred_uri_ref)},
-                    source_label=self.nodes[subject_uri].label if subject_uri in self.nodes else None,
-                    target_label=self.nodes[target_uri].label if target_uri in self.nodes else None,
+                    source_label=(
+                        self.nodes[subject_uri].label
+                        if subject_uri in self.nodes
+                        else self._infer_label_from_uri(subject_uri)
+                    ),
+                    target_label=(
+                        self.nodes[target_uri].label
+                        if target_uri in self.nodes
+                        else self._infer_label_from_uri(target_uri)
+                    ),
                 ))
                 self.stats['relationships'] += 1
                 try:
@@ -451,6 +468,63 @@ class RDFtoNeo4jTransformer:
             return obj
         else:
             return str(obj)
+
+    def _infer_label_from_uri(self, uri: str) -> str | None:
+        """Infer KGCS label from canonical resource URIs.
+
+        This keeps rels-only relationship MATCH clauses label-scoped even when
+        rdf:type triples are not present in the input relationship TTL.
+        """
+        if not uri:
+            return None
+
+        if uri.startswith("https://cve.mitre.org/cgi-bin/cvename.cgi"):
+            return "Vulnerability"
+
+        try:
+            path = urlparse(uri).path or ""
+        except Exception:
+            return None
+
+        if not path:
+            return None
+
+        if "/platformConfiguration/" in path:
+            return "PlatformConfiguration"
+        if "/platform/" in path:
+            return "Platform"
+        if "/weakness/" in path:
+            return "Weakness"
+        if "/attackPattern/" in path:
+            return "AttackPattern"
+        if "/capec/" in path:
+            return "AttackPattern"
+        if "/subtechnique/" in path:
+            return "SubTechnique"
+        if "/technique/" in path:
+            return "Technique"
+        if "/tactic/" in path:
+            return "Tactic"
+        if "/defensiveTechnique/" in path or "/deftech/" in path:
+            return "DefensiveTechnique"
+        if "/detectionAnalytic/" in path:
+            return "DetectionAnalytic"
+        if "/analytic/" in path:
+            return "DetectionAnalytic"
+        if "/deceptionTechnique/" in path:
+            return "DeceptionTechnique"
+        if "/engagementConcept/" in path:
+            return "EngagementConcept"
+        if "/reference/" in path:
+            return "Reference"
+        if "/consequence/" in path:
+            return "Consequence"
+        if "/prerequisite/" in path:
+            return "Prerequisite"
+        if "/score/" in path or "/vulnerabilityScore/" in path:
+            return "Score"
+
+        return None
     
     def _predicate_to_relationship(self, predicate_name: str) -> str:
         """Convert RDF predicate name to Neo4j relationship type (UPPER_SNAKE_CASE)."""

@@ -258,6 +258,8 @@ result = subprocess.run(['python', 'scripts/validation/validate_all_standards.py
 - Legacy/archived scripts in `.archive/` (not actively used)
 - `load_rels_all.ps1` uses canonical relationship TTL inputs from `data/*/samples/pipeline-stage*-rels.ttl` only (no `artifacts/*dedup*.ttl` or `tmp/*` fallbacks)
 - `load_rels_all.ps1` sets `-SkipDeprecates` to true by default; pass `-SkipDeprecates:$false` to include DEPRECATES relationships
+- `src/etl/rdf_to_neo4j.py` infers endpoint labels from URI paths during `--rels-only` loads to keep relationship `MATCH` clauses label-scoped even when `rdf:type` triples are absent in rel files
+- Supported URI aliases include canonical and ETL-emitted forms: `attackPattern|capec`, `defensiveTechnique|deftech`, `detectionAnalytic|analytic`, plus `consequence` and `prerequisite` endpoints used by CAPEC relations
 
 ---
 
