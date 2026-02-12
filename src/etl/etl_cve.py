@@ -18,46 +18,6 @@ Usage:
                               --validate
 """
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #!/usr/bin/env python3
 """Streaming CVE ETL: write Turtle incrementally to avoid large in-memory graphs.
 
@@ -77,6 +37,7 @@ from pathlib import Path
 import re
 
 import ijson
+from src.utils.cpematch_index import build_cpematch_index as build_cpematch_index_util, load_index as load_cpematch_index, save_index as save_cpematch_index
 
 
 def turtle_escape(s: str) -> str:
@@ -405,31 +366,7 @@ def iter_vulnerabilities_from_file(path):
                     yield item
 
 
-def _iter_cpematch_files(path: str):
-    if os.path.isdir(path):
-        for p in sorted(Path(path).rglob('*.json')):
-            yield str(p)
-    else:
-        yield path
-
-
-def build_cpematch_index(path: str) -> dict:
-    criteria_to_match_id = {}
-    for file_path in _iter_cpematch_files(path):
-        if not os.path.exists(file_path):
-            continue
-        with open(file_path, 'r', encoding='utf-8') as fh:
-            for item in ijson.items(fh, 'matchStrings.item'):
-                ms = item.get('matchString') if isinstance(item, dict) else None
-                if not isinstance(ms, dict):
-                    ms = item if isinstance(item, dict) else None
-                if not ms:
-                    continue
-                criteria = ms.get('criteria')
-                match_id = ms.get('matchCriteriaId')
-                if criteria and match_id and criteria not in criteria_to_match_id:
-                    criteria_to_match_id[criteria] = match_id
-    return criteria_to_match_id
+# NOTE: CPEMatch index building is provided by src.utils.cpematch_index
 
 
 def transform_cve(input_data, output_path, criteria_to_match_id=None, nodes_output_path=None, rels_output_path=None, rels_include_types: bool = False):
@@ -474,6 +411,8 @@ def main():
     parser.add_argument('--rels-out', help='Optional relationships-only Turtle output file')
     parser.add_argument('--rels-include-types', action='store_true', help='Also write rdf:type triples to rels output')
     parser.add_argument('--cpematch-input', help='Optional CPEMatch JSON file/dir to resolve criteria -> matchCriteriaId')
+    parser.add_argument('--cpematch-index', help='Optional JSON index file mapping criteria->matchCriteriaId')
+    parser.add_argument('--rebuild-cpematch-index', action='store_true', help='Force rebuild of CPEMatch index even if index file exists')
     parser.add_argument('--validate', action='store_true', help='Validate output with SHACL')
     parser.add_argument('--shapes', help='SHACL shapes file (defaults to docs/ontology/shacl/cve-shapes.ttl)')
     parser.add_argument('--append', action='store_true', help='Append to existing output file instead of overwriting')
@@ -521,10 +460,26 @@ def main():
     )
 
     criteria_to_match_id = None
-    if args.cpematch_input:
+    # Prefer a pre-built index if provided and not requested to rebuild
+    if getattr(args, 'cpematch_index', None) and os.path.exists(args.cpematch_index) and not getattr(args, 'rebuild_cpematch_index', False):
+        print(f"Loading CPEMatch criteria index from {args.cpematch_index}...", file=sys.stderr)
+        try:
+            criteria_to_match_id = load_cpematch_index(args.cpematch_index)
+            print(f"Loaded CPEMatch criteria index size: {len(criteria_to_match_id)}", file=sys.stderr)
+        except Exception as e:
+            print(f"Warning: failed to load cpematch index: {e}. Falling back to building from input.", file=sys.stderr)
+
+    if criteria_to_match_id is None and args.cpematch_input:
         print(f"Building CPEMatch criteria index from {args.cpematch_input}...", file=sys.stderr)
-        criteria_to_match_id = build_cpematch_index(args.cpematch_input)
+        criteria_to_match_id = build_cpematch_index_util(args.cpematch_input)
         print(f"CPEMatch criteria index size: {len(criteria_to_match_id)}", file=sys.stderr)
+        # Save index if path provided
+        if getattr(args, 'cpematch_index', None):
+            try:
+                save_cpematch_index(args.cpematch_index, criteria_to_match_id)
+                print(f"Saved CPEMatch index to {args.cpematch_index}", file=sys.stderr)
+            except Exception as e:
+                print(f"Warning: failed to save cpematch index: {e}", file=sys.stderr)
 
     mode = 'a' if args.append else 'w'
     with open(args.output, mode, encoding='utf-8') as out_f:

@@ -95,7 +95,7 @@ def main():
     else:
         print("[SKIP] No CPE chunk files found in data/cpe/raw/nvdcpe-2.0-chunks/")
     
-    # Stage 2: Process CPEMatch chunks
+    # # Stage 2: Process CPEMatch chunks
     print("\n" + "="*70)
     print("STAGE 2: CPEMatch (CVE to CPE Mappings)")
     print("="*70)
@@ -126,6 +126,17 @@ def main():
             )
     else:
         print("[SKIP] No CPEMatch chunk files found in data/cpe/raw/nvdcpematch-2.0-chunks/")
+    # Build a reusable CPEMatch criteria index once for CVE ETL to consume
+    cpematch_index_path = "data/cpe/samples/cpematch-criteria-index.json"
+    if cpematch_chunks:
+        try:
+            print(f"Building CPEMatch index at {cpematch_index_path}...")
+            from src.utils.cpematch_index import build_cpematch_index, save_index
+            index = build_cpematch_index("data/cpe/raw/nvdcpematch-2.0-chunks")
+            save_index(cpematch_index_path, index)
+            print(f"CPEMatch index saved ({len(index)} entries) to {cpematch_index_path}")
+        except Exception as e:
+            print(f"Warning: failed to build/save cpematch index: {e}")
     
     # Stage 3: Process CVE files (all years)
     print("\n" + "="*70)
@@ -143,8 +154,13 @@ def main():
         for p in (nodes_cve, rels_cve):
             if os.path.exists(p):
                 os.remove(p)
+        # Prefer passing the pre-built cpematch index to CVE ETL
         cpematch_input = "data/cpe/raw/nvdcpematch-2.0-chunks"
-        extra_args = ['--cpematch-input', cpematch_input] if os.path.exists(cpematch_input) else []
+        extra_args = []
+        if os.path.exists(cpematch_index_path):
+            extra_args = ['--cpematch-index', cpematch_index_path]
+        elif os.path.exists(cpematch_input):
+            extra_args = ['--cpematch-input', cpematch_input]
         for i, cve_file in enumerate(cve_files):
             # Append to output after first file
             run_etl_with_append(
