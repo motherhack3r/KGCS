@@ -1,6 +1,6 @@
 # KGCS Project Status Summary
 
-**Date:** February 3, 2026 (Updated)  
+**Date:** February 13, 2026 (Updated)  
 **Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟢 MVP Complete + CAPEC Enhancement | Phase 4 🔵 Designed | Phase 5 🔵 Planned
 
 - [KGCS Project Status Summary](#kgcs-project-status-summary)
@@ -31,7 +31,7 @@
 
 ## Executive Summary
 
-KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validation framework). Phase 3 ETL transforms raw data for all core standards and validates via parallel SHACL streaming. **ENHANCEMENT COMPLETED:** CAPEC ETL enhanced to extract XML Taxonomy_Mappings, achieving **7.5x improvement** in CAPEC→Technique coverage: **271 relationships from 177 patterns** (vs 36 relationships from 32 patterns previously). This elevates CAPEC→Technique coverage from 6.3% to 31.2% of all ATT&CK techniques, enabling complete causal chain traversal for defense recommendations. The Neo4j loader supports label-aware relationship inserts and cross-standard loading. End-to-end Neo4j loads verified with full outputs. Next: Regenerate combined pipeline with enhanced CAPEC and load to Neo4j for causal chain verification.
+KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validation framework). Phase 3 ETL transforms raw data for all core standards and validates via parallel SHACL streaming. **ENHANCEMENT COMPLETED:** CAPEC ETL enhanced to extract XML Taxonomy_Mappings, achieving **7.5x improvement** in CAPEC→Technique coverage: **271 relationships from 177 patterns** (vs 36 relationships from 32 patterns previously). The full fresh execution run (download → ETL → Neo4j) has now been revalidated on **neo4j-2026-02-12-rerun1** with production-scale volume and stage-based loaders. Next: SHACL re-validation on this refreshed dataset and alignment of stats-extractor legacy query labels with current relationship semantics.
 
 ## Key Metrics
 
@@ -166,10 +166,16 @@ Phase 3 MVP is complete. Next steps:
 
 ## Update Summary
 
-- **Date:** February 3, 2026 (Updated)
+- **Date:** February 13, 2026 (Updated)
 - **Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟢 MVP Complete (Full Production Load) | Phase 4 🔵 Designed | Phase 5 🔵 Planned  
 
 ### Recent Developments
+
+- **Fresh Full Rerun Completed (Feb 13, 2026):** End-to-end execution finished (download → ETL → nodes/rels load) into `neo4j-2026-02-12-rerun1`
+- **Verified Graph Volume (rerun1):** 2,530,719 nodes and 26,376,029 relationships (`artifacts/neo4j-stats-2026-02-12-rerun1.json`)
+- **Pipeline Runtime Snapshot:** download pipeline completed in 170.3s (`logs/download_summary.json`)
+- **Loader Behavior Confirmed:** rel-only/stage-based loading completed across all 10 stages with URI label inference support in place
+- **Operational Follow-up Identified:** stats extractor still includes legacy relationship/property queries that do not map to current graph names (non-blocking warnings)
 
 - **Full Production Load:** Neo4j database neo4j-2026-01-29 loaded with 2.5M nodes and 26M relationships
 - **CPE/CVE Data:** 1,560,484 platform nodes + 329,523 vulnerability nodes (full production)
@@ -211,23 +217,31 @@ Phase 3 MVP is complete. Next steps:
 
 **Before Phase 3.5 Production Use:**
 
-1. ~~**Fix CAPEC→Technique Mapping**~~ **✅ COMPLETED**
-   - ✅ CAPEC ETL enhanced to extract XML Taxonomy_Mappings
-   - ✅ 271 technique links achieved (31.2% coverage)
-   - ✅ Combined pipeline regenerated with enhanced CAPEC
-   - ✅ Target exceeded: 271 links vs 300 target
+- **Re-run SHACL on refreshed Feb 13 dataset** (Est. 1-2 hours)
 
-2. **Load Defense Layer Relationships** (Est. 2-3 hours)
-   - Verify D3FEND/CAR/SHIELD/ENGAGE ETL outputs in tmp/
-   - Emit Technique→Defense relationships (MITIGATED_BY, DETECTED_BY, COUNTERED_BY)
-   - Re-run Neo4j loader with all standard outputs
-   - Target: >200 total defense links
+Generate new per-standard SHACL summaries from current stage outputs, confirm no regressions after full rerun, and publish updated artifacts for the rerun checkpoint.
 
-3. **Add CVSS Score Nodes** (Est. 1-2 hours)
-   - Update `src/etl/etl_cve.py` to emit CVSS Score nodes
-   - Link CVE→Score with HAS_SCORE relationship
-   - Re-run CVE ETL and reload
-   - Target: 240k+ CVSS nodes (v2.0, v3.1, v4.0)
+- **Align stats extraction queries with current graph semantics** (Est. 1 hour)
+
+Update `scripts/utilities/extract_neo4j_stats.py` relationship/property probes (legacy names vs current names), keep metrics aligned to frozen ontology semantics and emitted ETL predicates, and remove noisy warning notifications from routine stats extraction.
+
+- ~~**Fix CAPEC→Technique Mapping**~~ **✅ COMPLETED**
+  - ✅ CAPEC ETL enhanced to extract XML Taxonomy_Mappings
+  - ✅ 271 technique links achieved (31.2% coverage)
+  - ✅ Combined pipeline regenerated with enhanced CAPEC
+  - ✅ Target exceeded: 271 links vs 300 target
+
+- **Load Defense Layer Relationships** (Est. 2-3 hours)
+  - Verify D3FEND/CAR/SHIELD/ENGAGE ETL outputs in tmp/
+  - Emit Technique→Defense relationships (MITIGATED_BY, DETECTED_BY, COUNTERED_BY)
+  - Re-run Neo4j loader with all standard outputs
+  - Target: >200 total defense links
+
+- **Add CVSS Score Nodes** (Est. 1-2 hours)
+  - Update `src/etl/etl_cve.py` to emit CVSS Score nodes
+  - Link CVE→Score with HAS_SCORE relationship
+  - Re-run CVE ETL and reload
+  - Target: 240k+ CVSS nodes (v2.0, v3.1, v4.0)
 
 **Post-Statistics Command:**
 
