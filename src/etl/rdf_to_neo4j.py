@@ -88,7 +88,7 @@ class RDFtoNeo4jTransformer:
             'rel_types': defaultdict(int),
         }
         self.merge_keys = {
-            "Platform": "cpeNameId",
+            "Platform": "cpeUri",
             "PlatformConfiguration": "matchCriteriaId",
             "Vulnerability": "cveId",
             "Weakness": "cweId",
@@ -189,7 +189,7 @@ class RDFtoNeo4jTransformer:
                 relationship_type=rel_type,
                 properties={"predicate_uri": str(predicate)},
                 source_label=self.nodes[subject_uri].label if subject_uri in self.nodes else None,
-                target_label=self.nodes[target_uri].label if target_uri in self.nodes else None
+                target_label=self.nodes[target_uri].label if target_uri in self.nodes else None,
             ))
             self.stats['relationships'] += 1
             try:
@@ -376,7 +376,7 @@ class RDFtoNeo4jTransformer:
                     relationship_type=rel_type,
                     properties={"predicate_uri": str(pred_uri_ref)},
                     source_label=self.nodes[subject_uri].label if subject_uri in self.nodes else None,
-                    target_label=self.nodes[target_uri].label if target_uri in self.nodes else None
+                    target_label=self.nodes[target_uri].label if target_uri in self.nodes else None,
                 ))
                 self.stats['relationships'] += 1
                 try:
@@ -655,7 +655,7 @@ class RDFtoNeo4jTransformer:
                 f"MERGE (source)-[r:`{rel_type}`]->(target) SET r += rel.properties"
             )
             # Execute in smaller sub-batches to avoid large MERGE transactions stalling
-            SUB_BATCH = 500
+            SUB_BATCH = 100
             try:
                 if len(rel_list) <= SUB_BATCH:
                     session.run(cypher, rels=rel_list)

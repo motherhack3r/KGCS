@@ -164,6 +164,12 @@ python scripts/utilities/reload_neo4j.py
 .
 \scripts\load_full_ordered.ps1 -DbVersion 2026-02-10 -FastParse -ProgressNewline -ResetDb
 
+# Load relationships only (canonical stage relationship files)
+.\scripts\load_rels_all.ps1 -DbVersion 2026-02-12 -FastParse -ProgressNewline
+
+# Include DEPRECATES edges explicitly (disabled by default)
+.\scripts\load_rels_all.ps1 -DbVersion 2026-02-12 -FastParse -ProgressNewline -SkipDeprecates:$false
+
 # Create phase 3 test samples
 python scripts/utilities/create_phase3_samples.py
 ```
@@ -250,6 +256,8 @@ result = subprocess.run(['python', 'scripts/validation/validate_all_standards.py
 - Temporary outputs go to `tmp/` directory
 - Final artifacts stored in `artifacts/` directory
 - Legacy/archived scripts in `.archive/` (not actively used)
+- `load_rels_all.ps1` uses canonical relationship TTL inputs from `data/*/samples/pipeline-stage*-rels.ttl` only (no `artifacts/*dedup*.ttl` or `tmp/*` fallbacks)
+- `load_rels_all.ps1` sets `-SkipDeprecates` to true by default; pass `-SkipDeprecates:$false` to include DEPRECATES relationships
 
 ---
 
