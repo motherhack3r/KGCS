@@ -128,13 +128,55 @@ def main():
         print("[SKIP] No CPEMatch chunk files found in data/cpe/raw/nvdcpematch-2.0-chunks/")
     # Build a reusable CPEMatch criteria index once for CVE ETL to consume
     cpematch_index_path = "data/cpe/samples/cpematch-criteria-index.json"
+    cpematch_index_meta = cpematch_index_path + ".meta.json"
     if cpematch_chunks:
         try:
-            print(f"Building CPEMatch index at {cpematch_index_path}...")
             from src.utils.cpematch_index import build_cpematch_index, save_index
-            index = build_cpematch_index("data/cpe/raw/nvdcpematch-2.0-chunks")
-            save_index(cpematch_index_path, index)
-            print(f"CPEMatch index saved ({len(index)} entries) to {cpematch_index_path}")
+
+            # Compute fingerprint of raw chunk files: max mtime, total size, count
+            files = find_files("data/cpe/raw/nvdcpematch-2.0-chunks/*.json")
+            mtimes = []
+            sizes = []
+            for f in files:
+                try:
+                    stat = os.stat(f)
+                    mtimes.append(int(stat.st_mtime))
+                    sizes.append(stat.st_size)
+                except Exception:
+                    continue
+            fingerprint = {
+                "max_mtime": max(mtimes) if mtimes else 0,
+                "total_size": sum(sizes) if sizes else 0,
+                "count": len(files),
+            }
+
+            need_build = True
+            if os.path.exists(cpematch_index_path) and os.path.exists(cpematch_index_meta):
+                try:
+                    import json
+                    with open(cpematch_index_meta, 'r', encoding='utf-8') as mfh:
+                        meta = json.load(mfh)
+                    if meta.get('fingerprint') == fingerprint:
+                        need_build = False
+                        print(f"CPEMatch index up-to-date ({cpematch_index_path}), skipping rebuild")
+                except Exception:
+                    need_build = True
+
+            if need_build:
+                print(f"Building CPEMatch index at {cpematch_index_path}...")
+                index = build_cpematch_index("data/cpe/raw/nvdcpematch-2.0-chunks")
+                save_index(cpematch_index_path, index)
+                try:
+                    import json
+                    meta = {"fingerprint": fingerprint, "entries": len(index)}
+                    Path(os.path.dirname(cpematch_index_meta)).mkdir(parents=True, exist_ok=True)
+                    tmp = cpematch_index_meta + '.tmp'
+                    with open(tmp, 'w', encoding='utf-8') as mfh:
+                        json.dump(meta, mfh)
+                    os.replace(tmp, cpematch_index_meta)
+                except Exception as e:
+                    print(f"Warning: failed to write cpematch index meta: {e}")
+                print(f"CPEMatch index saved ({len(index)} entries) to {cpematch_index_path}")
         except Exception as e:
             print(f"Warning: failed to build/save cpematch index: {e}")
     
