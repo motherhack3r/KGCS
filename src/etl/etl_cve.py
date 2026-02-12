@@ -377,6 +377,9 @@ def process_vulnerability(item, writer: TripleWriter, criteria_to_match_id=None)
                 continue
             seen.add(match_id)
             config_subj = subject_for_config(match_id)
+            # Ensure PlatformConfiguration exposes its external identifier
+            writer.write(config_subj, "<https://example.org/sec/core#matchCriteriaId>", turtle_escape(match_id))
+            # Link PlatformConfiguration -> Vulnerability (canonical predicate)
             writer.write(config_subj, "<https://example.org/sec/core#affected_by>", subj, is_uri_obj=True)
             triples += 1
 
