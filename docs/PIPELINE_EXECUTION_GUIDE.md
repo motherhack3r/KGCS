@@ -99,6 +99,9 @@ python scripts/combine_ttl_pipeline.py --inputs tmp/pipeline-stage6-capec.nt tmp
 # Load to Neo4j using the helper wrappers (nodes then relationships)
 .\scripts\load_nodes_all.ps1 -DbVersion 2026-02-08 -FastParse -ProgressNewline
 .\scripts\load_rels_all.ps1 -DbVersion 2026-02-08 -FastParse -ProgressNewline
+
+# Or load a single ordered full file (nodes then rels in one TTL)
+.\scripts\load_full_ordered.ps1 -DbVersion 2026-02-08 -FastParse -ProgressNewline -ResetDb
 ```
 
 See Appendix for verification notes and troubleshooting.
@@ -227,10 +230,11 @@ python scripts/run_all_etl.py
    - Deception techniques
 
 10. **Stage 10: ENGAGE** (12 files)
-   - Input: `data/engage/raw/*.json`
-   - Output: `data/engage/samples/pipeline-stage10-engage.ttl` (~0.05 MB)
-   - Processing: Directory merge (loads all in memory)
-   - Strategic engagement concepts
+
+      - Input: `data/engage/raw/*.json`
+      - Output: `data/engage/samples/pipeline-stage10-engage.ttl` (~0.05 MB)
+      - Processing: Directory merge (loads all in memory)
+      - Strategic engagement concepts
 
 **Output:**
 

@@ -10,10 +10,12 @@ import os
 import sys
 import json
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined-rels.ttl",
-                      heuristic_threshold=200_000_000, node_predicates=None, inputs=None, full_out: str | None = None):
+                      heuristic_threshold=200_000_000, node_predicates=None, inputs=None, full_out: str | None = None,
+                      preserve_order: bool = False, drop_rels_types: bool = False,
+                      skip_sanitize: bool = False, skip_post_validate: bool = False):
     """Stream-combine pipeline TTL files into two outputs: nodes and relationships.
 
     For each stage file we attempt to parse with rdflib (safe, accurate). If the file
@@ -25,6 +27,89 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
     stage_files = []
     import glob
     import os
+
+    def _stage_num(name: str) -> int | None:
+        lower = name.lower()
+        marker = "pipeline-stage"
+        if marker not in lower:
+            return None
+        try:
+            after = lower.split(marker, 1)[1]
+            digits = ""
+            for ch in after:
+                if ch.isdigit():
+                    digits += ch
+                else:
+                    break
+            return int(digits) if digits else None
+        except Exception:
+            return None
+
+    def _standard_key(name: str) -> str | None:
+        lower = name.lower()
+        if "cpematch" in lower:
+            return "cpematch"
+        if "cpe" in lower:
+            return "cpe"
+        if "cve" in lower:
+            return "cve"
+        if "cwe" in lower:
+            return "cwe"
+        if "capec" in lower:
+            return "capec"
+        if "attack" in lower:
+            return "attack"
+        if "d3fend" in lower:
+            return "d3fend"
+        if "car" in lower:
+            return "car"
+        if "shield" in lower:
+            return "shield"
+        if "engage" in lower:
+            return "engage"
+        return None
+
+    def _order_stage_files(paths: list[str]) -> list[str]:
+        split_nodes = []
+        split_rels = []
+        full_stage = []
+        for p in paths:
+            name = Path(p).name.lower()
+            if "-nodes." in name:
+                split_nodes.append(p)
+            elif "-rels." in name:
+                split_rels.append(p)
+            else:
+                full_stage.append(p)
+
+        node_order = ["cpe", "cpematch", "cve", "cwe", "capec", "attack", "d3fend", "car", "shield", "engage"]
+        rel_order = ["cpe", "cpe-deprecates", "cpematch", "cve", "cwe", "capec", "attack", "d3fend", "car", "shield", "engage"]
+
+        def _node_key(p: str) -> tuple[int, str]:
+            std = _standard_key(Path(p).name)
+            idx = node_order.index(std) if std in node_order else 999
+            return idx, Path(p).name
+
+        def _rel_key(p: str) -> tuple[int, str]:
+            name = Path(p).name.lower()
+            std = _standard_key(name) or ""
+            if std == "cpe" and "deprecates" in name:
+                std = "cpe-deprecates"
+            idx = rel_order.index(std) if std in rel_order else 999
+            return idx, Path(p).name
+
+        def _full_key(p: str) -> tuple[int, str]:
+            stage = _stage_num(Path(p).name)
+            idx = stage if stage is not None else 999
+            return idx, Path(p).name
+
+        ordered_nodes = sorted(split_nodes, key=_node_key)
+        ordered_rels = sorted(split_rels, key=_rel_key)
+        ordered_full = sorted(full_stage, key=_full_key)
+
+        if ordered_nodes or ordered_rels:
+            return ordered_nodes + ordered_rels + ordered_full
+        return ordered_full
 
     if inputs:
         # Explicit inputs provided: accept files, directories, or glob patterns
@@ -49,8 +134,9 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
                     fb_matches = sorted(glob.glob(inp) + glob.glob(os.path.join('data', '*', 'samples', os.path.basename(inp))))
                     if fb_matches:
                         expanded.extend(fb_matches)
-        # deduplicate and sort
-        stage_files = sorted(dict.fromkeys(expanded))
+        # deduplicate and order
+        stage_files = list(dict.fromkeys(expanded))
+        stage_files = _order_stage_files(stage_files)
         print(f"Combining explicit inputs ({len(stage_files)} files): {stage_files}")
     else:
         for i in range(1, 11):
@@ -71,6 +157,8 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
             if matches:
                 print(f"  Found {len(matches)} file(s) for stage {i}: {matches}")
                 stage_files.extend(matches)
+
+        stage_files = _order_stage_files(stage_files)
 
     if not stage_files:
         print("[ERROR] No pipeline stage files found in tmp/")
@@ -93,6 +181,8 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
         with open(nodes_out, 'w', encoding='utf-8') as nodes_f, open(rels_out, 'w', encoding='utf-8') as rels_f:
             for idx, input_file in enumerate(stage_files, 1):
                 path_p = Path(input_file)
+                name_lower = path_p.name.lower()
+                is_rels_file = "-rels." in name_lower
                 size = path_p.stat().st_size
                 print(f"[{idx:2d}/{len(stage_files)}] {path_p.name} (size: {size/1024/1024:.1f} MB)")
 
@@ -139,10 +229,17 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
                         node_triples = 0
                         rel_triples = 0
                         # Use a safe literal formatter so large literals are written as single-line
+                        def _format_literal_fallback(lit):
+                            try:
+                                return lit.n3()
+                            except Exception:
+                                return f"\"{str(lit)}\""
+
                         try:
-                            from src.etl.ttl_writer import _format_literal
+                            from src.etl.ttl_writer import _format_literal as _format_literal_impl
+                            _format_literal = _format_literal_impl
                         except Exception:
-                            from .ttl_writer import _format_literal
+                            _format_literal = _format_literal_fallback
 
                         def _n3_full(node):
                             from rdflib import Literal as _Literal
@@ -160,6 +257,8 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
                             else:
                                 obj_txt = _n3_full(o)
 
+                            if (p == RDF.type) and drop_rels_types and is_rels_file:
+                                continue
                             if (p == RDF.type) or isinstance(o, Literal) or (p_str in node_predicates_set):
                                 nodes_f.write(f"{subj_txt} {pred_txt} {obj_txt} .\n")
                                 node_triples += 1
@@ -173,13 +272,13 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
                     except Exception as e:
                         print(f"       rdflib parse failed ({e}), falling back to heuristic line parser")
                         # fall through to heuristic
-                        res = parse_with_heuristic(input_file, nodes_f, rels_f, node_predicates_set)
+                        res = parse_with_heuristic(input_file, nodes_f, rels_f, node_predicates_set, drop_rels_types, is_rels_file)
                         if res:
                             triples, nodes_t, rels_t, malformed = res
                             file_stats.append((path_p.name, size, triples, nodes_t, rels_t, malformed))
                 else:
                     # large file: heuristic parse
-                    res = parse_with_heuristic(input_file, nodes_f, rels_f, node_predicates_set)
+                    res = parse_with_heuristic(input_file, nodes_f, rels_f, node_predicates_set, drop_rels_types, is_rels_file)
                     if res:
                         triples, nodes_t, rels_t, malformed = res
                         file_stats.append((path_p.name, size, triples, nodes_t, rels_t, malformed))
@@ -203,34 +302,40 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
 
         # write summary JSON to logs
         summary = {
-            "timestamp": datetime.utcnow().isoformat() + 'Z',
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "nodes_out": str(nodes_out),
             "rels_out": str(rels_out),
             "stages": stages,
             "totals": {"triples": total_triples, "node_triples": total_nodes, "rel_triples": total_rels}
         }
-        summary_path = logs_dir / f"combine-split-summary-{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}.json"
+        summary_path = logs_dir / f"combine-split-summary-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.json"
         with open(summary_path, 'w', encoding='utf-8') as sf:
             json.dump(summary, sf, indent=2)
 
         print(f"\nSummary written to: {summary_path}")
 
-        # Reorder node triples by subject (rdf:type first) to produce a grouped nodes file.
-        # Uses disk-backed bucketing to avoid loading the full file into memory.
-        try:
-            _reorder_nodes_grouped(nodes_out)
-            print(f"Reordered nodes file by subject: {nodes_out}")
-        except Exception as e:
-            print(f"Warning: node reordering failed: {e}")
+        if preserve_order:
+            print("Preserving stage order in nodes output (skipping subject reordering)")
+        else:
+            # Reorder node triples by subject (rdf:type first) to produce a grouped nodes file.
+            # Uses disk-backed bucketing to avoid loading the full file into memory.
+            try:
+                _reorder_nodes_grouped(nodes_out)
+                print(f"Reordered nodes file by subject: {nodes_out}")
+            except Exception as e:
+                print(f"Warning: node reordering failed: {e}")
 
         # Optionally write a full combined file with nodes followed by relationships.
         # Make the combined TTL safe by sanitizing node triples (merge multi-line triples,
         # escape newlines inside literals) and by deduplicating header/prefix lines.
         if full_out:
             try:
-                removed_nodes = _sanitize_nodes_file(nodes_out)
-                removed_rels = _sanitize_nodes_file(rels_out)
-                removed = removed_nodes + removed_rels
+                if skip_sanitize:
+                    removed = 0
+                else:
+                    removed_nodes = _sanitize_nodes_file(nodes_out)
+                    removed_rels = _sanitize_nodes_file(rels_out)
+                    removed = removed_nodes + removed_rels
 
                 # Collect unique prefix/header lines from nodes and rels (write them once)
                 prefix_lines = []
@@ -270,106 +375,110 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
 
                 print(f"Wrote combined full load file: {full_out} (removed malformed node lines: {removed})")
 
-                # Quick validation: try to parse the TTL we just wrote. If rdflib fails
-                # to parse it, emit an N-Triples fallback which is line-oriented and
-                # safer for downstream loaders.
-                try:
-                    from rdflib import Graph
-                    g = Graph()
-                    g.parse(full_out, format='turtle')
-                    print(f"Validated TTL full file: {full_out}")
-                except Exception as e:
-                    print(f"Warning: TTL parse failed for {full_out}; generating NT fallback: {e}")
-                    nt_path = Path(str(full_out)).with_suffix('.nt')
+                if skip_post_validate:
+                    print("Skipping post-validate steps for full_out")
+                else:
+                    # Quick validation: try to parse the TTL we just wrote. If rdflib fails
+                    # to parse it, emit an N-Triples fallback which is line-oriented and
+                    # safer for downstream loaders.
+                    try:
+                        from rdflib import Graph
+                        g = Graph()
+                        g.parse(full_out, format='turtle')
+                        print(f"Validated TTL full file: {full_out}")
+                    except Exception as e:
+                        print(f"Warning: TTL parse failed for {full_out}; generating NT fallback: {e}")
+                        nt_path = Path(str(full_out)).with_suffix('.nt')
 
-                    def _escape_newlines_in_literals_local(s: str) -> str:
-                        parts = s.split('"')
-                        for i in range(1, len(parts), 2):
-                            parts[i] = parts[i].replace('\n', '\\n').replace('\r', '\\r')
-                        return '"'.join(parts)
+                        def _escape_newlines_in_literals_local(s: str) -> str:
+                            parts = s.split('"')
+                            for i in range(1, len(parts), 2):
+                                parts[i] = parts[i].replace('\n', '\\n').replace('\r', '\\r')
+                            return '"'.join(parts)
 
-                    def _write_nt_from_ttl(src_path, out_f):
-                        with open(src_path, 'r', encoding='utf-8', errors='replace') as src:
-                            for line in src:
-                                if not line.strip() or line.startswith('@') or line.startswith('#'):
-                                    continue
-                                out_line = _escape_newlines_in_literals_local(line)
-                                if not out_line.strip().endswith('.'):
-                                    out_line = out_line.rstrip() + ' .\n'
-                                out_f.write(out_line)
+                        def _write_nt_from_ttl(src_path, out_f):
+                            with open(src_path, 'r', encoding='utf-8', errors='replace') as src:
+                                for line in src:
+                                    if not line.strip() or line.startswith('@') or line.startswith('#'):
+                                        continue
+                                    out_line = _escape_newlines_in_literals_local(line)
+                                    if not out_line.strip().endswith('.'):
+                                        out_line = out_line.rstrip() + ' .\n'
+                                    out_f.write(out_line)
 
-                    with open(nt_path, 'w', encoding='utf-8') as outf:
-                        _write_nt_from_ttl(nodes_out, outf)
-                        _write_nt_from_ttl(rels_out, outf)
+                        with open(nt_path, 'w', encoding='utf-8') as outf:
+                            _write_nt_from_ttl(nodes_out, outf)
+                            _write_nt_from_ttl(rels_out, outf)
 
-                    print(f"Wrote fallback NT file: {nt_path}")
+                        print(f"Wrote fallback NT file: {nt_path}")
             except Exception as e:
                 print(f"Warning: could not write full_out file {full_out}: {e}")
 
-        # Post-combine diagnostics: scan nodes output for suspicious lines that do not start
-        # with a valid subject token (i.e., '<', '_:', or 'a'). This detects stray fragments
-        # caused by multi-line triples or tokenization problems and writes examples to a log.
-        bad_examples = []
-        try:
-            with open(nodes_out, 'r', encoding='utf-8') as nf:
-                for idx, line in enumerate(nf, start=1):
-                    ln = line.strip()
-                    if not ln or ln.startswith('@') or ln.startswith('#'):
-                        continue
-                    first_tok = ln.split(' ', 1)[0]
-                    if not (first_tok.startswith('<') or first_tok.startswith('_:') or first_tok == 'a'):
-                        bad_examples.append({'line': idx, 'token': first_tok, 'snippet': ln[:200]})
-                        if len(bad_examples) >= 50:
-                            break
-        except Exception:
+        if not skip_post_validate:
+            # Post-combine diagnostics: scan nodes output for suspicious lines that do not start
+            # with a valid subject token (i.e., '<', '_:', or 'a'). This detects stray fragments
+            # caused by multi-line triples or tokenization problems and writes examples to a log.
             bad_examples = []
+            try:
+                with open(nodes_out, 'r', encoding='utf-8') as nf:
+                    for idx, line in enumerate(nf, start=1):
+                        ln = line.strip()
+                        if not ln or ln.startswith('@') or ln.startswith('#'):
+                            continue
+                        first_tok = ln.split(' ', 1)[0]
+                        if not (first_tok.startswith('<') or first_tok.startswith('_:') or first_tok == 'a'):
+                            bad_examples.append({'line': idx, 'token': first_tok, 'snippet': ln[:200]})
+                            if len(bad_examples) >= 50:
+                                break
+            except Exception:
+                bad_examples = []
 
-        if bad_examples:
-            Path('logs').mkdir(exist_ok=True)
-            bad_nodes_log = Path('logs') / 'bad_nodes_lines.log'
-            with open(bad_nodes_log, 'w', encoding='utf-8') as bf:
-                for ex in bad_examples:
-                    bf.write(f"{nodes_out}:{ex['line']}: {ex['token']}: {ex['snippet']}\n")
-            print(f"[WARN] Suspicious lines found in {nodes_out}: {len(bad_examples)} (see {bad_nodes_log})")
-            # Add to summary JSON
-            summary.setdefault('diagnostics', {})['bad_node_lines_examples'] = bad_examples[:10]
-            summary['diagnostics']['bad_node_lines_count'] = len(bad_examples)
-            with open(summary_path, 'w', encoding='utf-8') as sf:
-                json.dump(summary, sf, indent=2)
-
-        # Post-combine diagnostics: detect subjects that have literal properties but no rdf:type
-        # (these are the small set of problematic subjects you observed; report examples).
-        try:
-            types_set = set()
-            literal_subjects = set()
-            with open(nodes_out, 'r', encoding='utf-8') as nf:
-                for line in nf:
-                    ln = line.strip()
-                    if not ln or ln.startswith('@') or ln.startswith('#'):
-                        continue
-                    parts = ln.split(' ', 2)
-                    if len(parts) < 3:
-                        continue
-                    subj_tok, pred_tok, obj_tok = parts[0], parts[1], parts[2]
-                    lower_pred = pred_tok.lower()
-                    if 'rdf-syntax-ns#type' in lower_pred or 'rdf:type' in lower_pred or pred_tok == 'a':
-                        types_set.add(subj_tok)
-                    if obj_tok.startswith('"') or obj_tok.startswith("'"):
-                        literal_subjects.add(subj_tok)
-            candidates = sorted(list(literal_subjects - types_set))
-            if candidates:
+            if bad_examples:
                 Path('logs').mkdir(exist_ok=True)
-                bad_subjects_log = Path('logs') / 'bad_node_subjects.log'
-                with open(bad_subjects_log, 'w', encoding='utf-8') as bf:
-                    for c in candidates[:50]:
-                        bf.write(f"{nodes_out}: SUBJECT_WITH_LITERAL_NO_TYPE: {c}\n")
-                print(f"[WARN] Subjects have literals but no rdf:type: {len(candidates)} examples written to {bad_subjects_log}")
-                summary.setdefault('diagnostics', {})['bad_node_subjects_examples'] = candidates[:10]
-                summary['diagnostics']['bad_node_subjects_count'] = len(candidates)
+                bad_nodes_log = Path('logs') / 'bad_nodes_lines.log'
+                with open(bad_nodes_log, 'w', encoding='utf-8') as bf:
+                    for ex in bad_examples:
+                        bf.write(f"{nodes_out}:{ex['line']}: {ex['token']}: {ex['snippet']}\n")
+                print(f"[WARN] Suspicious lines found in {nodes_out}: {len(bad_examples)} (see {bad_nodes_log})")
+                # Add to summary JSON
+                summary.setdefault('diagnostics', {})['bad_node_lines_examples'] = bad_examples[:10]
+                summary['diagnostics']['bad_node_lines_count'] = len(bad_examples)
                 with open(summary_path, 'w', encoding='utf-8') as sf:
                     json.dump(summary, sf, indent=2)
-        except Exception:
-            pass
+
+            # Post-combine diagnostics: detect subjects that have literal properties but no rdf:type
+            # (these are the small set of problematic subjects you observed; report examples).
+            try:
+                types_set = set()
+                literal_subjects = set()
+                with open(nodes_out, 'r', encoding='utf-8') as nf:
+                    for line in nf:
+                        ln = line.strip()
+                        if not ln or ln.startswith('@') or ln.startswith('#'):
+                            continue
+                        parts = ln.split(' ', 2)
+                        if len(parts) < 3:
+                            continue
+                        subj_tok, pred_tok, obj_tok = parts[0], parts[1], parts[2]
+                        lower_pred = pred_tok.lower()
+                        if 'rdf-syntax-ns#type' in lower_pred or 'rdf:type' in lower_pred or pred_tok == 'a':
+                            types_set.add(subj_tok)
+                        if obj_tok.startswith('"') or obj_tok.startswith("'"):
+                            literal_subjects.add(subj_tok)
+                candidates = sorted(list(literal_subjects - types_set))
+                if candidates:
+                    Path('logs').mkdir(exist_ok=True)
+                    bad_subjects_log = Path('logs') / 'bad_node_subjects.log'
+                    with open(bad_subjects_log, 'w', encoding='utf-8') as bf:
+                        for c in candidates[:50]:
+                            bf.write(f"{nodes_out}: SUBJECT_WITH_LITERAL_NO_TYPE: {c}\n")
+                    print(f"[WARN] Subjects have literals but no rdf:type: {len(candidates)} examples written to {bad_subjects_log}")
+                    summary.setdefault('diagnostics', {})['bad_node_subjects_examples'] = candidates[:10]
+                    summary['diagnostics']['bad_node_subjects_count'] = len(candidates)
+                    with open(summary_path, 'w', encoding='utf-8') as sf:
+                        json.dump(summary, sf, indent=2)
+            except Exception:
+                pass
         return True
 
     except Exception as e:
@@ -377,7 +486,7 @@ def combine_ttl_files(nodes_out="tmp/combined-nodes.ttl", rels_out="tmp/combined
         return False
 
 
-def parse_with_heuristic(input_file, nodes_f, rels_f, node_predicates_set):
+def parse_with_heuristic(input_file, nodes_f, rels_f, node_predicates_set, drop_rels_types: bool, is_rels_file: bool):
     """Very small heuristic line-based parser: assumes triples are single-line and headers handled.
 
     Adds a lightweight validation pass to detect malformed triples (tokenization errors) and
@@ -425,6 +534,8 @@ def parse_with_heuristic(input_file, nodes_f, rels_f, node_predicates_set):
             # check for ' a ' (rdf:type), explicit rdf:type tokens, or '#type' in full-URI predicates
             lower = line.lower()
             if ' a ' in lower or 'rdf:type' in lower or '#type' in lower or 'rdf-syntax-ns#type' in lower:
+                if drop_rels_types and is_rels_file:
+                    continue
                 nodes_f.write(line)
                 nodes_t += 1
                 continue
@@ -709,6 +820,10 @@ def main():
     parser.add_argument("--node-predicate", action="append", help="Predicate URI (or substring) to force into nodes file; repeatable")
     parser.add_argument("--inputs", nargs='*', help="Explicit list of input files or directories to combine (overrides automatic discovery)")
     parser.add_argument("--full-out", help="Write a single combined file with nodes followed by relationships (path)")
+    parser.add_argument("--preserve-order", action="store_true", help="Preserve stage order in nodes output (skip subject reordering)")
+    parser.add_argument("--drop-rels-types", action="store_true", help="Drop rdf:type triples found in rels input files")
+    parser.add_argument("--skip-sanitize", action="store_true", help="Skip sanitize pass for full_out")
+    parser.add_argument("--skip-post-validate", action="store_true", help="Skip post-combine validation and diagnostics")
 
     args = parser.parse_args()
     
@@ -723,7 +838,11 @@ def main():
                                 heuristic_threshold=args.heuristic_threshold,
                                 node_predicates=args.node_predicate,
                                 inputs=args.inputs,
-                                full_out=args.full_out)
+                                full_out=args.full_out,
+                                preserve_order=args.preserve_order,
+                                drop_rels_types=args.drop_rels_types,
+                                skip_sanitize=args.skip_sanitize,
+                                skip_post_validate=args.skip_post_validate)
     
     if success:
         print(f"End time: {datetime.now().isoformat()}")

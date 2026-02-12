@@ -89,6 +89,7 @@ scripts/
 ├── run_all_etl.py                    ⭐ MAIN ENTRY POINT
 ├── combine_pipeline.py               ⭐ PIPELINE ORCHESTRATION
 ├── verify_combined_capec.py          ⭐ VERIFICATION
+├── load_full_ordered.ps1             ⭐ COMBINED ORDERED LOAD
 │
 ├── validation/                       📋 VALIDATION SCRIPTS
 │   ├── __init__.py
@@ -158,6 +159,10 @@ python scripts/utilities/extract_neo4j_stats.py
 
 # Reload data into Neo4j
 python scripts/utilities/reload_neo4j.py
+
+# Combine ordered TTL and load full graph
+.
+\scripts\load_full_ordered.ps1 -DbVersion 2026-02-10 -FastParse -ProgressNewline -ResetDb
 
 # Create phase 3 test samples
 python scripts/utilities/create_phase3_samples.py
