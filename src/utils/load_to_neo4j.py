@@ -74,7 +74,9 @@ class TTLExtractor:
     def _extract_platforms(self) -> List[Dict[str, Any]]:
         rows = []
         for subject in self.graph.subjects(RDF.type, SEC.Platform):
-            cpe_uri = literal_value(self.graph.value(subject, SEC.CPEUri))
+            # Accept canonical `CPEUri` and legacy `cpeUri`
+            cpe_val = self.graph.value(subject, SEC.CPEUri) or self.graph.value(subject, SEC.cpeUri)
+            cpe_uri = literal_value(cpe_val)
             if not cpe_uri:
                 continue
             self.platform_uri_to_cpe[str(subject)] = cpe_uri
@@ -159,7 +161,8 @@ class TTLExtractor:
         }
         for config_uri, match_id in self.config_uri_to_id.items():
             cfg_ref = URIRef(config_uri)
-            platform_obj = self.graph.value(cfg_ref, SEC.matchesPlatform)
+            # Accept canonical `matchesPlatform` and legacy `includes` predicates
+            platform_obj = self.graph.value(cfg_ref, SEC.matchesPlatform) or self.graph.value(cfg_ref, SEC.includes)
             if platform_obj and str(platform_obj) in self.platform_uri_to_cpe:
                 edges["config_platform"].append(
                     {
