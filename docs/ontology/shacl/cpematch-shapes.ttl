@@ -18,7 +18,7 @@ sec:PlatformConfigurationShape a sh:NodeShape ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
-        sh:path sec:includes ;
+        sh:path sec:matchesPlatform ;
         sh:class sec:Platform ;
         sh:minCount 1 ;
     ] ;

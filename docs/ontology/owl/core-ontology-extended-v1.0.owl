@@ -26,7 +26,7 @@ sec:PlatformConfiguration a owl:Class ;
   rdfs:label "Platform Configuration" ;
   rdfs:comment "Logical expression of platform versions and criteria (CPEMatch schema) defining a set of vulnerable platform instances. Critical invariant: vulnerabilities affect configurations, never platforms directly." .
 
-sec:CPEUri a owl:DatatypeProperty ;
+sec:cpeUri a owl:DatatypeProperty ;
   rdfs:label "CPE URI" ;
   rdfs:comment "Canonical Common Platform Enumeration URI (e.g., 'cpe:2.3:a:vendor:product:version:*:*:*:*:*:*:*')." ;
   rdfs:domain sec:Platform ;
@@ -428,20 +428,6 @@ sec:exploits a owl:ObjectProperty ;
   rdfs:domain sec:AttackPattern ;
   rdfs:range sec:Weakness ;
   owl:inverseOf sec:exploited_by .
-
-sec:implements a owl:ObjectProperty ;
-  rdfs:label "implements" ;
-  rdfs:comment "Attack pattern is implemented by ATT&CK technique(s). Links CAPEC patterns to concrete adversary techniques." ;
-  rdfs:domain sec:AttackPattern ;
-  rdfs:range sec:Technique ;
-  owl:inverseOf sec:implements_pattern .
-
-sec:implements_pattern a owl:ObjectProperty ;
-  rdfs:label "implements pattern" ;
-  rdfs:comment "Technique implements attack pattern methodology." ;
-  rdfs:domain sec:Technique ;
-  rdfs:range sec:AttackPattern ;
-  owl:inverseOf sec:implements .
 
 ############################
 # ADVERSARY TRADECRAFT LAYER (ATT&CK-aligned)

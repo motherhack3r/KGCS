@@ -102,8 +102,7 @@ def process_product(cpe: dict, writer: TripleWriter) -> int:
         is_rdf_type=True,
     )
     written += 1
-    # Emit canonical OWL property `CPEUri` (capitalized) and keep backward-compatible `cpeUri`
-    writer.write(subj, "<https://example.org/sec/core#CPEUri>", turtle_escape(cpe_name))
+    # Emit canonical OWL property `cpeUri`
     writer.write(subj, "<https://example.org/sec/core#cpeUri>", turtle_escape(cpe_name))
     written += 1
     label_value = strip_cpe_prefix(cpe_name)

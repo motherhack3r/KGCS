@@ -73,12 +73,12 @@ sec:NoIncidentVulnerabilityShape a sh:NodeShape ;
 
 # Additional Core constraints
 
-# Platform must provide a CPE URI or identifier (CPEURI)
+# Platform must provide a CPE URI or identifier
 sec:PlatformCpeUriShape a sh:NodeShape ;
   kgcs:ruleId "KGCS-CORE-003" ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#PlatformCpeUriShape> ;
   sh:targetClass sec:Platform ;
-  sh:property [ a sh:PropertyShape ; sh:path sec:CPEUri ; sh:minCount 1 ; sh:message "Platform must include a canonical CPE URI (sec:CPEUri)." ] ;
+  sh:property [ a sh:PropertyShape ; sh:path sec:cpeUri ; sh:minCount 1 ; sh:message "Platform must include a canonical CPE URI (sec:cpeUri)." ] ;
 .
 
 # PlatformConfiguration must include match criteria or an id
@@ -142,10 +142,10 @@ sec:PlatformExternalIdShape a sh:NodeShape ;
   kgcs:provenance <https://example.org/docs/ontology/shacl/core-shapes.ttl#PlatformExternalIdShape> ;
   sh:targetClass sec:Platform ;
   sh:or (
-    [ sh:property ( [ a sh:PropertyShape ; sh:predicate sec:CPEUri ; sh:minCount 1 ] ) ]
+    [ sh:property ( [ a sh:PropertyShape ; sh:predicate sec:cpeUri ; sh:minCount 1 ] ) ]
     [ sh:property ( [ a sh:PropertyShape ; sh:predicate sec:cpeNameId ; sh:minCount 1 ] ) ]
   ) ;
-  sh:message "Platform must expose a stable CPE identifier via sec:CPEUri or sec:cpeNameId." ;
+  sh:message "Platform must expose a stable CPE identifier via sec:cpeUri or sec:cpeNameId." ;
 .
 
 sec:PlatformConfigurationExternalIdShape a sh:NodeShape ;

@@ -233,7 +233,7 @@ class CAPECtoRDFTransformer:
                 technique_node = URIRef(f"{EX}subtechnique/{attack_id}")
             else:
                 technique_node = URIRef(f"{EX}technique/{attack_id}")
-            self.graph.add((pattern_node, SEC.implements, technique_node))
+            self.graph.add((pattern_node, SEC.implemented_as, technique_node))
 
     def _extract_description(self, description_obj) -> str:
         """Extract description text from potentially nested structure."""
@@ -249,7 +249,7 @@ class CAPECtoRDFTransformer:
         return ""
 
     def _add_weakness_relationships(self, pattern_node, related_weaknesses: list):
-        """Add exploits relationships to weaknesses (CWE)."""
+        """Add canonical Weakness -> AttackPattern relationships (exploited_by)."""
         for rel in related_weaknesses:
             cwe_id = rel.get("ID", "")
             if not cwe_id:
@@ -257,7 +257,7 @@ class CAPECtoRDFTransformer:
 
             cwe_id_full = f"CWE-{cwe_id}" if not cwe_id.startswith("CWE-") else cwe_id
             weakness_node = URIRef(f"{EX}weakness/{cwe_id_full}")
-            self.graph.add((pattern_node, SEC.exploits, weakness_node))
+            self.graph.add((weakness_node, SEC.exploited_by, pattern_node))
 
     def _add_pattern_relationships(self, patterns: list):
         """Add relationships between attack patterns (parent/child/related)."""

@@ -147,18 +147,16 @@ def process_match_string(ms: dict, writer: TripleWriter, platform_cache: set, in
         match_platform_id = match.get('cpeNameId') or urllib.parse.quote(match_cpe, safe='')
         platform_subj = subject_for_platform(match_platform_id)
 
-        # Emit Platform node and both canonical `CPEUri` and legacy `cpeUri`
+        # Emit Platform node with canonical `cpeUri`
         triples.append((platform_subj, "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>", "<https://example.org/sec/core#Platform>", True, True))
-        triples.append((platform_subj, "<https://example.org/sec/core#CPEUri>", turtle_escape(match_cpe), False, False))
         triples.append((platform_subj, "<https://example.org/sec/core#cpeUri>", turtle_escape(match_cpe), False, False))
         triples.append((platform_subj, "<https://example.org/sec/core#cpeNameId>", turtle_escape(match_platform_id), False, False))
         label_value = strip_cpe_prefix(match_cpe)
         if label_value:
             triples.append((platform_subj, "<http://www.w3.org/2000/01/rdf-schema#label>", turtle_escape(label_value), False, False))
         includes_written += 1
-        # Link PlatformConfiguration -> Platform using canonical `matchesPlatform` and keep legacy `includes`
+        # Link PlatformConfiguration -> Platform using canonical `matchesPlatform`
         triples.append((subj, "<https://example.org/sec/core#matchesPlatform>", platform_subj, True, False))
-        triples.append((subj, "<https://example.org/sec/core#includes>", platform_subj, True, False))
 
         if match.get('vulnerable') is not None:
             triples.append((

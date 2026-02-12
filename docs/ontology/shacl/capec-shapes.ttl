@@ -51,19 +51,19 @@ sec:AttackPatternShape a sh:NodeShape ;
     sh:description "Potential consequences of this attack pattern"
   ] ;
   
-  # Mandatory: exploits (at least one weakness reference)
+  # Mandatory: canonical weakness link via inverse path (^sec:exploited_by)
   sh:property [
-    sh:path sec:exploits ;
+    sh:path [ sh:inversePath sec:exploited_by ] ;
     sh:nodeKind sh:IRI ;
     # sh:minCount 1 ;
-    sh:description "Weakness URI(s) that this attack pattern exploits (IRI reference)"
+    sh:description "Weakness URI(s) linked via canonical sec:exploited_by (reverse traversal)"
   ] ;
 
-  # Optional: implements (0 or more technique references)
+  # Optional: canonical AttackPattern -> Technique link
   sh:property [
-    sh:path sec:implements ;
+    sh:path sec:implemented_as ;
     sh:nodeKind sh:IRI ;
-    sh:description "ATT&CK Technique URI(s) that implement this attack pattern (IRI reference)"
+    sh:description "ATT&CK Technique URI(s) this attack pattern is implemented as (IRI reference)"
   ] ;
   
   # Optional: parentOf (specializations)

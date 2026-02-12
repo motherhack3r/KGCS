@@ -118,7 +118,7 @@ def _iter_match_criteria_ids(configs, criteria_to_match_id=None):
         nodes = []
         for entry in configs:
             if isinstance(entry, dict) and isinstance(entry.get('nodes'), list):
-                nodes.extend(entry.get('nodes'))
+                nodes.extend(entry.get('nodes') or [])
             else:
                 nodes.append(entry)
     else:
@@ -291,14 +291,6 @@ def process_vulnerability(item, writer: TripleWriter, criteria_to_match_id=None)
                 for k, v in score.items():
                     writer.write(subj, f"<https://example.org/sec/core#{pred}_{k}>", turtle_escape(str(v)))
                     triples += 1
-
-    # affects (PlatformConfiguration)
-    configs = item.get('configurations') or (item.get('cve', {}) or {}).get('configurations')
-    if configs:
-        for match_id in _iter_match_criteria_ids(configs, criteria_to_match_id):
-            if match_id:
-                writer.write(subj, "<https://example.org/sec/core#affects>", subject_for_config(match_id), is_uri_obj=True)
-                triples += 1
 
     # CWE relationships: CVE -> CWE (caused_by)
     weaknesses = []
