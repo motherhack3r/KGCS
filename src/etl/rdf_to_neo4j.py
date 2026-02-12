@@ -654,19 +654,26 @@ class RDFtoNeo4jTransformer:
                 f"{target_clause} "
                 f"MERGE (source)-[r:`{rel_type}`]->(target) SET r += rel.properties"
             )
+            # Execute in smaller sub-batches to avoid large MERGE transactions stalling
+            SUB_BATCH = 500
             try:
-                session.run(cypher, rels=rel_list)
+                if len(rel_list) <= SUB_BATCH:
+                    session.run(cypher, rels=rel_list)
+                else:
+                    total = len(rel_list)
+                    print(f"      Splitting {total} relationships into sub-batches of {SUB_BATCH}")
+                    for i in range(0, total, SUB_BATCH):
+                        sub = rel_list[i:i+SUB_BATCH]
+                        session.run(cypher, rels=sub)
             except Exception as e:
-                # Retry once with a smaller batch if possible
-                if len(rel_list) > 1:
-                    mid = len(rel_list) // 2
-                    try:
-                        session.run(cypher, rels=rel_list[:mid])
-                        session.run(cypher, rels=rel_list[mid:])
-                        continue
-                    except Exception:
-                        pass
-                print(f"      Warning: relationship batch failed: {e}")
+                # As a fallback, attempt progressively smaller chunks
+                print(f"      Warning: relationship batch failed: {e}. Retrying in smaller chunks")
+                chunk = max(1, min(SUB_BATCH, len(rel_list)//4))
+                try:
+                    for i in range(0, len(rel_list), chunk):
+                        session.run(cypher, rels=rel_list[i:i+chunk])
+                except Exception as e2:
+                    print(f"      Error: relationship sub-batch retry failed: {e2}")
     
     def _get_database_stats(self, session) -> None:
         """Get and print database statistics."""
