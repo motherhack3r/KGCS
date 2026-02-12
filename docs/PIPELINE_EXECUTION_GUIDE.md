@@ -1,54 +1,59 @@
 # KGCS Data Pipeline: Complete Setup & Execution Guide
 
-**Last Updated:** February 10, 2026  
+**Last Updated:** February 12, 2026  
 **Status:** Production Ready (Phase 3 MVP)
 
-## Quick Start (6 Steps)
+## Quick Start (5 Steps)
 
 ```bash
 # Step 1: Activate conda environment
 (E:\DEVEL\software\miniconda\shell\condabin\conda-hook.ps1)
-conda activate E:\DEVEL\software\miniconda\envs\metadata
+conda activate E:\DEVEL\LAIA\KGCS\.conda
 cd e:\DEVEL\LAIA\KGCS
 
 # Step 2: Download all raw data from authoritative sources
-python -m src.ingest.download_manager
+E:/DEVEL/LAIA/KGCS/.conda/python.exe -m src.ingest.download_manager
 
 # Step 3: Run ETL pipeline (transforms raw data to RDF Turtle)
-python scripts/run_all_etl.py
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/run_all_etl.py
 
 # Step 4: Validate outputs with SHACL (recommended)
 # Run SHACL validation for all standards before combining/loading
-python scripts/validation/validate_all_standards.py
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/validation/validate_all_standards.py
 
-# Step 5: Combine all TTL outputs into nodes + relationships files (optional)
-python scripts/combine_ttl_pipeline.py --nodes-out tmp/combined-nodes.ttl --rels-out tmp/combined-rels.ttl
+# Step 5: Load to Neo4j using canonical per-stage loaders (nodes first, then relationships)
+.\scripts\load_nodes_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
+.\scripts\load_rels_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
 ```
 
 Note: ETL output locations
 
 - Stages 1–10 write per-standard TTLs into `data/{standard}/samples/`.
-- `tmp/` is used only for intermediate chunked processing and combined outputs.
-- `scripts/combine_ttl_pipeline.py` auto-discovers stage TTLs under both `data/*/samples/` and `tmp/`.
+- `scripts/load_nodes_all.ps1` and `scripts/load_rels_all.ps1` load directly from those canonical stage files.
+- `tmp/` and `scripts/combine_ttl_pipeline.py` are optional for combined-file workflows and troubleshooting.
+
+Optional: combined-file load path (not required for normal pipeline runs)
+
+Use this only when you explicitly need `tmp/combined-nodes.ttl` and `tmp/combined-rels.ttl`:
 
 ```bash
-# Step 6: Load to Neo4j (nodes first, then relationships)
-python src/etl/rdf_to_neo4j.py --ttl tmp/combined-nodes.ttl --db-version 2026-02-08 --reset-db --nodes-only
-python src/etl/rdf_to_neo4j.py --ttl tmp/combined-rels.ttl --db-version 2026-02-08 --rels-only
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/combine_ttl_pipeline.py --nodes-out tmp/combined-nodes.ttl --rels-out tmp/combined-rels.ttl
 ```
 
-Recommended safe two-step load (nodes first, then relationships)
+Then load with direct `rdf_to_neo4j.py` commands if needed.
+
+Advanced: direct two-step load (nodes first, then relationships)
 
 Prepare DB and load nodes-only (creates DB + indexes):
 
 ```bash
-python src/etl/rdf_to_neo4j.py \
+E:/DEVEL/LAIA/KGCS/.conda/python.exe src/etl/rdf_to_neo4j.py \
    --ttl tmp/combined-nodes.ttl \
    --chunk-size 20000 \
    --fast-parse \
    --progress-newline \
-   --parse-heartbeat-seconds 30 \
-   --db-version 2026-02-08 \
+   --parse-heartbeat-seconds 20 \
+   --db-version 2026-02-12 \
    --reset-db \
    --nodes-only
 ```
@@ -56,14 +61,15 @@ python src/etl/rdf_to_neo4j.py \
 After nodes complete, load relationships-only (do NOT use `--reset-db`):
 
 ```bash
-python src/etl/rdf_to_neo4j.py \
+E:/DEVEL/LAIA/KGCS/.conda/python.exe src/etl/rdf_to_neo4j.py \
    --ttl tmp/combined-rels.ttl \
    --chunk-size 20000 \
    --fast-parse \
    --progress-newline \
-   --parse-heartbeat-seconds 30 \
-   --db-version 2026-02-08 \
-   --rel-batch-size 1000 \
+   --parse-heartbeat-seconds 20 \
+   --db-version 2026-02-12 \
+   --rel-batch-size 200 \
+   --skip-deprecates \
    --rels-only
 ```
 
@@ -80,18 +86,20 @@ Notes:
 ```powershell
 # PowerShell: activate conda, create logs, run downloader + ETL + combine + load
 (E:\DEVEL\software\miniconda\shell\condabin\conda-hook.ps1)
-conda activate E:\DEVEL\software\miniconda\envs\metadata
+conda activate E:\DEVEL\LAIA\KGCS\.conda
 cd e:\DEVEL\LAIA\KGCS
 
 # Ensure logs directory exists
 if (!(Test-Path -Path logs)) { New-Item -ItemType Directory -Path logs }
 
 # Run downloader (creates data/{standard}/raw, data/{standard}/schemas, manifests)
-python -m src.ingest.download_manager
+E:/DEVEL/LAIA/KGCS/.conda/python.exe -m src.ingest.download_manager
 
-# Run ETL and combine stages (combine is optional for per-standard loads)
-python scripts/run_all_etl.py
-python scripts/combine_ttl_pipeline.py --nodes-out tmp/combined-nodes.ttl --rels-out tmp/combined-rels.ttl
+# Run ETL stages
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/run_all_etl.py
+
+# Optional: combine stages into two unified files (not required for canonical stage loaders)
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/combine_ttl_pipeline.py --nodes-out tmp/combined-nodes.ttl --rels-out tmp/combined-rels.ttl
 
 # Optional: produce a single full-load file (nodes then relationships)
 # Useful when your loader accepts a single input file. Use `--full-out` to write a concatenated file.
@@ -99,11 +107,25 @@ python scripts/combine_ttl_pipeline.py --inputs tmp/pipeline-stage6-capec.nt tmp
     --nodes-out tmp/selected-nodes.nt --rels-out tmp/selected-rels.nt --full-out tmp/selected-full.nt
 
 # Load to Neo4j using the helper wrappers (nodes then relationships)
-.\scripts\load_nodes_all.ps1 -DbVersion 2026-02-08 -FastParse -ProgressNewline
-.\scripts\load_rels_all.ps1 -DbVersion 2026-02-08 -FastParse -ProgressNewline
+.\scripts\load_nodes_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
+.\scripts\load_rels_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
 
 # Or load a single ordered full file (nodes then rels in one TTL)
-.\scripts\load_full_ordered.ps1 -DbVersion 2026-02-08 -FastParse -ProgressNewline -ResetDb
+.\scripts\load_full_ordered.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20 -ResetDb
+```
+
+### Validated Relationship Smoke Commands (Executed)
+
+Use these exact commands to validate relationship load behavior by stage with the current loader settings:
+
+```bash
+E:/DEVEL/LAIA/KGCS/.conda/python.exe src/etl/rdf_to_neo4j.py --ttl data/d3fend/samples/pipeline-stage5-d3fend-rels.ttl --rels-only --chunk-size 20000 --rel-batch-size 200 --db-version 2026-02-12 --fast-parse --progress-newline --parse-heartbeat-seconds 20 --skip-deprecates
+
+E:/DEVEL/LAIA/KGCS/.conda/python.exe src/etl/rdf_to_neo4j.py --ttl data/attack/samples/pipeline-stage4-attack-rels.ttl --rels-only --chunk-size 20000 --rel-batch-size 200 --db-version 2026-02-12 --fast-parse --progress-newline --parse-heartbeat-seconds 20 --skip-deprecates
+
+E:/DEVEL/LAIA/KGCS/.conda/python.exe src/etl/rdf_to_neo4j.py --ttl data/capec/samples/pipeline-stage6-capec-rels.ttl --rels-only --chunk-size 20000 --rel-batch-size 200 --db-version 2026-02-12 --fast-parse --progress-newline --parse-heartbeat-seconds 20 --skip-deprecates
+
+E:/DEVEL/LAIA/KGCS/.conda/python.exe src/etl/rdf_to_neo4j.py --ttl data/car/samples/pipeline-stage8-car-rels.ttl --rels-only --chunk-size 20000 --rel-batch-size 200 --db-version 2026-02-12 --fast-parse --progress-newline --parse-heartbeat-seconds 20 --skip-deprecates
 ```
 
 See Appendix for verification notes and troubleshooting.
@@ -118,16 +140,16 @@ cd e:\DEVEL\LAIA\KGCS
 
 # Activate conda environment
 (E:\DEVEL\software\miniconda\shell\condabin\conda-hook.ps1)
-conda activate E:\DEVEL\software\miniconda\envs\metadata
+conda activate E:\DEVEL\LAIA\KGCS\.conda
 
 # Verify Python and dependencies
-python --version
+E:/DEVEL/LAIA/KGCS/.conda/python.exe --version
 pip list | grep rdflib
 ```
 
 **Required Environment:**
 
-- Conda: `E:\DEVEL\software\miniconda\envs\metadata`
+- Conda: `E:\DEVEL\LAIA\KGCS\.conda`
 - Python: 3.9+
 - Key packages: rdflib, requests, pyshacl, neo4j
 
@@ -136,7 +158,7 @@ pip list | grep rdflib
 Downloads all authoritative standards data from NVD and MITRE:
 
 ```bash
-python -m src.ingest.download_manager
+E:/DEVEL/LAIA/KGCS/.conda/python.exe -m src.ingest.download_manager
 ```
 
 **What it downloads:**
@@ -174,7 +196,7 @@ python -m src.ingest.download_manager
 Transforms raw JSON/XML/YAML data into RDF Turtle format:
 
 ```bash
-python scripts/run_all_etl.py
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/run_all_etl.py
 ```
 
 **Processing stages (in order):**
@@ -249,12 +271,12 @@ python scripts/run_all_etl.py
 
 **IMPORTANT:** Do NOT run monitoring commands while ETL is running - it may interrupt the background job!
 
-### Step 4: Combine TTL Files
+### Step 4 (Optional): Combine TTL Files
 
-Combine stage outputs into nodes and relationships TTLs (streaming, memory-safe):
+Optional combined-file workflow only (not required for canonical stage loaders):
 
 ```bash
-python scripts/combine_ttl_pipeline.py --nodes-out tmp/combined-nodes.ttl --rels-out tmp/combined-rels.ttl
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/combine_ttl_pipeline.py --nodes-out tmp/combined-nodes.ttl --rels-out tmp/combined-rels.ttl
 ```
 
 Options:
@@ -274,28 +296,29 @@ If you still need a separate splitter utility for special cases, `scripts/utilit
 
 See Appendix for the selected-standards workflow, tuning notes, and troubleshooting tips.
 
-### Step 5: Load to Neo4j
+### Step 5: Load to Neo4j (Canonical Stage Loaders)
 
-Load RDF into Neo4j using a nodes-first then relationships-second approach (recommended). The loader supports chunked, streaming parsing and a variety of tuning options to match your machine resources.
+Load RDF into Neo4j using nodes-first then relationships-second per-stage loaders (recommended and validated).
 
 Quick workflow (recommended):
 
-1. Dry-run to estimate counts (uses --workers to parallelize estimation):
+1. Load nodes (resets DB on first stage only):
 
 ```bash
-python src/etl/rdf_to_neo4j.py --ttl tmp/combined-nodes.ttl --chunk-size 50000 --fast-parse --dry-run --workers 8 --progress-newline
+.\scripts\load_nodes_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
 ```
 
-1. Nodes load (reset DB, create indexes, load nodes):
+1. Load relationships (canonical rel files only):
 
 ```bash
-python src/etl/rdf_to_neo4j.py --ttl tmp/combined-nodes.ttl --chunk-size 100000 --fast-parse --batch-size 20000 --db-version 2026-02-08 --reset-db --nodes-only --progress-newline --parse-heartbeat-seconds 30
+.\scripts\load_rels_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
 ```
 
-1. Relationships load (no reset):
+Advanced (optional): direct combined-file loader path when using `tmp/combined-*` outputs:
 
 ```bash
-python src/etl/rdf_to_neo4j.py --ttl tmp/combined-rels.ttl --chunk-size 100000 --fast-parse --batch-size 20000 --rel-batch-size 5000 --db-version 2026-02-08 --rels-only --progress-newline --parse-heartbeat-seconds 30
+E:/DEVEL/LAIA/KGCS/.conda/python.exe src/etl/rdf_to_neo4j.py --ttl tmp/combined-nodes.ttl --chunk-size 20000 --fast-parse --progress-newline --parse-heartbeat-seconds 20 --db-version 2026-02-12 --reset-db --nodes-only
+E:/DEVEL/LAIA/KGCS/.conda/python.exe src/etl/rdf_to_neo4j.py --ttl tmp/combined-rels.ttl --chunk-size 20000 --fast-parse --progress-newline --parse-heartbeat-seconds 20 --db-version 2026-02-12 --rel-batch-size 200 --skip-deprecates --rels-only
 ```
 
 Processing performed by the loader:
@@ -312,13 +335,14 @@ Expected time depends on hardware and Neo4j configuration; on a modern workstati
 The pipeline follows a strict 10-stage architecture with immutable ontologies:
 
 ```text
-Stage 1-10 (ETL):     Raw data → RDF Turtle
-   ↓ (Combine)
-Single TTL file:      All 10 stages merged
-   ↓ (Load)
+Stage 1-10 (ETL):     Raw data → RDF Turtle (per-standard nodes/rels)
+   ↓ (Canonical load)
 Neo4j graph:          Queryable knowledge graph
    ↓ (Query)
 Causal chain:         CVE → CWE → CAPEC → Technique → Defense
+
+Optional branch:
+Stage outputs → Combine (`tmp/combined-*`) → Direct loader commands
 ```
 
 **Key Invariants:**
@@ -335,24 +359,24 @@ Optional: Validate outputs with SHACL before loading:
 
 ```bash
 # Validate individual stage
-python scripts/validation/validate_shacl_stream.py --data tmp/pipeline-stage1-cpe.ttl --shapes docs/ontology/shacl/cpe-shapes.ttl
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/validation/validate_shacl_stream.py --data data/cpe/samples/pipeline-stage1-cpe.ttl --shapes docs/ontology/shacl/cpe-shapes.ttl
 
 # Validate all outputs
-python scripts/validation/validate_all_standards.py
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/validation/validate_all_standards.py
 ```
 
 ## Appendix: Development Notes and Troubleshooting
 
 ### Verification Notes
 
-**Verification note (Feb 8, 2026):** After activating the `metadata` conda environment (Step 1), running the downloader (`python -m src.ingest.download_manager`) successfully fetched raw files, wrote per-standard manifests (`data/{standard}/manifest.json`), and saved official schemas under `data/{standard}/schemas/` (for example, CVSS JSON schemas under `data/cve/schemas/`).
+**Verification note (Feb 12, 2026):** After activating `E:\DEVEL\LAIA\KGCS\.conda` (Step 1), running the downloader (`E:/DEVEL/LAIA/KGCS/.conda/python.exe -m src.ingest.download_manager`) fetched raw files, wrote per-standard manifests (`data/{standard}/manifest.json`), and saved official schemas under `data/{standard}/schemas/`.
 
 ### Combine Fallback (if auto-discovery is unavailable)
 
 ```powershell
 # Copy per-standard samples into tmp/ (idempotent)
 Get-ChildItem -Path data\*\samples -Filter pipeline-stage*-*.ttl -Recurse | ForEach-Object { Copy-Item $_.FullName -Destination tmp -Force }
-python scripts/combine_ttl_pipeline.py
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/combine_ttl_pipeline.py
 ```
 
 ### E2E Run for Selected Standards (nodes-first, rels-second)
@@ -370,32 +394,32 @@ python -m src.etl.etl_car --input data/car/samples --output tmp/pipeline-stage8-
 1. Combine only the `tmp/` pipeline-stage files (the combine script auto-discovers `.ttl` and `.nt`):
 
 ```bash
-python scripts/combine_ttl_pipeline.py --nodes-out tmp/selected-nodes.nt --rels-out tmp/selected-rels.nt
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/combine_ttl_pipeline.py --nodes-out tmp/selected-nodes.nt --rels-out tmp/selected-rels.nt
 ```
 
 1. Validate combined outputs with SHACL (mandatory):
 
 ```bash
-python scripts/validation/validate_all_standards.py --input tmp/selected-nodes.nt
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/validation/validate_all_standards.py --input tmp/selected-nodes.nt
 # or run targeted shape checks for the standards involved
 ```
 
 1. Dry-run the Neo4j loader to inspect label & relationship counts and reveal missing types or subjects:
 
 ```bash
-python src/etl/rdf_to_neo4j.py --ttl tmp/selected-nodes.nt --fast-parse --dry-run --workers 4
+E:/DEVEL/LAIA/KGCS/.conda/python.exe src/etl/rdf_to_neo4j.py --ttl tmp/selected-nodes.nt --fast-parse --dry-run --workers 4
 ```
 
 1. Load nodes-only for the selected standards (create DB, indexes, insert nodes):
 
 ```bash
-python src/etl/rdf_to_neo4j.py --ttl tmp/selected-nodes.nt --reset-db --nodes-only --chunk-size 50000 --fast-parse
+E:/DEVEL/LAIA/KGCS/.conda/python.exe src/etl/rdf_to_neo4j.py --ttl tmp/selected-nodes.nt --reset-db --nodes-only --chunk-size 50000 --fast-parse
 ```
 
 1. Load relationships-only (no reset):
 
 ```bash
-python src/etl/rdf_to_neo4j.py --ttl tmp/selected-rels.nt --rels-only --rel-batch-size 1000 --fast-parse
+E:/DEVEL/LAIA/KGCS/.conda/python.exe src/etl/rdf_to_neo4j.py --ttl tmp/selected-rels.nt --rels-only --rel-batch-size 1000 --fast-parse
 ```
 
 Notes & troubleshooting:
@@ -432,7 +456,7 @@ data/car/samples/pipeline-stage8-car.ttl               0.14 MB   (122 files)
 data/shield/samples/pipeline-stage9-shield.ttl         0.31 MB   (12 files)
 data/engage/samples/pipeline-stage10-engage.ttl        0.05 MB   (12 files)
 ────────────────────────────────────────────────────────────────
-tmp/combined-nodes.ttl + tmp/combined-rels.ttl     ~28,600 MB   (combined total)
+tmp/combined-nodes.ttl + tmp/combined-rels.ttl     ~28,600 MB   (optional combined workflow)
 ```
 
 **Total RDF triples:** ~3.2M triples across all standards
@@ -457,7 +481,7 @@ tmp/combined-nodes.ttl + tmp/combined-rels.ttl     ~28,600 MB   (combined total)
 - Verify Neo4j service is running: `neo4j status`
 - Check database connection: `neo4j console`
 - Review Neo4j logs: `logs/neo4j.log`
-- Ensure combined TTL file is valid: `python -c "from rdflib import Graph; g = Graph(); g.parse('tmp/combined-nodes.ttl', format='turtle'); print(f'Loaded {len(g)} triples')"`
+- Ensure combined TTL file is valid (optional workflow): `E:/DEVEL/LAIA/KGCS/.conda/python.exe -c "from rdflib import Graph; g = Graph(); g.parse('tmp/combined-nodes.ttl', format='turtle'); print(f'Loaded {len(g)} triples')"`
 
 #### Out of Memory
 
@@ -474,6 +498,6 @@ tmp/combined-nodes.ttl + tmp/combined-rels.ttl     ~28,600 MB   (combined total)
 
 ---
 
-**Total Pipeline Time:** ~3-4 hours (download + ETL + combine + load)  
+**Total Pipeline Time:** ~3-4 hours (download + ETL + load; combine only if using optional combined workflow)  
 **Last Run:** February 3, 2026 @ 17:47  
 **Status:** ✅ Production Ready
