@@ -1,0 +1,297 @@
+{
+  "data_file": "data/cpe/samples/pipeline-stage1-cpe.ttl",
+  "conforms": true,
+  "chunks": 32,
+  "triples_scanned": 18945360,
+  "errors": [],
+  "chunk_reports": [
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp3z488r1w.chunk4.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 4,
+      "elapsed": 190.5937626361847,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp8lm9qmrf.chunk8.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 8,
+      "elapsed": 191.92947721481323,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp_wn9o4fb.chunk6.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 6,
+      "elapsed": 192.17935299873352,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpgz614dsf.chunk7.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 7,
+      "elapsed": 192.439706325531,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpqbssb01s.chunk3.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 3,
+      "elapsed": 192.65808057785034,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpjr83ng1v.chunk5.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 5,
+      "elapsed": 192.84257245063782,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpp_qe_r_v.chunk11.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 11,
+      "elapsed": 194.80552053451538,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpvvgfcba1.chunk10.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 10,
+      "elapsed": 195.42361879348755,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpr0j8r0sd.chunk12.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 12,
+      "elapsed": 196.05029702186584,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmphv8tkysx.chunk1.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 1,
+      "elapsed": 197.9876687526703,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp2_ccagcm.chunk2.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 2,
+      "elapsed": 200.62005424499512,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmphg6cl1u1.chunk9.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 9,
+      "elapsed": 201.5549840927124,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpda4wcgtc.chunk20.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 20,
+      "elapsed": 187.92510890960693,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpclwnpyt9.chunk16.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 16,
+      "elapsed": 192.09512281417847,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpn14ny9jt.chunk17.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 17,
+      "elapsed": 193.99780464172363,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp4dzt3amu.chunk15.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 15,
+      "elapsed": 195.11614727973938,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpouqinwr7.chunk13.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 13,
+      "elapsed": 198.32330799102783,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpdz31p416.chunk14.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 14,
+      "elapsed": 198.05473923683167,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpksi0884a.chunk22.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 22,
+      "elapsed": 192.3266942501068,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp323wa92j.chunk18.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 18,
+      "elapsed": 197.66177320480347,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmprpgxt0q2.chunk24.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 24,
+      "elapsed": 189.05969142913818,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpul5p3ubw.chunk19.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 19,
+      "elapsed": 196.12525081634521,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpou6pd7kv.chunk21.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 21,
+      "elapsed": 194.9503858089447,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp3zxnme1g.chunk23.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 23,
+      "elapsed": 191.9752697944641,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpz42lfsh_.chunk32.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 32,
+      "elapsed": 66.31943678855896,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpfx6tsrpb.chunk26.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 26,
+      "elapsed": 152.38452076911926,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpet_94dlb.chunk25.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 25,
+      "elapsed": 153.66834354400635,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpyiblze50.chunk28.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 28,
+      "elapsed": 150.19664430618286,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmps8dzh2pb.chunk27.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 27,
+      "elapsed": 150.91467213630676,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpge4ainac.chunk29.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 29,
+      "elapsed": 149.52959656715393,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmpw8vy10ql.chunk30.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 30,
+      "elapsed": 149.31863260269165,
+      "return_code": 0
+    },
+    {
+      "data_file": "C:\\Users\\humbe\\AppData\\Local\\Temp\\tmp_hg47yvm.chunk31.ttl",
+      "conforms": true,
+      "results_text": "Validation Report\nConforms: True\n",
+      "violations": [],
+      "chunk": 31,
+      "elapsed": 149.15950179100037,
+      "return_code": 0
+    }
+  ]
+}
