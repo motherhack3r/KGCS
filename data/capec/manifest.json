@@ -1,28 +1,13 @@
 {
   "files": [
     {
-      "content_type": "text/xml",
-      "etag": null,
-      "last_modified": "Tue, 24 Jan 2023 18:32:31 GMT",
-      "saved_at": "2026-02-08T03:10:17Z",
-      "sha256": "70279a2dff0cb0ad79e546adb07828335a704ad5210e047e09e986172fc9e34d",
+      "filename": "capec_latest.xml",
       "size_bytes": 3849998,
-      "source": "capec.mitre.org",
+      "sha256": "70279a2dff0cb0ad79e546adb07828335a704ad5210e047e09e986172fc9e34d",
       "url": "https://capec.mitre.org/data/xml/capec_latest.xml",
-      "filename": "capec_latest.xml"
-    },
-    {
-      "content_type": "text/plain; charset=utf-8",
-      "etag": "W/\"e5d6df86cab801cc811ecc7631ae0ef202f730714f655ce10e7b3727584729d2\"",
-      "last_modified": null,
-      "saved_at": "2026-02-08T03:10:17Z",
-      "sha256": "ee6244f48259c1963d0507535e1843d67ba08fe58b4dfe351c1b74f9e376fa69",
-      "size_bytes": 4480297,
-      "source": "raw.githubusercontent.com",
-      "url": "https://raw.githubusercontent.com/mitre/cti/refs/heads/master/capec/2.1/stix-capec.json",
-      "filename": "stix-capec.json"
+      "status": "success"
     }
   ],
-  "last_updated": "2026-02-08T03:10:18.070370",
-  "source": null
+  "last_updated": "2026-02-12T20:34:22.886027",
+  "source": "https://capec.mitre.org/"
 }
