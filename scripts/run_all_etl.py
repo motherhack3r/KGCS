@@ -164,6 +164,19 @@ def main():
 
             if need_build:
                 print(f"Building CPEMatch index at {cpematch_index_path}...")
+                # Try to import the cpematch util via package path; if that fails, load by file path
+                try:
+                    from src.utils.cpematch_index import build_cpematch_index, save_index
+                except Exception:
+                    import importlib.util
+                    spec = importlib.util.spec_from_file_location("cpematch_index", os.path.join("src", "utils", "cpematch_index.py"))
+                    if spec and spec.loader:
+                        cpematch_mod = importlib.util.module_from_spec(spec)
+                        spec.loader.exec_module(cpematch_mod)
+                        build_cpematch_index = cpematch_mod.build_cpematch_index
+                        save_index = cpematch_mod.save_index
+                    else:
+                        raise
                 index = build_cpematch_index("data/cpe/raw/nvdcpematch-2.0-chunks")
                 save_index(cpematch_index_path, index)
                 try:
