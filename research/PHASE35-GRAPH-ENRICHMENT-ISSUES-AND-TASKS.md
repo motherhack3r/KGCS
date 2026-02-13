@@ -17,12 +17,16 @@ Recent Phase A work has been validated and committed. This document now tracks b
 - Label inference coverage was extended for D3FEND resource URIs (`/d3fentity/` → `D3fendResource`) to reduce rel-only endpoint misses.
 - CAPEC ATT&CK technique ID normalization is implemented in ETL (`src/etl/etl_capec.py`) so mappings are canonicalized to `Txxxx` / `Txxxx.xxx` before URI emission.
 - Task 5 regression coverage was added and validated (`tests/unit/test_etl_capec_attack_id_normalization.py`; `2 passed`).
+- CWE XML extraction was expanded for schema-defined fields including introduction modes, likelihood, consequences, detection methods, mitigations, references, notes, and observed CVE examples (`src/etl/etl_cwe.py`).
+- CWE extraction now preserves schema-native sub-entity IDs (`Consequence_ID`, `Detection_Method_ID`, `Mitigation_ID`) for stable URI emission and provenance fidelity.
+- CWE SHACL status enum was aligned with current CWE schema values (`Deprecated|Draft|Incomplete|Obsolete|Stable|Usable`) in `docs/ontology/shacl/cwe-shapes.ttl`.
+- Task 7/8 regression coverage was added and validated (`tests/unit/test_etl_cwe_enrichment_extraction.py`; focused suite passing).
 
 ### Still pending
 
 - P1 reporting/statistics correctness items (Section 1 tasks) remain open.
 - CVE CVSS v2.0/v3.0/v3.1/v4.0 ingestion update remains open.
-- Broader cross-standard enrichments (CAR/SHIELD/ENGAGE/D3FEND connectivity and remaining audits) remain open.
+- Broader cross-standard enrichments (CAR/SHIELD/ENGAGE/D3FEND connectivity) and remaining loader/stat audits remain open.
 
 ---
 
@@ -195,10 +199,12 @@ Recent Phase A work has been validated and committed. This document now tracks b
 - **Task 7: Expand CWE XML extraction coverage**
    Details: Add extraction for `Modes_Of_Introduction`, `Likelihood_Of_Exploit`, `Detection_Methods`, `Potential_Mitigations`, and additional consequence/context fields present in source; map only to existing ontology predicates/classes or approved extension points.  
    Acceptance: measurable increase in CWE property and relationship richness without SHACL regressions.
+  Status: **Completed (implementation + focused unit tests)**.
 
 - **Task 8: Expand CWE relationship/context extraction**
    Details: Include additional valid relationship/context structures where supported by ontology.  
    Acceptance: increased inter-weakness and context linkage with provenance retained.
+  Status: **Completed (implementation + focused unit tests)**.
 
 ---
 
