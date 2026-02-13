@@ -242,7 +242,7 @@ Recent Phase A work has been validated and committed. This document now tracks b
 - **Task 13: Audit `_infer_label_from_uri` coverage against all rel-only stage outputs**
   Details: Add alias support for any uncovered URI patterns.  
   Acceptance: zero or near-zero missing source/target label inference for rel files.
-  Status: **Partially complete** (D3FEND `/d3fentity/` mapping plus SHIELD/ENGAGE aliases `/deception/` and `/engagement/` added after regenerating stages 5/8/9/10; targeted rel-file audit for those stages now reports zero unknown endpoint labels. Full multi-standard audit remains pending).
+  Status: **Completed** (D3FEND `/d3fentity/` plus SHIELD/ENGAGE aliases `/deception/` and `/engagement/` are in place; full multi-standard rel-file audit across all current stage rel outputs reports zero unknown endpoint labels: 10 rel files, 52,977,976 endpoints checked, 0 unknown).
 
 - **Task 14: Add targeted verification scripts and regression checks**
   Details: Add relationship directionality checks, causal chain completeness checks, and per-standard link coverage checks (CAPEC↔ATT&CK, ATT&CK↔Defense layers).  
