@@ -12,6 +12,7 @@ Usage:
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
@@ -38,6 +39,30 @@ except Exception:
 
 SEC = Namespace("https://example.org/sec/core#")
 EX = Namespace("https://example.org/")
+
+
+def _canonicalize_attack_technique_id(raw_id: str | None) -> str | None:
+    """Canonicalize ATT&CK technique IDs to Txxxx or Txxxx.xxx."""
+    if not isinstance(raw_id, str):
+        return None
+
+    candidate = raw_id.strip().upper()
+    if not candidate:
+        return None
+
+    if candidate.startswith("T"):
+        candidate = candidate[1:]
+
+    match = re.fullmatch(r"(\d{4})(?:\.(\d{1,3}))?", candidate)
+    if not match:
+        return None
+
+    technique_id = match.group(1)
+    subtechnique_id = match.group(2)
+    if subtechnique_id is None:
+        return f"T{technique_id}"
+
+    return f"T{technique_id}.{subtechnique_id.zfill(3)}"
 
 
 class CAPECtoRDFTransformer:
@@ -214,21 +239,29 @@ class CAPECtoRDFTransformer:
             # self.graph.add((pattern_node, SEC.exploits, URIRef("")))
 
         # CAPEC -> ATT&CK mappings: combine from external ATT&CK STIX data AND from CAPEC XML Taxonomy_Mappings
-        attack_ids = set()
+        raw_attack_ids = set()
         
         # First, add mappings from external capec_to_attack dictionary (from ATT&CK STIX parsing)
-        attack_ids.update(self.capec_to_attack.get(capec_id_full, []))
+        raw_attack_ids.update(self.capec_to_attack.get(capec_id_full, []))
         
         # Second, add mappings from CAPEC XML Taxonomy_Mappings (direct from source)
         attack_mappings = pattern.get("AttackMappings", [])
         for mapping in attack_mappings:
             if mapping.get("TechniqueID"):
-                attack_ids.add(mapping["TechniqueID"])
+                raw_attack_ids.add(mapping["TechniqueID"])
+
+        attack_ids = set()
+        for raw_attack_id in raw_attack_ids:
+            normalized_attack_id = _canonicalize_attack_technique_id(raw_attack_id)
+            if normalized_attack_id is None:
+                warnings.warn(
+                    f"CAPEC pattern {capec_id_full} has invalid ATT&CK TechniqueID mapping: {raw_attack_id}"
+                )
+                continue
+            attack_ids.add(normalized_attack_id)
         
         # Create relationships to all discovered ATT&CK techniques
         for attack_id in attack_ids:
-            if not isinstance(attack_id, str) or not attack_id:
-                continue
             if "." in attack_id:
                 technique_node = URIRef(f"{EX}subtechnique/{attack_id}")
             else:
@@ -423,7 +456,7 @@ def _build_capec_to_attack_map(attack_input: str) -> dict:
                 if not isinstance(ref, dict):
                     continue
                 if ref.get("source_name") == "mitre-attack":
-                    attack_id = ref.get("external_id")
+                    attack_id = _canonicalize_attack_technique_id(ref.get("external_id"))
                 if ref.get("source_name") == "capec":
                     capec_ids.append(ref.get("external_id"))
             if not attack_id:
