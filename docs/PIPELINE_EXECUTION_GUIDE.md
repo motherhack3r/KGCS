@@ -161,6 +161,22 @@ Downloads all authoritative standards data from NVD and MITRE:
 E:/DEVEL/LAIA/KGCS/.conda/python.exe -m src.ingest.download_manager
 ```
 
+Targeted download examples:
+
+```bash
+# Single standard
+E:/DEVEL/LAIA/KGCS/.conda/python.exe -m src.ingest.download_manager --standards d3fend
+
+# Multiple standards (space-separated)
+E:/DEVEL/LAIA/KGCS/.conda/python.exe -m src.ingest.download_manager --standards attack capec d3fend
+
+# Multiple standards (comma-separated)
+E:/DEVEL/LAIA/KGCS/.conda/python.exe -m src.ingest.download_manager --standards attack,capec,d3fend
+
+# Skip large NVD feeds while targeting selected standards
+E:/DEVEL/LAIA/KGCS/.conda/python.exe -m src.ingest.download_manager --skip-large --standards cwe capec attack d3fend
+```
+
 **What it downloads:**
 
 - **CPE** (NVD): 15 chunk files (nvdcpe-2.0) → `data/cpe/raw/` (chunked extraction created `nvdcpe-2.0-chunks`)

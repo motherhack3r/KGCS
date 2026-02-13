@@ -1,6 +1,7 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix ex: <https://example.org/sec/core#> .
 @prefix d3: <https://example.org/sec/d3fend#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 # D3FEND shapes: DefensiveTechnique identifier (accepts ex:d3fendId or d3:d3fendId)
@@ -11,4 +12,109 @@ ex:D3fendShape a sh:NodeShape ;
     [ a sh:PropertyShape ; sh:path ex:d3fendId ; sh:datatype xsd:string ; sh:minCount 1 ]
     [ a sh:PropertyShape ; sh:path d3:d3fendId ; sh:datatype xsd:string ; sh:minCount 1 ]
   ) ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:description ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:status ;
+    sh:datatype xsd:string
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:kbArticle ;
+    sh:datatype xsd:string
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:synonym ;
+    sh:datatype xsd:string
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:sourceIdentifier ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:url ;
+    sh:datatype xsd:anyURI
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:references ;
+    sh:nodeKind sh:IRI
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:analyzes ;
+    sh:nodeKind sh:IRI
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:monitors ;
+    sh:nodeKind sh:IRI
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:hardens ;
+    sh:nodeKind sh:IRI
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:filters ;
+    sh:nodeKind sh:IRI
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:isolates ;
+    sh:nodeKind sh:IRI
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:restricts ;
+    sh:nodeKind sh:IRI
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:enables ;
+    sh:nodeKind sh:IRI
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:blocks ;
+    sh:nodeKind sh:IRI
+  ] ;
   sh:message "DefensiveTechnique must include a d3fendId (either ex:d3fendId or d3:d3fendId)." .
+
+ex:D3fendReferenceShape a sh:NodeShape ;
+  sh:targetClass ex:Reference ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:referenceType ;
+    sh:datatype xsd:string
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:url ;
+    sh:datatype xsd:anyURI
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path ex:referenceSource ;
+    sh:datatype xsd:string
+  ] ;
+  sh:property [
+    a sh:PropertyShape ;
+    sh:path rdfs:label ;
+    sh:datatype xsd:string
+  ] ;
+  sh:or (
+    [ a sh:PropertyShape ; sh:path ex:url ; sh:minCount 1 ]
+    [ a sh:PropertyShape ; sh:path rdfs:label ; sh:minCount 1 ]
+  ) ;
+  sh:message "Reference should include at least a URL or label." .
