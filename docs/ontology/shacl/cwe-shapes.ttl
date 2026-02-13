@@ -46,12 +46,12 @@ sec:WeaknessShape a sh:NodeShape ;
     sh:description "Abstraction level: Pillar, Compound, Class, Base, or Variant"
   ] ;
   
-  # Optional: status (Active, Draft, Incomplete, Deprecated, Stable)
+  # Optional: status (Deprecated, Draft, Incomplete, Obsolete, Stable, Usable)
   sh:property [
     sh:path sec:status ;
     sh:datatype xsd:string ;
     sh:maxCount 1 ;
-    sh:pattern "^(Active|Draft|Incomplete|Deprecated|Stable)$" ;
+    sh:pattern "^(Deprecated|Draft|Incomplete|Obsolete|Stable|Usable)$" ;
     sh:description "Status of the weakness definition"
   ] ;
   
