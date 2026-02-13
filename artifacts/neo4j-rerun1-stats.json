@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-13T01:48:54.290627",
+  "timestamp": "2026-02-13T16:29:29.182756",
   "database": "neo4j-2026-02-12-rerun1",
   "nodes": {
     "Platform": 1576128,
@@ -13,8 +13,9 @@
     "Technique": 568,
     "SubTechnique": 526,
     "DeceptionTechnique": 494,
+    "Reference": 440,
+    "Class": 125,
     "DetectionAnalytic": 102,
-    "Reference": 68,
     "Tactic": 34,
     "EngagementConcept": 31,
     "Goal": 5
@@ -29,6 +30,7 @@
     "HAS_CONSEQUENCE": 814,
     "HAS_PREREQUISITE": 747,
     "SUBTECHNIQUE_OF": 526,
+    "REFERENCES": 509,
     "BELONGS_TO": 330,
     "CAN_PRECEDE": 305,
     "PEER_OF": 117,
@@ -41,8 +43,8 @@
     "STARTS_WITH": 3
   },
   "totals": {
-    "nodes": 2535335,
-    "relationships": 26376940
+    "nodes": 2535832,
+    "relationships": 26377449
   },
   "causal_chain_analysis": {
     "cve_to_cwe": 270321,
@@ -70,7 +72,8 @@
       "EngagementConcept": 31,
       "Goal": 5,
       "Reference": 60,
-      "DefensiveTechnique": 4498
+      "DefensiveTechnique": 4369,
+      "Class": 125
     },
     "cvss_versions": {
       "v2.0": 0,
@@ -130,26 +133,26 @@
       },
       {
         "relationship": "AFFECTED_BY",
-        "source": "PlatformConfiguration",
-        "target": "Vulnerability",
-        "count": 2970592
-      },
-      {
-        "relationship": "AFFECTED_BY",
         "source": "Vulnerability",
         "target": "PlatformConfiguration",
         "count": 2970592
       },
       {
-        "relationship": "CAUSED_BY",
-        "source": "Vulnerability",
-        "target": "Weakness",
-        "count": 270321
+        "relationship": "AFFECTED_BY",
+        "source": "PlatformConfiguration",
+        "target": "Vulnerability",
+        "count": 2970592
       },
       {
         "relationship": "CAUSED_BY",
         "source": "Weakness",
         "target": "Vulnerability",
+        "count": 270321
+      },
+      {
+        "relationship": "CAUSED_BY",
+        "source": "Vulnerability",
+        "target": "Weakness",
         "count": 270321
       },
       {
@@ -160,14 +163,14 @@
       },
       {
         "relationship": "EXPLOITED_BY",
-        "source": "AttackPattern",
-        "target": "Weakness",
+        "source": "Weakness",
+        "target": "AttackPattern",
         "count": 1212
       },
       {
         "relationship": "EXPLOITED_BY",
-        "source": "Weakness",
-        "target": "AttackPattern",
+        "source": "AttackPattern",
+        "target": "Weakness",
         "count": 1212
       },
       {
@@ -178,14 +181,14 @@
       },
       {
         "relationship": "MITIGATES",
-        "source": "Technique",
-        "target": "DefensiveTechnique",
+        "source": "DefensiveTechnique",
+        "target": "Technique",
         "count": 911
       },
       {
         "relationship": "MITIGATES",
-        "source": "DefensiveTechnique",
-        "target": "Technique",
+        "source": "Technique",
+        "target": "DefensiveTechnique",
         "count": 911
       },
       {
@@ -214,15 +217,27 @@
       },
       {
         "relationship": "SUBTECHNIQUE_OF",
+        "source": "Technique",
+        "target": "SubTechnique",
+        "count": 526
+      },
+      {
+        "relationship": "SUBTECHNIQUE_OF",
         "source": "SubTechnique",
         "target": "Technique",
         "count": 526
       },
       {
-        "relationship": "SUBTECHNIQUE_OF",
-        "source": "Technique",
-        "target": "SubTechnique",
-        "count": 526
+        "relationship": "REFERENCES",
+        "source": "DefensiveTechnique",
+        "target": "Reference",
+        "count": 509
+      },
+      {
+        "relationship": "REFERENCES",
+        "source": "Reference",
+        "target": "DefensiveTechnique",
+        "count": 509
       },
       {
         "relationship": "CAN_PRECEDE",
@@ -280,18 +295,6 @@
       },
       {
         "relationship": "DERIVED_FROM",
-        "source": "Technique",
-        "target": "AttackPattern",
-        "count": 36
-      },
-      {
-        "relationship": "DERIVED_FROM",
-        "source": "AttackPattern",
-        "target": "Technique",
-        "count": 36
-      },
-      {
-        "relationship": "IMPLEMENTED_AS",
         "source": "Technique",
         "target": "AttackPattern",
         "count": 36
