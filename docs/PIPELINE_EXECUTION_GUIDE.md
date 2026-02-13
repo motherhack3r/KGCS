@@ -22,8 +22,8 @@ E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/run_all_etl.py
 E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/validation/validate_all_standards.py
 
 # Step 5: Load to Neo4j using canonical per-stage loaders (nodes first, then relationships)
-.\scripts\load_nodes_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
-.\scripts\load_rels_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts\load_nodes_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts\load_rels_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
 ```
 
 Note: ETL output locations
@@ -327,13 +327,13 @@ Quick workflow (recommended):
 1. Load relationships (canonical rel files only):
 
 ```bash
-.\scripts\load_rels_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/load_rels_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
 ```
 
 Advanced (optional): direct combined-file loader path when using `tmp/combined-*` outputs:
 
 ```bash
-E:/DEVEL/LAIA/KGCS/.conda/python.exe src/etl/rdf_to_neo4j.py --ttl tmp/combined-nodes.ttl --chunk-size 20000 --fast-parse --progress-newline --parse-heartbeat-seconds 20 --db-version 2026-02-12 --reset-db --nodes-only
+E:/DEVEL/LAIA/KGCS/.conda/python.exe src/etl/rdf_to_neo4j.py --ttl tmp/combined-nodes.ttl --chunk-size 20000 --fast-parse --progress-newline --parse-heartbeat-seconds 20 --db-version 2026-02-12 --nodes-only
 E:/DEVEL/LAIA/KGCS/.conda/python.exe src/etl/rdf_to_neo4j.py --ttl tmp/combined-rels.ttl --chunk-size 20000 --fast-parse --progress-newline --parse-heartbeat-seconds 20 --db-version 2026-02-12 --rel-batch-size 200 --skip-deprecates --rels-only
 ```
 

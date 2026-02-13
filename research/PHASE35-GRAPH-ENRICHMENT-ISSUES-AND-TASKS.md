@@ -15,12 +15,14 @@ Recent Phase A work has been validated and committed. This document now tracks b
 - SHACL constraints for D3FEND Phase A were aligned for operational validation (including `ex:references` IRI-kind enforcement and dedicated reference shape checks).
 - Loader write concurrency hardening is in place via a single-writer lock to prevent concurrent rel-load deadlocks.
 - Label inference coverage was extended for D3FEND resource URIs (`/d3fentity/` → `D3fendResource`) to reduce rel-only endpoint misses.
+- CAPEC ATT&CK technique ID normalization is implemented in ETL (`src/etl/etl_capec.py`) so mappings are canonicalized to `Txxxx` / `Txxxx.xxx` before URI emission.
+- Task 5 regression coverage was added and validated (`tests/unit/test_etl_capec_attack_id_normalization.py`; `2 passed`).
 
 ### Still pending
 
 - P1 reporting/statistics correctness items (Section 1 tasks) remain open.
 - CVE CVSS v2.0/v3.0/v3.1/v4.0 ingestion update remains open.
-- CAPEC ATT&CK ID normalization and broader cross-standard enrichments remain open.
+- Broader cross-standard enrichments (CAR/SHIELD/ENGAGE/D3FEND connectivity and remaining audits) remain open.
 
 ---
 
@@ -180,6 +182,7 @@ Recent Phase A work has been validated and committed. This document now tracks b
 - **Task 5: Normalize CAPEC ATT&CK technique IDs before emitting URIs**
   Details: Canonicalize all mapped ATT&CK IDs to `Txxxx` / `Txxxx.xxx`; preserve source ID as provenance literal if needed.  
   Acceptance: significant increase in `IMPLEMENTED_AS` loaded relationships.
+  Status: **Completed (implementation + unit tests)**. Neo4j delta verification deferred until full graph reload.
 
 - **Task 6: Update CVE ETL to ingest NVD 2.0 CVSS metrics**
   Details: Parse `metrics.cvssMetricV2`, `cvssMetricV30`, `cvssMetricV31`, `cvssMetricV40`; emit version-separated score nodes and CVE→score edges.  
