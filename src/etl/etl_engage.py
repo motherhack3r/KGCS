@@ -12,6 +12,7 @@ import argparse
 from pathlib import Path
 import sys
 import os
+import re
 
 from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib import RDF, RDFS, XSD
@@ -113,13 +114,28 @@ class ENGAGEtoRDFTransformer:
             engage_id_full = f"ENGAGE-{engage_id}" if not engage_id.startswith("ENGAGE-") else engage_id
             concept_node = URIRef(f"{self.EX}engagement/{engage_id_full}")
 
-            if concept.get("DisruptsTechniques"):
-                for att_technique in concept["DisruptsTechniques"]:
-                    att_id = att_technique if isinstance(att_technique, str) else att_technique.get("ID", "")
-                    if att_id:
-                        att_id_full = f"{att_id}" if att_id.startswith("T") else f"T{att_id}"
-                        att_node = URIRef(f"{self.EX}technique/{att_id_full}")
-                        self.graph.add((concept_node, self.SEC.disrupts, att_node))
+            seen = set()
+            raw_values = concept.get("DisruptsTechniques") or []
+            if not isinstance(raw_values, list):
+                raw_values = [raw_values]
+
+            for att_technique in raw_values:
+                att_id = None
+                if isinstance(att_technique, str):
+                    att_id = _canonical_attack_id(att_technique)
+                elif isinstance(att_technique, dict):
+                    att_id = _canonical_attack_id(
+                        att_technique.get("ID")
+                        or att_technique.get("id")
+                        or att_technique.get("attack_id")
+                        or att_technique.get("attackId")
+                        or ""
+                    )
+
+                if att_id and att_id not in seen:
+                    seen.add(att_id)
+                    att_node = URIRef(f"{self.EX}technique/{att_id}")
+                    self.graph.add((concept_node, self.SEC.disrupts, att_node))
 
     def _add_goals(self, goals):
         """Add Goal nodes and link to approaches or engagement concepts."""
@@ -270,10 +286,22 @@ def _load_engage_data(input_path: str) -> dict:
         # Build attack mappings if present (activity -> [technique ids])
         am = file_datas.get("attack_mapping.json")
         if isinstance(am, dict):
-            # expecting keys to be activity ids or approach ids
+            # expecting keys to be activity ids or approach ids, values may be list of ids or dicts
             for k, v in am.items():
-                if isinstance(v, list):
-                    attack_mappings[k] = v
+                values = v if isinstance(v, list) else [v]
+                for item in values:
+                    att_id = _extract_attack_id(item)
+                    if att_id:
+                        attack_mappings.setdefault(k, []).append(att_id)
+        elif isinstance(am, list):
+            # common shape: [{"eac_id": "EAC0001", "attack_id": "T1007", ...}, ...]
+            for row in am:
+                if not isinstance(row, dict):
+                    continue
+                concept_id = row.get("eac_id") or row.get("activity_id") or row.get("activityId") or row.get("id")
+                att_id = _extract_attack_id(row)
+                if concept_id and att_id:
+                    attack_mappings.setdefault(str(concept_id), []).append(att_id)
 
         # Now normalize activities: prefer explicit activity maps, else scan files for items
         seen = set()
@@ -290,7 +318,12 @@ def _load_engage_data(input_path: str) -> dict:
                 approaches = approach_activity.get(aid, [])
                 categories = [approaches_map.get(a, {}).get("type") or approaches_map.get(a, {}).get("name") for a in approaches]
                 strategic_values = [approaches_map.get(a, {}).get("type") for a in approaches if approaches_map.get(a)]
-                disrupts = attack_mappings.get(aid) or []
+                disrupts = list(attack_mappings.get(aid) or [])
+                for attack_item in item.get("attack_techniques") or []:
+                    attack_id = _extract_attack_id(attack_item)
+                    if attack_id:
+                        disrupts.append(attack_id)
+                disrupts = sorted(set(disrupts))
                 normalized.append({
                     "ID": concept_id,
                     "Name": name,
@@ -322,7 +355,12 @@ def _load_engage_data(input_path: str) -> dict:
                     approaches = approach_activity.get(concept_id, [])
                     categories = [approaches_map.get(a, {}).get("type") or approaches_map.get(a, {}).get("name") for a in approaches]
                     strategic_values = [approaches_map.get(a, {}).get("type") for a in approaches if approaches_map.get(a)]
-                    disrupts = attack_mappings.get(concept_id) or []
+                    disrupts = list(attack_mappings.get(concept_id) or [])
+                    for attack_item in item.get("attack_techniques") or []:
+                        attack_id = _extract_attack_id(attack_item)
+                        if attack_id:
+                            disrupts.append(attack_id)
+                    disrupts = sorted(set(disrupts))
                     normalized.append({
                         "ID": concept_id,
                         "Name": name,
@@ -353,6 +391,25 @@ def _load_engage_data(input_path: str) -> dict:
         return result
     with open(input_path, "r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def _canonical_attack_id(value: str) -> str | None:
+    if not value:
+        return None
+    text = str(value).upper().replace("\\", "/")
+    match = re.search(r"T\d{4}(?:[./]\d{3})?", text)
+    if not match:
+        return None
+    return match.group(0).replace("/", ".")
+
+
+def _extract_attack_id(value) -> str | None:
+    if isinstance(value, str):
+        return _canonical_attack_id(value)
+    if isinstance(value, dict):
+        candidate = value.get("attack_id") or value.get("attackId") or value.get("id") or value.get("ID")
+        return _canonical_attack_id(candidate or "")
+    return None
 
 
 def main():

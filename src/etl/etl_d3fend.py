@@ -12,6 +12,7 @@ import argparse
 from pathlib import Path
 import sys
 import os
+import re
 
 from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib import RDF, RDFS, XSD
@@ -459,13 +460,15 @@ class D3FENDtoRDFTransformer:
             def_tech_id = self._resolve_def_tech_id(binding)
             
             att_tech_id = None
-            if "off_tech_id" in binding and isinstance(binding["off_tech_id"], dict):
-                att_tech_id = binding["off_tech_id"].get("value")
+            for key in ("off_tech_id", "attack_id", "technique_id", "off_technique"):
+                if key in binding and isinstance(binding[key], dict):
+                    att_tech_id = binding[key].get("value") or att_tech_id
             
             # If we have both, create a mitigates relationship
             if def_tech_id and att_tech_id:
-                # Normalize IDs
-                att_id_full = f"{att_tech_id}" if str(att_tech_id).startswith("T") else f"T{att_tech_id}"
+                att_id_full = self._canonical_attack_id(att_tech_id)
+                if not att_id_full:
+                    continue
                 def_tech_uri = self._normalize_d3fend_id(def_tech_id)
 
                 def_tech_node = URIRef(f"{self.EX}deftech/{def_tech_uri}")
@@ -473,6 +476,15 @@ class D3FENDtoRDFTransformer:
                 
                 # Add the mitigates relationship
                 self.graph.add((def_tech_node, self.SEC.mitigates, att_node))
+
+    def _canonical_attack_id(self, value: str) -> str | None:
+        if not value:
+            return None
+        text = str(value).upper().replace("\\", "/")
+        match = re.search(r"T\d{4}(?:[./]\d{3})?", text)
+        if not match:
+            return None
+        return match.group(0).replace("/", ".")
 
     def _is_defensive_technique(self, item: dict) -> bool:
         types = item.get("@type")
@@ -606,9 +618,9 @@ class D3FENDtoRDFTransformer:
             if technique.get("MitigatesTechniques"):
                 for att_technique in technique["MitigatesTechniques"]:
                     att_id = att_technique if isinstance(att_technique, str) else att_technique.get("ID", "")
+                    att_id = self._canonical_attack_id(str(att_id))
                     if att_id:
-                        att_id_full = f"{att_id}" if att_id.startswith("T") else f"T{att_id}"
-                        att_node = URIRef(f"{self.EX}technique/{att_id_full}")
+                        att_node = URIRef(f"{self.EX}technique/{att_id}")
                         self.graph.add((technique_node, self.SEC.mitigates, att_node))
 
 

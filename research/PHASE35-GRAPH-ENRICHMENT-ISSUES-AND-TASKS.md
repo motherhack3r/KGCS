@@ -21,12 +21,17 @@ Recent Phase A work has been validated and committed. This document now tracks b
 - CWE extraction now preserves schema-native sub-entity IDs (`Consequence_ID`, `Detection_Method_ID`, `Mitigation_ID`) for stable URI emission and provenance fidelity.
 - CWE SHACL status enum was aligned with current CWE schema values (`Deprecated|Draft|Incomplete|Obsolete|Stable|Usable`) in `docs/ontology/shacl/cwe-shapes.ttl`.
 - Task 7/8 regression coverage was added and validated (`tests/unit/test_etl_cwe_enrichment_extraction.py`; focused suite passing).
+- CAR ETL now extracts ATT&CK IDs from `coverage[].technique` and `coverage[].subtechniques`, with canonical `Txxxx` / `Txxxx.xxx` normalization for `DETECTS` emission (`src/etl/etl_car.py`).
+- SHIELD ETL directory normalization now preserves `attack_techniques` (and `Counters*` variants) from detail-file shapes and emits `COUNTERS` links (`src/etl/etl_shield.py`).
+- ENGAGE ETL now ingests list-based and dict-based `attack_mapping.json` forms (including `eac_id` ↔ `attack_id`) and additional activity `attack_techniques`, normalized before `DISRUPTS` emission (`src/etl/etl_engage.py`).
+- D3FEND ETL SPARQL mapping ingestion now canonicalizes ATT&CK IDs from URI/literal forms (including slash-form subtechniques) before `MITIGATES` emission (`src/etl/etl_d3fend.py`).
+- P2 regression coverage added and validated (`tests/unit/test_etl_car_coverage_attack_links.py`, `tests/unit/test_etl_shield_attack_mapping.py`, `tests/unit/test_etl_engage_attack_mapping.py`, `tests/unit/test_etl_d3fend_attack_id_normalization.py`; focused suite passing).
 
 ### Still pending
 
 - P1 reporting/statistics correctness items (Section 1 tasks) remain open.
 - CVE CVSS v2.0/v3.0/v3.1/v4.0 ingestion update remains open.
-- Broader cross-standard enrichments (CAR/SHIELD/ENGAGE/D3FEND connectivity) and remaining loader/stat audits remain open.
+- Remaining loader/stat audits and full post-fix Neo4j rerun/stat publication remain open.
 
 ---
 
@@ -213,18 +218,22 @@ Recent Phase A work has been validated and committed. This document now tracks b
 - **Task 9: CAR: parse ATT&CK mappings from `coverage[]` structures**
   Details: Extract both primary techniques and subtechniques from YAML coverage blocks and emit `DETECTS` edges against canonical technique/subtechnique URIs.  
   Acceptance: substantial increase in CAR↔ATT&CK links.
+  Status: **Completed (implementation + focused unit tests)**. Neo4j delta verification deferred until full graph reload.
 
 - **Task 10: SHIELD: preserve and map ATT&CK technique associations from raw detail files**
   Details: Extend normalization to keep `attack_techniques` and map to graph relationships.  
   Acceptance: non-zero SHIELD↔ATT&CK relationship counts.
+  Status: **Completed (implementation + focused unit tests)**. Neo4j delta verification deferred until full graph reload.
 
 - **Task 11: ENGAGE: broaden attack mapping extraction and ID normalization**
   Details: Ensure `DisruptsTechniques` is populated from available mapping files and canonicalized.  
   Acceptance: non-zero ENGAGE↔ATT&CK relationship counts.
+  Status: **Completed (implementation + focused unit tests)**. Neo4j delta verification deferred until full graph reload.
 
 - **Task 12: D3FEND ingestion compatibility pass**
   Details: Support available raw source forms (`.owl` and/or generated mapping artifacts) to emit valid ATT&CK links.  
   Acceptance: non-zero D3FEND↔ATT&CK relationship counts from current dataset.
+  Status: **Completed (implementation + focused unit tests for mapping normalization paths)**. Full dataset-level Neo4j count verification deferred until full graph reload.
 
 ---
 

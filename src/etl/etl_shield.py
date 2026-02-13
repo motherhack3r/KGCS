@@ -12,6 +12,7 @@ import argparse
 from pathlib import Path
 import sys
 import os
+import re
 
 from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib import RDF, RDFS, XSD
@@ -110,22 +111,31 @@ class SHIELDtoRDFTransformer:
             shield_id_full = f"SHIELD-{shield_id}" if not shield_id.startswith("SHIELD-") else shield_id
             technique_node = URIRef(f"{self.EX}deception/{shield_id_full}")
 
-            if technique.get("CountersTechniques"):
-                for att_technique in technique["CountersTechniques"]:
-                    att_id = att_technique if isinstance(att_technique, str) else att_technique.get("ID", "")
-                    if att_id:
-                        att_id_full = f"{att_id}" if att_id.startswith("T") else f"T{att_id}"
-                        att_node = URIRef(f"{self.EX}technique/{att_id_full}")
+            seen = set()
+            for key in ("CountersTechniques", "Counters", "attack_techniques"):
+                values = technique.get(key)
+                if not values:
+                    continue
+                if not isinstance(values, list):
+                    values = [values]
+
+                for att_technique in values:
+                    att_id = None
+                    if isinstance(att_technique, str):
+                        att_id = _canonical_attack_id(att_technique)
+                    elif isinstance(att_technique, dict):
+                        att_id = _canonical_attack_id(
+                            att_technique.get("ID")
+                            or att_technique.get("id")
+                            or att_technique.get("attack_id")
+                            or att_technique.get("attackId")
+                            or ""
+                        )
+
+                    if att_id and att_id not in seen:
+                        seen.add(att_id)
+                        att_node = URIRef(f"{self.EX}technique/{att_id}")
                         self.graph.add((technique_node, self.SEC.counters, att_node))
-            # Ensure to handle missing/optional fields gracefully
-            if technique.get("Counters"):
-                counters = technique["Counters"]
-                if isinstance(counters, list):
-                    for tech_id in counters:
-                        if tech_id:
-                            self.graph.add((technique_node, self.SEC.counters, URIRef(f"{self.EX}technique/{tech_id}")))
-                elif isinstance(counters, str):
-                    self.graph.add((technique_node, self.SEC.counters, URIRef(f"{self.EX}technique/{counters}")))
 
 
 def _load_shield_data(input_path: str) -> dict:
@@ -147,10 +157,20 @@ def _load_shield_data(input_path: str) -> dict:
                         if isinstance(item, dict):
                             items.append(item)
                 elif isinstance(data, dict):
+                    # Dictionary keyed by ID -> detail objects
+                    if all(isinstance(v, dict) for v in data.values()) and not any(
+                        k in data for k in ("DeceptionTechniques", "techniques", "Techniques", "items")
+                    ):
+                        for key, value in data.items():
+                            obj = dict(value)
+                            obj.setdefault("id", key)
+                            items.append(obj)
                     # Try common keys
-                    items = data.get("DeceptionTechniques") or data.get("techniques") or data.get("Techniques") or data.get("items") or []
-                    if isinstance(items, dict):
-                        items = [items]
+                    keyed_items = data.get("DeceptionTechniques") or data.get("techniques") or data.get("Techniques") or data.get("items") or []
+                    if isinstance(keyed_items, dict):
+                        keyed_items = [keyed_items]
+                    if isinstance(keyed_items, list):
+                        items.extend([it for it in keyed_items if isinstance(it, dict)])
                 # else: skip non-dict, non-list
                 for item in items:
                     if not isinstance(item, dict):
@@ -158,14 +178,36 @@ def _load_shield_data(input_path: str) -> dict:
                     tech_id = item.get("id") or item.get("ID")
                     name = item.get("name") or item.get("Name")
                     description = item.get("description") or item.get("Description") or item.get("long_description")
+
+                    counters = []
+                    for key in ("attack_techniques", "CountersTechniques", "Counters"):
+                        value = item.get(key)
+                        if not value:
+                            continue
+                        if isinstance(value, list):
+                            counters.extend(value)
+                        else:
+                            counters.append(value)
+
                     normalized.append({
                         "ID": tech_id,
                         "Name": name,
-                        "Description": description
+                        "Description": description,
+                        "CountersTechniques": counters,
                     })
         return {"DeceptionTechniques": normalized}
     with open(input_path, "r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def _canonical_attack_id(value: str) -> str | None:
+    if not value:
+        return None
+    text = str(value).upper().replace("\\", "/")
+    match = re.search(r"T\d{4}(?:[./]\d{3})?", text)
+    if not match:
+        return None
+    return match.group(0).replace("/", ".")
 
 
 def main():

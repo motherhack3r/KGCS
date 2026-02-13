@@ -11,6 +11,7 @@ Usage:
 import argparse
 import glob
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
@@ -205,6 +206,7 @@ def _extract_technique_ids(analytic: Dict[str, Any]) -> Iterable[str]:
         "attck_techniques",
         "attackTechniques",
         "attack_technique_ids",
+        "coverage",
     ]
     seen = set()
     for key in keys:
@@ -222,6 +224,17 @@ def _normalize_technique_items(value: Any) -> Iterable[str]:
         return []
     if isinstance(value, list):
         for entry in value:
+            if isinstance(entry, dict) and ("technique" in entry or "subtechniques" in entry):
+                tech = _extract_technique_id(entry.get("technique"))
+                if tech:
+                    yield tech
+                subtechs = entry.get("subtechniques")
+                if isinstance(subtechs, list):
+                    for sub in subtechs:
+                        sub_id = _extract_technique_id(sub)
+                        if sub_id:
+                            yield sub_id
+                continue
             item = _extract_technique_id(entry)
             if item:
                 yield item
@@ -233,12 +246,22 @@ def _normalize_technique_items(value: Any) -> Iterable[str]:
 
 def _extract_technique_id(entry: Any) -> str | None:
     if isinstance(entry, str):
-        return entry.strip()
+        return _canonical_attack_id(entry)
     if isinstance(entry, dict):
         for key in ("id", "ID", "technique_id", "techniqueId", "attack_id", "attackId"):
             if entry.get(key):
-                return str(entry.get(key)).strip()
+                return _canonical_attack_id(str(entry.get(key)).strip())
     return None
+
+
+def _canonical_attack_id(value: str) -> str | None:
+    if not value:
+        return None
+    text = str(value).upper().replace("\\", "/")
+    match = re.search(r"T\d{4}(?:[./]\d{3})?", text)
+    if not match:
+        return None
+    return match.group(0).replace("/", ".")
 
 
 def _extract_description(description_obj: Any) -> str:
