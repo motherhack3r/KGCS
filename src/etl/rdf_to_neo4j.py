@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 from urllib.parse import urlparse
 from dataclasses import dataclass
+from contextlib import contextmanager, nullcontext
 from dotenv import load_dotenv
 from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -33,6 +34,11 @@ from src.config import neo4j_config
 from rdflib import Graph, Namespace, RDF, Literal, URIRef
 from rdflib.term import Node
 from datetime import datetime
+
+if os.name == 'nt':
+    import msvcrt
+else:
+    import fcntl
 
 
 @dataclass
@@ -507,6 +513,8 @@ class RDFtoNeo4jTransformer:
             return "Tactic"
         if "/defensiveTechnique/" in path or "/deftech/" in path:
             return "DefensiveTechnique"
+        if "/d3fentity/" in path:
+            return "D3fendResource"
         if "/detectionAnalytic/" in path:
             return "DetectionAnalytic"
         if "/analytic/" in path:
@@ -525,7 +533,8 @@ class RDFtoNeo4jTransformer:
             return "Score"
 
         return None
-    
+
+
     def _predicate_to_relationship(self, predicate_name: str) -> str:
         """Convert RDF predicate name to Neo4j relationship type (UPPER_SNAKE_CASE)."""
         # Convert camelCase or snake_case to UPPER_SNAKE_CASE
@@ -926,6 +935,48 @@ def _update_progress(completed: int, total: int, worker_id: int | None = None, p
         print(f"\r{message}", end='', flush=True)
 
 
+@contextmanager
+def neo4j_loader_lock(lock_path: str = "tmp/rdf_to_neo4j.lock"):
+    """Prevent concurrent loader instances from writing to Neo4j."""
+    lock_file = Path(lock_path)
+    lock_file.parent.mkdir(parents=True, exist_ok=True)
+    handle = open(lock_file, "a+", encoding="utf-8")
+
+    try:
+        try:
+            if os.name == 'nt':
+                handle.seek(0)
+                if not handle.read(1):
+                    handle.write("0")
+                    handle.flush()
+                handle.seek(0)
+                msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            raise RuntimeError(
+                "Another rdf_to_neo4j.py process is active. "
+                "Stop concurrent loaders before retrying."
+            )
+
+        handle.seek(0)
+        handle.truncate()
+        handle.write(f"pid={os.getpid()} start={datetime.utcnow().isoformat()}Z\n")
+        handle.flush()
+
+        yield
+    finally:
+        try:
+            if os.name == 'nt':
+                handle.seek(0)
+                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+            else:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+        except Exception:
+            pass
+        handle.close()
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="RDF-to-Neo4j loader")
@@ -996,238 +1047,240 @@ def main():
     print("=" * 100)
     print("RDF-TO-NEO4J TRANSFORMATION")
     print("=" * 100)
+
+    use_write_lock = not args.dry_run and not args.export_only
     
     try:
-        if args.chunk_size and args.chunk_size > 0:
-            chunk_files, total_triples = chunk_ttl_file(args.ttl, args.chunk_size)
-            total_chunks = len(chunk_files)
-            completed = 0
-            aggregate_labels: Dict[str, int] = {}
-            aggregate_rels = 0
-            aggregate_rel_types: Dict[str, int] = {}
+        lock_context = neo4j_loader_lock() if use_write_lock else nullcontext()
+        with lock_context:
+            if args.chunk_size and args.chunk_size > 0:
+                chunk_files, total_triples = chunk_ttl_file(args.ttl, args.chunk_size)
+                total_chunks = len(chunk_files)
+                completed = 0
+                aggregate_labels: Dict[str, int] = {}
+                aggregate_rels = 0
+                aggregate_rel_types: Dict[str, int] = {}
 
-            if args.dry_run:
-                workers = max(args.workers or 1, 1)
-                if workers > 1:
-                    with ProcessPoolExecutor(max_workers=workers) as executor:
-                        futures = [executor.submit(_dry_run_chunk, tmp_path, args.skip_deprecates) for _, tmp_path in chunk_files]
-                        for future in as_completed(futures):
-                            result = future.result()
+                if args.dry_run:
+                    workers = max(args.workers or 1, 1)
+                    if workers > 1:
+                        with ProcessPoolExecutor(max_workers=workers) as executor:
+                            futures = [executor.submit(_dry_run_chunk, tmp_path, args.skip_deprecates) for _, tmp_path in chunk_files]
+                            for future in as_completed(futures):
+                                result = future.result()
+                                completed += 1
+                                worker_id = ((completed - 1) % workers) + 1
+                                _update_progress(completed, total_chunks, worker_id, args.progress_newline)
+                                _merge_label_counts(aggregate_labels, result.get('labels', {}))
+                                aggregate_rels += result.get('relationships', 0)
+                                _merge_label_counts(aggregate_rel_types, result.get('rel_types', {}))
+                    else:
+                        for chunk_idx, tmp_path in chunk_files:
+                            result = _dry_run_chunk(tmp_path, args.skip_deprecates)
                             completed += 1
-                            worker_id = ((completed - 1) % workers) + 1
-                            _update_progress(completed, total_chunks, worker_id, args.progress_newline)
+                            _update_progress(completed, total_chunks, ((chunk_idx - 1) % workers) + 1, args.progress_newline)
                             _merge_label_counts(aggregate_labels, result.get('labels', {}))
                             aggregate_rels += result.get('relationships', 0)
                             _merge_label_counts(aggregate_rel_types, result.get('rel_types', {}))
+
+                    if total_chunks:
+                        print()
+                    print("\nDry run enabled — skipping Neo4j load.")
                 else:
-                    for chunk_idx, tmp_path in chunk_files:
-                        result = _dry_run_chunk(tmp_path, args.skip_deprecates)
-                        completed += 1
-                        _update_progress(completed, total_chunks, ((chunk_idx - 1) % workers) + 1, args.progress_newline)
-                        _merge_label_counts(aggregate_labels, result.get('labels', {}))
-                        aggregate_rels += result.get('relationships', 0)
-                        _merge_label_counts(aggregate_rel_types, result.get('rel_types', {}))
+                    if args.workers and args.workers > 1:
+                        print("\nNote: workers > 1 is ignored for Neo4j load to avoid write contention.")
 
-                if total_chunks:
-                    print()
-                print("\nDry run enabled — skipping Neo4j load.")
-            else:
-                if args.workers and args.workers > 1:
-                    print("\nNote: workers > 1 is ignored for Neo4j load to avoid write contention.")
+                    from neo4j import GraphDatabase
 
-                from neo4j import GraphDatabase
-
-                print(f"\nConnecting to Neo4j at {neo4j_config.uri}...")
-                driver = GraphDatabase.driver(
-                    neo4j_config.uri,
-                    auth=(neo4j_config.user, neo4j_config.password),
-                    encrypted=neo4j_config.encrypted
-                )
-
-                with driver.session(database=target_db) as session:
-                    transformer = RDFtoNeo4jTransformer(
-                        args.ttl,
-                        batch_size=args.batch_size,
-                        skip_deprecates=args.skip_deprecates,
+                    print(f"\nConnecting to Neo4j at {neo4j_config.uri}...")
+                    driver = GraphDatabase.driver(
+                        neo4j_config.uri,
+                        auth=(neo4j_config.user, neo4j_config.password),
+                        encrypted=neo4j_config.encrypted
                     )
-                    if args.reset_db and not args.dry_run:
-                        if not transformer.reset_database(driver, target_db):
-                            driver.close()
-                            return 1
-                    transformer._create_indexes(session)
 
-                # Pass 1: load nodes only (unless relationships-only)
-                if not args.rels_only:
-                    for chunk_idx, tmp_path in chunk_files:
+                    with driver.session(database=target_db) as session:
                         transformer = RDFtoNeo4jTransformer(
-                            tmp_path,
+                            args.ttl,
                             batch_size=args.batch_size,
-                            parse_heartbeat_seconds=args.parse_heartbeat_seconds,
-                            relationship_batch_size=args.rel_batch_size,
                             skip_deprecates=args.skip_deprecates,
                         )
-                        if args.fast_parse:
-                            transformer.extract_nodes_and_relationships_stream(
-                                Path(tmp_path),
-                                verbose=False,
-                                include_relationships=False,
+                        if args.reset_db and not args.dry_run:
+                            if not transformer.reset_database(driver, target_db):
+                                driver.close()
+                                return 1
+                        transformer._create_indexes(session)
+
+                    if not args.rels_only:
+                        for _, tmp_path in chunk_files:
+                            transformer = RDFtoNeo4jTransformer(
+                                tmp_path,
+                                batch_size=args.batch_size,
+                                parse_heartbeat_seconds=args.parse_heartbeat_seconds,
+                                relationship_batch_size=args.rel_batch_size,
+                                skip_deprecates=args.skip_deprecates,
                             )
-                        else:
-                            g = transformer.load_rdf()
-                            transformer.extract_nodes_and_relationships(g, verbose=False, include_relationships=False)
-                        success = transformer.load_to_neo4j(
-                            driver,
-                            include_indexes=False,
-                            include_stats=False,
-                            database=target_db,
-                            load_nodes=True,
-                            load_relationships=False,
-                        )
-                        if not success:
-                            driver.close()
-                            return 1
-                        completed += 1
-                        _update_progress(completed, total_chunks, None, args.progress_newline)
-                        _merge_label_counts(aggregate_labels, dict(transformer.stats['labels']))
-
-                # Pass 2: load relationships after all nodes exist (unless nodes-only)
-                if not args.nodes_only:
-                    completed = 0
-                    for chunk_idx, tmp_path in chunk_files:
-                        transformer = RDFtoNeo4jTransformer(
-                            tmp_path,
-                            batch_size=args.batch_size,
-                            parse_heartbeat_seconds=args.parse_heartbeat_seconds,
-                            relationship_batch_size=args.rel_batch_size,
-                            skip_deprecates=args.skip_deprecates,
-                        )
-                        if args.fast_parse:
-                            transformer.extract_nodes_and_relationships_stream(
-                                Path(tmp_path),
-                                verbose=False,
-                                include_relationships=True,
-                                allow_external_targets=True,
-                                allow_missing_sources=args.rels_only,
+                            if args.fast_parse:
+                                transformer.extract_nodes_and_relationships_stream(
+                                    Path(tmp_path),
+                                    verbose=False,
+                                    include_relationships=False,
+                                )
+                            else:
+                                g = transformer.load_rdf()
+                                transformer.extract_nodes_and_relationships(g, verbose=False, include_relationships=False)
+                            success = transformer.load_to_neo4j(
+                                driver,
+                                include_indexes=False,
+                                include_stats=False,
+                                database=target_db,
+                                load_nodes=True,
+                                load_relationships=False,
                             )
-                        else:
-                            g = transformer.load_rdf()
-                            transformer.extract_nodes_and_relationships(
-                                g,
-                                verbose=False,
-                                include_relationships=True,
-                                allow_external_targets=True,
-                                allow_missing_sources=args.rels_only,
+                            if not success:
+                                driver.close()
+                                return 1
+                            completed += 1
+                            _update_progress(completed, total_chunks, None, args.progress_newline)
+                            _merge_label_counts(aggregate_labels, dict(transformer.stats['labels']))
+
+                    if not args.nodes_only:
+                        completed = 0
+                        for _, tmp_path in chunk_files:
+                            transformer = RDFtoNeo4jTransformer(
+                                tmp_path,
+                                batch_size=args.batch_size,
+                                parse_heartbeat_seconds=args.parse_heartbeat_seconds,
+                                relationship_batch_size=args.rel_batch_size,
+                                skip_deprecates=args.skip_deprecates,
                             )
-                        success = transformer.load_to_neo4j(
-                            driver,
-                            include_indexes=False,
-                            include_stats=False,
-                            database=target_db,
-                            load_nodes=False,
-                            load_relationships=True,
-                        )
-                        if not success:
-                            driver.close()
-                            return 1
-                        completed += 1
-                        _update_progress(completed, total_chunks, None, args.progress_newline)
-                        aggregate_rels += transformer.stats['relationships']
+                            if args.fast_parse:
+                                transformer.extract_nodes_and_relationships_stream(
+                                    Path(tmp_path),
+                                    verbose=False,
+                                    include_relationships=True,
+                                    allow_external_targets=True,
+                                    allow_missing_sources=args.rels_only,
+                                )
+                            else:
+                                g = transformer.load_rdf()
+                                transformer.extract_nodes_and_relationships(
+                                    g,
+                                    verbose=False,
+                                    include_relationships=True,
+                                    allow_external_targets=True,
+                                    allow_missing_sources=args.rels_only,
+                                )
+                            success = transformer.load_to_neo4j(
+                                driver,
+                                include_indexes=False,
+                                include_stats=False,
+                                database=target_db,
+                                load_nodes=False,
+                                load_relationships=True,
+                            )
+                            if not success:
+                                driver.close()
+                                return 1
+                            completed += 1
+                            _update_progress(completed, total_chunks, None, args.progress_newline)
+                            aggregate_rels += transformer.stats['relationships']
 
-                driver.close()
-                if total_chunks:
-                    print()
+                    driver.close()
+                    if total_chunks:
+                        print()
 
-            for _, tmp_path in chunk_files:
-                try:
-                    os.remove(tmp_path)
-                except Exception:
-                    pass
+                for _, tmp_path in chunk_files:
+                    try:
+                        os.remove(tmp_path)
+                    except Exception:
+                        pass
 
-            print("\nSummary:")
-            for label, count in sorted(aggregate_labels.items()):
-                print(f"   * {label}: {count}")
-            if aggregate_rel_types:
-                print("   * Relationships by type:")
-                for rel_type, count in sorted(aggregate_rel_types.items(), key=lambda x: -x[1]):
-                    print(f"      - {rel_type}: {count}")
-            print(f"   * Relationships: {aggregate_rels}")
-            print(f"   * Triples scanned: {total_triples}")
+                print("\nSummary:")
+                for label, count in sorted(aggregate_labels.items()):
+                    print(f"   * {label}: {count}")
+                if aggregate_rel_types:
+                    print("   * Relationships by type:")
+                    for rel_type, count in sorted(aggregate_rel_types.items(), key=lambda x: -x[1]):
+                        print(f"      - {rel_type}: {count}")
+                print(f"   * Relationships: {aggregate_rels}")
+                print(f"   * Triples scanned: {total_triples}")
 
-            if args.dry_run:
+                if args.dry_run:
+                    return 0
+
+                print("\n" + "=" * 100)
+                print("SUCCESS: RDF-TO-NEO4J TRANSFORMATION COMPLETE")
+                print("=" * 100)
                 return 0
 
-            print("\n" + "=" * 100)
-            print("SUCCESS: RDF-TO-NEO4J TRANSFORMATION COMPLETE")
-            print("=" * 100)
-            return 0
-
-        transformer = RDFtoNeo4jTransformer(
-            args.ttl,
-            batch_size=args.batch_size,
-            parse_heartbeat_seconds=args.parse_heartbeat_seconds,
-            relationship_batch_size=args.rel_batch_size,
-            skip_deprecates=args.skip_deprecates,
-        )
-        if args.fast_parse:
-            transformer.extract_nodes_and_relationships_stream(
-                Path(args.ttl),
-                include_relationships=not args.nodes_only,
-                include_literals=not args.rels_only,
-                allow_external_targets=args.rels_only,
-                allow_missing_sources=args.rels_only,
+            transformer = RDFtoNeo4jTransformer(
+                args.ttl,
+                batch_size=args.batch_size,
+                parse_heartbeat_seconds=args.parse_heartbeat_seconds,
+                relationship_batch_size=args.rel_batch_size,
+                skip_deprecates=args.skip_deprecates,
             )
-        else:
-            g = transformer.load_rdf()
-            transformer.extract_nodes_and_relationships(
-                g,
-                include_relationships=not args.nodes_only,
-                allow_external_targets=args.rels_only,
-                allow_missing_sources=args.rels_only,
+            if args.fast_parse:
+                transformer.extract_nodes_and_relationships_stream(
+                    Path(args.ttl),
+                    include_relationships=not args.nodes_only,
+                    include_literals=not args.rels_only,
+                    allow_external_targets=args.rels_only,
+                    allow_missing_sources=args.rels_only,
+                )
+            else:
+                g = transformer.load_rdf()
+                transformer.extract_nodes_and_relationships(
+                    g,
+                    include_relationships=not args.nodes_only,
+                    allow_external_targets=args.rels_only,
+                    allow_missing_sources=args.rels_only,
+                )
+
+            if args.dry_run:
+                print()
+                print("Dry run enabled — skipping Neo4j load.")
+                print("\nSummary:")
+                for label, count in sorted(transformer.stats['labels'].items()):
+                    print(f"   * {label}: {count}")
+                rel_types = transformer.stats.get('rel_types', {})
+                if rel_types:
+                    print("   * Relationships by type:")
+                    for rel_type, count in sorted(rel_types.items(), key=lambda x: -x[1]):
+                        print(f"      - {rel_type}: {count}")
+                print(f"   * Relationships: {transformer.stats['relationships']}")
+                return 0
+
+            from neo4j import GraphDatabase
+
+            print(f"\nConnecting to Neo4j at {neo4j_config.uri}...")
+            driver = GraphDatabase.driver(
+                neo4j_config.uri,
+                auth=(neo4j_config.user, neo4j_config.password),
+                encrypted=neo4j_config.encrypted
             )
 
-        if args.dry_run:
-            print()
-            print("Dry run enabled — skipping Neo4j load.")
-            print("\nSummary:")
-            for label, count in sorted(transformer.stats['labels'].items()):
-                print(f"   * {label}: {count}")
-            rel_types = transformer.stats.get('rel_types', {})
-            if rel_types:
-                print("   * Relationships by type:")
-                for rel_type, count in sorted(rel_types.items(), key=lambda x: -x[1]):
-                    print(f"      - {rel_type}: {count}")
-            print(f"   * Relationships: {transformer.stats['relationships']}")
-            return 0
+            if args.reset_db and not args.dry_run:
+                if not transformer.reset_database(driver, target_db):
+                    driver.close()
+                    return 1
 
-        from neo4j import GraphDatabase
+            success = transformer.load_to_neo4j(
+                driver,
+                database=target_db,
+                load_nodes=not args.rels_only,
+                load_relationships=not args.nodes_only,
+            )
+            driver.close()
 
-        print(f"\nConnecting to Neo4j at {neo4j_config.uri}...")
-        driver = GraphDatabase.driver(
-            neo4j_config.uri,
-            auth=(neo4j_config.user, neo4j_config.password),
-            encrypted=neo4j_config.encrypted
-        )
-
-        if args.reset_db and not args.dry_run:
-            if not transformer.reset_database(driver, target_db):
-                driver.close()
+            if success:
+                print("\n" + "=" * 100)
+                print("SUCCESS: RDF-TO-NEO4J TRANSFORMATION COMPLETE")
+                print("=" * 100)
+                return 0
+            else:
                 return 1
-
-        success = transformer.load_to_neo4j(
-            driver,
-            database=target_db,
-            load_nodes=not args.rels_only,
-            load_relationships=not args.nodes_only,
-        )
-        driver.close()
-
-        if success:
-            print("\n" + "=" * 100)
-            print("SUCCESS: RDF-TO-NEO4J TRANSFORMATION COMPLETE")
-            print("=" * 100)
-            return 0
-        else:
-            return 1
             
     except Exception as e:
         print(f"\nError: {e}")
