@@ -4,6 +4,24 @@
 **Branch:** `feat/phase35-graph-enrichment`  
 **Scope:** Pre-implementation analysis before applying enrichment fixes.
 
+## Status Update (2026-02-13, Post Phase A Validation)
+
+Recent Phase A work has been validated and committed. This document now tracks both outstanding enrichment gaps and items already addressed.
+
+### Completed in current branch
+
+- D3FEND Phase A relationship families now materialize in Neo4j (`ANALYZES`, `MONITORS`, `HARDENS`, `FILTERS`, `ISOLATES`, `RESTRICTS`, `ENABLES`, `BLOCKS`) with non-zero counts in validation artifacts.
+- D3FEND ETL emits stronger reference/resource typing for Phase A assertions.
+- SHACL constraints for D3FEND Phase A were aligned for operational validation (including `ex:references` IRI-kind enforcement and dedicated reference shape checks).
+- Loader write concurrency hardening is in place via a single-writer lock to prevent concurrent rel-load deadlocks.
+- Label inference coverage was extended for D3FEND resource URIs (`/d3fentity/` → `D3fendResource`) to reduce rel-only endpoint misses.
+
+### Still pending
+
+- P1 reporting/statistics correctness items (Section 1 tasks) remain open.
+- CVE CVSS v2.0/v3.0/v3.1/v4.0 ingestion update remains open.
+- CAPEC ATT&CK ID normalization and broader cross-standard enrichments remain open.
+
 ---
 
 ## (A) Detailed List of Issues Found
@@ -206,6 +224,7 @@
 - **Task 13: Audit `_infer_label_from_uri` coverage against all rel-only stage outputs**
   Details: Add alias support for any uncovered URI patterns.  
   Acceptance: zero or near-zero missing source/target label inference for rel files.
+  Status: **Partially complete** (D3FEND `/d3fentity/` mapping added; full multi-standard audit still pending).
 
 - **Task 14: Add targeted verification scripts and regression checks**
   Details: Add relationship directionality checks, causal chain completeness checks, and per-standard link coverage checks (CAPEC↔ATT&CK, ATT&CK↔Defense layers).  
@@ -214,6 +233,7 @@
 - **Task 15: Regenerate and publish updated stats artifact after fixes**
   Details: Re-run ETL stages affected by fixes, reload Neo4j, and extract revised stats.  
   Acceptance: artifact demonstrates corrected metrics and expected enrichment improvements.
+  Status: **Partially complete** (Stage 5 D3FEND-focused artifacts published; full Phase 3.5 post-fix global artifact still pending).
 
 ---
 
