@@ -521,7 +521,11 @@ class RDFtoNeo4jTransformer:
             return "DetectionAnalytic"
         if "/deceptionTechnique/" in path:
             return "DeceptionTechnique"
+        if "/deception/" in path:
+            return "DeceptionTechnique"
         if "/engagementConcept/" in path:
+            return "EngagementConcept"
+        if "/engagement/" in path:
             return "EngagementConcept"
         if "/reference/" in path:
             return "Reference"
