@@ -282,13 +282,19 @@ def main():
 
     graph = combined_graph
 
-    os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
-    print(f"Writing RDF to {args.output}...")
-    if args.format == "nt":
-        write_graph_ntriples_lines(graph, args.output, append=args.append)
-    else:
-        write_graph_turtle_lines(graph, args.output, include_prefixes=not args.append, append=args.append)
 
+    # Always write full TTL to tmp/
+    from pathlib import Path
+    full_ttl_name = Path(args.output).name
+    tmp_full_path = Path("tmp") / full_ttl_name
+    Path(tmp_full_path).parent.mkdir(parents=True, exist_ok=True)
+    print(f"Writing full RDF to {tmp_full_path}...")
+    if args.format == "nt":
+        write_graph_ntriples_lines(graph, str(tmp_full_path), append=args.append)
+    else:
+        write_graph_turtle_lines(graph, str(tmp_full_path), include_prefixes=not args.append, append=args.append)
+
+    # Write nodes/rels to samples/ if requested
     if args.nodes_out and args.rels_out:
         os.makedirs(os.path.dirname(args.nodes_out) or ".", exist_ok=True)
         os.makedirs(os.path.dirname(args.rels_out) or ".", exist_ok=True)

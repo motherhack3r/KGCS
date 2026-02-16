@@ -7,9 +7,10 @@ Usage:
                               --output data/d3fend/samples/d3fend-output.ttl
 """
 
+from pathlib import Path
 import json
 import argparse
-from pathlib import Path
+
 import sys
 import os
 
@@ -589,15 +590,29 @@ def main():
         print(f"Error: no D3FEND JSON files loaded from {args.input}")
         return 1
 
-    # Write the combined graph to output
-    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-    print(f"Writing RDF to {args.output}...")
-    if args.format == "nt":
-        write_graph_ntriples_lines(transformer.graph, args.output, append=args.append)
-    else:
-        write_graph_turtle_lines(transformer.graph, args.output, include_prefixes=not args.append, append=args.append)
 
+    # Always write full TTL to tmp/
+    full_ttl_name = Path(args.output).name
+    tmp_full_path = Path("tmp") / full_ttl_name
+    Path(tmp_full_path).parent.mkdir(parents=True, exist_ok=True)
+    print(f"Writing full RDF to {tmp_full_path}...")
+    if args.format == "nt":
+        write_graph_ntriples_lines(transformer.graph, str(tmp_full_path), append=args.append)
+    else:
+        write_graph_turtle_lines(transformer.graph, str(tmp_full_path), include_prefixes=not args.append, append=args.append)
+
+    # Write nodes/rels to samples/ if requested
+    samples_dir = os.path.join('data', 'd3fend', 'samples')
+    os.makedirs(samples_dir, exist_ok=True)
     if args.nodes_out and args.rels_out:
+        nodes_dir = os.path.dirname(os.path.normpath(args.nodes_out))
+        rels_dir = os.path.dirname(os.path.normpath(args.rels_out))
+        if os.path.normpath(nodes_dir) != os.path.normpath(samples_dir):
+            args.nodes_out = os.path.join(samples_dir, os.path.basename(args.nodes_out))
+            print(f"Info: overriding nodes output path to {args.nodes_out} to use D3FEND samples folder")
+        if os.path.normpath(rels_dir) != os.path.normpath(samples_dir):
+            args.rels_out = os.path.join(samples_dir, os.path.basename(args.rels_out))
+            print(f"Info: overriding rels output path to {args.rels_out} to use D3FEND samples folder")
         Path(args.nodes_out).parent.mkdir(parents=True, exist_ok=True)
         Path(args.rels_out).parent.mkdir(parents=True, exist_ok=True)
         if args.format == "nt":

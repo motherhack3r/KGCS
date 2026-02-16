@@ -248,15 +248,18 @@ def main():
         print("Error: --nodes-out and --rels-out must be provided together", file=sys.stderr)
         sys.exit(1)
 
-    # Ensure outputs go to the standard samples folder for CPE (matches live with other CPE outputs)
+
+    # Always write full TTL to tmp/
+    from pathlib import Path
+    full_ttl_name = Path(args.output).name
+    tmp_full_path = Path("tmp") / full_ttl_name
+    Path(tmp_full_path).parent.mkdir(parents=True, exist_ok=True)
+    args.output = str(tmp_full_path)
+    print(f"Writing full RDF to {args.output}...")
+
+    # Write nodes/rels to samples/ if requested
     samples_dir = os.path.join('data', 'cpe', 'samples')
     os.makedirs(samples_dir, exist_ok=True)
-    requested_output = args.output
-    output_dir = os.path.dirname(os.path.normpath(requested_output))
-    if os.path.normpath(output_dir) != os.path.normpath(samples_dir):
-        args.output = os.path.join(samples_dir, os.path.basename(requested_output))
-        print(f"Info: overriding output path to {args.output} to use CPE samples folder")
-
     if args.nodes_out and args.rels_out:
         nodes_dir = os.path.dirname(os.path.normpath(args.nodes_out))
         rels_dir = os.path.dirname(os.path.normpath(args.rels_out))

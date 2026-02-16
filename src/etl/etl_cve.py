@@ -473,8 +473,14 @@ def main():
             except Exception as e:
                 print(f"Warning: failed to save cpematch index: {e}", file=sys.stderr)
 
+
+    # Always write full TTL to tmp/
+    from pathlib import Path
+    full_ttl_name = Path(args.output).name
+    tmp_full_path = Path("tmp") / full_ttl_name
+    Path(tmp_full_path).parent.mkdir(parents=True, exist_ok=True)
     mode = 'a' if args.append else 'w'
-    with open(args.output, mode, encoding='utf-8') as out_f:
+    with open(tmp_full_path, mode, encoding='utf-8') as out_f:
         nodes_f = None
         rels_f = None
         if args.nodes_out and args.rels_out:
