@@ -228,25 +228,27 @@ def get_neo4j_stats(driver, database: Optional[str] = None) -> Dict[str, Any]:
 
             stats["quality_metrics"]["techniques_by_tactic"] = tactics
 
-            # Relationship breakdown by source/target labels
+            # Relationship breakdown by source/target labels (UNWIND labels)
             print("Analyzing relationship patterns...")
             result = session.run("""
-                MATCH (source)-[r]-(target)
-                RETURN 
-                    type(r) as rel_type,
-                    labels(source)[0] as source_label,
-                    labels(target)[0] as target_label,
-                    COUNT(r) as count
-                ORDER BY count DESC
+                MATCH (a)-[r]->(b)
+                UNWIND labels(a) AS Label_Start
+                UNWIND labels(b) AS Label_End
+                RETURN
+                  type(r) AS RelationshipType,
+                  Label_Start,
+                  Label_End,
+                  count([Label_Start, Label_End]) AS Count
+                ORDER BY Count DESC
                 LIMIT 30
             """)
             rel_patterns = []
             for record in result:
                 rel_patterns.append({
-                    "relationship": record['rel_type'] or 'unknown',
-                    "source": record['source_label'] or 'untyped',
-                    "target": record['target_label'] or 'untyped',
-                    "count": record['count'] or 0,
+                    "relationship": record['RelationshipType'] or 'unknown',
+                    "source": record['Label_Start'] or 'untyped',
+                    "target": record['Label_End'] or 'untyped',
+                    "count": record['Count'] or 0,
                 })
 
             stats["quality_metrics"]["relationship_patterns"] = rel_patterns
@@ -258,7 +260,7 @@ def get_neo4j_stats(driver, database: Optional[str] = None) -> Dict[str, Any]:
             result = session.run("""
                 MATCH (cve:Vulnerability)
                 OPTIONAL MATCH (cve)-[r:CAUSED_BY]->(cwe:Weakness)
-                WITH COUNT(DISTINCT cve) as total_cves, COUNT(DISTINCT cwe) as cves_with_cwe
+                WITH COUNT(DISTINCT cve) as total_cves, COUNT(DISTINCT r) as cves_with_cwe
                 RETURN total_cves, cves_with_cwe
             """)
             record = result.single()

@@ -962,7 +962,8 @@ def neo4j_loader_lock(lock_path: str = "tmp/rdf_to_neo4j.lock"):
 
         handle.seek(0)
         handle.truncate()
-        handle.write(f"pid={os.getpid()} start={datetime.utcnow().isoformat()}Z\n")
+        from datetime import timezone
+        handle.write(f"pid={os.getpid()} start={datetime.now(timezone.utc).isoformat()}Z\n")
         handle.flush()
 
         yield

@@ -1,0 +1,273 @@
+{
+  "nodes": {
+    "Platform": 1578570,
+    "PlatformConfiguration": 617507,
+    "Vulnerability": 332947,
+    "DefensiveTechnique": 4616,
+    "Weakness": 969,
+    "Consequence": 814,
+    "Prerequisite": 747,
+    "AttackPattern": 647,
+    "Technique": 568,
+    "SubTechnique": 526,
+    "DeceptionTechnique": 494,
+    "DetectionAnalytic": 102,
+    "Reference": 68,
+    "Tactic": 34,
+    "EngagementConcept": 31,
+    "Goal": 5
+  },
+  "relationships": {
+    "MATCHES_PLATFORM": 23175251,
+    "AFFECTED_BY": 2972227,
+    "CAUSED_BY": 270724,
+    "CHILD_OF": 1692,
+    "EXPLOITED_BY": 1212,
+    "MITIGATES": 911,
+    "HAS_CONSEQUENCE": 814,
+    "HAS_PREREQUISITE": 747,
+    "SUBTECHNIQUE_OF": 526,
+    "BELONGS_TO": 330,
+    "CAN_PRECEDE": 305,
+    "PEER_OF": 117,
+    "IMPLEMENTED_AS": 36,
+    "DERIVED_FROM": 36,
+    "CAN_ALSO_BE": 30,
+    "REQUIRES": 13,
+    "CAN_FOLLOW": 10,
+    "REFERENCE": 8,
+    "STARTS_WITH": 3
+  },
+  "totals": {
+    "nodes": 2538645,
+    "relationships": 26424992
+  },
+  "causal_chain_analysis": {
+    "cve_to_cwe": 270724,
+    "cwe_to_capec": 1212,
+    "capec_to_technique": 0,
+    "cve_to_platform_config": 0
+  },
+  "cross_standard_links": {
+    "technique_to_defense": 0,
+    "technique_to_detection": 0,
+    "technique_to_deception": 0,
+    "technique_to_engagement": 0
+  },
+  "quality_metrics": {
+    "orphaned_nodes": {
+      "Platform": 291827,
+      "PlatformConfiguration": 85472,
+      "Vulnerability": 20125,
+      "Weakness": 17,
+      "AttackPattern": 55,
+      "Tactic": 15,
+      "Technique": 213,
+      "DefensiveTechnique": 4498,
+      "DetectionAnalytic": 96,
+      "DeceptionTechnique": 494,
+      "EngagementConcept": 31,
+      "Goal": 5,
+      "Reference": 60
+    },
+    "cvss_versions": {
+      "v2.0": 0,
+      "v3.1": 0,
+      "v4.0": 0
+    },
+    "total_platforms": 1578570,
+    "total_configs": 0,
+    "techniques_by_tactic": {
+      "credential-access": 0,
+      "execution": 0,
+      "impact": 0,
+      "persistence": 0,
+      "privilege-escalation": 0,
+      "lateral-movement": 0,
+      "defense-evasion": 0,
+      "exfiltration": 0,
+      "discovery": 0,
+      "collection": 0,
+      "resource-development": 0,
+      "reconnaissance": 0,
+      "command-and-control": 0,
+      "initial-access": 0,
+      "inhibit-response-function": 0,
+      "evasion": 0,
+      "impair-process-control": 0,
+      "network-effects": 0,
+      "remote-service-effects": 0,
+      "technical-information-gathering": 0,
+      "priority-definition-direction": 0,
+      "establish-&-maintain-infrastructure": 0,
+      "adversary-opsec": 0,
+      "target-selection": 0,
+      "technical-weakness-identification": 0,
+      "priority-definition-planning": 0,
+      "organizational-information-gathering": 0,
+      "test-capabilities": 0,
+      "organizational-weakness-identification": 0,
+      "persona-development": 0,
+      "build-capabilities": 0,
+      "stage-capabilities": 0,
+      "people-information-gathering": 0,
+      "people-weakness-identification": 0
+    },
+    "relationship_patterns": [
+      {
+        "relationship": "MATCHES_PLATFORM",
+        "source": "PlatformConfiguration",
+        "target": "Platform",
+        "count": 23175251
+      },
+      {
+        "relationship": "AFFECTED_BY",
+        "source": "PlatformConfiguration",
+        "target": "Vulnerability",
+        "count": 2972227
+      },
+      {
+        "relationship": "CAUSED_BY",
+        "source": "Vulnerability",
+        "target": "Weakness",
+        "count": 270724
+      },
+      {
+        "relationship": "EXPLOITED_BY",
+        "source": "Weakness",
+        "target": "AttackPattern",
+        "count": 1212
+      },
+      {
+        "relationship": "CHILD_OF",
+        "source": "Weakness",
+        "target": "Weakness",
+        "count": 1159
+      },
+      {
+        "relationship": "MITIGATES",
+        "source": "DefensiveTechnique",
+        "target": "Technique",
+        "count": 911
+      },
+      {
+        "relationship": "HAS_CONSEQUENCE",
+        "source": "AttackPattern",
+        "target": "Consequence",
+        "count": 814
+      },
+      {
+        "relationship": "HAS_PREREQUISITE",
+        "source": "AttackPattern",
+        "target": "Prerequisite",
+        "count": 747
+      },
+      {
+        "relationship": "CHILD_OF",
+        "source": "AttackPattern",
+        "target": "AttackPattern",
+        "count": 533
+      },
+      {
+        "relationship": "SUBTECHNIQUE_OF",
+        "source": "SubTechnique",
+        "target": "Technique",
+        "count": 526
+      },
+      {
+        "relationship": "BELONGS_TO",
+        "source": "Technique",
+        "target": "Tactic",
+        "count": 205
+      },
+      {
+        "relationship": "CAN_PRECEDE",
+        "source": "AttackPattern",
+        "target": "AttackPattern",
+        "count": 162
+      },
+      {
+        "relationship": "CAN_PRECEDE",
+        "source": "Weakness",
+        "target": "Weakness",
+        "count": 143
+      },
+      {
+        "relationship": "BELONGS_TO",
+        "source": "SubTechnique",
+        "target": "Tactic",
+        "count": 125
+      },
+      {
+        "relationship": "PEER_OF",
+        "source": "Weakness",
+        "target": "Weakness",
+        "count": 98
+      },
+      {
+        "relationship": "IMPLEMENTED_AS",
+        "source": "AttackPattern",
+        "target": "Technique",
+        "count": 36
+      },
+      {
+        "relationship": "DERIVED_FROM",
+        "source": "Technique",
+        "target": "AttackPattern",
+        "count": 36
+      },
+      {
+        "relationship": "CAN_ALSO_BE",
+        "source": "Weakness",
+        "target": "Weakness",
+        "count": 27
+      },
+      {
+        "relationship": "PEER_OF",
+        "source": "AttackPattern",
+        "target": "AttackPattern",
+        "count": 19
+      },
+      {
+        "relationship": "REQUIRES",
+        "source": "Weakness",
+        "target": "Weakness",
+        "count": 13
+      },
+      {
+        "relationship": "CAN_FOLLOW",
+        "source": "AttackPattern",
+        "target": "AttackPattern",
+        "count": 10
+      },
+      {
+        "relationship": "REFERENCE",
+        "source": "DetectionAnalytic",
+        "target": "Reference",
+        "count": 8
+      },
+      {
+        "relationship": "STARTS_WITH",
+        "source": "Weakness",
+        "target": "Weakness",
+        "count": 3
+      },
+      {
+        "relationship": "CAN_ALSO_BE",
+        "source": "AttackPattern",
+        "target": "AttackPattern",
+        "count": 3
+      }
+    ],
+    "cve_cwe_coverage": {
+      "total_cves": 332947,
+      "cves_with_cwe": 270724,
+      "coverage_percent": 81.31
+    },
+    "technique_defense_coverage": {
+      "total_techniques": 568,
+      "techniques_with_defense": 0,
+      "coverage_percent": 0.0
+    }
+  }
+}
