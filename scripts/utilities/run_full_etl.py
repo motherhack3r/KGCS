@@ -410,135 +410,120 @@ def main():
     parser.add_argument("--cve-first", action="store_true", help="Derive from CVEs (default)")
     parser.add_argument("--attack-first", action="store_true", help="Derive from ATT&CK techniques")
     parser.add_argument("--workers", type=int, default=6, help="Number of parallel workers")
+    parser.add_argument("--standard", type=str, default=None, help="Run ETL for only one standard (e.g., d3fend, car, shield, engage, capec, attack, cwe, cpe, cve). If omitted, runs all.")
     args = parser.parse_args()
+
+    # Determine standards to process
+    all_standards = [
+        'cpe', 'cpematch', 'cve', 'cwe', 'capec', 'attack', 'd3fend', 'car', 'shield', 'engage'
+    ]
+    if args.standard:
+        selected_standards = [args.standard.strip().lower()]
+        if selected_standards[0] not in all_standards:
+            print(f"Unknown standard: {selected_standards[0]}")
+            print(f"Allowed: {', '.join(all_standards)}")
+            return 2
+        print(f"[ETL] Running pipeline for standard: {selected_standards[0]}")
+    else:
+        selected_standards = all_standards
+        print("[ETL] Running pipeline for all standards.")
 
     print("Starting full ETL pipeline...")
 
-    # Load data in parallel
-    print("Loading data in parallel...")
-    with ProcessPoolExecutor(max_workers=args.workers) as executor:
-        futures = {}
-        
-        # CPE - use chunks directory
-        futures['cpe'] = executor.submit(_collect_all_items, _pick_files("data/cpe/raw/nvdcpe-2.0-chunks", "*.json"), "products.item")
-        
-        # CPEMatch - use chunks directory
-        futures['cpematch'] = executor.submit(_collect_all_items, _pick_files("data/cpe/raw/nvdcpematch-2.0-chunks", "*.json"), "matchStrings.item")
-        
-        # CVE
-        futures['cve'] = executor.submit(_collect_all_items, _pick_files("data/cve/raw", "nvdcve-2.0-*.json"), "vulnerabilities.item")
-        
-        # CWE - single file
-        futures['cwe'] = executor.submit(_load_cwe_data, ["data/cwe/raw/cwec_v4.19.1.xml"])
-        
-        # CAPEC - single file
-        futures['capec'] = executor.submit(_load_capec_data, ["data/capec/raw/capec_latest.xml"])
-        
-        # ATT&CK
-        futures['attack'] = executor.submit(_collect_attack_techniques, _pick_files("data/attack/raw", "*.json"))
-        
-        # Defenses
-        futures['d3fend'] = executor.submit(_load_d3fend_data, ["data/d3fend/raw/d3fend-full-mappings.json"])
-        futures['car'] = executor.submit(_load_car_data, _pick_files("data/car/raw", "*.yaml"))
-        futures['shield'] = executor.submit(_load_shield_data, _pick_files("data/shield/raw", "*.json"))
-        futures['engage'] = executor.submit(_load_engage_data, _pick_files("data/engage/raw", "*.json"))
-        
-        # Collect results
+    # Only load and process the selected standard(s)
+    print("Loading data for selected standard(s)...")
+    data_items = {}
+    if 'cpe' in selected_standards:
         print("Collecting CPE data...")
-        cpe_items = futures['cpe'].result()
+        cpe_items = _collect_all_items(_pick_files("data/cpe/raw/nvdcpe-2.0-chunks", "*.json"), "products.item")
         print(f"Loaded {len(cpe_items)} CPE items")
-        
+        data_items['cpe'] = cpe_items
+    if 'cpematch' in selected_standards:
         print("Collecting CPEMatch data...")
-        cpematch_items = futures['cpematch'].result()
+        cpematch_items = _collect_all_items(_pick_files("data/cpe/raw/nvdcpematch-2.0-chunks", "*.json"), "matchStrings.item")
         print(f"Loaded {len(cpematch_items)} CPEMatch items")
-        
+        data_items['cpematch'] = cpematch_items
+    if 'cve' in selected_standards:
         print("Collecting CVE data...")
-        cve_items = futures['cve'].result()
+        cve_items = _collect_all_items(_pick_files("data/cve/raw", "nvdcve-2.0-*.json"), "vulnerabilities.item")
         print(f"Loaded {len(cve_items)} CVE items")
-        
+        data_items['cve'] = cve_items
+    if 'cwe' in selected_standards:
         print("Collecting CWE data...")
-        cwe_items = futures['cwe'].result()
+        cwe_items = _load_cwe_data(["data/cwe/raw/cwec_v4.19.1.xml"])
         print(f"Loaded {len(cwe_items)} CWE items")
-        
+        data_items['cwe'] = cwe_items
+    if 'capec' in selected_standards:
         print("Collecting CAPEC data...")
-        capec_items = futures['capec'].result()
+        capec_items = _load_capec_data(["data/capec/raw/capec_latest.xml"])
         print(f"Loaded {len(capec_items)} CAPEC items")
-        
+        data_items['capec'] = capec_items
+    if 'attack' in selected_standards:
         print("Collecting ATT&CK data...")
-        attack_items = futures['attack'].result()
+        attack_items = _collect_attack_techniques(_pick_files("data/attack/raw", "*.json"))
         print(f"Loaded {len(attack_items)} ATT&CK items")
-        
-        print("Collecting defense data...")
-        d3fend_items = futures['d3fend'].result()
-        car_items = futures['car'].result()
-        shield_items = futures['shield'].result()
-        engage_items = futures['engage'].result()
+        data_items['attack'] = attack_items
+    if 'd3fend' in selected_standards:
+        print("Collecting D3FEND data...")
+        d3fend_items = _load_d3fend_data(["data/d3fend/raw/d3fend-full-mappings.json"])
+        print(f"Loaded {len(d3fend_items)} D3FEND items")
+        data_items['d3fend'] = d3fend_items
+    if 'car' in selected_standards:
+        print("Collecting CAR data...")
+        car_items = _load_car_data(_pick_files("data/car/raw", "*.yaml"))
+        print(f"Loaded {len(car_items)} CAR items")
+        data_items['car'] = car_items
+    if 'shield' in selected_standards:
+        print("Collecting SHIELD data...")
+        shield_items = _load_shield_data(_pick_files("data/shield/raw", "*.json"))
+        print(f"Loaded {len(shield_items)} SHIELD items")
+        data_items['shield'] = shield_items
+    if 'engage' in selected_standards:
+        print("Collecting ENGAGE data...")
+        engage_items = _load_engage_data(_pick_files("data/engage/raw", "*.json"))
+        print(f"Loaded {len(engage_items)} ENGAGE items")
+        data_items['engage'] = engage_items
 
-    print(f"Loaded data: CPE={len(cpe_items)}, CPEMatch={len(cpematch_items)}, CVE={len(cve_items)}, CWE={len(cwe_items)}, CAPEC={len(capec_items)}, ATT&CK={len(attack_items)}")
-    print(f"Defense data: D3FEND={len(d3fend_items)}, CAR={len(car_items)}, SHIELD={len(shield_items)}, ENGAGE={len(engage_items)}")
-
-    # Now run the ETL transformations
-    print("Starting ETL transformations...")
+    print("Starting ETL transformations for selected standard(s)...")
     from rdflib import Graph
-    from src.etl.etl_cpe import transform_cpe
-    from src.etl.etl_cpematch import transform_cpematch
-    from src.etl.etl_cve import transform_cve
-    from src.etl.etl_cwe import CWEtoRDFTransformer
-    from src.etl.etl_capec import CAPECtoRDFTransformer
-    from src.etl.etl_attack import ATTACKtoRDFTransformer
-    from src.etl.etl_d3fend import D3FENDtoRDFTransformer
-    from src.etl.etl_car import CARtoRDFTransformer
-    from src.etl.etl_shield import SHIELDtoRDFTransformer
-    from src.etl.etl_engage import ENGAGEtoRDFTransformer
+    if 'cpe' in selected_standards:
+        from src.etl.etl_cpe import transform_cpe
+        print("Running CPE ETL...")
+        cpe_data = {"products": data_items['cpe']}
+        transform_cpe(cpe_data, "tmp/pipeline-stage1-cpe.ttl")
+    if 'cpematch' in selected_standards:
+        from src.etl.etl_cpematch import transform_cpematch
+        print("Running CPEMatch ETL...")
+        cpematch_data = {"matches": data_items['cpematch']}
+        transform_cpematch(cpematch_data, "tmp/pipeline-stage2-cpematch.ttl")
+    if 'cve' in selected_standards:
+        from src.etl.etl_cve import transform_cve
+        print("Running CVE ETL...")
+        cve_data = {"vulnerabilities": data_items['cve']}
+        transform_cve(cve_data, "tmp/pipeline-stage3-cve.ttl")
+    if 'attack' in selected_standards:
+        print("Running ATT&CK ETL...")
+        _run_etl_attack(data_items['attack'])
+    if 'd3fend' in selected_standards:
+        print("Running D3FEND ETL...")
+        _run_etl_d3fend(data_items['d3fend'])
+    if 'capec' in selected_standards:
+        print("Running CAPEC ETL...")
+        _run_etl_capec(data_items['capec'])
+    if 'cwe' in selected_standards:
+        print("Running CWE ETL...")
+        _run_etl_cwe(data_items['cwe'])
+    if 'car' in selected_standards:
+        print("Running CAR ETL...")
+        _run_etl_car(data_items['car'])
+    if 'shield' in selected_standards:
+        print("Running SHIELD ETL...")
+        _run_etl_shield(data_items['shield'])
+    if 'engage' in selected_standards:
+        print("Running ENGAGE ETL...")
+        _run_etl_engage(data_items['engage'])
 
-    # Sequential core chain
-    # Stage 1: CPE
-    print("Running CPE ETL...")
-    cpe_data = {"products": cpe_items}
-    transform_cpe(cpe_data, "tmp/pipeline-stage1-cpe.ttl")
-
-    # Stage 2: CPEMatch
-    print("Running CPEMatch ETL...")
-    cpematch_data = {"matches": cpematch_items}
-    transform_cpematch(cpematch_data, "tmp/pipeline-stage2-cpematch.ttl")
-
-    # Stage 3: CVE
-    print("Running CVE ETL...")
-    cve_data = {"vulnerabilities": cve_items}
-    transform_cve(cve_data, "tmp/pipeline-stage3-cve.ttl")
-
-    # Parallel processing for remaining stages
-    print("Running remaining ETLs in parallel...")
-    with ProcessPoolExecutor(max_workers=args.workers) as executor:
-        futures = {}
-        
-        # Stage 4: ATT&CK
-        futures['attack'] = executor.submit(_run_etl_attack, attack_items)
-        
-        # Stage 5: D3FEND
-        futures['d3fend'] = executor.submit(_run_etl_d3fend, d3fend_items)
-        
-        # Stage 6: CAPEC
-        futures['capec'] = executor.submit(_run_etl_capec, capec_items)
-        
-        # Stage 7: CWE
-        futures['cwe'] = executor.submit(_run_etl_cwe, cwe_items)
-        
-        # Stage 8: CAR
-        futures['car'] = executor.submit(_run_etl_car, car_items)
-        
-        # Stage 9: SHIELD
-        futures['shield'] = executor.submit(_run_etl_shield, shield_items)
-        
-        # Stage 10: ENGAGE
-        futures['engage'] = executor.submit(_run_etl_engage, engage_items)
-        
-        # Collect results
-        for name, future in futures.items():
-            future.result()
-            print(f"Completed {name} ETL")
-
-    print("Full ETL pipeline complete!")
+    print("ETL pipeline for selected standard(s) complete!")
 
 
 if __name__ == "__main__":

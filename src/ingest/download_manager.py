@@ -233,6 +233,8 @@ class NVDCPEDownloader(StandardDownloader):
                     if tmp_meta:
                         src = self.raw_dir / schema_filename
                         dst = schema_dir / schema_filename
+                        # Ensure destination directory exists before moving
+                        dst.parent.mkdir(parents=True, exist_ok=True)
                         try:
                             src.replace(dst)
                         except Exception:
@@ -240,6 +242,8 @@ class NVDCPEDownloader(StandardDownloader):
             except Exception:
                 logger.debug('Could not fetch CPE schema')
 
+            # Ensure manifest directory exists before saving
+            self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
             self.save_manifest(manifest)
         
         return {'standard': 'cpe', 'files': [file_meta] if file_meta else []}
@@ -279,6 +283,8 @@ class NVDCPEMatchDownloader(StandardDownloader):
                     if tmp_meta:
                         src = self.raw_dir / schema_filename
                         dst = schema_dir / schema_filename
+                        # Ensure destination directory exists before moving
+                        dst.parent.mkdir(parents=True, exist_ok=True)
                         try:
                             src.replace(dst)
                         except Exception:
@@ -286,6 +292,8 @@ class NVDCPEMatchDownloader(StandardDownloader):
             except Exception:
                 logger.debug('Could not fetch CPEmatch schema')
 
+            # Ensure manifest directory exists before saving
+            self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
             self.save_manifest(manifest)
         
         return {'standard': 'cpematch', 'files': [file_meta] if file_meta else []}
@@ -317,6 +325,8 @@ class NVDCVEDownloader(StandardDownloader):
         
         manifest['files'] = files_metadata
         manifest['source'] = 'https://nvd.nist.gov/feeds/json/cve/2.0/'
+        # Ensure manifest directory exists before saving
+        self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
         self.save_manifest(manifest)
         
         # Attempt to download CVE JSON schema for reference
@@ -402,6 +412,8 @@ class MITRECWEDownloader(StandardDownloader):
             except Exception:
                 logger.debug('Could not fetch CWE schema')
 
+            # Ensure manifest directory exists before saving
+            self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
             self.save_manifest(manifest)
         
         return {'standard': 'cwe', 'files': [file_meta] if file_meta else []}
@@ -426,6 +438,8 @@ class MITRECAPECDownloader(StandardDownloader):
         if file_meta:
             manifest['files'] = [file_meta]
             manifest['source'] = 'https://capec.mitre.org/'
+            # Ensure manifest directory exists before saving
+            self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
             self.save_manifest(manifest)
         
         return {'standard': 'capec', 'files': [file_meta] if file_meta else []}
@@ -458,6 +472,8 @@ class MITREATTACKDownloader(StandardDownloader):
         
         manifest['files'] = files_metadata
         manifest['source'] = 'https://github.com/mitre/cti'
+        # Ensure manifest directory exists before saving
+        self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
         self.save_manifest(manifest)
         
         return {'standard': 'attack', 'files': files_metadata}
@@ -472,10 +488,8 @@ class MITRED3FENDDownloader(StandardDownloader):
     def download(self) -> Dict:
         """Download D3FEND ontology from MITRE."""
         logger.info("Starting MITRE D3FEND download...")
-
         manifest = self.load_manifest()
         files_metadata = []
-
         try:
             from src.ingest.ingest_config import APIEndpoints
             base_url = APIEndpoints.MITRE_D3FEND_BASE.rstrip('/')
@@ -483,7 +497,6 @@ class MITRED3FENDDownloader(StandardDownloader):
             base_url = 'https://d3fend.mitre.org/ontologies/d3fend/1.3.0'
 
         file_candidates = {
-            # Required by Stage 5 ETL flow
             'd3fend-full-mappings.json': [
                 f'{base_url}/d3fend-full-mappings.json',
                 'https://d3fend.mitre.org/ontologies/d3fend/1.3.0/d3fend-full-mappings.json',
@@ -494,13 +507,11 @@ class MITRED3FENDDownloader(StandardDownloader):
                 'https://d3fend.mitre.org/api/json/d3fend.json',
                 'https://raw.githubusercontent.com/mitre-engenuity/d3fend/master/d3fend.json',
             ],
-            # Ontology artifact for reference and compatibility
             'd3fend.owl': [
                 'https://d3fend.mitre.org/ontologies/d3fend.owl',
                 f'{base_url}/d3fend.owl',
                 'https://raw.githubusercontent.com/mitre-engenuity/d3fend/master/d3fend.owl',
             ],
-            # Optional serialization; do not fail downloader if unavailable
             'd3fend.ttl': [
                 f'{base_url}/d3fend.ttl',
                 'https://raw.githubusercontent.com/mitre-engenuity/d3fend/master/d3fend.ttl',
@@ -513,6 +524,7 @@ class MITRED3FENDDownloader(StandardDownloader):
             'd3fend.owl',
         }
 
+
         for filename, urls in file_candidates.items():
             file_meta = None
             for url in urls:
@@ -520,6 +532,19 @@ class MITRED3FENDDownloader(StandardDownloader):
                     candidate_meta = self.download_file(url, filename, extract_zip=False)
                     if candidate_meta and candidate_meta.get('status') in {'success', 'cached'}:
                         file_meta = candidate_meta
+                        # If this is d3fend.owl, move it to schemas dir
+                        if filename == 'd3fend.owl':
+                            schema_dir = self.raw_dir.parent / 'schemas'
+                            schema_dir.mkdir(parents=True, exist_ok=True)
+                            src = self.raw_dir / filename
+                            dst = schema_dir / filename
+                            try:
+                                if src.exists():
+                                    src.replace(dst)
+                                    file_meta['moved_to'] = str(dst)
+                                    logger.info(f"Moved {filename} to {dst}")
+                            except Exception as move_exc:
+                                logger.warning(f"Could not move d3fend.owl to schemas dir: {move_exc}")
                         break
                 except Exception as e:
                     logger.debug(f"Failed to download {filename} from {url}: {e}")
@@ -590,6 +615,8 @@ class MITRECARDownloader(StandardDownloader):
         if files_metadata:
             manifest['files'] = files_metadata
             manifest['source'] = 'https://github.com/mitre-attack/car'
+            # Ensure manifest directory exists before saving
+            self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
             self.save_manifest(manifest)
         else:
             logger.warning("Could not download any CAR files")
@@ -651,6 +678,8 @@ class MITRESHIELDDownloader(StandardDownloader):
                 if files_metadata:
                     manifest['files'] = files_metadata
                     manifest['source'] = api_url.split('/contents')[0]
+                    # Ensure manifest directory exists before saving
+                    self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
                     self.save_manifest(manifest)
                     return {'standard': 'shield', 'files': files_metadata}
             except Exception as e:
@@ -709,6 +738,8 @@ class MITREENGAGEDownloader(StandardDownloader):
             if files_metadata:
                 manifest['files'] = files_metadata
                 manifest['source'] = 'https://github.com/mitre/engage'
+                # Ensure manifest directory exists before saving
+                self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
                 self.save_manifest(manifest)
             else:
                 logger.warning('Could not download ENGAGE files from GitHub API')
@@ -725,7 +756,6 @@ class DownloadPipeline:
     def __init__(self, base_dir: str = 'data', skip_large_files: bool = False, standards: Optional[List[str]] = None):
         self.base_dir = base_dir
         self.skip_large_files = skip_large_files
-
         all_downloaders = {
             'cpe': NVDCPEDownloader(),
             'cpematch': NVDCPEMatchDownloader(),
@@ -825,7 +855,7 @@ def main():
     """Main entry point."""
     import sys
     os.makedirs('logs', exist_ok=True)
-
+    
     parser = argparse.ArgumentParser(description='KGCS download pipeline')
     parser.add_argument('--skip-large', action='store_true', help='Skip large NVD files (CPE, CPEMatch, CVE)')
     parser.add_argument(

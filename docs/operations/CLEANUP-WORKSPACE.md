@@ -22,7 +22,7 @@ The cleanup script removes temporary files, cache, logs, and test artifacts that
 Show what would be removed without deleting:
 
 ```bash
-python scripts/cleanup_workspace.py
+python scripts/utilities/cleanup_workspace.py
 ```
 
 Output:
@@ -47,7 +47,7 @@ Output:
 Preview deletion with detailed output (no files deleted):
 
 ```bash
-python scripts/cleanup_workspace.py --dry-run
+python scripts/utilities/cleanup_workspace.py --dry-run
 ```
 
 ### Execute Cleanup
@@ -55,7 +55,7 @@ python scripts/cleanup_workspace.py --dry-run
 Actually delete the files:
 
 ```bash
-python scripts/cleanup_workspace.py --execute
+python scripts/utilities/cleanup_workspace.py --execute
 ```
 
 Output:
@@ -76,7 +76,7 @@ Output:
 Include downloaded source data from `data/*/raw/` directories (CPE, CVE, CWE, etc.):
 
 ```bash
-python scripts/cleanup_workspace.py --sources --execute
+python scripts/utilities/cleanup_workspace.py --sources --execute
 ```
 
 ⚠️ **Warning:** This will delete downloaded source data. Re-run the data ingestion pipeline to re-download.
@@ -86,7 +86,7 @@ python scripts/cleanup_workspace.py --sources --execute
 Include transformed sample data in `data/` folder:
 
 ```bash
-python scripts/cleanup_workspace.py --data --execute
+python scripts/utilities/cleanup_workspace.py --data --execute
 ```
 
 ⚠️ **Warning:** This will delete transformed sample outputs. Re-run ETL transformers to recreate.
@@ -96,7 +96,7 @@ python scripts/cleanup_workspace.py --data --execute
 Combine both flags to clean everything:
 
 ```bash
-python scripts/cleanup_workspace.py --sources --data --execute
+python scripts/utilities/cleanup_workspace.py --sources --data --execute
 ```
 
 ⚠️ **This will delete:**
@@ -160,31 +160,31 @@ Manifest files are preserved for reference.
 
 ```bash
 # Remove test artifacts and cache
-python scripts/cleanup_workspace.py --execute
+python scripts/utilities/cleanup_workspace.py --execute
 ```
 
 **Before committing** (recommended):
 
 ```bash
 # Check what would be cleaned
-python scripts/cleanup_workspace.py
+python scripts/utilities/cleanup_workspace.py
 
 # Clean if happy with the list
-python scripts/cleanup_workspace.py --execute
+python scripts/utilities/cleanup_workspace.py --execute
 ```
 
 **Before deployment** (good practice):
 
 ```bash
 # Full clean including optional source and sample data
-python scripts/cleanup_workspace.py --sources --data --execute
+python scripts/utilities/cleanup_workspace.py --sources --data --execute
 ```
 
 **Troubleshooting** (when tests act weird):
 
 ```bash
 # Clean all cache and restart
-python scripts/cleanup_workspace.py --execute
+python scripts/utilities/cleanup_workspace.py --execute
 pytest tests/ -v
 ```
 
@@ -232,7 +232,7 @@ The cleanup script can be integrated into CI/CD pipelines:
 ```yaml
 # Example: GitHub Actions workflow
 - name: Clean workspace
-  run: python scripts/cleanup_workspace.py --execute
+  run: python scripts/utilities/cleanup_workspace.py --execute
 
 - name: Run tests
   run: pytest tests/ -v
@@ -240,7 +240,7 @@ The cleanup script can be integrated into CI/CD pipelines:
 
 ## Script Location
 
-- **Location:** `scripts/cleanup_workspace.py`
+- **Location:** `scripts/utilities/cleanup_workspace.py`
 - **Executable:** Yes (has shebang `#!/usr/bin/env python3`)
 - **Dependencies:** None (uses Python stdlib only: `os`, `shutil`, `pathlib`, `argparse`)
 
@@ -263,10 +263,10 @@ Options:
 
 ```bash
 # See what would be removed
-python scripts/cleanup_workspace.py
+python scripts/utilities/cleanup_workspace.py
 
 # Remove all temporary files and cache
-python scripts/cleanup_workspace.py --execute
+python scripts/utilities/cleanup_workspace.py --execute
 
 # Now safe to commit
 git add .
@@ -278,7 +278,7 @@ git push
 
 ```bash
 # Clean all cache that might interfere
-python scripts/cleanup_workspace.py --execute
+python scripts/utilities/cleanup_workspace.py --execute
 
 # Re-run tests to see if they pass
 pytest tests/test_phase3_comprehensive.py -v
@@ -288,13 +288,13 @@ pytest tests/test_phase3_comprehensive.py -v
 
 ```bash
 # See how much space can be freed
-python scripts/cleanup_workspace.py
+python scripts/utilities/cleanup_workspace.py
 
 # Free up space
-python scripts/cleanup_workspace.py --execute
+python scripts/utilities/cleanup_workspace.py --execute
 
 # If you have raw data downloads, also clean those
-python scripts/cleanup_workspace.py --sources --execute
+python scripts/utilities/cleanup_workspace.py --sources --execute
 ```
 
 ## Troubleshooting
@@ -304,7 +304,7 @@ python scripts/cleanup_workspace.py --sources --execute
 On Linux/macOS, ensure the script is executable:
 
 ```bash
-chmod +x scripts/cleanup_workspace.py
+chmod +x scripts/utilities/cleanup_workspace.py
 ```
 
 ### Some files won't delete
@@ -327,13 +327,13 @@ Clean related tasks:
 
 ```bash
 # List cache items only (dry-run)
-python scripts/cleanup_workspace.py --dry-run
+python scripts/utilities/cleanup_workspace.py --dry-run
 
 # Clean everything
-python scripts/cleanup_workspace.py --execute
+python scripts/utilities/cleanup_workspace.py --execute
 
 # Clean including downloaded data
-python scripts/cleanup_workspace.py --full --execute
+python scripts/utilities/cleanup_workspace.py --full --execute
 
 # Git garbage collection (additional cleanup)
 git gc --aggressive
