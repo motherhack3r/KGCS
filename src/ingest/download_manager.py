@@ -23,6 +23,10 @@ import importlib.util
 import asyncio
 from abc import ABC, abstractmethod
 
+
+# Ensure logs directory exists before configuring logging
+os.makedirs('logs', exist_ok=True)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -232,6 +236,8 @@ class NVDCPEDownloader(StandardDownloader):
                     if tmp_meta:
                         src = self.raw_dir / schema_filename
                         dst = schema_dir / schema_filename
+                        # Ensure destination directory exists before moving
+                        dst.parent.mkdir(parents=True, exist_ok=True)
                         try:
                             src.replace(dst)
                         except Exception:
@@ -239,6 +245,8 @@ class NVDCPEDownloader(StandardDownloader):
             except Exception:
                 logger.debug('Could not fetch CPE schema')
 
+            # Ensure manifest directory exists before saving
+            self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
             self.save_manifest(manifest)
         
         return {'standard': 'cpe', 'files': [file_meta] if file_meta else []}
@@ -278,6 +286,8 @@ class NVDCPEMatchDownloader(StandardDownloader):
                     if tmp_meta:
                         src = self.raw_dir / schema_filename
                         dst = schema_dir / schema_filename
+                        # Ensure destination directory exists before moving
+                        dst.parent.mkdir(parents=True, exist_ok=True)
                         try:
                             src.replace(dst)
                         except Exception:
@@ -285,6 +295,8 @@ class NVDCPEMatchDownloader(StandardDownloader):
             except Exception:
                 logger.debug('Could not fetch CPEmatch schema')
 
+            # Ensure manifest directory exists before saving
+            self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
             self.save_manifest(manifest)
         
         return {'standard': 'cpematch', 'files': [file_meta] if file_meta else []}
@@ -316,6 +328,8 @@ class NVDCVEDownloader(StandardDownloader):
         
         manifest['files'] = files_metadata
         manifest['source'] = 'https://nvd.nist.gov/feeds/json/cve/2.0/'
+        # Ensure manifest directory exists before saving
+        self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
         self.save_manifest(manifest)
         
         # Attempt to download CVE JSON schema for reference
@@ -401,6 +415,8 @@ class MITRECWEDownloader(StandardDownloader):
             except Exception:
                 logger.debug('Could not fetch CWE schema')
 
+            # Ensure manifest directory exists before saving
+            self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
             self.save_manifest(manifest)
         
         return {'standard': 'cwe', 'files': [file_meta] if file_meta else []}
@@ -425,6 +441,8 @@ class MITRECAPECDownloader(StandardDownloader):
         if file_meta:
             manifest['files'] = [file_meta]
             manifest['source'] = 'https://capec.mitre.org/'
+            # Ensure manifest directory exists before saving
+            self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
             self.save_manifest(manifest)
         
         return {'standard': 'capec', 'files': [file_meta] if file_meta else []}
@@ -457,6 +475,8 @@ class MITREATTACKDownloader(StandardDownloader):
         
         manifest['files'] = files_metadata
         manifest['source'] = 'https://github.com/mitre/cti'
+        # Ensure manifest directory exists before saving
+        self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
         self.save_manifest(manifest)
         
         return {'standard': 'attack', 'files': files_metadata}
@@ -495,6 +515,8 @@ class MITRED3FENDDownloader(StandardDownloader):
         if file_meta:
             manifest['files'] = [file_meta]
             manifest['source'] = 'https://d3fend.mitre.org/'
+            # Ensure manifest directory exists before saving
+            self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
             self.save_manifest(manifest)
         else:
             logger.warning("Could not download D3FEND from any source")
@@ -545,6 +567,8 @@ class MITRECARDownloader(StandardDownloader):
         if files_metadata:
             manifest['files'] = files_metadata
             manifest['source'] = 'https://github.com/mitre-attack/car'
+            # Ensure manifest directory exists before saving
+            self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
             self.save_manifest(manifest)
         else:
             logger.warning("Could not download any CAR files")
@@ -606,6 +630,8 @@ class MITRESHIELDDownloader(StandardDownloader):
                 if files_metadata:
                     manifest['files'] = files_metadata
                     manifest['source'] = api_url.split('/contents')[0]
+                    # Ensure manifest directory exists before saving
+                    self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
                     self.save_manifest(manifest)
                     return {'standard': 'shield', 'files': files_metadata}
             except Exception as e:
@@ -664,6 +690,8 @@ class MITREENGAGEDownloader(StandardDownloader):
             if files_metadata:
                 manifest['files'] = files_metadata
                 manifest['source'] = 'https://github.com/mitre/engage'
+                # Ensure manifest directory exists before saving
+                self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
                 self.save_manifest(manifest)
             else:
                 logger.warning('Could not download ENGAGE files from GitHub API')
