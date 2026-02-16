@@ -31,23 +31,42 @@ def build_py_cmd(args_list: list[str]) -> list[str]:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Load TO Neo4j wrapper (nodes-first, rels-second)")
-    parser.add_argument('--nodes-ttl', default='tmp/combined-nodes.ttl')
-    parser.add_argument('--rels-ttl', default='tmp/combined-rels.ttl')
-    parser.add_argument('--db-version', default=datetime.utcnow().strftime('%Y-%m-%d'))
-    parser.add_argument('--dry-run', action='store_true')
-    parser.add_argument('--chunk-size', type=int, default=50000)
-    parser.add_argument('--batch-size', type=int, default=5000)
-    parser.add_argument('--rel-batch-size', type=int, default=1000)
-    parser.add_argument('--fast-parse', action='store_true')
-    parser.add_argument('--progress-newline', action='store_true')
-    parser.add_argument('--heartbeat', type=int, default=30)
-    parser.add_argument('--logs-dir', default='logs')
+    parser = argparse.ArgumentParser(
+        description="Load RDF/TTL files into Neo4j in nodes-first, relationships-second order. "
+                    "Creates timestamped logs and supports chunked, batched, and incremental loading."
+    )
+    parser.add_argument('--nodes-ttl', default='tmp/combined-nodes.ttl',
+                        help='TTL file containing node definitions to load (default: tmp/combined-nodes.ttl)')
+    parser.add_argument('--rels-ttl', default='tmp/combined-rels.ttl',
+                        help='TTL file containing relationship definitions to load (default: tmp/combined-rels.ttl)')
+    parser.add_argument('--db-version', default=datetime.now().strftime('%Y-%m-%d'),
+                        help='Database version label for provenance (default: today\'s date)')
+    dryrun_group = parser.add_mutually_exclusive_group()
+    dryrun_group.add_argument('--dry-run', dest='dry_run', action='store_true', default=True,
+                              help='Estimate import size and validate TTLs, but do not load into Neo4j (default: enabled)')
+    dryrun_group.add_argument('--no-dry-run', dest='dry_run', action='store_false',
+                              help='Perform actual load into Neo4j (disables dry-run)')
+    parser.add_argument('--chunk-size', type=int, default=50000,
+                        help='Number of triples per chunk to process in memory (default: 50000)')
+    parser.add_argument('--batch-size', type=int, default=5000,
+                        help='Number of nodes/relationships per Cypher batch (default: 5000)')
+    parser.add_argument('--rel-batch-size', type=int, default=1000,
+                        help='Number of relationships per Cypher batch (default: 1000)')
+    parser.add_argument('--fast-parse', action='store_true',
+                        help='Enable fast parsing mode (less validation, more speed)')
+    parser.add_argument('--progress-newline', action='store_true',
+                        help='Print progress on new lines (for CI logs or noisy output)')
+    parser.add_argument('--heartbeat', type=int, default=30,
+                        help='Seconds between progress heartbeats (default: 30)')
+    parser.add_argument('--logs-dir', default='logs',
+                        help='Directory to store log files (default: logs)')
+    parser.add_argument('--reset-db', action='store_true', default=False,
+                        help='Reset Neo4j database before loading nodes (default: False; WARNING: this will erase all data)')
     parsed = parser.parse_args()
 
     logs_dir = Path(parsed.logs_dir)
     logs_dir.mkdir(exist_ok=True)
-    ts = datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
+    ts = datetime.now().strftime('%Y%m%dT%H%M%S')
     nodes_log = logs_dir / f'load-nodes-{ts}.log'
     rels_log = logs_dir / f'load-rels-{ts}.log'
 
@@ -74,8 +93,9 @@ def main():
                  '--chunk-size', str(parsed.chunk_size),
                  '--batch-size', str(parsed.batch_size),
                  '--db-version', parsed.db_version,
-                 '--reset-db',
                  '--nodes-only']
+    if parsed.reset_db:
+        nodes_cmd.insert(nodes_cmd.index('--nodes-only'), '--reset-db')
     if parsed.fast_parse:
         nodes_cmd.append('--fast-parse')
     if parsed.progress_newline:
