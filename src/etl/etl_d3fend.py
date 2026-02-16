@@ -35,11 +35,25 @@ except Exception:
 class D3FENDtoRDFTransformer:
     """Transform D3FEND JSON to RDF."""
 
+    PHASE_A_DEFENSIVE_PREDICATES = {
+        "analyzes": "analyzes",
+        "monitors": "monitors",
+        "hardens": "hardens",
+        "filters": "filters",
+        "isolates": "isolates",
+        "restricts": "restricts",
+        "enables": "enables",
+        "blocks": "blocks",
+    }
+
     def __init__(self):
         self.graph = Graph()
         self.SEC = Namespace("https://example.org/sec/core#")
         self.EX = Namespace("https://example.org/")
-        
+        self._def_tech_alias_to_id = {}
+        self._def_tech_alias_index_loaded = False
+        self._items_by_id = {}
+
         self.graph.bind("sec", self.SEC)
         self.graph.bind("rdf", RDF)
         self.graph.bind("rdfs", RDFS)
@@ -79,29 +93,299 @@ class D3FENDtoRDFTransformer:
 
         return s
 
-    def transform(self, json_data: dict) -> Graph:
+    def transform(self, json_data: dict, source_path: str | None = None) -> Graph:
         """Transform D3FEND JSON to RDF graph."""
         if "DefensiveTechniques" in json_data:
             techniques = json_data["DefensiveTechniques"]
-
-            for technique in techniques:
-                self._add_defensive_technique(technique)
-
-            self._add_technique_relationships(techniques)
-            self._add_mitigation_relationships(techniques)
+            for item in techniques:
+                self._transform_technique(item)
             return self.graph
 
         if "@graph" in json_data:
-            self._transform_jsonld(json_data.get("@graph", []))
+            graph_items = json_data.get("@graph", [])
+            self._index_graph_items(graph_items)
+            self._transform_jsonld(graph_items)
             return self.graph
 
         # SPARQL full mappings format (results -> bindings)
         if "results" in json_data and isinstance(json_data.get("results"), dict):
             bindings = json_data.get("results", {}).get("bindings", [])
-            self._transform_sparql_bindings(bindings)
+            self._transform_sparql_bindings(bindings, source_path=source_path)
             return self.graph
 
         raise ValueError("Unsupported D3FEND JSON format")
+    def _transform_technique(self, item: dict) -> None:
+        d3fend_id = item.get("d3fendId") or item.get("d3fend-id")
+        if not d3fend_id:
+            return
+        technique_node = URIRef(f"{self.EX}deftech/{self._normalize_d3fend_id(d3fend_id)}")
+        self.graph.add((technique_node, RDF.type, self.SEC.DefensiveTechnique))
+        label = item.get("label")
+        if label:
+            self.graph.add((technique_node, RDFS.label, Literal(label, datatype=XSD.string)))
+        definition = item.get("definition")
+        if definition:
+            self.graph.add((technique_node, self.SEC.description, Literal(definition, datatype=XSD.string)))
+
+    def _index_graph_items(self, graph_items: list) -> None:
+        for item in graph_items:
+            if not isinstance(item, dict):
+                continue
+            item_id = item.get("@id")
+            if isinstance(item_id, str) and item_id:
+                self._items_by_id[item_id] = item
+            d3fend_id = self._get_value(item.get("d3f:d3fend-id")) or self._get_value(item.get("d3f:d3fendId"))
+            if not d3fend_id:
+                continue
+            if isinstance(item_id, str) and item_id:
+                local = item_id.split(":", 1)[-1] if ":" in item_id else item_id
+                self._def_tech_alias_to_id[local] = str(d3fend_id)
+            label = self._get_value(item.get("rdfs:label"))
+            if isinstance(label, str) and label:
+                self._def_tech_alias_to_id[label] = str(d3fend_id)
+                compact = "".join(ch for ch in label if ch.isalnum()).lower()
+                if compact:
+                    self._def_tech_alias_to_id[compact] = str(d3fend_id)
+
+    def _reference_uri(self, ref_id: str) -> URIRef:
+        token = ref_id
+        if token.startswith("http://") or token.startswith("https://"):
+            token = token.rstrip("/").rsplit("/", 1)[-1]
+        if ":" in token:
+            token = token.split(":", 1)[-1]
+        return URIRef(f"{self.EX}reference/{self._normalize_d3fend_id(token)}")
+
+    def _resource_uri(self, item_id: str) -> URIRef:
+        token = item_id
+        if token.startswith("http://") or token.startswith("https://"):
+            token = token.rstrip("/").rsplit("/", 1)[-1]
+        if ":" in token:
+            token = token.split(":", 1)[-1]
+        return URIRef(f"{self.EX}d3fentity/{self._normalize_d3fend_id(token)}")
+
+    def _ensure_resource_node(self, item_id: str) -> URIRef | None:
+        target_item = self._items_by_id.get(item_id)
+        if not isinstance(target_item, dict):
+            return None
+        resource_node = self._resource_uri(item_id)
+        item_types = target_item.get("@type")
+        type_values = [item_types] if isinstance(item_types, str) else item_types if isinstance(item_types, list) else []
+        for t in type_values:
+            if not isinstance(t, str):
+                continue
+            local = t.split(":", 1)[-1] if ":" in t else t
+            if local:
+                self.graph.add((resource_node, RDF.type, URIRef(f"{self.SEC}{local}")))
+        self.graph.add((resource_node, RDF.type, URIRef(f"{self.SEC}D3fendResource")))
+        label = self._get_value(target_item.get("rdfs:label"))
+        if isinstance(label, str) and label:
+            self.graph.add((resource_node, RDFS.label, Literal(label, datatype=XSD.string)))
+        description = self._get_value(target_item.get("d3f:definition"))
+        if isinstance(description, str) and description:
+            self.graph.add((resource_node, self.SEC.description, Literal(description, datatype=XSD.string)))
+        self.graph.add((resource_node, self.SEC.sourceIdentifier, Literal(item_id, datatype=XSD.string)))
+        return resource_node
+
+    def _add_phase_a_properties(self, technique_node: URIRef, item: dict) -> None:
+        source_identifier = item.get("@id")
+        if isinstance(source_identifier, str) and source_identifier:
+            self._add_single_string_value(technique_node, self.SEC.sourceIdentifier, source_identifier)
+        status = self._get_value(item.get("d3f:status"))
+        if isinstance(status, str) and status:
+            self.graph.add((technique_node, self.SEC.status, Literal(status, datatype=XSD.string)))
+        kb_article = self._get_value(item.get("d3f:kb-article"))
+        if isinstance(kb_article, str) and kb_article:
+            self.graph.add((technique_node, self.SEC.kbArticle, Literal(kb_article, datatype=XSD.string)))
+        synonyms = item.get("d3f:synonym")
+        synonym_values = synonyms if isinstance(synonyms, list) else [synonyms] if synonyms else []
+        for synonym in synonym_values:
+            synonym_text = self._get_value(synonym)
+            if isinstance(synonym_text, str) and synonym_text:
+                self.graph.add((technique_node, self.SEC.synonym, Literal(synonym_text, datatype=XSD.string)))
+        see_also = item.get("rdfs:seeAlso")
+        see_also_values = see_also if isinstance(see_also, list) else [see_also] if see_also else []
+        for entry in see_also_values:
+            target = self._get_value(entry)
+            if isinstance(target, str) and (target.startswith("http://") or target.startswith("https://")):
+                self.graph.add((technique_node, self.SEC.url, Literal(target, datatype=XSD.anyURI)))
+
+    def _add_single_string_value(self, subject: URIRef, predicate: URIRef, value: str) -> None:
+        if not isinstance(value, str) or not value:
+            return
+        if any(True for _ in self.graph.objects(subject, predicate)):
+            return
+        self.graph.add((subject, predicate, Literal(value, datatype=XSD.string)))
+
+    def _add_typed_kb_references(self, technique_node: URIRef, item: dict) -> None:
+        ref_values = []
+        for key in ("d3f:kb-reference", "d3f:kb-reference-of"):
+            value = item.get(key)
+            if isinstance(value, list):
+                ref_values.extend(value)
+            elif value is not None:
+                ref_values.append(value)
+        for ref in ref_values:
+            ref_id = self._get_value(ref)
+            if not isinstance(ref_id, str) or not ref_id:
+                continue
+            ref_item = self._items_by_id.get(ref_id)
+            ref_node = self._reference_uri(ref_id)
+            self.graph.add((ref_node, RDF.type, self.SEC.Reference))
+            if isinstance(ref_item, dict):
+                ref_type = ref_item.get("@type")
+                if isinstance(ref_type, list):
+                    ref_type = next((t for t in ref_type if isinstance(t, str) and t.startswith("d3f:")), None)
+                if isinstance(ref_type, str):
+                    self.graph.add((ref_node, self.SEC.referenceType, Literal(ref_type.split(":", 1)[-1], datatype=XSD.string)))
+                title = self._get_value(ref_item.get("d3f:kb-reference-title")) or self._get_value(ref_item.get("rdfs:label"))
+                if isinstance(title, str) and title:
+                    self.graph.add((ref_node, RDFS.label, Literal(title, datatype=XSD.string)))
+                ref_url = self._get_value(ref_item.get("rdfs:seeAlso")) or self._get_value(ref_item.get("rdfs:isDefinedBy"))
+                if isinstance(ref_url, str) and (ref_url.startswith("http://") or ref_url.startswith("https://")):
+                    self.graph.add((ref_node, self.SEC.url, Literal(ref_url, datatype=XSD.anyURI)))
+                organization = self._get_value(ref_item.get("d3f:kb-organization"))
+                if isinstance(organization, str) and organization:
+                    self.graph.add((ref_node, self.SEC.referenceSource, Literal(organization, datatype=XSD.string)))
+            if not any(True for _ in self.graph.objects(ref_node, RDFS.label)) and not any(True for _ in self.graph.objects(ref_node, self.SEC.url)):
+                fallback_label = ref_id.split(":", 1)[-1] if ":" in ref_id else ref_id
+                if fallback_label:
+                    self.graph.add((ref_node, RDFS.label, Literal(fallback_label, datatype=XSD.string)))
+            self.graph.add((technique_node, self.SEC.references, ref_node))
+
+    def _resolve_phase_a_target(self, target_value) -> URIRef | None:
+        target = self._get_value(target_value)
+        if not isinstance(target, str) or not target:
+            return None
+        target_item = self._items_by_id.get(target)
+        if isinstance(target_item, dict):
+            target_id = self._get_value(target_item.get("d3f:d3fend-id")) or self._get_value(target_item.get("d3f:d3fendId"))
+            if isinstance(target_id, str) and target_id:
+                return URIRef(f"{self.EX}deftech/{self._normalize_d3fend_id(target_id)}")
+            resource_node = self._ensure_resource_node(target)
+            if resource_node is not None:
+                return resource_node
+        token = target.split(":", 1)[-1] if ":" in target else target
+        resolved = self._def_tech_alias_to_id.get(token)
+        if resolved:
+            return URIRef(f"{self.EX}deftech/{self._normalize_d3fend_id(resolved)}")
+        compact = "".join(ch for ch in token if ch.isalnum()).lower()
+        if compact:
+            resolved_compact = self._def_tech_alias_to_id.get(compact)
+            if resolved_compact:
+                return URIRef(f"{self.EX}deftech/{self._normalize_d3fend_id(resolved_compact)}")
+        return None
+
+    def _add_phase_a_defensive_predicates(self, technique_node: URIRef, item: dict) -> None:
+        for key, rel_name in self.PHASE_A_DEFENSIVE_PREDICATES.items():
+            value = item.get(f"d3f:{key}")
+            if value is None:
+                continue
+            values = value if isinstance(value, list) else [value]
+            rel_predicate = URIRef(f"{self.SEC}{rel_name}")
+            for candidate in values:
+                target_node = self._resolve_phase_a_target(candidate)
+                if not target_node:
+                    continue
+                self.graph.add((technique_node, rel_predicate, target_node))
+
+    def _load_def_tech_alias_index(self, source_path: str | None = None) -> None:
+        if self._def_tech_alias_index_loaded:
+            return
+        candidate_paths = []
+        if source_path:
+            src = Path(source_path)
+            candidate_paths.append(src.parent / "d3fend.json")
+        candidate_paths.append(Path("data/d3fend/raw/d3fend.json"))
+        d3fend_json_path = None
+        for candidate in candidate_paths:
+            if candidate and candidate.exists():
+                d3fend_json_path = candidate
+                break
+        self._def_tech_alias_index_loaded = True
+        if not d3fend_json_path:
+            return
+        try:
+            with open(d3fend_json_path, 'r', encoding='utf-8', errors='replace') as f:
+                data = json.load(f)
+        except Exception:
+            return
+        graph_items = data.get("@graph", []) if isinstance(data, dict) else []
+        for item in graph_items:
+            if not isinstance(item, dict):
+                continue
+            d3fend_id = self._get_value(item.get("d3f:d3fend-id")) or self._get_value(item.get("d3f:d3fendId"))
+            if not d3fend_id:
+                continue
+            id_value = item.get("@id")
+            if isinstance(id_value, str) and id_value:
+                local = id_value.split(":", 1)[-1] if ":" in id_value else id_value
+                if local:
+                    self._def_tech_alias_to_id[local] = str(d3fend_id)
+            label = self._get_value(item.get("rdfs:label"))
+            if isinstance(label, str) and label:
+                self._def_tech_alias_to_id[label] = str(d3fend_id)
+                self._def_tech_alias_to_id["".join(ch for ch in label if ch.isalnum()).lower()] = str(d3fend_id)
+
+    def _resolve_def_tech_id(self, binding: dict) -> str | None:
+        def_tech_id = None
+        def_tech_alias = None
+        if "def_tech" in binding and isinstance(binding["def_tech"], dict):
+            def_tech_value = binding["def_tech"].get("value")
+            if isinstance(def_tech_value, str) and def_tech_value.strip():
+                token = def_tech_value.strip()
+                if "#" in token:
+                    token = token.rsplit("#", 1)[-1]
+                elif "/" in token:
+                    token = token.rstrip("/").rsplit("/", 1)[-1]
+                def_tech_alias = token or None
+        if "def_tech_id" in binding and isinstance(binding["def_tech_id"], dict):
+            def_tech_id = binding["def_tech_id"].get("value") or def_tech_id
+        if "d3fend_id" in binding and isinstance(binding["d3fend_id"], dict):
+            def_tech_id = binding["d3fend_id"].get("value") or def_tech_id
+        if not def_tech_id and def_tech_alias:
+            def_tech_id = self._def_tech_alias_to_id.get(def_tech_alias)
+        if not def_tech_id and "def_tech_label" in binding and isinstance(binding["def_tech_label"], dict):
+            label = binding["def_tech_label"].get("value")
+            if isinstance(label, str):
+                compact = "".join(ch for ch in label if ch.isalnum()).lower()
+                def_tech_id = self._def_tech_alias_to_id.get(label) or self._def_tech_alias_to_id.get(compact)
+        if not def_tech_id and def_tech_alias:
+            def_tech_id = def_tech_alias
+        return def_tech_id
+
+    def _transform_jsonld(self, graph_items: list) -> None:
+        for item in graph_items:
+            if not isinstance(item, dict):
+                continue
+            d3fend_id = self._get_value(item.get("d3f:d3fend-id")) or self._get_value(item.get("d3f:d3fendId"))
+            if not d3fend_id:
+                continue
+            technique_node = URIRef(f"{self.EX}deftech/{self._normalize_d3fend_id(d3fend_id)}")
+            self.graph.add((technique_node, RDF.type, self.SEC.DefensiveTechnique))
+            label = self._get_value(item.get("rdfs:label"))
+            if label:
+                self.graph.add((technique_node, RDFS.label, Literal(label, datatype=XSD.string)))
+            definition = self._get_value(item.get("d3f:definition"))
+            if definition:
+                self.graph.add((technique_node, self.SEC.description, Literal(definition, datatype=XSD.string)))
+            self._add_phase_a_properties(technique_node, item)
+            self._add_typed_kb_references(technique_node, item)
+            self._add_phase_a_defensive_predicates(technique_node, item)
+
+    def _transform_sparql_bindings(self, bindings: list, source_path: str | None = None) -> None:
+        self._load_def_tech_alias_index(source_path=source_path)
+        for binding in bindings:
+            if not isinstance(binding, dict):
+                continue
+            def_tech_id = self._resolve_def_tech_id(binding)
+            att_tech_id = None
+            if "off_tech_id" in binding and isinstance(binding["off_tech_id"], dict):
+                att_tech_id = binding["off_tech_id"].get("value")
+            if def_tech_id and att_tech_id:
+                att_id_full = f"{att_tech_id}" if str(att_tech_id).startswith("T") else f"T{att_tech_id}"
+                def_tech_node = URIRef(f"{self.EX}deftech/{self._normalize_d3fend_id(def_tech_id)}")
+                att_node = URIRef(f"{self.EX}technique/{att_id_full}")
+                self.graph.add((def_tech_node, self.SEC.mitigates, att_node))
 
     def _transform_jsonld(self, graph_items: list) -> None:
         """Transform D3FEND JSON-LD (@graph) into DefensiveTechnique nodes."""
@@ -135,35 +419,6 @@ class D3FENDtoRDFTransformer:
             if definition:
                 self.graph.add((technique_node, self.SEC.description, Literal(definition, datatype=XSD.string)))
 
-    def _transform_sparql_bindings(self, bindings: list) -> None:
-        """Transform SPARQL full mappings (D3FEND to ATT&CK) into mitigates relationships."""
-        for binding in bindings:
-            if not isinstance(binding, dict):
-                continue
-            
-            # Extract D3FEND technique label and ATT&CK technique ID from SPARQL results
-            def_tech_label = None
-            if "def_tech_label" in binding and isinstance(binding["def_tech_label"], dict):
-                def_tech_label = binding["def_tech_label"].get("value")
-            
-            att_tech_id = None
-            if "off_tech_id" in binding and isinstance(binding["off_tech_id"], dict):
-                att_tech_id = binding["off_tech_id"].get("value")
-            
-            # If we have both, create a mitigates relationship
-            if def_tech_label and att_tech_id:
-                # Normalize IDs
-                att_id_full = f"{att_tech_id}" if str(att_tech_id).startswith("T") else f"T{att_tech_id}"
-                
-                # Use def_tech_label to create URI (convert to proper D3FEND ID-like format)
-                # D3FEND uses CamelCase for technique names in URIs
-                def_tech_uri = "".join(word.capitalize() for word in def_tech_label.split())
-                
-                def_tech_node = URIRef(f"{self.EX}deftech/{def_tech_uri}")
-                att_node = URIRef(f"{self.EX}technique/{att_id_full}")
-                
-                # Add the mitigates relationship
-                self.graph.add((def_tech_node, self.SEC.mitigates, att_node))
 
     def _is_defensive_technique(self, item: dict) -> bool:
         types = item.get("@type")

@@ -524,6 +524,7 @@ class MITRED3FENDDownloader(StandardDownloader):
             'd3fend.owl',
         }
 
+
         for filename, urls in file_candidates.items():
             file_meta = None
             for url in urls:
@@ -531,6 +532,19 @@ class MITRED3FENDDownloader(StandardDownloader):
                     candidate_meta = self.download_file(url, filename, extract_zip=False)
                     if candidate_meta and candidate_meta.get('status') in {'success', 'cached'}:
                         file_meta = candidate_meta
+                        # If this is d3fend.owl, move it to schemas dir
+                        if filename == 'd3fend.owl':
+                            schema_dir = self.raw_dir.parent / 'schemas'
+                            schema_dir.mkdir(parents=True, exist_ok=True)
+                            src = self.raw_dir / filename
+                            dst = schema_dir / filename
+                            try:
+                                if src.exists():
+                                    src.replace(dst)
+                                    file_meta['moved_to'] = str(dst)
+                                    logger.info(f"Moved {filename} to {dst}")
+                            except Exception as move_exc:
+                                logger.warning(f"Could not move d3fend.owl to schemas dir: {move_exc}")
                         break
                 except Exception as e:
                     logger.debug(f"Failed to download {filename} from {url}: {e}")
