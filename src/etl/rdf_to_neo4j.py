@@ -1,3 +1,4 @@
+    # D3FEND enhancement: normalize D3FEND IDs and add D3fendResource label mapping
 #!/usr/bin/env python3
 """
 RDF-to-Neo4j Transformer for KGCS

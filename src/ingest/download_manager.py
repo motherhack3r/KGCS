@@ -22,10 +22,7 @@ import gzip
 import importlib.util
 import asyncio
 from abc import ABC, abstractmethod
-
-
-# Ensure logs directory exists before configuring logging
-os.makedirs('logs', exist_ok=True)
+import argparse
 
 # Configure logging
 logging.basicConfig(
@@ -491,37 +488,74 @@ class MITRED3FENDDownloader(StandardDownloader):
     def download(self) -> Dict:
         """Download D3FEND ontology from MITRE."""
         logger.info("Starting MITRE D3FEND download...")
-        
-        # Try D3FEND OWL ontology - various possible formats
-        urls_to_try = [
-            'https://d3fend.mitre.org/ontologies/d3fend.owl',
-            'https://raw.githubusercontent.com/mitre-engenuity/d3fend/master/d3fend.owl',
-            'https://d3fend.mitre.org/api/json/d3fend.json'
-        ]
-        
         manifest = self.load_manifest()
-        file_meta = None
-        
-        for url in urls_to_try:
-            try:
-                filename = url.split('/')[-1]
-                file_meta = self.download_file(url, filename, extract_zip=False)
-                if file_meta:
-                    break
-            except Exception as e:
-                logger.debug(f"Failed to download from {url}: {e}")
-                continue
-        
-        if file_meta:
-            manifest['files'] = [file_meta]
+        files_metadata = []
+        try:
+            from src.ingest.ingest_config import APIEndpoints
+            base_url = APIEndpoints.MITRE_D3FEND_BASE.rstrip('/')
+        except Exception:
+            base_url = 'https://d3fend.mitre.org/ontologies/d3fend/1.3.0'
+
+        file_candidates = {
+            'd3fend-full-mappings.json': [
+                f'{base_url}/d3fend-full-mappings.json',
+                'https://d3fend.mitre.org/ontologies/d3fend/1.3.0/d3fend-full-mappings.json',
+                'https://raw.githubusercontent.com/mitre-engenuity/d3fend/master/d3fend-full-mappings.json',
+            ],
+            'd3fend.json': [
+                f'{base_url}/d3fend.json',
+                'https://d3fend.mitre.org/api/json/d3fend.json',
+                'https://raw.githubusercontent.com/mitre-engenuity/d3fend/master/d3fend.json',
+            ],
+            'd3fend.owl': [
+                'https://d3fend.mitre.org/ontologies/d3fend.owl',
+                f'{base_url}/d3fend.owl',
+                'https://raw.githubusercontent.com/mitre-engenuity/d3fend/master/d3fend.owl',
+            ],
+            'd3fend.ttl': [
+                f'{base_url}/d3fend.ttl',
+                'https://raw.githubusercontent.com/mitre-engenuity/d3fend/master/d3fend.ttl',
+            ],
+        }
+
+        required_files = {
+            'd3fend-full-mappings.json',
+            'd3fend.json',
+            'd3fend.owl',
+        }
+
+        for filename, urls in file_candidates.items():
+            file_meta = None
+            for url in urls:
+                try:
+                    candidate_meta = self.download_file(url, filename, extract_zip=False)
+                    if candidate_meta and candidate_meta.get('status') in {'success', 'cached'}:
+                        file_meta = candidate_meta
+                        break
+                except Exception as e:
+                    logger.debug(f"Failed to download {filename} from {url}: {e}")
+                    continue
+
+            if file_meta:
+                files_metadata.append(file_meta)
+            elif filename in required_files:
+                logger.warning(f"Missing required D3FEND artifact: {filename}")
+            else:
+                logger.info(f"Optional D3FEND artifact not available: {filename}")
+
+        if files_metadata:
+            manifest['files'] = files_metadata
             manifest['source'] = 'https://d3fend.mitre.org/'
-            # Ensure manifest directory exists before saving
-            self.manifest_file.parent.mkdir(parents=True, exist_ok=True)
             self.save_manifest(manifest)
         else:
             logger.warning("Could not download D3FEND from any source")
-        
-        return {'standard': 'd3fend', 'files': [file_meta] if file_meta else []}
+
+        downloaded_required = {f.get('filename') for f in files_metadata}
+        missing_required = sorted(required_files - downloaded_required)
+        if missing_required:
+            logger.warning(f"D3FEND required artifacts still missing: {', '.join(missing_required)}")
+
+        return {'standard': 'd3fend', 'files': files_metadata}
 
 
 class MITRECARDownloader(StandardDownloader):
@@ -705,23 +739,33 @@ class MITREENGAGEDownloader(StandardDownloader):
 class DownloadPipeline:
     """Orchestrate downloads for all standards."""
 
-    def __init__(self, base_dir: str = 'data', skip_large_files: bool = False):
+    def __init__(self, base_dir: str = 'data', skip_large_files: bool = False, standards: Optional[List[str]] = None):
         self.base_dir = base_dir
         self.skip_large_files = skip_large_files
-        self.downloaders = [
-            NVDCPEDownloader() if not skip_large_files else None,
-            NVDCPEMatchDownloader() if not skip_large_files else None,
-            NVDCVEDownloader() if not skip_large_files else None,
-            MITRECWEDownloader(),
-            MITRECAPECDownloader(),
-            MITREATTACKDownloader(),
-            MITRED3FENDDownloader(),
-            MITRECARDownloader(),
-            MITRESHIELDDownloader(),
-            MITREENGAGEDownloader(),
-        ]
-        # Filter out None values
-        self.downloaders = [d for d in self.downloaders if d is not None]
+        all_downloaders = {
+            'cpe': NVDCPEDownloader(),
+            'cpematch': NVDCPEMatchDownloader(),
+            'cve': NVDCVEDownloader(),
+            'cwe': MITRECWEDownloader(),
+            'capec': MITRECAPECDownloader(),
+            'attack': MITREATTACKDownloader(),
+            'd3fend': MITRED3FENDDownloader(),
+            'car': MITRECARDownloader(),
+            'shield': MITRESHIELDDownloader(),
+            'engage': MITREENGAGEDownloader(),
+        }
+
+        if skip_large_files:
+            for large_standard in ('cpe', 'cpematch', 'cve'):
+                all_downloaders.pop(large_standard, None)
+
+        self.selected_standards = None
+        if standards:
+            requested = {s.strip().lower() for s in standards if s and s.strip()}
+            self.selected_standards = requested
+            all_downloaders = {k: v for k, v in all_downloaders.items() if k in requested}
+
+        self.downloaders = list(all_downloaders.values())
         self.results = []
 
     async def run(self) -> Dict:
@@ -795,12 +839,34 @@ def main():
     import sys
     os.makedirs('logs', exist_ok=True)
     
-    # Check for command line argument to skip large files
-    skip_large = '--skip-large' in sys.argv
-    if skip_large:
+    parser = argparse.ArgumentParser(description='KGCS download pipeline')
+    parser.add_argument('--skip-large', action='store_true', help='Skip large NVD files (CPE, CPEMatch, CVE)')
+    parser.add_argument(
+        '--standards',
+        nargs='+',
+        help='Run only selected standards (space and/or comma separated). Allowed: cpe cpematch cve cwe capec attack d3fend car shield engage'
+    )
+    args = parser.parse_args()
+
+    requested_standards = []
+    if args.standards:
+        for token in args.standards:
+            requested_standards.extend([item.strip().lower() for item in token.split(',') if item.strip()])
+
+    allowed = {'cpe', 'cpematch', 'cve', 'cwe', 'capec', 'attack', 'd3fend', 'car', 'shield', 'engage'}
+    invalid = sorted(set(requested_standards) - allowed)
+    if invalid:
+        logger.error(f"Unknown standards: {', '.join(invalid)}")
+        logger.error(f"Allowed values: {', '.join(sorted(allowed))}")
+        return 2
+
+    if args.skip_large:
         logger.info("Skipping large NVD files (CPE, CPEMatch, CVE)")
-    
-    pipeline = DownloadPipeline(skip_large_files=skip_large)
+
+    if requested_standards:
+        logger.info(f"Filtering download to standards: {', '.join(sorted(set(requested_standards)))}")
+
+    pipeline = DownloadPipeline(skip_large_files=args.skip_large, standards=requested_standards or None)
     asyncio.run(pipeline.run())
     
     # Exit with error if any download failed
