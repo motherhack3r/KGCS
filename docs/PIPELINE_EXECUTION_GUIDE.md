@@ -54,6 +54,16 @@ E:/DEVEL/LAIA/KGCS/.conda/python.exe -m src.ingest.download_manager
 # Step 3: Run ETL pipeline (transforms raw data to RDF Turtle)
 E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/run_all_etl.py
 
+Or run a single-standard ETL (recommended for iterative work):
+
+```powershell
+# Guided interactive helper (asks standard + step)
+python scripts/run_standard_pipeline.py
+
+# Direct per-standard ETL module (example: CAPEC)
+python -m src.etl.etl_capec --input data/capec/raw --output data/capec/samples/pipeline-stage6-capec.ttl
+```
+
 # Step 4: Validate outputs with SHACL (recommended)
 # Run SHACL validation for all standards before combining/loading
 E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/validation/validate_all_standards.py
@@ -91,8 +101,8 @@ Notes:
 
 
 Note: ETL output locations
-
 - Stages 1–10 write per-standard TTLs into `data/{standard}/samples/`.
+- ETLs also write a full per-standard TTL to `tmp/` (useful for combined-file workflows and troubleshooting).
 - `scripts/load_nodes_all.ps1` and `scripts/load_rels_all.ps1` load directly from those canonical stage files.
 - `tmp/` and `scripts/combine_ttl_pipeline.py` are optional for combined-file workflows and troubleshooting.
 
@@ -572,6 +582,13 @@ tmp/combined-nodes.ttl + tmp/combined-rels.ttl     ~28,600 MB   (optional combin
 ## References
 
 - [ARCHITECTURE.md](../docs/ARCHITECTURE.md) - 5-phase roadmap
+
+## Appendix: Recent Changes & Migration Notes
+
+- CAPEC→ATT&CK predicate: some historical ETL versions used `SEC.implements` while others emitted `SEC.implemented_as`. The current CAPEC ETL emits `SEC.implemented_as` and the loader preserves predicates by default.
+- If you need a canonical predicate across an existing database, run the one-time Cypher migration in the README appendix to convert `IMPLEMENTED_AS` to `IMPLEMENTS`.
+- The stats utility now reports a `capec_to_technique_breakdown` and `capec_to_technique_samples` to help verify CAPEC→Technique mappings (see `artifacts/neo4j-stats-<db>.json`).
+
 - [KGCS.md](../docs/KGCS.md) - Executive summary
 - [GLOSSARY.md](../docs/GLOSSARY.md) - Standard definitions
 - [D3FEND_DATA_RECOVERY.md](../docs/D3FEND_DATA_RECOVERY.md) - D3FEND fix details

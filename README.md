@@ -63,8 +63,15 @@ For a full technical and architectural overview, see [docs/KGCS.md](docs/KGCS.md
 2. **Load data**  
    - Download NVD and MITRE JSON/STIX files into data.  
    - Run the ingestion script (Python/Neo4j or RDF).  
+  
+   Tip: For interactive, single-standard runs use the guided helper:
 
-3. **Query the graph**  
+   ```bash
+   python scripts/run_standard_pipeline.py
+   # choose a standard (e.g. capec) and a single step (download|etl|shacl|load-nodes|load-rels|stats)
+   ```
+
+3. **Query the graph**
    - Use Neo4j Cypher or SPARQL.  
    - Example:  
 
@@ -74,7 +81,7 @@ For a full technical and architectural overview, see [docs/KGCS.md](docs/KGCS.md
      RETURN cve, cwe
      ```
 
-4. **Integrate with RAG**  
+4. **Integrate with RAG**
    - Use the pre‑approved traversal templates in rag.  
    - Ensure LLM queries follow a template; otherwise reject.
 
@@ -114,6 +121,17 @@ Each extension lives in its own OWL file and imports the core ontology.
 
 - `scripts/db/` holds the Phase 4 helpers (`create_cpe_cve_relationships.py`, `verify_phase4_complete.py`, the `check_*` utilities, etc.) that interact with Neo4j for reproduction or diagnostics.  
 - `scripts/legacy/phase4/` archives the one-off repair/verification scripts (`repair_cpe_properties.py`, `diagnose_cpe_mismatch.py`, `check_buggy_pattern.py`, etc.) that were needed during the CPE parsing fix but are no longer part of normal ingestion.
+ 
+Notes about ETL outputs and loader behavior
+
+- All ETLs now write a full per-standard TTL file into `tmp/` (useful for combined-file workflows and debugging).
+- Per-standard split outputs (nodes + rels) live under `data/{standard}/samples/` and are the canonical source for the loaders.
+- The loader defaults to safe behavior: it will not reset the target database unless `--reset-db` is passed. Use `--dry-run` to verify parse + counts without writes.
+
+Predicate naming and CAPEC→ATT&CK mappings
+
+- Historically some ETLs emitted different predicate names for CAPEC→ATT&CK mappings (`implements` vs `implemented_as`). The current CAPEC ETL emits `SEC.implemented_as` and the loader preserves predicate names on ingest to avoid silent remapping.
+- If you prefer a canonical relationship across the DB, run a one-time migration (Cypher) or canonicalize at ETL time. See `docs/PIPELINE_EXECUTION_GUIDE.md` Appendix for recommended commands.
 - Regression and integration suites now live under `tests/` so the repository root stays focused on documentation, configuration, and operational scripts.
 
 ### Verification Utilities (RDF/Turtle)

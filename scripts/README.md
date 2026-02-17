@@ -9,6 +9,8 @@ Comprehensive collection of production and support scripts for the Knowledge Gra
 **Core Pipeline Scripts** (run these)
 
 - [`run_all_etl.py`](#run_all_etlpy) - Main ETL orchestrator
+ - [`run_standard_pipeline.py`](#run_standard_pipelinepy) - Guided helper to run a single standard/step (recommended for iterative work)
+ 
 - [`combine_pipeline.py`](#combine_pipelinepy) - Combine pipeline stages
 - [`verify_combined_capec.py`](#verify_combined_capecpy) - Verify CAPEC enhancement
 
@@ -36,6 +38,16 @@ Comprehensive collection of production and support scripts for the Knowledge Gra
 - Manages dependencies between stages
 - Handles timeouts and error recovery
 - Generates combined pipeline output
+
+**Note:** For iterative development and testing you may prefer to run a single-standard ETL rather than `run_all_etl.py`. Use `scripts/run_standard_pipeline.py` (interactive) or run the module directly:
+
+```bash
+# Guided
+python scripts/run_standard_pipeline.py
+
+# Direct per-standard ETL (example: CAPEC)
+python -m src.etl.etl_capec --input data/capec/raw --output data/capec/samples/pipeline-stage6-capec.ttl
+```
 
 **Key Features:**
 
