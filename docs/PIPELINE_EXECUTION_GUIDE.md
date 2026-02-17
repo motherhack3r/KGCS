@@ -3,6 +3,43 @@
 **Last Updated:** February 12, 2026  
 **Status:** Production Ready (Phase 3 MVP)
 
+## Quick Commands
+
+Use these commands for a validated end-to-end run (download → ETL → load → stats). Keep this section handy during operations.
+
+```powershell
+# Activate environment
+(E:\DEVEL\software\miniconda\shell\condabin\conda-hook.ps1)
+conda activate E:\DEVEL\LAIA\KGCS\.conda
+cd e:\DEVEL\LAIA\KGCS
+
+# Ensure logs directory exists
+if (!(Test-Path -Path logs)) { New-Item -ItemType Directory -Path logs }
+
+# Download
+E:/DEVEL/LAIA/KGCS/.conda/python.exe -m src.ingest.download_manager
+
+# Run ETL
+E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/run_all_etl.py
+
+# Load nodes then relationships (example DB version tag)
+.\scripts\load_nodes_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-16 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
+.\scripts\load_rels_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-16 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
+
+# Extract stats
+python .\scripts\utilities\extract_neo4j_stats.py --db neo4j-2026-02-16 --output artifacts/neo4j-stats-2026-02-16.json --pretty
+```
+
+## Contents
+
+- Quick Commands (this page)
+- Validated Run & Notes
+- Quick Start (full walkthrough)
+- Detailed Steps (download, ETL stages, combine, load)
+- Validation & Troubleshooting
+- Appendix & Development Notes
+
+
 ## Quick Start (5 Steps)
 
 ```bash
@@ -25,6 +62,33 @@ E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/validation/validate_all_standards.p
 .\scripts\load_nodes_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
 .\scripts\load_rels_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
 ```
+
+## Validated Run (2026-02-16)
+
+The following commands reflect the exact pipeline run used to create the `neo4j-2026-02-16` database (download → ETL → load → stats):
+
+```powershell
+(E:\DEVEL\LAIA\KGCS\.conda) PS E:\DEVEL\LAIA\KGCS> history
+
+   Id     Duration CommandLine
+   --     -------- -----------
+    1        0.108 try { . "e:\DEVEL\software\Microsoft VS Code\b6a47e94e3\resources\app\out\vs\workbench\contrib\terminal\common\scripts\shellIntegration.ps1" } c…      
+    2        0.709 (E:\DEVEL\software\miniconda\shell\condabin\conda-hook.ps1) ; (conda activate E:\DEVEL\LAIA\KGCS\.conda)
+    3        0.929 python.exe -m src.ingest.download_manager
+    4        0.046 if (!(Test-Path -Path logs)) { New-Item -ItemType Directory -Path logs }
+    5     2:36.539 E:/DEVEL/LAIA/KGCS/.conda/python.exe -m src.ingest.download_manager
+    6    10:30.405 E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/run_all_etl.py
+    7    40:39.831 .\scripts\load_nodes_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-16 -FastParse -ProgressNewline -ParseHeartbeatSe…      
+    8    57:43.429 .\scripts\load_rels_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-16 -FastParse -ProgressNewline -ParseHeartbeatSec…      
+    9    58:12:542 python .\scripts\utilities\extract_neo4j_stats.py --db neo4j-2026-02-16 --output artifacts/neo4j-stats-2026-02-16.json --pretty
+(E:\DEVEL\LAIA\KGCS\.conda) PS E:\DEVEL\LAIA\KGCS>
+```
+
+Notes:
+
+- The loader commands used `-DbVersion 2026-02-16` to tag the created Neo4j database.
+- The stats script was run against the created database and produced `artifacts/neo4j-stats-2026-02-16.json`.
+
 
 Note: ETL output locations
 
