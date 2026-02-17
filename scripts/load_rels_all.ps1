@@ -23,9 +23,9 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $stages = @(
-    # @{ name = 'CPE';      path = 'data/cpe/samples/pipeline-stage1-cpe-rels.ttl'; chunk = $ChunkSizeCpe; relBatch = $RelBatchCpe },
-    # @{ name = 'CPEMatch'; path = 'data/cpe/samples/pipeline-stage2-cpematch-rels.ttl'; chunk = $ChunkSizeCpeMatch; relBatch = $RelBatchCpeMatch },
-    # @{ name = 'CVE';      path = 'data/cve/samples/pipeline-stage3-cve-rels.ttl'; chunk = $ChunkSizeCve; relBatch = $RelBatchCve },
+    @{ name = 'CPE';      path = 'data/cpe/samples/pipeline-stage1-cpe-rels.ttl'; chunk = $ChunkSizeCpe; relBatch = $RelBatchCpe },
+    @{ name = 'CPEMatch'; path = 'data/cpe/samples/pipeline-stage2-cpematch-rels.ttl'; chunk = $ChunkSizeCpeMatch; relBatch = $RelBatchCpeMatch },
+    @{ name = 'CVE';      path = 'data/cve/samples/pipeline-stage3-cve-rels.ttl'; chunk = $ChunkSizeCve; relBatch = $RelBatchCve },
     @{ name = 'ATTACK';   path = 'data/attack/samples/pipeline-stage4-attack-rels.ttl'; chunk = $ChunkSizeDefault; relBatch = $RelBatchDefault },
     @{ name = 'D3FEND';   path = 'data/d3fend/samples/pipeline-stage5-d3fend-rels.ttl'; chunk = $ChunkSizeDefault; relBatch = $RelBatchDefault },
     @{ name = 'CAPEC';    path = 'data/capec/samples/pipeline-stage6-capec-rels.ttl'; chunk = $ChunkSizeDefault; relBatch = $RelBatchDefault },

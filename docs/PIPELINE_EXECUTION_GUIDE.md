@@ -23,11 +23,11 @@ E:/DEVEL/LAIA/KGCS/.conda/python.exe -m src.ingest.download_manager
 E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/run_all_etl.py
 
 # Load nodes then relationships (example DB version tag)
-.\scripts\load_nodes_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-16 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
-.\scripts\load_rels_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-16 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
+.\scripts\load_nodes_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-17 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
+.\scripts\load_rels_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-17 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
 
 # Extract stats
-python .\scripts\utilities\extract_neo4j_stats.py --db neo4j-2026-02-16 --output artifacts/neo4j-stats-2026-02-16.json --pretty
+python .\scripts\utilities\extract_neo4j_stats.py --db neo4j-2026-02-17 --output artifacts/neo4j-stats-2026-02-17.json --pretty
 ```
 
 ## Contents
@@ -38,7 +38,6 @@ python .\scripts\utilities\extract_neo4j_stats.py --db neo4j-2026-02-16 --output
 - Detailed Steps (download, ETL stages, combine, load)
 - Validation & Troubleshooting
 - Appendix & Development Notes
-
 
 ## Quick Start (5 Steps)
 
@@ -54,23 +53,17 @@ E:/DEVEL/LAIA/KGCS/.conda/python.exe -m src.ingest.download_manager
 # Step 3: Run ETL pipeline (transforms raw data to RDF Turtle)
 E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/run_all_etl.py
 
-Or run a single-standard ETL (recommended for iterative work):
-
-```powershell
-# Guided interactive helper (asks standard + step)
-python scripts/run_standard_pipeline.py
-
-# Direct per-standard ETL module (example: CAPEC)
-python -m src.etl.etl_capec --input data/capec/raw --output data/capec/samples/pipeline-stage6-capec.ttl
-```
-
 # Step 4: Validate outputs with SHACL (recommended)
+
 # Run SHACL validation for all standards before combining/loading
+
 E:/DEVEL/LAIA/KGCS/.conda/python.exe scripts/validation/validate_all_standards.py
 
 # Step 5: Load to Neo4j using canonical per-stage loaders (nodes first, then relationships)
+
 .\scripts\load_nodes_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
 .\scripts\load_rels_all.ps1 -PythonExe E:/DEVEL/LAIA/KGCS/.conda/python.exe -DbVersion 2026-02-12 -FastParse -ProgressNewline -ParseHeartbeatSeconds 20
+
 ```
 
 ## Validated Run (2026-02-16)
@@ -99,8 +92,8 @@ Notes:
 - The loader commands used `-DbVersion 2026-02-16` to tag the created Neo4j database.
 - The stats script was run against the created database and produced `artifacts/neo4j-stats-2026-02-16.json`.
 
-
 Note: ETL output locations
+
 - Stages 1–10 write per-standard TTLs into `data/{standard}/samples/`.
 - ETLs also write a full per-standard TTL to `tmp/` (useful for combined-file workflows and troubleshooting).
 - `scripts/load_nodes_all.ps1` and `scripts/load_rels_all.ps1` load directly from those canonical stage files.

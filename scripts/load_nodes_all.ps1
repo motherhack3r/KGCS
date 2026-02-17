@@ -23,10 +23,10 @@ function Get-NodePath([string]$preferred, [string]$fallback) {
 }
 
 $stages = @(
-    # @{ name = 'CPE';      path = (Get-NodePath 'data/cpe/samples/pipeline-stage1-cpe-nodes.ttl' 'tmp/pipeline-stage1-cpe.ttl'); chunk = $ChunkSizeCpe; batch = $BatchSizeCpe; reset = $true },
-    # @{ name = 'CPEMatch'; path = (Get-NodePath 'data/cpe/samples/pipeline-stage2-cpematch-nodes.ttl' 'tmp/pipeline-stage2-cpematch.ttl'); chunk = $ChunkSizeCpeMatch; batch = $BatchSizeCpeMatch; reset = $false },
-    # @{ name = 'CVE';      path = (Get-NodePath 'data/cve/samples/pipeline-stage3-cve-nodes.ttl' 'tmp/pipeline-stage3-cve.ttl'); chunk = $ChunkSizeCve; batch = $BatchSizeCve; reset = $false },
-    @{ name = 'CWE';      path = (Get-NodePath 'data/cwe/samples/pipeline-stage7-cwe-nodes.ttl' 'tmp/pipeline-stage7-cwe.ttl'); chunk = $ChunkSizeDefault; batch = $BatchSizeDefault; reset = $true },
+    @{ name = 'CPE';      path = (Get-NodePath 'data/cpe/samples/pipeline-stage1-cpe-nodes.ttl' 'tmp/pipeline-stage1-cpe.ttl'); chunk = $ChunkSizeCpe; batch = $BatchSizeCpe; reset = $true },
+    @{ name = 'CPEMatch'; path = (Get-NodePath 'data/cpe/samples/pipeline-stage2-cpematch-nodes.ttl' 'tmp/pipeline-stage2-cpematch.ttl'); chunk = $ChunkSizeCpeMatch; batch = $BatchSizeCpeMatch; reset = $false },
+    @{ name = 'CVE';      path = (Get-NodePath 'data/cve/samples/pipeline-stage3-cve-nodes.ttl' 'tmp/pipeline-stage3-cve.ttl'); chunk = $ChunkSizeCve; batch = $BatchSizeCve; reset = $false },
+    @{ name = 'CWE';      path = (Get-NodePath 'data/cwe/samples/pipeline-stage7-cwe-nodes.ttl' 'tmp/pipeline-stage7-cwe.ttl'); chunk = $ChunkSizeDefault; batch = $BatchSizeDefault; reset = $false },
     @{ name = 'CAPEC';    path = (Get-NodePath 'data/capec/samples/pipeline-stage6-capec-nodes.ttl' 'tmp/pipeline-stage6-capec.ttl'); chunk = $ChunkSizeDefault; batch = $BatchSizeDefault; reset = $false },
     @{ name = 'ATTACK';   path = (Get-NodePath 'data/attack/samples/pipeline-stage4-attack-nodes.ttl' 'tmp/pipeline-stage4-attack.ttl'); chunk = $ChunkSizeDefault; batch = $BatchSizeDefault; reset = $false },
     @{ name = 'D3FEND';   path = (Get-NodePath 'data/d3fend/samples/pipeline-stage5-d3fend-nodes.ttl' 'tmp/pipeline-stage5-d3fend.ttl'); chunk = $ChunkSizeDefault; batch = $BatchSizeDefault; reset = $false },
