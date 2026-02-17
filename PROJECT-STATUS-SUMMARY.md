@@ -15,7 +15,6 @@
   - [Critical Path](#critical-path)
   - [MVP "Definition of Done"](#mvp-definition-of-done)
   - [Update Summary](#update-summary)
-    - [Recent Developments](#recent-developments)
     - [Critical Findings from Full Load](#critical-findings-from-full-load)
     - [Next Steps (Phase 3.5 Blocking Items)](#next-steps-phase-35-blocking-items)
     - [Phase 3.5 Readiness](#phase-35-readiness)
@@ -31,7 +30,7 @@
 
 ## Executive Summary
 
-KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validation framework). Phase 3 ETL transforms raw data for all core standards and validates via parallel SHACL streaming. **ENHANCEMENT COMPLETED:** CAPEC ETL enhanced to extract XML Taxonomy_Mappings, achieving **7.5x improvement** in CAPEC→Technique coverage: **271 relationships from 177 patterns** (vs 36 relationships from 32 patterns previously). The full fresh execution run (download → ETL → Neo4j) has now been revalidated on **neo4j-2026-02-12-rerun1** with production-scale volume and stage-based loaders. Next: SHACL re-validation on this refreshed dataset and alignment of stats-extractor legacy query labels with current relationship semantics.
+KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validation framework). Phase 3 ETL transforms raw data for all core standards and validates via parallel SHACL streaming. **ENHANCEMENT COMPLETED:** CAPEC ETL enhanced to extract XML Taxonomy_Mappings. The latest verified execution produced **307 CAPEC→ATT&CK relationships** (combined), with a breakdown of **146 Technique** and **161 SubTechnique** mappings (updated after merging STIX-derived and XML taxonomy mappings). The full fresh execution run (download → ETL → Neo4j) has been revalidated against `neo4j-2026-02-16` with production-scale volume and stage-based loaders. Next: SHACL re-validation on this refreshed dataset and alignment of stats-extractor probes with current emitted predicates and relationship semantics.
 
 ## Key Metrics
 
@@ -44,7 +43,7 @@ KGCS has completed Phase 1 (frozen core ontologies) and Phase 2 (SHACL validatio
 - **10 ETL Outputs** — CPE, CPEMatch, CVE, ATT&CK, D3FEND, CAPEC⭐, CWE, CAR, SHIELD, ENGAGE ✅
 - **10 SHACL Summary Reports** — per-standard summaries generated ✅
 - **222 MB raw data validated** — CPE (217 MB) + CVE 2026 (5 MB) production-scale testing ✅
-- **CAPEC Enhancement:** XML Taxonomy_Mappings extraction yielding **7.5x improvement** (271 vs 36 relationships) ⭐
+- **CAPEC Enhancement:** XML Taxonomy_Mappings extraction; latest load shows **307 CAPEC→ATT&CK relationships** (146 Technique, 161 SubTechnique) ⭐
 - **Neo4j full load (combined TTL)** — complete cross-standard graph load ✅
 
 ## Phase 1 — Core Standards (✅ Complete)
@@ -166,13 +165,13 @@ Phase 3 MVP is complete. Next steps:
 
 ## Update Summary
 
-- **Date:** February 13, 2026 (Updated)
+- **Date:** February 17, 2026 (Updated)
 - **Overall Status:** Phase 1 ✅ Complete | Phase 2 ✅ Complete | Phase 3 🟢 MVP Complete (Full Production Load) | Phase 4 🔵 Designed | Phase 5 🔵 Planned  
 
-### Recent Developments
+-### Recent Developments
 
-- **Fresh Full Rerun Completed (Feb 13, 2026):** End-to-end execution finished (download → ETL → nodes/rels load) into `neo4j-2026-02-12-rerun1`
-- **Verified Graph Volume (rerun1):** 2,530,719 nodes and 26,376,029 relationships (`artifacts/neo4j-stats-2026-02-12-rerun1.json`)
+- **Fresh Full Rerun Completed (Feb 16, 2026):** End-to-end execution finished (download → ETL → nodes/rels load) into `neo4j-2026-02-16`
+- **Verified Graph Volume (neo4j-2026-02-16):** 2,538,645 nodes and 26,425,263 relationships (`artifacts/neo4j-stats-2026-02-16-after-capec.json`)
 - **Pipeline Runtime Snapshot:** download pipeline completed in 170.3s (`logs/download_summary.json`)
 - **Loader Behavior Confirmed:** rel-only/stage-based loading completed across all 10 stages with URI label inference support in place
 - **Operational Follow-up Identified:** stats extractor still includes legacy relationship/property queries that do not map to current graph names (non-blocking warnings)
@@ -189,29 +188,17 @@ Phase 3 MVP is complete. Next steps:
 
 **Graph Strengths:**
 
-- ✅ CPE/CVE/PlatformConfiguration infrastructure: 99.7% of graph edges (23.7M relationships)
-- ✅ CVE→CWE linkage: 267,018 mappings (81% of CVEs have CWE roots)
-- ✅ Platform impact analysis: 2,948,956 CVE→PlatformConfiguration links
-- ✅ Technique structure: 568 techniques + 526 sub-techniques properly hierarchical
-
 **Graph Gaps (Blocking Phase 3.5 Defense Features):**
 
-- ✅ **CAPEC→Technique mapping:** **271 links (31.2% of 568 techniques)** — RESOLVED
-  - Impact: Causal chain now complete (CVE→CWE→CAPEC→Technique)
-  - Enhancement: CAPEC ETL enhanced to extract XML Taxonomy_Mappings
-  - Result: **8.5x improvement** from 36 links → 271 links
+- Impact: Causal chain coverage improved; CAPEC→Technique hop is now present in the graph.
+- Note: ETL emits `IMPLEMENTED_AS` predicates for CAPEC→ATT&CK mappings in current loads; loader preserves predicate names by default.
 
-- ❌ **Defense/Detection layer:** 0 links across all standards
-  - D3FEND: 31 nodes orphaned (0 Technique links)
-  - CAR: 102 nodes orphaned (0 Technique links)
-  - SHIELD: 33 nodes orphaned (0 Technique links)
-  - ENGAGE: 31 nodes orphaned (0 Technique links)
-  - Impact: Cannot recommend mitigations/detections in Phase 3.5
-  - Fix priority: **HIGH**
+- Current status: D3FEND/CAR/SHIELD/ENGAGE ETLs produced defense nodes; some `MITIGATES` relationships (e.g., 911) exist, but Technique→defense linkage needs verification.
+- Impact: Defense recommendations and detection guidance require validation before production use.
+- Fix priority: **HIGH**
 
-- ❌ **CVSS scores:** 0 nodes (should have 240k+)
-  - Impact: No vulnerability severity assessment
-  - Fix priority: **MEDIUM**
+- Impact: No vulnerability severity assessment
+- Fix priority: **MEDIUM**
 
 ### Next Steps (Phase 3.5 Blocking Items)
 

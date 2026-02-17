@@ -112,16 +112,22 @@ Each extension lives in its own OWL file and imports the core ontology.
 
 ## 📈 Future Work
 
-- Add new standards (e.g., NIST SP 800‑53).  
-- SHACL validation: canonical shapes, per-OWL bundles and manifest, validator CLI (`--template` / `--owl`) implemented; ETL integration and governance artifacts added. Validator emits machine-readable reports to `artifacts/` and a consolidated index `artifacts/shacl-report-consolidated.json`. CI gating remains scaffolded and requires rule‑ID policy selection.
-- Build a UI for visualizing traversal paths.  
-- Integrate with an LLM for explainable answers.
+- Short-term (now): stabilize CI SHACL gating, add per-OWL positive/negative samples, and automate validator runs in CI for changed OWL/SHACL artifacts.
+- Near-term (next 3 months): harden ETL + loader operational contracts (per-standard ETL modules, guided CLI, tmp full-TTL outputs), canonical predicate policy for cross-standard links, and small migration utilities for existing DBs.
+- Mid-term (3–9 months): expand modular OWL coverage, add robust integration tests for ingestion + load, and produce more example traversal templates for RAG safety.
+- Long-term (9–18 months): optional UI for traversal visualization and explainable query interfaces.
 
 ## 🧰 Operational Scripts
 
 - `scripts/db/` holds the Phase 4 helpers (`create_cpe_cve_relationships.py`, `verify_phase4_complete.py`, the `check_*` utilities, etc.) that interact with Neo4j for reproduction or diagnostics.  
 - `scripts/legacy/phase4/` archives the one-off repair/verification scripts (`repair_cpe_properties.py`, `diagnose_cpe_mismatch.py`, `check_buggy_pattern.py`, etc.) that were needed during the CPE parsing fix but are no longer part of normal ingestion.
- 
+
+Key operational scripts and conventions
+
+- `scripts/run_standard_pipeline.py`: interactive helper to run a single standard + step (download, etl, shacl, load-nodes, load-rels, stats). Use for iterative development.
+- Per-standard ETL modules under `src/etl/` can be invoked directly: `python -m src.etl.etl_capec --input data/capec/raw --output data/capec/samples/pipeline-stage6-capec.ttl`.
+- `scripts/run_all_etl.py` remains as the full orchestrator for end‑to‑end runs; prefer per-standard ETL for targeted runs during development.
+
 Notes about ETL outputs and loader behavior
 
 - All ETLs now write a full per-standard TTL file into `tmp/` (useful for combined-file workflows and debugging).
@@ -133,6 +139,11 @@ Predicate naming and CAPEC→ATT&CK mappings
 - Historically some ETLs emitted different predicate names for CAPEC→ATT&CK mappings (`implements` vs `implemented_as`). The current CAPEC ETL emits `SEC.implemented_as` and the loader preserves predicate names on ingest to avoid silent remapping.
 - If you prefer a canonical relationship across the DB, run a one-time migration (Cypher) or canonicalize at ETL time. See `docs/PIPELINE_EXECUTION_GUIDE.md` Appendix for recommended commands.
 - Regression and integration suites now live under `tests/` so the repository root stays focused on documentation, configuration, and operational scripts.
+
+CI and testing
+
+- GitHub Actions contains a Phase 3 ingestion smoke workflow (`.github/workflows/phase3-ingest-smoke.yml`) that runs the integration test suite and optional validation steps.
+- Unit and integration tests live under `tests/` and are used by CI to exercise ETL transformers and loader compatibility (`tests/integration/test_phase3_comprehensive.py`, `tests/unit/test_etl_loader_compat.py`).
 
 ### Verification Utilities (RDF/Turtle)
 
@@ -161,10 +172,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## **Current Status**
 
-- **Core Ontology:** Modular OWL files and core invariants are implemented under `docs/ontology/`.
-- **SHACL Validation:** Validation module at `src/core/validation.py` with CLI entry points; machine-readable reports stored in `artifacts/`; CI gating is scaffolded but not fully enforced.
-- **Ingestion:** ETL transformers for all 9 standards live in `src/etl/` (e.g., `etl_cve.py`, `etl_cpe.py`); pre-ingest pipeline in `src/ingest/pipeline.py` with validation gates; ready for Neo4j integration.
-- **RAG Safety:** Traversal templates and safety rules are documented; runtime enforcement and query-time validation remain to be completed.
+- **Core Ontology:** Modular OWL files and core invariants are implemented under `docs/ontology/` and treated as frozen for Phase 3.
+- **SHACL Validation:** `src/core/validation.py` and validator CLI exist; machine-readable reports are emitted to `artifacts/`; CI SHACL gating is scaffolded and being stabilized.
+- **Ingestion:** Per-standard ETL transformers exist under `src/etl/`. ETLs now write a full per-standard TTL into `tmp/` plus canonical nodes/rels into `data/{standard}/samples/` (canonical loaders consume the samples folder).
+- **Loader:** `src/etl/rdf_to_neo4j.py` supports nodes-only / rels-only loads, fast streaming parse, and safe defaults (`--dry-run`, `--reset-db` optional). Loader preserves existing predicates by default to avoid silent remapping; see Appendix for migration guidance.
+- **Stats & Verification:** `scripts/utilities/extract_neo4j_stats.py` reports causal-chain metrics including CAPEC→Technique breakdown (Technique vs SubTechnique) and sample mappings, written to `artifacts/neo4j-stats-<db>.json`.
+- **Tests & CI:** Unit and integration tests exercise ETLs and loader compatibility; the Phase 3 ingest smoke workflow runs tests and optional validation in CI.
 - **Integrations & UI:** Neo4j loader and sample data are present; a production UI is planned but not yet implemented.
 
 _For detailed technical documentation, please refer to the files in the `docs/` directory._
