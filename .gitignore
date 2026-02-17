@@ -1,3 +1,4 @@
+# RAW DATA
 data/*/raw/
 /data/*/raw/
 data/*/samples/
@@ -10,6 +11,7 @@ data/capec/raw/
 data/d3fend/raw/
 data/cti-stix/raw/
 data/attack/raw/
+
 # Python
 __pycache__/
 *.py[cod]
@@ -50,6 +52,7 @@ config.local.py
 # IDEs
 .vscode/
 .idea/
+.ideas/
 *.swp
 *.swo
 *~
@@ -76,3 +79,7 @@ artifacts/ttl_pair_counts_summary.json
 artifacts/ttl_rel_stats_summary.json
 artifacts/*-rels-*-top*.csv
 artifacts/*-rels-dedup*.ttl
+artifacts/shacl-*.json
+
+# ARCHIVE and LEGACY
+.archive/
