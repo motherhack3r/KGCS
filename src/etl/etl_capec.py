@@ -222,8 +222,13 @@ class CAPECtoRDFTransformer:
         # Second, add mappings from CAPEC XML Taxonomy_Mappings (direct from source)
         attack_mappings = pattern.get("AttackMappings", [])
         for mapping in attack_mappings:
-            if mapping.get("TechniqueID"):
-                attack_ids.add(mapping["TechniqueID"])
+            tid = mapping.get("TechniqueID")
+            if tid:
+                tid = str(tid).strip()
+                # Normalize to ATT&CK ID format: ensure leading 'T'
+                if not tid.upper().startswith('T'):
+                    tid = f"T{tid}"
+                attack_ids.add(tid)
         
         # Create relationships to all discovered ATT&CK techniques
         for attack_id in attack_ids:
