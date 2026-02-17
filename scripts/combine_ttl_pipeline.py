@@ -694,6 +694,7 @@ def _sanitize_nodes_file(nodes_out: str, max_accum_lines: int = 6) -> int:
             # Escape backslashes first, then double quotes so they are safe inside a double-quoted literal
             text = text.replace('\\', '\\\\')
             text = text.replace('"', '\\"')
+            text = text.replace('’', "\\'")
 
             # Replace remaining control characters (except common whitespace) with a single space
             text = ''.join(ch if (ch == '\n' or ch == '\r' or ch == '\t' or ord(ch) >= 0x20) else ' ' for ch in text)

@@ -30,6 +30,7 @@ def _escape_literal(value: str) -> str:
     # Escape backslashes and double quotes, and common control chars
     s = s.replace("\\", "\\\\")
     s = s.replace('"', '\\"')
+    s = s.replace('’', "\\'")
     s = s.replace('\n', '\\n')
     s = s.replace('\r', '\\r')
     s = s.replace('\t', '\\t')

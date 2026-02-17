@@ -39,14 +39,11 @@ Comprehensive collection of production and support scripts for the Knowledge Gra
 - Handles timeouts and error recovery
 - Generates combined pipeline output
 
-**Note:** For iterative development and testing you may prefer to run a single-standard ETL rather than `run_all_etl.py`. Use `scripts/run_standard_pipeline.py` (interactive) or run the module directly:
+**Note:** For iterative development and testing you should prefer `scripts/run_standard_pipeline.py` (interactive) which runs exactly the per-standard ETL you select. Example:
 
 ```bash
-# Guided
 python scripts/run_standard_pipeline.py
-
-# Direct per-standard ETL (example: CAPEC)
-python -m src.etl.etl_capec --input data/capec/raw --output data/capec/samples/pipeline-stage6-capec.ttl
+# follow prompts: select `capec` then `etl`
 ```
 
 **Key Features:**
