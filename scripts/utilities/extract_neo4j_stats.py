@@ -119,13 +119,59 @@ def get_neo4j_stats(driver, database: Optional[str] = None) -> Dict[str, Any]:
             record = result.single()
             stats["causal_chain_analysis"]["cwe_to_capec"] = record['count'] if record else 0
 
-            # CAPEC → Technique links
-            result = session.run("""
-                MATCH (capec:AttackPattern)-[r:IMPLEMENTS|IMPLEMENTS_AS]->(tech:Technique)
+            # CAPEC → Technique links (breakdown by Technique vs SubTechnique)
+            predicates = ['IMPLEMENTED_AS','IMPLEMENTS','IMPLEMENTS_AS','implemented_as','implements']
+            pred_list = ",".join([f"'{p}'" for p in predicates])
+
+            # Total (any Technique or SubTechnique)
+            result = session.run(f"""
+                MATCH (capec:AttackPattern)-[r]->(t)
+                WHERE type(r) IN [{pred_list}] AND (t:Technique OR t:SubTechnique)
                 RETURN COUNT(r) as count
             """)
             record = result.single()
-            stats["causal_chain_analysis"]["capec_to_technique"] = record['count'] if record else 0
+            total_capec_to_tech = record['count'] if record else 0
+
+            # Technique only
+            result = session.run(f"""
+                MATCH (capec:AttackPattern)-[r]->(tech:Technique)
+                WHERE type(r) IN [{pred_list}]
+                RETURN COUNT(r) as count
+            """)
+            record = result.single()
+            tech_count = record['count'] if record else 0
+
+            # SubTechnique only
+            result = session.run(f"""
+                MATCH (capec:AttackPattern)-[r]->(sub:SubTechnique)
+                WHERE type(r) IN [{pred_list}]
+                RETURN COUNT(r) as count
+            """)
+            record = result.single()
+            subtech_count = record['count'] if record else 0
+
+            stats["causal_chain_analysis"]["capec_to_technique"] = total_capec_to_tech
+            stats["causal_chain_analysis"]["capec_to_technique_breakdown"] = {
+                "technique": tech_count,
+                "subtechnique": subtech_count,
+            }
+
+            # Include a small sample of CAPEC -> Technique/SubTechnique mappings for inspection
+            result = session.run(f"""
+                MATCH (capec:AttackPattern)-[r]->(t)
+                WHERE type(r) IN [{pred_list}] AND (t:Technique OR t:SubTechnique)
+                RETURN capec.capecId AS capecId, type(r) AS relType, labels(t)[0] AS targetLabel, t.attackTechniqueId AS attackId
+                LIMIT 20
+            """)
+            samples = []
+            for record in result:
+                samples.append({
+                    "capecId": record.get('capecId'),
+                    "relType": record.get('relType'),
+                    "targetLabel": record.get('targetLabel'),
+                    "attackId": record.get('attackId'),
+                })
+            stats["causal_chain_analysis"]["capec_to_technique_samples"] = samples
 
             # CVE → Platform links
             result = session.run("""
