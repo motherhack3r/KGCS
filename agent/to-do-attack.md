@@ -2,48 +2,368 @@
 
 Here’s a summary of the ATT&CK data/ontology/ETL situation and next steps for gap analysis:
 
+- [ATT\&CK Data/Ontology/ETL Gap Analysis](#attck-dataontologyetl-gap-analysis)
+  - [1. Raw Data (enterprise-attack.json)](#1-raw-data-enterprise-attackjson)
+  - [2. Current Ontology (attack-ontology-v1.0.md \& SHACL)](#2-current-ontology-attack-ontology-v10md--shacl)
+  - [3. ETL (etl\_attack.py)](#3-etl-etl_attackpy)
+    - [Prioritized ETL/Ontology Enrichment Tasks](#prioritized-etlontology-enrichment-tasks)
+  - [4. External Ontology Comparison](#4-external-ontology-comparison)
+    - [4.1. External Ontology (data/attack/schemas/ontology.ttl)](#41-external-ontology-dataattackschemasontologyttl)
+    - [4.2. STIX Schema (attack-pattern.json)](#42-stix-schema-attack-patternjson)
+  - [5. Gaps \& Opportunities](#5-gaps--opportunities)
+    - [Gap Table](#gap-table)
+  - [6. Recommendations](#6-recommendations)
+  - [7. Next Steps](#7-next-steps)
+    - [Mapping Plan for Missing/Partial Properties](#mapping-plan-for-missingpartial-properties)
+    - [SHACL Review and Recommendations](#shacl-review-and-recommendations)
+    - [Mapping Decisions and Rationale](#mapping-decisions-and-rationale)
+  - [8. Implementation Details: Subclass Structure and Enrichment](#8-implementation-details-subclass-structure-and-enrichment)
+    - [8.1 Task: Implement Subclass Structure in ETL Output](#81-task-implement-subclass-structure-in-etl-output)
+      - [8.1.1 Review of Current ETL Logic](#811-review-of-current-etl-logic)
+      - [8.1.2 Implementation Plan](#812-implementation-plan)
+      - [8.1.3 Gaps or Improvements Needed](#813-gaps-or-improvements-needed)
+      - [8.1.4 Next Steps](#814-next-steps)
+    - [8.2 Subclass Structure: Full Analysis](#82-subclass-structure-full-analysis)
+      - [8.2.1 Tactic Nodes](#821-tactic-nodes)
+      - [8.2.2 Technique and SubTechnique Nodes](#822-technique-and-subtechnique-nodes)
+      - [8.2.3 Relationships](#823-relationships)
+      - [8.2.4 Other Classes/Extensions](#824-other-classesextensions)
+    - [8.3 Summary Table: Subclass Structure Coverage](#83-summary-table-subclass-structure-coverage)
+    - [8.4 Recommendations](#84-recommendations)
+    - [8.5 Subclass Structure: Additional ATT\&CK Classes](#85-subclass-structure-additional-attck-classes)
+      - [8.5.1 Group (Intrusion Set/Group)](#851-group-intrusion-setgroup)
+      - [8.5.2 Software (Tool/Malware)](#852-software-toolmalware)
+      - [8.5.3 DataSource / DataComponent](#853-datasource--datacomponent)
+      - [8.5.4 Asset](#854-asset)
+    - [8.6 Summary Table: Coverage of Additional Classes](#86-summary-table-coverage-of-additional-classes)
+    - [8.7 Recommendations (Additional Classes)](#87-recommendations-additional-classes)
+
 ---
 
-**1. Raw Data (enterprise-attack.json):**
+## 1. Raw Data (enterprise-attack.json)
 
 - Contains rich STIX 2.1 objects: x-mitre-matrix, x-mitre-tactic, attack-pattern, course-of-action, group, software, marking, etc.
 - Each object has many attributes: id, type, created, modified, external_references, platforms, domains, kill_chain_phases, etc.
 - Relationships are often implicit via references (e.g., tactic_refs, kill_chain_phases, object_marking_refs).
 
-**2. Current Ontology (attack-ontology-v1.0.md & SHACL):**
+## 2. Current Ontology (attack-ontology-v1.0.md & SHACL)
 
-- Models core classes: Tactic, Technique, SubTechnique, Group, Software, DataSource, DataComponent, Asset.
-- Main relationships: contains, subtechnique_of, uses, detects, targets.
-- SHACL shapes enforce basic structure (e.g., Technique must have attackTechniqueId, label, belongs_to Tactic).
+- **KGCS core ontology/SHACL models only:** Tactic, Technique, SubTechnique (with required properties and relationships).
+- **Not present in KGCS core ontology/SHACL:** Group, Software, Asset (these are present only in the external ontology or not at all).
+- **DataSource/DataComponent:** Only present as properties (not as node types/classes) in KGCS core ontology/SHACL.
+- **External ontology (ontology.ttl):** Models additional classes and relationships (Group, Software, DataSource, DataComponent, Asset, etc.).
+- Main relationships: contains, subtechnique_of, uses, detects, targets (coverage varies by ontology).
+- SHACL shapes enforce basic structure for core classes (e.g., Technique must have attackTechniqueId, label, belongs_to Tactic).
 
-**3. ETL (etl_attack.py):**
+## 3. ETL (etl_attack.py)
 
 - Transforms STIX JSON to RDF, mapping only a subset of fields (mainly id, name, description, tactic-technique links).
-- Focuses on Tactic, Technique, SubTechnique, Group, Software.
+- Focuses on Tactic, Technique, SubTechnique.
+- **Does not emit:** Group, Software, Asset, or DataSource/DataComponent as nodes (only as properties for the latter two).
 - Likely omits: kill_chain_phases, platforms, domains, marking, external references, detection, mitigations, and other STIX object types.
 
-**4. External Ontology (data/attack/schemas/ontology.ttl):**
+### Prioritized ETL/Ontology Enrichment Tasks
+
+1. **Map all required ATT&CK ontology properties:**
+   - Add support for platforms, domains, kill_chain_phases, object_marking_refs, external_references, detection, mitigations, aliases, and all required fields for Tactic, Technique, SubTechnique. (Group, Software, DataSource, DataComponent, Asset require ontology extension first.)
+2. **Implement subclass structure:**
+   - Reflect subclasses (e.g., SubTechnique, DataComponent, etc.) in ETL output, using correct RDF types. (Only Tactic, Technique, SubTechnique currently supported.)
+3. **Add object property relationships:**
+   - Support accomplishesTactic, associatedGroup, hasAdversaryGroup, hasMitigation, hasPlatform, hasDataSource, detects, targets, uses, contains, subtechnique_of, as per ontology and external ontology.ttl. (Some require ontology extension.)
+   - Ensure relationships are traceable to source data and not fabricated.
+4. **Enforce SHACL constraints:**
+   - Validate ETL output against SHACL shapes to ensure all mandatory fields and relationships are present.
+5. **Extend ETL for unmapped STIX fields:**
+   - Review ATT&CK STIX data for any fields or relationships not currently mapped; extend ETL to cover them.
+6. **Document all changes and gaps:**
+   - Update this file and ETL documentation with all improvements, gaps, and reasoning value.
+7. **Prioritize by reasoning and RAG value:**
+   - Focus on properties and relationships that improve downstream reasoning, RAG safety, and operational traceability.
+
+## 4. External Ontology Comparison
+
+### 4.1. External Ontology (data/attack/schemas/ontology.ttl)
 
 - More detailed: includes properties like accomplishesTactic, associatedGroup, hasAdversaryGroup, hasMitigation, hasPlatform, hasDataSource, etc.
 - Models more relationships and attributes than current KGCS ontology.
 
-**5. STIX Schema (attack-pattern.json):**
+### 4.2. STIX Schema (attack-pattern.json)
 
 - Defines all possible fields for attack-pattern objects, including aliases, kill_chain_phases, external references, etc.
 
----
-
-**Gaps & Opportunities:**
+## 5. Gaps & Opportunities
 
 - **Missing in KGCS graph:** Many STIX fields (aliases, platforms, domains, kill_chain_phases, marking, external references, detection, mitigations, etc.) are not mapped or represented in the ontology or ETL output.
 - **Ontology enrichment:** The external ontology (ontology.ttl) models more relationships and attributes—these can be selectively adopted to enrich the KGCS ontology.
-- **ETL enhancement:** The ETL should be extended to extract and emit all relevant fields and relationships, not just the core tactic/technique/group/software structure.
+- **ETL enhancement:** The ETL should be extended to extract and emit all relevant fields and relationships, not just the core tactic/technique structure.
 - **SHACL/validation:** SHACL shapes should be updated to validate the richer structure if new fields/relationships are added.
 
----
+### Gap Table
 
-**Next Steps:**
+> **Legend:**
+>
+> - "Yes": Present in KGCS core ontology/ETL/TTL output
+> - "Partial": Some mapping exists, but not complete
+> - "No": Not present in KGCS core ontology/ETL/TTL output
+> - "External Ontology": Present only in external ontology.ttl
 
-1. List all fields and relationships present in the raw STIX data but missing from the current ontology/ETL.
-2. Propose ontology/ETL/SHACL updates to cover these gaps, referencing the external ontology for property/relationship ideas.
-3. Prioritize which attributes/relationships are most valuable for reasoning, RAG, or downstream applications.
+| Raw Field/Relationship | Ontology Property | ETL | TTL Output | External Ontology | Gap/Notes |
+| --- | --- | --- | --- | --- | --- |
+| type | attack:type | Yes | Yes | Yes | |
+| spec_version | attack:specVersion | No | No | Yes | Needs mapping |
+| id | attack:attackId | Yes | Yes | Yes | |
+| created_by_ref | attack:createdBy | No | No | Yes | Needs mapping |
+| labels | attack:labels | No | No | Yes | Needs mapping |
+| created | attack:created | Yes | Yes | Yes | |
+| modified | attack:modified | Yes | Yes | Yes | |
+| name | attack:name/label | Yes | Yes | Yes | |
+| description | attack:description | Yes | Yes | Yes | |
+| aliases | attack:aliases | No | No | Yes | Needs mapping |
+| kill_chain_phases | attack:killChainPhase | No | No | Yes | Needs mapping |
+| external_references | attack:externalReference | No | No | Yes | Needs mapping |
+| object_marking_refs | attack:objectMarking | No | No | Yes | Needs mapping |
+| tactic_refs | Yes | Yes | Yes | Yes | |
+| subtechnique_of | Yes | Yes | Yes | Yes | |
+| uses (group/software) | No (KGCS) / Yes (Ext) | No | No | Yes | Requires ontology extension |
+| detects | Partial | No | No | Yes | Needs enrichment |
+| mitigations | Partial | No | No | Yes | Needs enrichment |
+| associatedGroup | No (KGCS) / Yes (Ext) | No | No | Yes | Requires ontology extension |
+| hasAdversaryGroup | No (KGCS) / Yes (Ext) | No | No | Yes | Requires ontology extension |
+| hasMitigation | No (KGCS) / Yes (Ext) | No | No | Yes | Requires ontology extension |
+| hasPlatform | No (KGCS) / Yes (Ext) | No | No | Yes | Requires ontology extension |
+| hasDataSource | Partial (property only) | As property | As property | Yes | Promote to node if needed |
+| contains | Yes | Yes | Yes | Yes | |
+| targets | Partial | No | No | Yes | Needs enrichment |
+| data_source | Partial (property only) | As property | As property | Yes | Promote to node if needed |
+| data_component | Partial (property only) | As property | As property | Yes | Promote to node if needed |
+| asset | No (KGCS) / Yes (Ext) | No | No | Yes | Requires ontology extension |
+| course_of_action | Partial | No | No | Yes | Needs enrichment |
+| marking | No | No | No | Yes | Needs enrichment |
+| status | No | No | No | Yes | Needs enrichment |
+| version | No | No | No | Yes | Needs enrichment |
+| references | Partial | No | No | Yes | Needs enrichment |
+| accomplishesTactic | No (KGCS) / Yes (Ext) | No | No | Yes | Requires ontology extension |
+| related_techniques | Partial | No | No | Yes | Needs enrichment |
+| related_groups | Partial | No | No | Yes | Needs enrichment |
+| related_software | Partial | No | No | Yes | Needs enrichment |
+| related_mitigations | Partial | No | No | Yes | Needs enrichment |
+
+## 6. Recommendations
+
+- Propose ontology/ETL/SHACL updates to cover gaps
+- Prioritize by reasoning value, RAG, downstream use
+
+## 7. Next Steps
+
+- Plan implementation tasks for branch
+- Update this file as analysis progresses
+
+### Mapping Plan for Missing/Partial Properties
+
+- **spec_version**: Add mapping from STIX `spec_version` to `attack:specVersion` in RDF. Store as a datatype property on all core nodes.
+- **created_by_ref**: Map STIX `created_by_ref` to `attack:createdBy`. If present, create a node for the creator (if not already present) and link.
+- **labels**: Map STIX `labels` array to `attack:labels` (multi-valued). Store as datatype properties on the node.
+- **aliases**: Map STIX `aliases` array to `attack:aliases` (multi-valued). Store as datatype properties on the node.
+- **kill_chain_phases**: Map STIX `kill_chain_phases` array to `attack:killChainPhase`. Each phase should be a node or literal, linked to the technique/attack-pattern.
+- **external_references**: Map STIX `external_references` array to `attack:externalReference`. Each reference should be a node or literal, linked to the technique/attack-pattern.
+- **object_marking_refs**: Map STIX `object_marking_refs` array to `attack:objectMarking`. Each marking should be a node or literal, linked to the technique/attack-pattern.
+
+For each property:
+
+- Update ETL to extract the field from STIX JSON.
+- Add RDF triple(s) using the correct SEC/attack namespace property.
+- Ensure multi-valued fields are handled as repeated triples.
+- If the property is a reference (e.g., created_by_ref, external_references), create/link the referenced node as needed.
+- Update SHACL shapes to require or validate the new property if mandatory.
+- Add tests to confirm correct mapping in sample TTL output.
+
+### SHACL Review and Recommendations
+
+- Current SHACL shapes (attack-shapes.ttl) require: attackTechniqueId, rdfs:label, sec:belongs_to (Tactic), and optionally sec:description for Technique and SubTechnique.
+- The following properties are not currently required or validated by SHACL:
+  - spec_version
+  - created_by_ref
+  - labels
+  - aliases
+  - kill_chain_phases
+  - external_references
+  - object_marking_refs
+- Recommendation: Extend SHACL shapes to include these properties as required or recommended, based on their importance for traceability, reasoning, and standards alignment.
+  - For multi-valued fields (labels, aliases, kill_chain_phases, external_references, object_marking_refs), use sh:minCount 0 and sh:datatype xsd:string or sh:class as appropriate.
+  - For references (created_by_ref, external_references, object_marking_refs), ensure referenced nodes are validated if present.
+- Update SHACL validation tests to cover new/extended properties.
+
+### Mapping Decisions and Rationale
+
+- Each missing or partial property was reviewed for:
+  - Presence in authoritative STIX schema and ATT&CK data
+  - Value for traceability, reasoning, and RAG safety
+  - Alignment with KGCS ontology governance and SHACL constraints
+- Properties prioritized for mapping/enrichment:
+  - spec_version, created_by_ref, labels, aliases, kill_chain_phases, external_references, object_marking_refs
+- Mapping approach:
+  - Use canonical SEC/attack namespace predicates for all new properties
+  - Multi-valued fields (labels, aliases, kill_chain_phases, external_references, object_marking_refs) mapped as repeated triples
+  - References (created_by_ref, external_references, object_marking_refs) create/link referenced nodes as needed
+  - SHACL shapes updated to require or recommend new properties as appropriate
+- Rationale:
+  - Ensures full traceability to source data and standards
+  - Enables richer reasoning and RAG-safe traversals
+  - Aligns with KGCS governance: no fabricated edges, all relationships traceable to authoritative data
+  - Supports downstream applications and analytics
+
+## 8. Implementation Details: Subclass Structure and Enrichment
+
+This section provides a detailed analysis and implementation plan for subclass structure, property mapping, and enrichment tasks identified in the gap analysis above.
+
+### 8.1 Task: Implement Subclass Structure in ETL Output
+
+#### 8.1.1 Review of Current ETL Logic
+
+- The ETL (`src/etl/etl_attack.py`) distinguishes between Techniques and SubTechniques:
+  - If the ATT&CK ID contains a dot (e.g., `T1059.001`), it is treated as a SubTechnique (`SEC.SubTechnique`).
+  - Otherwise, it is treated as a Technique (`SEC.Technique`).
+- The ETL adds the `SEC.subtechnique_of` relationship for subtechniques, pointing to their parent technique.
+- All required SHACL properties are present in the ETL logic:
+  - `attackTechniqueId`, `rdfs:label`, `sec:description` (optional), `sec:belongs_to` (tactic) for both classes.
+  - `sec:subtechnique_of` (parent technique) for subtechniques.
+
+#### 8.1.2 Implementation Plan
+
+1. **Audit ETL Output:**
+   - Ensure all subtechniques are output as `SEC.SubTechnique` and have a valid `sec:subtechnique_of` triple.
+   - Ensure all techniques are output as `SEC.Technique` only.
+   - Validate that all required properties are present for each node type.
+2. **Edge Case Handling:**
+   - Confirm that subtechniques with missing or malformed parent IDs are handled (e.g., log or skip with warning).
+   - Ensure no node is output as both Technique and SubTechnique.
+3. **Testing:**
+   - Generate sample output and validate against SHACL shapes.
+   - Add/extend tests to cover subclass structure and relationships.
+
+#### 8.1.3 Gaps or Improvements Needed
+
+- If any subtechnique lacks a valid parent technique, the ETL should log a warning and skip or flag the node.
+- Consider refactoring for clarity if logic is duplicated or unclear.
+- Ensure all subclass relationships are traceable to source data (per governance rules).
+
+#### 8.1.4 Next Steps
+
+- Implement or refactor ETL logic as needed.
+- Validate output with SHACL.
+- Document any issues or edge cases found during implementation.
+
+### 8.2 Subclass Structure: Full Analysis
+
+#### 8.2.1 Tactic Nodes
+
+- **ETL Handling:**
+  - The ETL creates a node for each STIX object of type `x-mitre-tactic` as `SEC.Tactic`.
+  - Properties mapped: `sec:tacticId` (from `x_mitre_shortname`), `rdfs:label` (from `name`), `sec:description`, `sec:deprecated`, `sec:created`, `sec:modified`.
+  - SHACL requires: `sec:tacticId` (required), `rdfs:label` (required).
+- **Gaps/Improvements:**
+  - All required properties are mapped. Optional properties are included if present.
+  - No subclassing of Tactic is required in the core ontology.
+  - Ensure that every `sec:belongs_to` on Technique/SubTechnique points to a valid Tactic node.
+
+#### 8.2.2 Technique and SubTechnique Nodes
+
+- **ETL Handling:**
+  - Techniques: STIX `attack-pattern` with ATT&CK ID (no dot) → `SEC.Technique`.
+  - SubTechniques: STIX `attack-pattern` with ATT&CK ID (dot) → `SEC.SubTechnique`.
+  - Properties mapped: `sec:attackTechniqueId`, `rdfs:label`, `sec:description`, `sec:belongs_to`, `sec:subtechnique_of` (for subtechniques), plus optional fields (platform, dataSource, etc.).
+  - SHACL requires: `sec:attackTechniqueId`, `rdfs:label`, `sec:belongs_to` (both), `sec:subtechnique_of` (subtechniques only).
+- **Gaps/Improvements:**
+  - All required properties are mapped.
+  - Ensure that subtechniques always have a valid parent technique and that all relationships are present.
+  - No node should be both Technique and SubTechnique.
+
+#### 8.2.3 Relationships
+
+- **ETL Handling:**
+  - `sec:belongs_to`: Technique/SubTechnique → Tactic (from `kill_chain_phases` mapping to `tactics_map`).
+  - `sec:subtechnique_of`: SubTechnique → Technique (from ATT&CK ID parent extraction).
+  - `sec:derived_from`: Technique → CAPEC (from external references).
+- **Gaps/Improvements:**
+  - All required relationships for subclass structure are present.
+  - Ensure that all referenced nodes (Tactic, Technique) exist in the output graph.
+  - Consider logging or flagging if a referenced node is missing.
+
+#### 8.2.4 Other Classes/Extensions
+
+- **ETL Handling:**
+  - The ETL does not currently emit other ATT&CK subclasses (e.g., Group, Software, Mitigation) as these are not present in the current STIX input or core ontology.
+  - If/when these are added to the ontology, ETL logic will need to be extended accordingly.
+
+### 8.3 Summary Table: Subclass Structure Coverage
+
+| Class | ETL Node Type | Required Properties (SHACL) | ETL Coverage | Gaps/Notes |
+| --- | --- | --- | --- | --- |
+| Tactic | SEC.Tactic | tacticId, rdfs:label | Yes | None |
+| Technique | SEC.Technique | attackTechniqueId, rdfs:label, belongs_to | Yes | None |
+| SubTechnique | SEC.SubTechnique | attackTechniqueId, rdfs:label, belongs_to, subtechnique_of | Yes | Must ensure parent exists |
+
+### 8.4 Recommendations
+
+- Validate that all subclass relationships are present and correct in ETL output.
+- Add logging for any missing referenced nodes (tactic, parent technique).
+- Extend ETL and ontology if new ATT&CK subclasses are introduced in future standards.
+
+### 8.5 Subclass Structure: Additional ATT&CK Classes
+
+#### 8.5.1 Group (Intrusion Set/Group)
+
+- **Ontology/SHACL:**
+  - Not present in current core ontology or SHACL shapes for ATT&CK.
+  - In STIX, represented as `intrusion-set` objects (sometimes called Group in MITRE ATT&CK docs).
+- **ETL Handling:**
+  - Current ETL does not process or emit Group/Intrusion Set nodes.
+- **Gaps/Improvements:**
+  - If Group is added to the ontology, ETL must be extended to map `intrusion-set` objects to `SEC.Group` (or equivalent), with required properties and relationships (e.g., uses, attributed-to).
+
+#### 8.5.2 Software (Tool/Malware)
+
+- **Ontology/SHACL:**
+  - Not present in current core ontology or SHACL shapes for ATT&CK.
+  - In STIX, represented as `tool` and `malware` objects (collectively "Software" in ATT&CK docs).
+- **ETL Handling:**
+  - Current ETL does not process or emit Software nodes.
+- **Gaps/Improvements:**
+  - If Software is added to the ontology, ETL must be extended to map `tool` and `malware` objects to `SEC.Software` (or equivalent), with required properties and relationships (e.g., used-by, implements, targets).
+
+#### 8.5.3 DataSource / DataComponent
+
+- **Ontology/SHACL:**
+  - DataSource and DataComponent are referenced in the ontology as properties (e.g., `sec:dataSource`, `sec:dataComponent`), but not as first-class node types/classes.
+  - SHACL does not define shapes for DataSource/DataComponent nodes.
+- **ETL Handling:**
+  - ETL emits `sec:dataSource` and `sec:dataComponent` as string literals attached to Technique/SubTechnique nodes.
+- **Gaps/Improvements:**
+  - If DataSource/DataComponent are promoted to first-class nodes in the ontology, ETL must be updated to emit nodes and relationships (e.g., Technique → usesDataSource → DataSource).
+  - Current approach is property-only, not node-based.
+
+#### 8.5.4 Asset
+
+- **Ontology/SHACL:**
+  - Asset is not present as a class in the current ATT&CK core ontology or SHACL shapes.
+  - Not directly represented in STIX ATT&CK SDOs.
+- **ETL Handling:**
+  - No Asset nodes or properties are emitted by the ETL.
+- **Gaps/Improvements:**
+  - If Asset is added to the ontology (e.g., for mapping to D3FEND or other standards), ETL will need to be extended accordingly.
+
+### 8.6 Summary Table: Coverage of Additional Classes
+
+| Class | STIX Object(s) | Ontology/SHACL Present | ETL Coverage | Gaps/Notes |
+| --- | --- | --- | --- | --- |
+| Group | intrusion-set | No | No | Add if ontology extended |
+| Software | tool, malware | No | No | Add if ontology extended |
+| DataSource | (property only) | Property only | As property | Promote to node if needed |
+| DataComponent | (property only) | Property only | As property | Promote to node if needed |
+| Asset | (not in STIX) | No | No | Add if ontology extended |
+
+### 8.7 Recommendations (Additional Classes)
+
+- Review ontology/SHACL for future inclusion of Group, Software, DataSource, DataComponent, Asset.
+- Extend ETL to support these classes if/when added to the ontology.
+- For DataSource/DataComponent, consider node-based modeling if richer relationships are needed.
