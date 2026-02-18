@@ -109,5 +109,5 @@ ex:GroupA a ex:Group ; ex:uses ex:MalwareX , ex:T1059 .
 - **ETL transformer:** [etl_attck.py](../../scripts/etl_attck.py) (STIX → RDF)
 
 Notes: Use the official ATT&CK STIX repository for canonical IDs and timestamps; snapshots should include the commit SHA in `.meta.json`.
- 
+
 - **Local schemas / samples:** `data/attack/schemas/`, `data/attack/raw/`, `data/attack/samples/` (preferred for offline snapshots)
