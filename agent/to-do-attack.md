@@ -39,11 +39,16 @@ Here’s a summary of the ATT&CK data/ontology/ETL situation and next steps for 
     - [8.6 Summary Table: Coverage of Additional Classes](#86-summary-table-coverage-of-additional-classes)
     - [8.7 Recommendations (Additional Classes)](#87-recommendations-additional-classes)
 - [ANNEX: External ATT\&CK Schema Analyses](#annex-external-attck-schema-analyses)
+  - [ATT\&CK-STIX Schema Reference](#attck-stix-schema-reference)
+    - [STIX Domain Objects](#stix-domain-objects)
+    - [STIX Relationship Objects](#stix-relationship-objects)
+    - [STIX Meta Objects](#stix-meta-objects)
   - [A.1 Tactic Schema Mapping (version 3.3.0)](#a1-tactic-schema-mapping-version-330)
   - [A.2 Technique Schema Mapping (version 3.3.0)](#a2-technique-schema-mapping-version-330)
   - [A.3 Mitigation Schema Mapping (version 3.3.0)](#a3-mitigation-schema-mapping-version-330)
   - [A.4 Group Schema Mapping (version 3.3.0)](#a4-group-schema-mapping-version-330)
   - [A.5 Software Schema Mapping (version 3.3.0)](#a5-software-schema-mapping-version-330)
+  - [A.6 Relationship Types Schema Mapping (version 3.3.0)](#a6-relationship-types-schema-mapping-version-330)
 
 ---
 
@@ -404,34 +409,69 @@ This section provides a detailed analysis and implementation plan for subclass s
 
 This section will be expanded with detailed analyses and mapping tables for each ATT&CK schema file as reviewed. Each table compares the external schema, KGCS ontology/ETL coverage, and highlights gaps or recommendations for enrichment.
 
+## ATT&CK-STIX Schema Reference
+
+Current ATT&CK Spec Version: [3.3.0](https://github.com/mitre-attack/attack-stix-data/blob/master/CHANGELOG.md)
+
+### STIX Domain Objects
+
+| ATT&CK Concept | STIX Object | Notes |
+| -------------- | ----------- | ----- |
+| [Analytic](./sdo/analytic.schema.mdx) | `x-mitre-analytic` | |
+| [Asset](./sdo/asset.schema.mdx) | `x-mitre-asset` | |
+| [Campaign](./sdo/campaign.schema.mdx) | `campaign` ([STIX 2.0](https://docs.oasis-open.org/cti/stix/v2.0/cs01/part2-stix-objects/stix-v2.0-cs01-part2-stix-objects.html#_Toc496714304), [STIX 2.1](https://docs.oasis-open.org/cti/stix/v2.1/os/stix-v2.1-os.html#_pcpvfz4ik6d6)) | |
+| [Collection](./sdo/collection.schema.mdx) | `x-mitre-collection` | This type was added in the upgrade to STIX 2.1 and is not available in the [STIX 2.0 dataset](https://github.com/mitre/cti). |
+| [Data Component](./sdo/data-component.schema.mdx) | `x-mitre-data-component` | |
+| [Data Source](./sdo/data-source.schema.mdx) | `x-mitre-data-source` | |
+| [Detection Strategy](./sdo/detection-strategy.schema.mdx) | `x-mitre-detection-strategy` | |
+| [Group](./sdo/group.schema.mdx) | `intrusion-set` ([STIX 2.0](https://docs.oasis-open.org/cti/stix/v2.0/cs01/part2-stix-objects/stix-v2.0-cs01-part2-stix-objects.html#_Toc496714316), [STIX 2.1](https://docs.oasis-open.org/cti/stix/v2.1/os/stix-v2.1-os.html#_5ol9xlbbnrdn)) | |
+| [Identity](./sdo/identity.schema.mdx) | `identity` ([STIX 2.0](https://docs.oasis-open.org/cti/stix/v2.0/cs01/part2-stix-objects/stix-v2.0-cs01-part2-stix-objects.html#_Toc496714310), [STIX 2.1](https://docs.oasis-open.org/cti/stix/v2.1/os/stix-v2.1-os.html#_wh296fiwpklp)) | Referenced by `created_by_ref` and `x_mitre_modified_by_ref` to convey the creator and most recent modifier of each object |
+| [Matrix](./sdo/matrix.schema.mdx) | `x-mitre-matrix` | |
+| [Mitigation](./sdo/mitigation.schema.mdx) | `course-of-action` ([STIX 2.0](https://docs.oasis-open.org/cti/stix/v2.0/cs01/part2-stix-objects/stix-v2.0-cs01-part2-stix-objects.html#_Toc496714307), [STIX 2.1](https://docs.oasis-open.org/cti/stix/v2.1/os/stix-v2.1-os.html#_a925mpw39txn)) | |
+| [Software](./sdo/software.schema.mdx) | `malware` ([STIX 2.0](https://docs.oasis-open.org/cti/stix/v2.0/cs01/part2-stix-objects/stix-v2.0-cs01-part2-stix-objects.html#_Toc496714319), [STIX 2.1](https://docs.oasis-open.org/cti/stix/v2.1/os/stix-v2.1-os.html#_s5l7katgbp09)) or `tool` ([STIX 2.0](https://docs.oasis-open.org/cti/stix/v2.0/cs01/part2-stix-objects/stix-v2.0-cs01-part2-stix-objects.html#_Toc496714331), [STIX 2.1](https://docs.oasis-open.org/cti/stix/v2.1/os/stix-v2.1-os.html#_z4voa9ndw8v)) | |
+| [Tactic](./sdo/tactic.schema.mdx) | `x-mitre-tactic` | |
+| [Technique](./sdo/technique.schema.mdx) | `attack-pattern` ([STIX 2.0](https://docs.oasis-open.org/cti/stix/v2.0/cs01/part2-stix-objects/stix-v2.0-cs01-part2-stix-objects.html#_Toc496714301), [STIX 2.1](https://docs.oasis-open.org/cti/stix/v2.1/os/stix-v2.1-os.html#_axjijf603msy)) | |
+
+### STIX Relationship Objects
+
+| ATT&CK Concept | STIX Object | Notes |
+| -------------- | ----------- | ----- |
+| [Relationship](./sro/relationship.schema.mdx) | `relationship` ([STIX 2.0](https://docs.oasis-open.org/cti/stix/v2.0/cs01/part2-stix-objects/stix-v2.0-cs01-part2-stix-objects.html#_Toc496714337), [STIX 2.1](https://docs.oasis-open.org/cti/stix/v2.1/os/stix-v2.1-os.html#_cqhkqvhnlgfh)) | ATT&CK uses many relationship types. [Refer to them here](./relationship-types). |
+
+### STIX Meta Objects
+
+| ATT&CK Concept | STIX Object | Notes |
+| -------------- | ----------- | ----- |
+| [Marking Definition](./smo/marking-definition.schema.mdx) | `marking-definition` ([STIX 2.0](https://docs.oasis-open.org/cti/stix/v2.0/cs01/part1-stix-core/stix-v2.0-cs01-part1-stix-core.html#_Toc496709283), [STIX 2.1](https://docs.oasis-open.org/cti/stix/v2.1/os/stix-v2.1-os.html#_k5fndj2c7c1k)) | Referenced in the `object_marking_refs` of all objects to express the MITRE Corporation copyright |
+
 ## A.1 Tactic Schema Mapping (version 3.3.0)
 
-| Property                   | External Schema | KGCS Ontology/ETL | Gap/Notes                        |
-|----------------------------|----------------|-------------------|-----------------------------------|
-| id                         | Yes (req)      | Yes               | -                                 |
-| type                       | Yes (req)      | Yes               | -                                 |
-| spec_version               | Yes (req)      | No                | Needs mapping                     |
-| created                    | Yes (req)      | Yes               | -                                 |
-| modified                   | Yes (req)      | Yes               | -                                 |
-| created_by_ref             | Yes (req)      | No                | Needs mapping                     |
-| labels                     | Optional       | No                | Needs mapping                     |
-| revoked                    | Optional       | No                | Needs mapping                     |
-| confidence                 | Optional       | No                | Needs mapping                     |
-| lang                       | Optional       | No                | Needs mapping                     |
-| external_references        | Yes (req)      | No                | Needs mapping                     |
-| object_marking_refs        | Yes (req)      | No                | Needs mapping                     |
-| granular_markings          | Optional       | No                | Needs mapping                     |
-| extensions                 | Optional       | No                | Needs mapping                     |
-| name                       | Yes (req)      | Yes               | -                                 |
-| x_mitre_attack_spec_version| Yes (req)      | No                | Needs mapping                     |
-| x_mitre_version            | Yes (req)      | No                | Needs mapping                     |
-| x_mitre_old_attack_id      | Optional       | No                | Needs mapping                     |
-| x_mitre_deprecated         | Optional       | Yes               | -                                 |
-| description                | Yes (req)      | Yes               | -                                 |
-| x_mitre_domains            | Yes (req)      | No                | Needs mapping                     |
-| x_mitre_shortname          | Yes (req)      | Yes               | -                                 |
-| x_mitre_modified_by_ref    | Yes (req)      | No                | Needs mapping                     |
-| x_mitre_contributors       | Optional       | Yes               | -                                 |
+| Property | External Schema | KGCS Ontology/ETL | Gap/Notes |
+| --- | --- | --- | --- |
+| id | Yes (req) | Yes | - |
+| type | Yes (req) | Yes | - |
+| spec_version | Yes (req) | No | Needs mapping |
+| created | Yes (req) | Yes | - |
+| modified | Yes (req) | Yes | - |
+| created_by_ref | Yes (req) | No | Needs mapping |
+| labels | Optional | No | Needs mapping |
+| revoked | Optional | No | Needs mapping |
+| confidence | Optional | No | Needs mapping |
+| lang | Optional | No | Needs mapping |
+| external_references | Yes (req) | No | Needs mapping |
+| object_marking_refs | Yes (req) | No | Needs mapping |
+| granular_markings | Optional | No | Needs mapping |
+| extensions | Optional | No | Needs mapping |
+| name | Yes (req) | Yes | - |
+| x_mitre_attack_spec_version | Yes (req) | No | Needs mapping |
+| x_mitre_version | Yes (req) | No | Needs mapping |
+| x_mitre_old_attack_id | Optional | No | Needs mapping |
+| x_mitre_deprecated | Optional | Yes | - |
+| description | Yes (req) | Yes | - |
+| x_mitre_domains | Yes (req) | No | Needs mapping |
+| x_mitre_shortname | Yes (req) | Yes | - |
+| x_mitre_modified_by_ref | Yes (req) | No | Needs mapping |
+| x_mitre_contributors | Optional | Yes | - |
 
 **Legend:**
 
@@ -444,44 +484,44 @@ This section will be expanded with detailed analyses and mapping tables for each
 
 ## A.2 Technique Schema Mapping (version 3.3.0)
 
-| Property                      | External Schema | KGCS Ontology/ETL | Gap/Notes                                                                 |
-|-------------------------------|----------------|-------------------|--------------------------------------------------------------------------|
-| id                            | Yes (req)      | Yes               | -                                                                        |
-| type                          | Yes (req)      | Yes               | -                                                                        |
-| spec_version                  | Yes (req)      | No                | Needs mapping                                                            |
-| created                       | Yes (req)      | Yes               | -                                                                        |
-| modified                      | Yes (req)      | Yes               | -                                                                        |
-| created_by_ref                | Optional       | No                | Needs mapping                                                            |
-| labels                        | Optional       | No                | Needs mapping                                                            |
-| revoked                       | Optional       | No                | Needs mapping                                                            |
-| confidence                    | Optional       | No                | Needs mapping                                                            |
-| lang                          | Optional       | No                | Needs mapping                                                            |
-| external_references           | Yes (req)      | Partial           | Only CAPEC/ATT&CK IDs mapped; full mapping needed                        |
-| object_marking_refs           | Optional       | No                | Needs mapping                                                            |
-| granular_markings             | Optional       | No                | Needs mapping                                                            |
-| extensions                    | Optional       | No                | Needs mapping                                                            |
-| name                          | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_attack_spec_version   | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_version               | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_old_attack_id         | Optional       | No                | Needs mapping                                                            |
-| x_mitre_deprecated            | Optional       | No                | Needs mapping                                                            |
-| kill_chain_phases             | Optional       | Yes               | Used for tactic mapping                                                  |
-| description                   | Optional       | Yes               | -                                                                        |
-| x_mitre_platforms             | Optional       | Yes               | -                                                                        |
-| x_mitre_detection             | Deprecated     | Yes               | Will be removed in v4.0.0; currently mapped                              |
-| x_mitre_is_subtechnique       | Yes (req)      | Yes               | Used to distinguish subtechniques                                        |
-| x_mitre_data_sources          | Deprecated     | Yes               | Will be removed in v4.0.0; currently mapped                              |
-| x_mitre_defense_bypassed      | Deprecated     | No                | Needs mapping if required                                                |
-| x_mitre_contributors          | Optional       | No                | Needs mapping                                                            |
-| x_mitre_permissions_required  | Deprecated     | Yes               | Will be removed in v4.0.0; currently mapped                              |
-| x_mitre_remote_support        | Deprecated     | No                | Needs mapping if required                                                |
-| x_mitre_system_requirements   | Deprecated     | No                | Needs mapping if required                                                |
-| x_mitre_impact_type           | Optional       | No                | Needs mapping if required (for Impact tactic)                            |
-| x_mitre_effective_permissions | Deprecated     | Yes               | Will be removed in v4.0.0; currently mapped                              |
-| x_mitre_network_requirements  | Optional       | Yes               | -                                                                        |
-| x_mitre_tactic_type           | Optional       | No                | Needs mapping if required (for Mobile domain)                            |
-| x_mitre_domains               | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_modified_by_ref       | Optional       | No                | Needs mapping                                                            |
+| Property | External Schema | KGCS Ontology/ETL | Gap/Notes |
+| --- | --- | --- | --- |
+| id | Yes (req) | Yes | - |
+| type | Yes (req) | Yes | - |
+| spec_version | Yes (req) | No | Needs mapping |
+| created | Yes (req) | Yes | - |
+| modified | Yes (req) | Yes | - |
+| created_by_ref | Optional | No | Needs mapping |
+| labels | Optional | No | Needs mapping |
+| revoked | Optional | No | Needs mapping |
+| confidence | Optional | No | Needs mapping |
+| lang | Optional | No | Needs mapping |
+| external_references | Yes (req) | Partial | Only CAPEC/ATT&CK IDs mapped; full mapping needed |
+| object_marking_refs | Optional | No | Needs mapping |
+| granular_markings | Optional | No | Needs mapping |
+| extensions | Optional | No | Needs mapping |
+| name | Yes (req) | No | Needs mapping |
+| x_mitre_attack_spec_version | Yes (req) | No | Needs mapping |
+| x_mitre_version | Yes (req) | No | Needs mapping |
+| x_mitre_old_attack_id | Optional | No | Needs mapping |
+| x_mitre_deprecated | Optional | No | Needs mapping |
+| kill_chain_phases | Optional | Yes | Used for tactic mapping |
+| description | Optional | Yes | - |
+| x_mitre_platforms | Optional | Yes | - |
+| x_mitre_detection | Deprecated | Yes | Will be removed in v4.0.0; currently mapped |
+| x_mitre_is_subtechnique | Yes (req) | Yes | Used to distinguish subtechniques |
+| x_mitre_data_sources | Deprecated | Yes | Will be removed in v4.0.0; currently mapped |
+| x_mitre_defense_bypassed | Deprecated | No | Needs mapping if required |
+| x_mitre_contributors | Optional | No | Needs mapping |
+| x_mitre_permissions_required | Deprecated | Yes | Will be removed in v4.0.0; currently mapped |
+| x_mitre_remote_support | Deprecated | No | Needs mapping if required |
+| x_mitre_system_requirements | Deprecated | No | Needs mapping if required |
+| x_mitre_impact_type | Optional | No | Needs mapping if required (for Impact tactic) |
+| x_mitre_effective_permissions | Deprecated | Yes | Will be removed in v4.0.0; currently mapped |
+| x_mitre_network_requirements | Optional | Yes | - |
+| x_mitre_tactic_type | Optional | No | Needs mapping if required (for Mobile domain) |
+| x_mitre_domains | Yes (req) | No | Needs mapping |
+| x_mitre_modified_by_ref | Optional | No | Needs mapping |
 
 **Legend:**
 
@@ -496,31 +536,31 @@ This section will be expanded with detailed analyses and mapping tables for each
 
 ## A.3 Mitigation Schema Mapping (version 3.3.0)
 
-| Property                      | External Schema | KGCS Ontology/ETL | Gap/Notes                                                                 |
-|-------------------------------|----------------|-------------------|--------------------------------------------------------------------------|
-| id                            | Yes (req)      | No                | Needs mapping                                                            |
-| type                          | Yes (req)      | No                | Needs mapping                                                            |
-| spec_version                  | Yes (req)      | No                | Needs mapping                                                            |
-| created                       | Yes (req)      | No                | Needs mapping                                                            |
-| modified                      | Yes (req)      | No                | Needs mapping                                                            |
-| created_by_ref                | Yes (req)      | No                | Needs mapping                                                            |
-| labels                        | Optional       | No                | Needs mapping                                                            |
-| revoked                       | Optional       | No                | Needs mapping                                                            |
-| confidence                    | Optional       | No                | Needs mapping                                                            |
-| lang                          | Optional       | No                | Needs mapping                                                            |
-| external_references           | Yes (req)      | No                | Needs mapping                                                            |
-| object_marking_refs           | Yes (req)      | No                | Needs mapping                                                            |
-| granular_markings             | Optional       | No                | Needs mapping                                                            |
-| extensions                    | Optional       | No                | Needs mapping                                                            |
-| name                          | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_attack_spec_version   | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_version               | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_old_attack_id         | Optional       | No                | Needs mapping                                                            |
-| x_mitre_deprecated            | Optional       | No                | Needs mapping                                                            |
-| description                   | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_domains               | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_modified_by_ref       | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_contributors          | Optional       | No                | Needs mapping                                                            |
+| Property | External Schema | KGCS Ontology/ETL | Gap/Notes |
+| --- | --- | --- | --- |
+| id | Yes (req) | No | Needs mapping |
+| type | Yes (req) | No | Needs mapping |
+| spec_version | Yes (req) | No | Needs mapping |
+| created | Yes (req) | No | Needs mapping |
+| modified | Yes (req) | No | Needs mapping |
+| created_by_ref | Yes (req) | No | Needs mapping |
+| labels | Optional | No | Needs mapping |
+| revoked | Optional | No | Needs mapping |
+| confidence | Optional | No | Needs mapping |
+| lang | Optional | No | Needs mapping |
+| external_references | Yes (req) | No | Needs mapping |
+| object_marking_refs | Yes (req) | No | Needs mapping |
+| granular_markings | Optional | No | Needs mapping |
+| extensions | Optional | No | Needs mapping |
+| name | Yes (req) | No | Needs mapping |
+| x_mitre_attack_spec_version | Yes (req) | No | Needs mapping |
+| x_mitre_version | Yes (req) | No | Needs mapping |
+| x_mitre_old_attack_id | Optional | No | Needs mapping |
+| x_mitre_deprecated | Optional | No | Needs mapping |
+| description | Yes (req) | No | Needs mapping |
+| x_mitre_domains | Yes (req) | No | Needs mapping |
+| x_mitre_modified_by_ref | Yes (req) | No | Needs mapping |
+| x_mitre_contributors | Optional | No | Needs mapping |
 
 **Legend:**
 
@@ -535,38 +575,38 @@ This section will be expanded with detailed analyses and mapping tables for each
 
 ## A.4 Group Schema Mapping (version 3.3.0)
 
-| Property                      | External Schema | KGCS Ontology/ETL | Gap/Notes                                                                 |
-|-------------------------------|----------------|-------------------|--------------------------------------------------------------------------|
-| id                            | Yes (req)      | No                | Needs ontology extension and ETL mapping                                  |
-| type                          | Yes (req)      | No                | Should be 'intrusion-set'; not present in KGCS                            |
-| spec_version                  | Yes (req)      | No                | Needs mapping                                                            |
-| created                       | Yes (req)      | No                | Needs mapping                                                            |
-| modified                      | Yes (req)      | No                | Needs mapping                                                            |
-| created_by_ref                | Optional       | No                | Needs mapping                                                            |
-| labels                        | Optional       | No                | Needs mapping                                                            |
-| revoked                       | Optional       | No                | Needs mapping                                                            |
-| confidence                    | Optional       | No                | Needs mapping                                                            |
-| lang                          | Optional       | No                | Needs mapping                                                            |
-| external_references           | Yes (req)      | No                | Needs mapping                                                            |
-| object_marking_refs           | Optional       | No                | Needs mapping                                                            |
-| granular_markings             | Optional       | No                | Needs mapping                                                            |
-| extensions                    | Optional       | No                | Needs mapping                                                            |
-| name                          | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_attack_spec_version   | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_version               | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_old_attack_id         | Optional       | No                | Needs mapping                                                            |
-| x_mitre_deprecated            | Optional       | No                | Needs mapping                                                            |
-| description                   | Optional       | No                | Needs mapping                                                            |
-| x_mitre_domains               | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_contributors          | Optional       | No                | Needs mapping                                                            |
-| x_mitre_modified_by_ref       | Optional       | No                | Needs mapping                                                            |
-| aliases                       | Optional       | No                | Needs mapping                                                            |
-| first_seen                    | Optional       | No                | Needs mapping                                                            |
-| last_seen                     | Optional       | No                | Needs mapping                                                            |
-| goals                         | Optional       | No                | Needs mapping                                                            |
-| resource_level                | Optional       | No                | Needs mapping                                                            |
-| primary_motivation            | Optional       | No                | Needs mapping                                                            |
-| secondary_motivations         | Optional       | No                | Needs mapping                                                            |
+| Property | External Schema | KGCS Ontology/ETL | Gap/Notes |
+| --- | --- | --- | --- |
+| id | Yes (req) | No | Needs ontology extension and ETL mapping |
+| type | Yes (req) | No | Should be 'intrusion-set'; not present in KGCS |
+| spec_version | Yes (req) | No | Needs mapping |
+| created | Yes (req) | No | Needs mapping |
+| modified | Yes (req) | No | Needs mapping |
+| created_by_ref | Optional | No | Needs mapping |
+| labels | Optional | No | Needs mapping |
+| revoked | Optional | No | Needs mapping |
+| confidence | Optional | No | Needs mapping |
+| lang | Optional | No | Needs mapping |
+| external_references | Yes (req) | No | Needs mapping |
+| object_marking_refs | Optional | No | Needs mapping |
+| granular_markings | Optional | No | Needs mapping |
+| extensions | Optional | No | Needs mapping |
+| name | Yes (req) | No | Needs mapping |
+| x_mitre_attack_spec_version | Yes (req) | No | Needs mapping |
+| x_mitre_version | Yes (req) | No | Needs mapping |
+| x_mitre_old_attack_id | Optional | No | Needs mapping |
+| x_mitre_deprecated | Optional | No | Needs mapping |
+| description | Optional | No | Needs mapping |
+| x_mitre_domains | Yes (req) | No | Needs mapping |
+| x_mitre_contributors | Optional | No | Needs mapping |
+| x_mitre_modified_by_ref | Optional | No | Needs mapping |
+| aliases | Optional | No | Needs mapping |
+| first_seen | Optional | No | Needs mapping |
+| last_seen | Optional | No | Needs mapping |
+| goals | Optional | No | Needs mapping |
+| resource_level | Optional | No | Needs mapping |
+| primary_motivation | Optional | No | Needs mapping |
+| secondary_motivations | Optional | No | Needs mapping |
 
 **Legend:**
 
@@ -583,46 +623,46 @@ This section will be expanded with detailed analyses and mapping tables for each
 
 ATT&CK Software is modeled as both Malware and Tool STIX objects. The table below covers all properties for both types.
 
-| Property                      | External Schema | KGCS Ontology/ETL | Gap/Notes                                                                 |
-|-------------------------------|----------------|-------------------|--------------------------------------------------------------------------|
-| id                            | Yes (req)      | No                | Needs ontology extension and ETL mapping                                  |
-| type                          | Yes (req)      | No                | 'malware' or 'tool'; not present in KGCS                                  |
-| spec_version                  | Yes (req)      | No                | Needs mapping                                                            |
-| created                       | Yes (req)      | No                | Needs mapping                                                            |
-| modified                      | Yes (req)      | No                | Needs mapping                                                            |
-| created_by_ref                | Yes (req)      | No                | Needs mapping                                                            |
-| labels                        | Optional       | No                | Needs mapping                                                            |
-| revoked                       | Optional       | No                | Needs mapping                                                            |
-| confidence                    | Optional       | No                | Needs mapping                                                            |
-| lang                          | Optional       | No                | Needs mapping                                                            |
-| external_references           | Yes (req)      | No                | Needs mapping                                                            |
-| object_marking_refs           | Optional       | No                | Needs mapping                                                            |
-| granular_markings             | Optional       | No                | Needs mapping                                                            |
-| extensions                    | Optional       | No                | Needs mapping                                                            |
-| name                          | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_attack_spec_version   | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_version               | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_old_attack_id         | Optional       | No                | Needs mapping                                                            |
-| x_mitre_deprecated            | Optional       | No                | Needs mapping                                                            |
-| description                   | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_platforms             | Optional       | No                | Needs mapping                                                            |
-| x_mitre_contributors          | Optional       | No                | Needs mapping                                                            |
-| x_mitre_aliases               | Optional       | No                | Needs mapping                                                            |
-| x_mitre_modified_by_ref       | Yes (req)      | No                | Needs mapping                                                            |
-| x_mitre_domains               | Yes (req)      | No                | Needs mapping                                                            |
-| aliases                       | Optional       | No                | Needs mapping                                                            |
-| is_family                     | Malware only   | No                | Needs mapping                                                            |
-| malware_types                 | Malware only   | No                | Needs mapping                                                            |
-| kill_chain_phases             | Optional       | No                | Needs mapping                                                            |
-| first_seen                    | Optional       | No                | Needs mapping                                                            |
-| last_seen                     | Optional       | No                | Needs mapping                                                            |
-| architecture_execution_envs   | Malware only   | No                | Needs mapping                                                            |
-| implementation_languages      | Malware only   | No                | Needs mapping                                                            |
-| capabilities                  | Malware only   | No                | Needs mapping                                                            |
-| sample_refs                   | Malware only   | No                | Needs mapping                                                            |
-| operating_system_refs         | Malware only   | No                | Needs mapping                                                            |
-| tool_types                    | Tool only      | No                | Needs mapping                                                            |
-| tool_version                  | Tool only      | No                | Needs mapping                                                            |
+| Property | External Schema | KGCS Ontology/ETL | Gap/Notes |
+| --- | --- | --- | --- |
+| id | Yes (req) | No | Needs ontology extension and ETL mapping |
+| type | Yes (req) | No | 'malware' or 'tool'; not present in KGCS |
+| spec_version | Yes (req) | No | Needs mapping |
+| created | Yes (req) | No | Needs mapping |
+| modified | Yes (req) | No | Needs mapping |
+| created_by_ref | Yes (req) | No | Needs mapping |
+| labels | Optional | No | Needs mapping |
+| revoked | Optional | No | Needs mapping |
+| confidence | Optional | No | Needs mapping |
+| lang | Optional | No | Needs mapping |
+| external_references | Yes (req) | No | Needs mapping |
+| object_marking_refs | Optional | No | Needs mapping |
+| granular_markings | Optional | No | Needs mapping |
+| extensions | Optional | No | Needs mapping |
+| name | Yes (req) | No | Needs mapping |
+| x_mitre_attack_spec_version | Yes (req) | No | Needs mapping |
+| x_mitre_version | Yes (req) | No | Needs mapping |
+| x_mitre_old_attack_id | Optional | No | Needs mapping |
+| x_mitre_deprecated | Optional | No | Needs mapping |
+| description | Yes (req) | No | Needs mapping |
+| x_mitre_platforms | Optional | No | Needs mapping |
+| x_mitre_contributors | Optional | No | Needs mapping |
+| x_mitre_aliases | Optional | No | Needs mapping |
+| x_mitre_modified_by_ref | Yes (req) | No | Needs mapping |
+| x_mitre_domains | Yes (req) | No | Needs mapping |
+| aliases | Optional | No | Needs mapping |
+| is_family | Malware only | No | Needs mapping |
+| malware_types | Malware only | No | Needs mapping |
+| kill_chain_phases | Optional | No | Needs mapping |
+| first_seen | Optional | No | Needs mapping |
+| last_seen | Optional | No | Needs mapping |
+| architecture_execution_envs | Malware only | No | Needs mapping |
+| implementation_languages | Malware only | No | Needs mapping |
+| capabilities | Malware only | No | Needs mapping |
+| sample_refs | Malware only | No | Needs mapping |
+| operating_system_refs | Malware only | No | Needs mapping |
+| tool_types | Tool only | No | Needs mapping |
+| tool_version | Tool only | No | Needs mapping |
 
 **Legend:**
 
@@ -630,3 +670,28 @@ ATT&CK Software is modeled as both Malware and Tool STIX objects. The table belo
 - "Optional": Optional in external schema
 - "Yes": Present in KGCS ontology/ETL
 - "No": Not present in KGCS ontology/ETL
+
+## A.6 Relationship Types Schema Mapping (version 3.3.0)
+
+| Relationship Type | Source Type(s) | Target Type(s) | Custom Type? | External Schema | KGCS Ontology/ETL | Gap/Notes |
+| - | - | - | - | - | - | - |
+| uses | intrusion-set, malware, tool, campaign | attack-pattern, malware, tool | No | Yes | Partial | Only some uses relationships mapped; transitive logic not modeled |
+| mitigates | course-of-action | attack-pattern | No | Yes | No | Not mapped; needs ontology/ETL extension |
+| subtechnique-of | attack-pattern (subtechnique) | attack-pattern (parent) | Yes | Yes | Yes | Mapped as sec:subtechnique_of |
+| detects | x-mitre-data-component, x-mitre-detection-strategy | attack-pattern | Yes | Yes (deprecated) | No | Deprecated; not mapped in KGCS |
+| attributed-to | campaign | intrusion-set | No | Yes | No | Not mapped; needs ontology/ETL extension |
+| targets | attack-pattern | x-mitre-asset | Yes | Yes | No | Not mapped; asset not present in KGCS |
+| revoked-by | any type | any type | Yes | Yes | No | Not mapped; could be used for versioning/revocation |
+
+**Legend:**
+
+- "Yes": Present in external schema
+- "No": Not present in KGCS ontology/ETL
+- "Partial": Only some values or subfields mapped
+
+**Notes:**
+
+- Some relationships (e.g., uses) are only partially mapped in KGCS, and transitive relationships (e.g., group uses software uses technique) are not explicitly modeled.
+- The detects relationship is deprecated as of ATT&CK 3.3.0 and will be removed in 4.0.0.
+- Asset and detection-strategy objects are not present in KGCS ontology/ETL.
+- Custom types (e.g., subtechnique-of, detects, targets, revoked-by) require explicit ontology/ETL support if needed.
