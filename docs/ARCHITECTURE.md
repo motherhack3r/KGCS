@@ -4,8 +4,6 @@
 **Date:** January 29, 2026  
 **Status:** Phase 3 MVP (Neo4j loader and end-to-end pipeline operational)
 
----
-
 ## Project Vision
 
 KGCS (Cybersecurity Knowledge Graph) is a **frozen, standards-backed ontology** that unifies nine MITRE security taxonomies into a single source of truth for AI systems to reason about vulnerabilities, attacks, defenses, and threat intelligence without hallucination.
@@ -360,3 +358,19 @@ KGCS/
 - [CLEANUP-CHECKLIST.md](CLEANUP-CHECKLIST.md) — File-by-file decisions
 
 ---
+
+## ANNEX
+
+### AI Agent Architecture & Deployment
+
+The KGCS project includes a dedicated AI Agent Architecture for deploying a secure, production-grade Graph-RAG (Retrieval Augmented Generation) agent on Azure. This architecture leverages the validated knowledge graph, enforces strict security and networking controls, and uses the LLM as a reasoning and planning layer (not a knowledge store).
+
+**Purpose:**
+
+- Describes the rationale for Graph-RAG over fine-tuning or embedding-only search
+- Details the system and Azure production architecture (services, VNet, security, RBAC)
+- Specifies agent design, schema injection, and multi-hop reasoning patterns
+- Provides a Terraform deployment template for cloud infrastructure
+- Emphasizes observability, managed identity, and least-privilege access
+
+For full details, see: [AI Agent Architecture with KGCS](AI%20Agent%20Architecture%20with%20KGCS.md)
